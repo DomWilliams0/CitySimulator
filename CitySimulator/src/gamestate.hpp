@@ -7,11 +7,13 @@ class GameState : public State
 {
 public:
 	explicit GameState(Game *game_);
+	~GameState();
+
 
 	virtual void tick(float delta) override;
 	virtual void render(sf::RenderWindow &window) override;
 	virtual void handleInput(const sf::Event &event) override;
 
 private:
-	boost::shared_ptr<BaseWorld> world;
+	BaseWorld *world;
 };

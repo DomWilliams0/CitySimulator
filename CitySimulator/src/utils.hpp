@@ -31,4 +31,6 @@ namespace Utils
 	}
 
 	std::string searchForFile(const std::string &filename, const std::string &directory = "res");
+
+	sf::Image rotateImage(const sf::Image &image, int rotation);
 }

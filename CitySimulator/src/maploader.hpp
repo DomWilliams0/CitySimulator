@@ -3,9 +3,9 @@
 #include <SFML/System/Vector2.hpp>
 #include <bitset>
 #include <vector>
-#include <iostream>
-#include "logger.hpp"
 #include <boost/lexical_cast.hpp>
+
+enum BlockType;
 
 namespace TMX
 {
@@ -63,6 +63,10 @@ namespace TMX
 		{
 		}
 
+		virtual ~Tile()
+		{
+		}
+
 		explicit Tile(const std::string &id)
 		{
 			rotGid = gid = boost::lexical_cast<rot>(id);
@@ -81,30 +85,42 @@ namespace TMX
 			return rotation.any();
 		}
 
+		virtual inline bool isTile()
+		{
+			return true;
+		}
+
 		unsigned gid, rotGid;
 		std::bitset<3> rotation;
 	};
 
-	struct Object
+	struct Object : Tile
 	{
-		unsigned gid;
-		sf::Vector2i position;
+		Object()
+		{
+		}
 
-		int rotation;
-		std::bitset<3> flip;
+		explicit Object(const std::string &id)
+			: Tile(id)
+		{
+		}
+
+
+		inline bool isTile() override
+		{
+			return false;
+		}
+
+		sf::Vector2i position;
+		float rotationAngle;
 	};
 
-	template <class T>
 	struct Layer : PropertyOwner
 	{
 		std::string name;
-		T *items;
+		std::vector<Tile*> items;
 		bool visible;
 	};
-
-	typedef Layer<Tile> TileLayer;
-	typedef Layer<Object> ObjectGroup;
-
 
 	struct TileMap : PropertyOwner
 	{
@@ -112,14 +128,11 @@ namespace TMX
 		{
 			for (auto layer : layers)
 				delete layer;
-			for (auto object : objects)
-				delete object;
 		}
 
 
 		int width, height;
-		std::vector<TileLayer*> layers;
-		std::vector<ObjectGroup*> objects;
+		std::vector<Layer*> layers;
 
 		static TileMap* load(const std::string filename);
 	};

@@ -21,6 +21,7 @@ private:
 	State* Game::createFromStateType(State::StateType type);
 
 	sf::Color backgroundColor;
-	
+
 	void setWindowIcon();
+	void initFPSDisplay(sf::Text &fps);
 };

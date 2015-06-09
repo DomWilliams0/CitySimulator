@@ -8,6 +8,7 @@ namespace Constants
 
 	extern const int tilesetResolution;
 	extern const int tileSize;
+	extern const int tileScale;
 
 	extern sf::Font mainFont;
 }

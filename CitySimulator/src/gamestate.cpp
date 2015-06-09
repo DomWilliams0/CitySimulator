@@ -4,13 +4,18 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 
-boost::shared_ptr<BaseWorld> createMainWorld()
+BaseWorld* createMainWorld()
 {
 	return BaseWorld::loadWorld("small.tmx");
 }
 
 GameState::GameState(Game *game_) : State(game_, StateType::GAME), world(createMainWorld())
 {
+}
+
+GameState::~GameState()
+{
+	delete world;
 }
 
 void GameState::tick(float delta)

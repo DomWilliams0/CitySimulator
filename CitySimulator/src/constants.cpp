@@ -6,6 +6,7 @@ namespace Constants
 
 	const int tilesetResolution(16);
 	const int tileSize(32);
+	const int tileScale(tileSize / tilesetResolution);
 
 	sf::Font mainFont;
 }

@@ -12,6 +12,7 @@ Game::Game(const sf::Vector2i &windowSize, const sf::Uint32 &style) :
 {
 	// create window
 	window.setFramerateLimit(60);
+	window.setVerticalSyncEnabled(true);
 
 	// set icon
 	setWindowIcon();
@@ -31,6 +32,7 @@ Game::Game(const sf::Vector2i &windowSize, const sf::Uint32 &style) :
 
 Game::~Game()
 {
+	delete current;
 }
 
 void Game::start()
@@ -40,6 +42,9 @@ void Game::start()
 
 	sf::Clock clock;
 	sf::Event event;
+	
+	sf::Text fps;
+	initFPSDisplay(fps);
 
 	while (window.isOpen())
 	{
@@ -57,6 +62,10 @@ void Game::start()
 
 		window.clear();
 		current->render(window);
+		
+		fps.setString(std::to_string(static_cast<int>(1 / delta)));
+		window.draw(fps);
+
 		window.display();
 	}
 }
@@ -114,17 +123,18 @@ void Game::setWindowIcon()
 	window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 }
 
+void Game::initFPSDisplay(sf::Text &fps)
+{
+	fps.setFont(Constants::mainFont);
+	fps.setCharacterSize(20);
+	fps.setPosition(20, 20);
+	fps.setColor(sf::Color::Red);
+}
+
 void Game::end()
 {
 	window.close();
 	Logger::logDebug("Game ended through game.end()");
-}
-
-sf::Vector2i create()
-{
-	sf::Vector2i v = sf::Vector2i(2, 3);
-	v.x = 10;
-	return v;
 }
 
 int main()
@@ -133,9 +143,6 @@ int main()
 	{
 		Game g(Constants::windowSize, sf::Style::Default);
 		g.start();
-
-		//		Logger::createLogger(std::cout, Logger::DEBUG);
-		//		TMX::load("small.tmx");
 	}
 	catch (std::exception e)
 	{
