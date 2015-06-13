@@ -1,5 +1,4 @@
 #pragma once
-#include <boost/smart_ptr/shared_ptr.hpp>
 #include "state.hpp"
 #include "world.hpp"
 

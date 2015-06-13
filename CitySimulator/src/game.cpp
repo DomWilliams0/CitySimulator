@@ -5,7 +5,6 @@
 #include "logger.hpp"
 #include "state.hpp"
 #include "utils.hpp"
-#include "maploader.hpp"
 
 Game::Game(const sf::Vector2i &windowSize, const sf::Uint32 &style) :
 	window(sf::RenderWindow(sf::VideoMode(windowSize.x, windowSize.y), "Dank C++ Memes", style))

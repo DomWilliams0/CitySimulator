@@ -85,7 +85,7 @@ TMX::TileMap* TMX::TileMap::load(const std::string filename)
 		// object groups
 		else
 		{
-			int i(0);
+			i = 0;
 			for (auto o : pair.second)
 			{
 				if (o.first == "object")

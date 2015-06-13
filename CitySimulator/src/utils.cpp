@@ -1,7 +1,5 @@
 #include <boost/filesystem.hpp>
-
 #include "utils.hpp"
-#include <iostream>
 
 using namespace boost;
 
@@ -74,3 +72,4 @@ sf::Image Utils::rotateImage(const sf::Image &image, int rotation)
 	rotated.create(size.x, size.y, &pixels[0]);
 	return rotated;
 }
+

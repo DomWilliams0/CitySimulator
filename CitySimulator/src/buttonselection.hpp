@@ -1,8 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
-#include <string>
-#include "state.hpp"
 #include "game.hpp"
 #include "utils.hpp"
 
@@ -111,7 +109,7 @@ public:
 		{
 			sf::Vector2i mouse(game->getMousePosition());
 			bool selection(false);
-			for (BIndex i = 0; i < buttons.size(); i++)
+			for (BIndex i = 0; i < buttons.size(); ++i)
 			{
 				Button b(buttons[i]);
 				bool hover(b.rect.contains(mouse));

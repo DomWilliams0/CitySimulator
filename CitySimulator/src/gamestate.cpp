@@ -1,7 +1,5 @@
 #include "state.hpp"
 #include "gamestate.hpp"
-#include "logger.hpp"
-#include <boost/smart_ptr/shared_ptr.hpp>
 
 
 BaseWorld* createMainWorld()

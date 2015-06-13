@@ -37,33 +37,31 @@ Tileset::Tileset(const std::string &filename) : converted(false)
 	generatePoints();
 }
 
-void Tileset::textureQuad(sf::Vertex *quad, const BlockType &blockType, int fullGID)
+void Tileset::textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipFlags)
 {
-	int blockID;
+	int row = blockType % size.x;
+	int col = blockType / size.x;
 
-	// rotated
-	auto newBlockID = rotatedBlockTypes.find(fullGID);
-	if (newBlockID != rotatedBlockTypes.end())
-		blockID = newBlockID->second;
+	// rotating
+	int offset = 0;
+	if (rotationAngle == -90)
+		offset = 1;
+	else if (rotationAngle == 90)
+		offset = 3;
 
-	// normal
-	else
-		blockID = blockType;
+	// flipping TODO (shader?)
 
-	int row = blockID % size.x;
-	int col = blockID / size.x;
-
-	quad[0].texCoords = points[getIndex(row, col)];
-	quad[1].texCoords = points[getIndex(row + 1, col)];
-	quad[2].texCoords = points[getIndex(row + 1, col + 1)];
-	quad[3].texCoords = points[getIndex(row, col + 1)];
+	quad[(0 + offset) % 4].texCoords = points[getIndex(row, col)];
+	quad[(1 + offset) % 4].texCoords = points[getIndex(row + 1, col)];
+	quad[(2 + offset) % 4].texCoords = points[getIndex(row + 1, col + 1)];
+	quad[(3 + offset) % 4].texCoords = points[getIndex(row, col + 1)];
 }
 
-void Tileset::convertToTexture(std::vector<std::tuple<int, unsigned, std::shared_ptr<sf::Image>>> rotatedImages, int totalBlockTypeCount)
+void Tileset::convertToTexture()
 {
-	// resize image to fit all blocktypes
-	int rowsRequired = totalBlockTypeCount / size.x;
-	if (totalBlockTypeCount % size.x != 0)
+	// resize image
+	int rowsRequired = LAST / size.x;
+	if (LAST % size.x != 0)
 		rowsRequired += 1;
 
 	// transfer to new image
@@ -75,25 +73,6 @@ void Tileset::convertToTexture(std::vector<std::tuple<int, unsigned, std::shared
 	// update size
 	size.y = rowsRequired;
 	generatePoints();
-
-	// render extra blocktypes
-	for (auto tuple : rotatedImages)
-	{
-		int newID = std::get<0>(tuple);
-		int tileGID = std::get<1>(tuple);
-		std::shared_ptr<sf::Image> image = std::get<2>(tuple);
-
-		int tileX = newID % size.x;
-		int tileY = newID / size.x;
-
-		newImage.copy(*image, tileX * Constants::tilesetResolution, tileY * Constants::tilesetResolution);
-		image.reset();
-
-		// fullGID: new blockID
-		rotatedBlockTypes.insert(std::make_pair(tileGID, newID));
-	}
-
-	//	newImage.saveToFile("new_tileset.png");
 
 	// write to texture
 	if (!texture.loadFromImage(newImage))
@@ -154,12 +133,12 @@ int BaseWorld::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
 	return index;
 }
 
-void BaseWorld::setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer, int fullGID)
+void BaseWorld::setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer, int rotationAngle, int flipFlags)
 {
 	int index = getBlockIndex(pos, layer);
 
 	sf::Vertex *quad = &vertices[index];
-	tileset->textureQuad(quad, blockType, fullGID);
+	tileset->textureQuad(quad, blockType, rotationAngle, flipFlags);
 
 	quad[0].position = sf::Vector2f(pos.x, pos.y);
 	quad[1].position = sf::Vector2f(pos.x + 1, pos.y);
@@ -176,75 +155,6 @@ void BaseWorld::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	// tile drawing
 	states.texture = tileset->getTexture();
 	target.draw(vertices, states);
-
-	// objects
-	for (Object o : debugObjects)
-		target.draw(o);
-}
-
-std::pair<int, int> BaseWorld::getRotation(TMX::Tile *tile)
-{
-	int rotation(0);
-	int flip(0);
-
-	bool h = tile->rotation[0];
-	bool v = tile->rotation[1];
-	bool d = tile->rotation[2];
-
-	if (h)
-		flip |= TMX::Rotation::HORIZONTAL;
-	if (v)
-		flip |= TMX::Rotation::HORIZONTAL;
-	if (d)
-	{
-		if (h && v)
-		{
-			rotation = 90;
-			flip ^= TMX::Rotation::HORIZONTAL;
-		}
-
-		else if (h)
-		{
-			rotation = -90;
-			flip ^= TMX::Rotation::HORIZONTAL;
-		}
-
-		else if (v)
-		{
-			rotation = 90;
-			flip ^= TMX::Rotation::HORIZONTAL;
-		}
-
-		else
-		{
-			rotation = -90;
-			flip ^= TMX::Rotation::HORIZONTAL;
-		}
-	}
-
-	return std::make_pair(rotation, flip);
-}
-
-void BaseWorld::createRotatedImage(std::shared_ptr<sf::Image> image, TMX::Tile *tile, BlockType blockType)
-{
-	auto rotFlip = getRotation(tile);
-	int rotation = rotFlip.first;
-	int flip = rotFlip.second;
-
-	// create image from tile
-	tileset->createTileImage(image.get(), blockType);
-
-	// transform
-	if ((flip & TMX::Rotation::HORIZONTAL) != 0)
-		image->flipHorizontally();
-	if ((flip & TMX::Rotation::VERTICAL) != 0)
-		image->flipVertically();
-	if (rotation != 0)
-	{
-		sf::Image *rot = new sf::Image;
-		*rot = Utils::rotateImage(*image, rotation);
-		image.reset(rot);
-	}
 }
 
 void BaseWorld::discoverLayers(std::vector<TMX::Layer*> layers, LayerType *layerTypes)
@@ -280,14 +190,13 @@ void BaseWorld::discoverLayers(std::vector<TMX::Layer*> layers, LayerType *layer
 	}
 }
 
-void BaseWorld::discoverTiles(std::vector<TMX::Layer*> layers, LayerType *types, int &lastBlockType,
-                              std::vector<std::tuple<sf::Vector2i, LayerType, TMX::Tile*>> &tiles,
-                              std::vector<std::tuple<int, unsigned, std::shared_ptr<sf::Image>>> &rotatedImages)
+void BaseWorld::addTiles(std::vector<TMX::Layer*> layers, LayerType *types)
 {
-	int i(0);
+	sf::Vector2i pos;
+	int layerIndex(0);
 	for (TMX::Layer *layer : layers)
 	{
-		LayerType layerType = types[i++];
+		LayerType layerType = types[layerIndex++];
 
 		for (size_t x = 0; x < tileSize.x; ++x)
 		{
@@ -301,34 +210,23 @@ void BaseWorld::discoverTiles(std::vector<TMX::Layer*> layers, LayerType *types,
 				if (blockType == BLANK)
 					continue;
 
-				sf::Vector2i pos(x, y);
-
-				// objects don't need a new rotated texture as they're sprites
+				// objects are not stuck to the grid
 				if (layerType == OBJECTS)
 				{
 					TMX::Object *object = dynamic_cast<TMX::Object*>(tile);
 					pos = object->position;
+
+					// TODO: add to world
 				}
 
-				// rotated tiles
-				else if (tile->isRotated())
+				// tiles
+				else
 				{
-					auto rotTexture = rotations.find(tile->rotGid);
+					pos.x = x;
+					pos.y = y;
 
-					// not found: create
-					if (rotTexture == rotations.end())
-					{
-						std::shared_ptr<sf::Image> image(new sf::Image);
-						createRotatedImage(image, tile, blockType);
-
-						auto newBlockIDRotGidImage = std::make_tuple(lastBlockType++, tile->rotGid, image);
-						rotatedImages.push_back(newBlockIDRotGidImage);
-						rotations.insert(tile->rotGid);
-					}
+					setBlockType(pos, blockType, layerType, tile->getRotationAngle(), tile->getFlipFlags());
 				}
-
-				// add to list of tiles to add to world
-				tiles.push_back(std::make_tuple(pos, layerType, tile));
 			}
 		}
 	}
@@ -350,53 +248,15 @@ BaseWorld* BaseWorld::loadWorld(const std::string &filename)
 	LayerType types[LayerType::ERROR];
 	world->discoverLayers(layers, types);
 
-	// resize vertex array
+	// resize vertex array to accomodate for layer count
 	world->resizeVertexArray();
+	world->tileset->convertToTexture();
 
-	// discover extra (rotated) blocktypes and collect all tiles
-	int lastBlockType(LAST);
-	std::vector<std::tuple<sf::Vector2i, LayerType, TMX::Tile*>> tiles;
-	std::vector<std::tuple<int, unsigned, std::shared_ptr<sf::Image>>> rotatedImages;
-	world->discoverTiles(layers, types, lastBlockType, tiles, rotatedImages);
-
-	// update world and tileset to accomodate for new textures/blocktypes
-	world->tileset->convertToTexture(rotatedImages, lastBlockType);
-	world->blockTypes.resize(size.x * size.y * layers.size() * 4);
-
-	// add blocks and objects to world
-	for (auto posLayerTypeTile : tiles)
-	{
-		sf::Vector2i pos = std::get<0>(posLayerTypeTile);
-		LayerType layerType = std::get<1>(posLayerTypeTile);
-		TMX::Tile *tile = std::get<2>(posLayerTypeTile);
-		BlockType blockType = static_cast<BlockType>(tile->gid);
-
-		// tiles on the grid
-		if (tile->isTile())
-			world->setBlockType(pos, blockType, layerType, tile->rotGid);
-
-		// objects
-		else
-		{
-			TMX::Object *o = dynamic_cast<TMX::Object*>(tile);
-
-			Object object(world, blockType);
-			object.setRotation(o->rotationAngle);
-			world->addObject(object, static_cast<sf::Vector2f>(pos));
-		}
-	}
+	// add tiles to world
+	world->addTiles(layers, types);
 
 	delete tmx;
 	return world;
 }
 
-void BaseWorld::addObject(Object object, sf::Vector2f pos)
-{
-	pos.x *= Constants::tileScale;
 
-	pos.y -= object.getLocalBounds().height;
-	pos.y *= Constants::tileScale;
-
-	object.setPosition(pos);
-	debugObjects.push_back(object);
-}

@@ -69,20 +69,19 @@ namespace TMX
 
 		explicit Tile(const std::string &id)
 		{
-			rotGid = gid = boost::lexical_cast<rot>(id);
+			gid = boost::lexical_cast<rot>(id);
 			if (gid != 0)
 				gid -= 1;
+
+			std::bitset<3> rotation;
 
 			rotation.set(0, (gid & HORIZONTAL) != 0);
 			rotation.set(1, (gid & VERTICAL) != 0);
 			rotation.set(2, (gid & DIAGONAL) != 0);
 
 			gid &= ~(HORIZONTAL | VERTICAL | DIAGONAL);
-		}
 
-		inline bool isRotated()
-		{
-			return rotation.any();
+			processRotation(rotation);
 		}
 
 		virtual inline bool isTile()
@@ -90,8 +89,65 @@ namespace TMX
 			return true;
 		}
 
-		unsigned gid, rotGid;
-		std::bitset<3> rotation;
+		inline int getRotationAngle()
+		{
+			return rotationAngle;
+		}
+
+		inline int getFlipFlags()
+		{
+			return flipFlags;
+		}
+
+		unsigned gid;
+
+	private:
+		
+		void processRotation(std::bitset<3> rotation)
+		{
+			rotationAngle = 0;
+			flipFlags = 0;
+
+			bool h = rotation[0];
+			bool v = rotation[1];
+			bool d = rotation[2];
+
+			if (h)
+				flipFlags |= HORIZONTAL;
+			if (v)
+				flipFlags |= HORIZONTAL;
+			if (d)
+			{
+				if (h && v)
+				{
+					rotationAngle = 90;
+					flipFlags ^= HORIZONTAL;
+				}
+
+				else if (h)
+				{
+					rotationAngle = -90;
+					flipFlags ^= HORIZONTAL;
+				}
+
+				else if (v)
+				{
+					rotationAngle = 90;
+					flipFlags ^= HORIZONTAL;
+				}
+
+				else
+				{
+					rotationAngle = -90;
+					flipFlags ^= HORIZONTAL;
+				}
+			}
+
+			rotationAngle = rotationAngle;
+			flipFlags = flipFlags;
+		}
+		
+		int rotationAngle, flipFlags;
 	};
 
 	struct Object : Tile
