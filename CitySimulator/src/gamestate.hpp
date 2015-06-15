@@ -5,7 +5,7 @@
 class GameState : public State
 {
 public:
-	explicit GameState(Game *game_);
+	explicit GameState(BaseGame *game_);
 	~GameState();
 
 
@@ -15,4 +15,6 @@ public:
 
 private:
 	BaseWorld *world;
+	sf::View view;
+
 };

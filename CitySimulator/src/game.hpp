@@ -1,7 +1,34 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <stack>
+#include "utils.hpp"
 #include "state.hpp"
+#include "constants.hpp"
+
+class FPSCounter
+{
+public:
+
+	inline void init(float waitTime)
+	{
+		ticker.init(waitTime);
+
+		fpsText.setFont(Constants::mainFont);
+		fpsText.setCharacterSize(20);
+		fpsText.setPosition(20, 20);
+		fpsText.setColor(sf::Color::Red);
+	}
+
+	void tick(float delta, sf::RenderWindow &window);
+
+private:
+
+	std::vector<float> backlog;
+
+	sf::Text fpsText;
+	Utils::TimeTicker ticker;
+};
+
 
 class BaseGame
 {
@@ -11,12 +38,17 @@ public:
 	virtual ~BaseGame()
 	{
 	}
+
 	void beginGame();
+	
+	inline void setView(const sf::View &view)
+	{
+		window.setView(view);
+	}
 
 protected:
 	sf::RenderWindow window;
-	sf::Color backgroundColor;
-	
+
 	bool showFPS;
 
 	virtual void start() = 0;
@@ -27,11 +59,17 @@ protected:
 
 	void limitFrameRate(bool limit);
 
+	inline void setBackgroundColour(const sf::Uint8 &r, const sf::Uint8 &g, const sf::Uint8 &b, const sf::Uint8 &a = 255)
+	{
+		backgroundColour = sf::Color(r, g, b, a);
+	}
+
 
 private:
 	void setWindowIcon(const std::string &fileName);
-	void initFPSDisplay(sf::Text &fps);
-	sf::Text fps;
+
+	sf::Color backgroundColour;
+	FPSCounter fps;
 };
 
 class Game : public BaseGame

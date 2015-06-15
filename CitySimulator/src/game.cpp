@@ -1,10 +1,33 @@
 #include <SFML/Window.hpp>
 #include "game.hpp"
-#include "gamestate.hpp"
-#include "constants.hpp"
 #include "logger.hpp"
-#include "state.hpp"
-#include "utils.hpp"
+#include "gamestate.hpp"
+#include <numeric>
+
+void FPSCounter::tick(float delta, sf::RenderWindow &window)
+{
+	backlog.push_back(delta);
+
+	if (ticker.tick(delta))
+	{
+		int fps(0);
+
+		float total = accumulate(backlog.begin(), backlog.end(), 0.0);
+		if (total != 0)
+		{
+			float average = total / backlog.size();
+			if (average != 0)
+				fps = 1 / average;
+		}
+
+		fpsText.setString(std::to_string(fps) + " FPS");
+
+		backlog.clear();
+	}
+
+	window.draw(fpsText);
+}
+
 
 BaseGame::BaseGame(const sf::Vector2i &windowSize, const sf::Uint32 &style, const std::string &title) :
 	window(sf::RenderWindow(sf::VideoMode(windowSize.x, windowSize.y), title, style))
@@ -24,15 +47,15 @@ BaseGame::BaseGame(const sf::Vector2i &windowSize, const sf::Uint32 &style, cons
 		exit(-1);
 	}
 
-	// load fps counter
-	initFPSDisplay(fps);
 
-	Logger::logDebug("Game started");
+	Logger::logDebug(title + " started");
 }
 
 void BaseGame::beginGame()
 {
 	start();
+
+	fps.init(0.25);
 
 	sf::Clock clock;
 	sf::Event e;
@@ -50,14 +73,11 @@ void BaseGame::beginGame()
 		float delta(clock.restart().asSeconds());
 		tick(delta);
 
-		window.clear();
+		window.clear(backgroundColour);
 		render();
 
 		if (showFPS)
-		{
-			fps.setString(std::to_string(static_cast<int>(1 / delta)));
-			window.draw(fps);
-		}
+			fps.tick(delta, window);
 
 		window.display();
 	}
@@ -83,15 +103,8 @@ void BaseGame::setWindowIcon(const std::string &fileName)
 	window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 }
 
-void BaseGame::initFPSDisplay(sf::Text &fps)
-{
-	fps.setFont(Constants::mainFont);
-	fps.setCharacterSize(20);
-	fps.setPosition(20, 20);
-	fps.setColor(sf::Color::Red);
-}
 
-Game::Game(const sf::Vector2i &windowSize, const sf::Uint32 &style) : BaseGame(windowSize, style, "Dank C++ Memes")
+Game::Game(const sf::Vector2i &windowSize, const sf::Uint32 &style) : BaseGame(windowSize, style, "Dank Game Memes")
 {
 	showFPS = true;
 	limitFrameRate(false);
@@ -166,8 +179,9 @@ State* Game::createFromStateType(State::StateType type)
 void Game::end()
 {
 	window.close();
-	Logger::logDebug("Game ended through game.end()");
+	Logger::logDebug("Shutdown cleanly");
 }
+
 
 int main()
 {
@@ -176,7 +190,10 @@ int main()
 		const sf::Vector2i windowSize = Constants::windowSize;
 		const auto style = sf::Style::Default;
 
-		Game *game = new Game(windowSize, style);
+		BaseGame *game;
+		// game = new ShaderGame(windowSize, style);
+		// game = new RotationGame(windowSize, style);
+		game = new Game(windowSize, style);
 		dynamic_cast<BaseGame*>(game)->beginGame();
 	}
 	catch (std::exception e)

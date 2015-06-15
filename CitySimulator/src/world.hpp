@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include "maploader.hpp"
+#include "utils.hpp"
 
 class Object;
 class BaseWorld;
@@ -43,17 +44,22 @@ enum LayerType
 	OVERTERRAIN,
 	OBJECTS,
 	COLLISIONS,
-	ERROR
+	LT_ERROR
 };
 
 LayerType layerTypeFromString(const std::string &s);
+
+inline bool isTileLayer(LayerType &layerType)
+{
+	return layerType == UNDERTERRAIN || layerType == TERRAIN || layerType == OVERTERRAIN;
+}
 
 class Tileset
 {
 public:
 	explicit Tileset(const std::string &filename);
 
-	void textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipFlags);
+	void textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipGID);
 
 	inline sf::Texture* getTexture()
 	{
@@ -75,7 +81,7 @@ public:
 		return size;
 	}
 
-	void convertToTexture();
+	void convertToTexture(const std::vector<int> &flippedGIDs);
 	sf::IntRect getTileRect(unsigned blockType);
 	void createTileImage(sf::Image *image, unsigned blockType);
 protected:
@@ -85,15 +91,21 @@ private:
 	sf::Image *image;
 	sf::Texture texture;
 	sf::Vector2f *points;
+	sf::Vector2u size;
+
+	std::unordered_map<int, int> flippedBlockTypes;
 	bool converted;
 
-	sf::Vector2u size;
+	inline void addPoint(int x, int y)
+	{
+		points[getIndex(x, y)] = sf::Vector2f(x * Constants::tilesetResolution, y * Constants::tilesetResolution);
+	}
 
 	void generatePoints();
 
 	inline int getIndex(int x, int y) const
 	{
-		return x + ((size.x + 1) * y);
+		return x + (size.x + 1) * y;
 	}
 };
 
@@ -102,7 +114,8 @@ class BaseWorld : public sf::Drawable
 public:
 	explicit BaseWorld(const sf::Vector2i &size);
 	~BaseWorld();
-	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = TERRAIN, int rotationAngle = 0, int flipFlags = 0);
+	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = TERRAIN, int rotationAngle = 0, int flipGID = 0);
+	void addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer = OBJECTS, int rotationAngle = 0, int flipGID = 0);
 
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 	static BaseWorld* loadWorld(const std::string &filename);
@@ -124,8 +137,12 @@ private:
 	std::vector<BlockType> blockTypes;
 
 	void discoverLayers(std::vector<TMX::Layer*> layers, LayerType *layerTypes);
+	void discoverFlippedTiles(const std::vector<TMX::Layer*> &layers, std::vector<int> &flippedGIDs);
 	void addTiles(std::vector<TMX::Layer*> layers, LayerType *types);
 	int BaseWorld::getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
+
+	void rotate(sf::Vertex *quad, float degrees, const sf::Vector2i &pos);
+	void BaseWorld::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
 
 protected:
 	std::unordered_map<LayerType, int> layerDepths;

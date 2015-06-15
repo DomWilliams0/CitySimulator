@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-class Game;
+class BaseGame;
 
 class State
 {
@@ -20,7 +20,7 @@ public:
 		GAMEOVER
 	};
 
-	State(Game *game_, StateType screenType, bool mouse = true) : game(game_), type(screenType), showMouse(mouse)
+	State(BaseGame *game_, StateType screenType, bool mouse = true) : game(game_), type(screenType), showMouse(mouse)
 	{
 	}
 
@@ -32,5 +32,5 @@ public:
 	bool showMouse;
 
 protected:
-	Game *game;
+	BaseGame *game;
 };

@@ -5,6 +5,7 @@
 #include "world.hpp"
 #include "utils.hpp"
 #include "logger.hpp"
+#include <unordered_set>
 
 LayerType layerTypeFromString(const std::string &s)
 {
@@ -20,7 +21,7 @@ LayerType layerTypeFromString(const std::string &s)
 		return COLLISIONS;
 
 	Logger::logWarning("Unknown LayerType: " + s);
-	return ERROR;
+	return LT_ERROR;
 }
 
 Tileset::Tileset(const std::string &filename) : converted(false)
@@ -37,10 +38,22 @@ Tileset::Tileset(const std::string &filename) : converted(false)
 	generatePoints();
 }
 
-void Tileset::textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipFlags)
+void Tileset::textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipGID)
 {
-	int row = blockType % size.x;
-	int col = blockType / size.x;
+	int blockID;
+	auto flipResult = flippedBlockTypes.find(flipGID);
+
+	// not flipped
+	if (flipGID == 0 || flipResult == flippedBlockTypes.end())
+		blockID = blockType;
+
+	// flipped
+	else
+		blockID = flipResult->second;
+
+
+	int row = blockID % size.x;
+	int col = blockID / size.x;
 
 	// rotating
 	int offset = 0;
@@ -49,42 +62,73 @@ void Tileset::textureQuad(sf::Vertex *quad, const BlockType &blockType, int rota
 	else if (rotationAngle == 90)
 		offset = 3;
 
-	// flipping TODO (shader?)
-
 	quad[(0 + offset) % 4].texCoords = points[getIndex(row, col)];
 	quad[(1 + offset) % 4].texCoords = points[getIndex(row + 1, col)];
 	quad[(2 + offset) % 4].texCoords = points[getIndex(row + 1, col + 1)];
 	quad[(3 + offset) % 4].texCoords = points[getIndex(row, col + 1)];
 }
 
-void Tileset::convertToTexture()
+void Tileset::convertToTexture(const std::vector<int> &flippedGIDs)
 {
 	// resize image
-	int rowsRequired = LAST / size.x;
-	if (LAST % size.x != 0)
+	int totalBlockTypes = LAST + flippedGIDs.size();
+	int rowsRequired = totalBlockTypes / size.x;
+
+	if (totalBlockTypes % size.x != 0)
 		rowsRequired += 1;
 
 	// transfer to new image
 	sf::Image newImage;
 	newImage.create(size.x * Constants::tilesetResolution, rowsRequired * Constants::tilesetResolution);
 	newImage.copy(*image, 0, 0);
-	delete image;
 
 	// update size
 	size.y = rowsRequired;
 	generatePoints();
+
+	// render flipped blocktypes
+	int currentBlockType(LAST);
+	for (int flippedGID : flippedGIDs)
+	{
+		std::bitset<3> flips;
+		int blockType(TMX::stripFlip(flippedGID, flips));
+
+		// create image
+		sf::Image flippedImage;
+		flippedImage.create(16, 16);
+		createTileImage(&flippedImage, blockType);
+
+		// flip
+		if (flips[0])
+			flippedImage.flipHorizontally();
+		if (flips[1])
+			flippedImage.flipVertically();
+
+		// copy to tileset
+		sf::IntRect rect = getTileRect(currentBlockType);
+		newImage.copy(flippedImage, rect.left, rect.top);
+
+		// remember this new blocktype
+		flippedBlockTypes.insert(std::make_pair(flippedGID, currentBlockType));
+
+		++currentBlockType;
+	}
+
+	// debug
+	newImage.saveToFile("new_tileset.png");
 
 	// write to texture
 	if (!texture.loadFromImage(newImage))
 		throw std::exception("Could not render tileset");
 
 	converted = true;
+	delete image;
 }
 
 sf::IntRect Tileset::getTileRect(unsigned blockType)
 {
-	int tileX = (blockType % size.x);
-	int tileY = (blockType / size.x);
+	int tileX = blockType % size.x;
+	int tileY = blockType / size.x;
 	return sf::IntRect(tileX * Constants::tilesetResolution,
 	                   tileY * Constants::tilesetResolution,
 	                   Constants::tilesetResolution,
@@ -105,7 +149,7 @@ void Tileset::generatePoints()
 	points = new sf::Vector2f[(size.x + 1) * (size.y + 1)];
 	for (size_t x = 0; x <= size.x; x++)
 		for (size_t y = 0; y <= size.y; y++)
-			points[getIndex(x, y)] = sf::Vector2f(x * Constants::tilesetResolution, y * Constants::tilesetResolution);
+			addPoint(x, y);
 }
 
 BaseWorld::BaseWorld(const sf::Vector2i &size) : tileSize(size), pixelSize(Utils::toPixel(tileSize)),
@@ -133,19 +177,58 @@ int BaseWorld::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
 	return index;
 }
 
-void BaseWorld::setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer, int rotationAngle, int flipFlags)
+
+void BaseWorld::rotate(sf::Vertex *quad, float degrees, const sf::Vector2i &pos)
+{
+	sf::Vector2f centre(pos.x + Constants::tileSize / 2, pos.y + Constants::tileSize / 2);
+	float radians = degrees * Constants::degToRad;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		sf::Vector2f prev = quad[i].position;
+		prev.x -= centre.x;
+		prev.y -= centre.y;
+
+		sf::Vector2f newVertex(prev.x * cos(radians) - prev.y * sin(radians),
+		                       prev.x * sin(radians) + prev.y * cos(radians));
+
+		newVertex.x += centre.x;
+		newVertex.y += centre.y;
+
+		quad[i].position = newVertex;
+	}
+}
+
+void BaseWorld::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta)
+{
+	quad[0].position = sf::Vector2f(pos.x, pos.y);
+	quad[1].position = sf::Vector2f(pos.x + delta, pos.y);
+	quad[2].position = sf::Vector2f(pos.x + delta, pos.y + delta);
+	quad[3].position = sf::Vector2f(pos.x, pos.y + delta);
+}
+
+void BaseWorld::setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer, int rotationAngle, int flipGID)
 {
 	int index = getBlockIndex(pos, layer);
-
 	sf::Vertex *quad = &vertices[index];
-	tileset->textureQuad(quad, blockType, rotationAngle, flipFlags);
 
-	quad[0].position = sf::Vector2f(pos.x, pos.y);
-	quad[1].position = sf::Vector2f(pos.x + 1, pos.y);
-	quad[2].position = sf::Vector2f(pos.x + 1, pos.y + 1);
-	quad[3].position = sf::Vector2f(pos.x, pos.y + 1);
+	positionVertices(quad, static_cast<sf::Vector2f>(pos), 1);
+	tileset->textureQuad(quad, blockType, rotationAngle, flipGID);
 
 	blockTypes[index] = blockType;
+}
+
+void BaseWorld::addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer, int rotationAngle, int flipGID)
+{
+	// TODO: simply append object vertices to world vertices; remember order of objects so vertices can be referenced in the future
+
+	std::vector<sf::Vertex> quad(4);
+
+	positionVertices(&quad[0], pos, 1);
+	tileset->textureQuad(&quad[0], blockType, rotationAngle, flipGID);
+
+	for (int i = 0; i < 4; ++i)
+		vertices.append(quad[i]);
 }
 
 void BaseWorld::draw(sf::RenderTarget &target, sf::RenderStates states) const
@@ -167,7 +250,7 @@ void BaseWorld::discoverLayers(std::vector<TMX::Layer*> layers, LayerType *layer
 
 		// invalid layer type
 		LayerType layerType = layerTypeFromString(layer->name);
-		if (layerType == ERROR)
+		if (layerType == LT_ERROR)
 		{
 			Logger::logError("Invalid layer name: " + layer->name);
 			layerIt = layers.erase(layerIt);
@@ -187,6 +270,33 @@ void BaseWorld::discoverLayers(std::vector<TMX::Layer*> layers, LayerType *layer
 
 		++depth;
 		++layerIt;
+	}
+}
+
+void BaseWorld::discoverFlippedTiles(const std::vector<TMX::Layer*> &layers, std::vector<int> &flippedGIDs)
+{
+	std::unordered_set<int> flipped;
+
+	for (TMX::Layer *layer : layers)
+	{
+		for (TMX::Tile *tile : layer->items)
+		{
+			// doesn't exist or isn't flipped
+			if (tile == nullptr || !tile->isFlipped())
+				continue;
+
+			if (tile->gid == BLANK)
+				continue;
+
+			int flipGID = tile->getFlipGID();
+
+			// already done
+			if (flipped.find(flipGID) != flipped.end())
+				continue;
+
+			flippedGIDs.push_back(flipGID);
+			flipped.insert(flipGID);
+		}
 	}
 }
 
@@ -214,9 +324,7 @@ void BaseWorld::addTiles(std::vector<TMX::Layer*> layers, LayerType *types)
 				if (layerType == OBJECTS)
 				{
 					TMX::Object *object = dynamic_cast<TMX::Object*>(tile);
-					pos = object->position;
-
-					// TODO: add to world
+					addObject(object->position, blockType, layerType, tile->getRotationAngle(), tile->getFlipGID());
 				}
 
 				// tiles
@@ -225,7 +333,7 @@ void BaseWorld::addTiles(std::vector<TMX::Layer*> layers, LayerType *types)
 					pos.x = x;
 					pos.y = y;
 
-					setBlockType(pos, blockType, layerType, tile->getRotationAngle(), tile->getFlipFlags());
+					setBlockType(pos, blockType, layerType, tile->getRotationAngle(), tile->getFlipGID());
 				}
 			}
 		}
@@ -245,12 +353,16 @@ BaseWorld* BaseWorld::loadWorld(const std::string &filename)
 
 	// find layer depths
 	auto layers = tmx->layers;
-	LayerType types[LayerType::ERROR];
+	LayerType types[LayerType::LT_ERROR];
 	world->discoverLayers(layers, types);
 
 	// resize vertex array to accomodate for layer count
 	world->resizeVertexArray();
-	world->tileset->convertToTexture();
+
+	// update tileset with flipped textures
+	std::vector<int> flippedGIDs;
+	world->discoverFlippedTiles(layers, flippedGIDs);
+	world->tileset->convertToTexture(flippedGIDs);
 
 	// add tiles to world
 	world->addTiles(layers, types);
@@ -258,5 +370,3 @@ BaseWorld* BaseWorld::loadWorld(const std::string &filename)
 	delete tmx;
 	return world;
 }
-
-

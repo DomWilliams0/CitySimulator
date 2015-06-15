@@ -48,7 +48,7 @@ public:
 	typedef typename std::vector<Button>::size_type BIndex;
 
 	template <class T>
-	ButtonSelection(Game *game_, T *instance_, sf::Vector2f centreOffset, void (T::*clickCallback)(const std::string &), std::vector<std::string> &buttonsText)
+	ButtonSelection(BaseGame *game_, T *instance_, sf::Vector2f centreOffset, void (T::*clickCallback)(const std::string &), std::vector<std::string> &buttonsText)
 		: game(game_), instance(instance_), callback(clickCallback)
 	{
 		auto windowSize(game_->getWindowSize());
@@ -154,7 +154,7 @@ public:
 	}
 
 private:
-	Game *game;
+	BaseGame *game;
 	std::vector<Button> buttons;
 	BIndex selection;
 	void (T::*callback)(const std::string &);

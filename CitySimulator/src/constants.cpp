@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include "constants.hpp"
 
 namespace Constants
@@ -7,6 +8,9 @@ namespace Constants
 	const int tilesetResolution(16);
 	const int tileSize(32);
 	const int tileScale(tileSize / tilesetResolution);
+	const int realTileSize(tileSize * tileScale);
 
 	sf::Font mainFont;
+
+	const float degToRad = M_PI / 180;
 }

@@ -13,7 +13,7 @@ namespace TMX
 	{
 		TYPE,
 		VISIBLE,
-		ERROR
+		PT_ERROR
 	};
 
 	PropertyType propertyTypeFromString(const std::string &s);
@@ -57,10 +57,13 @@ namespace TMX
 		DIAGONAL = rot(1 << 29)
 	};
 
+	int stripFlip(const int &gid, std::bitset<3> &flips);
+
 	struct Tile
 	{
 		Tile()
 		{
+			gid = 0;
 		}
 
 		virtual ~Tile()
@@ -73,15 +76,12 @@ namespace TMX
 			if (gid != 0)
 				gid -= 1;
 
-			std::bitset<3> rotation;
+			std::bitset<3> flips;
+			gid = stripFlip(gid, flips);
 
-			rotation.set(0, (gid & HORIZONTAL) != 0);
-			rotation.set(1, (gid & VERTICAL) != 0);
-			rotation.set(2, (gid & DIAGONAL) != 0);
+			flipped = flips.any();
 
-			gid &= ~(HORIZONTAL | VERTICAL | DIAGONAL);
-
-			processRotation(rotation);
+			processRotation(flips);
 		}
 
 		virtual inline bool isTile()
@@ -89,65 +89,73 @@ namespace TMX
 			return true;
 		}
 
+
+		inline bool isFlipped()
+		{
+			return flipped;
+		}
+
+
+		/// <returns>Either -90, 0 or 90</returns>
 		inline int getRotationAngle()
 		{
 			return rotationAngle;
 		}
 
-		inline int getFlipFlags()
+
+		/// <returns>Block ID | horizontal or vertical flip flags</returns>
+		inline int getFlipGID()
 		{
-			return flipFlags;
+			return flipGID;
 		}
 
 		unsigned gid;
+		bool flipped;
 
 	private:
-		
+
 		void processRotation(std::bitset<3> rotation)
 		{
 			rotationAngle = 0;
-			flipFlags = 0;
+			flipGID = gid;
 
 			bool h = rotation[0];
 			bool v = rotation[1];
 			bool d = rotation[2];
 
 			if (h)
-				flipFlags |= HORIZONTAL;
+				flipGID |= HORIZONTAL;
 			if (v)
-				flipFlags |= HORIZONTAL;
+				flipGID |= VERTICAL;
 			if (d)
 			{
 				if (h && v)
 				{
 					rotationAngle = 90;
-					flipFlags ^= HORIZONTAL;
+					flipGID ^= VERTICAL;
 				}
 
 				else if (h)
 				{
 					rotationAngle = -90;
-					flipFlags ^= HORIZONTAL;
+					flipGID ^= VERTICAL;
 				}
 
 				else if (v)
 				{
 					rotationAngle = 90;
-					flipFlags ^= HORIZONTAL;
+					flipGID ^= HORIZONTAL;
 				}
 
 				else
 				{
 					rotationAngle = -90;
-					flipFlags ^= HORIZONTAL;
+					flipGID ^= HORIZONTAL;
 				}
 			}
-
-			rotationAngle = rotationAngle;
-			flipFlags = flipFlags;
 		}
-		
-		int rotationAngle, flipFlags;
+
+		int rotationAngle, flipGID;
 	};
 
 	struct Object : Tile
@@ -167,7 +175,7 @@ namespace TMX
 			return false;
 		}
 
-		sf::Vector2i position;
+		sf::Vector2f position;
 		float rotationAngle;
 	};
 
@@ -182,7 +190,7 @@ namespace TMX
 	{
 		~TileMap()
 		{
-			for (auto layer : layers)
+			for (auto &layer : layers)
 				delete layer;
 		}
 

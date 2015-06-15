@@ -1,3 +1,4 @@
+#include "game.hpp"
 #include "state.hpp"
 #include "gamestate.hpp"
 
@@ -7,8 +8,11 @@ BaseWorld* createMainWorld()
 	return BaseWorld::loadWorld("small.tmx");
 }
 
-GameState::GameState(Game *game_) : State(game_, StateType::GAME), world(createMainWorld())
+GameState::GameState(BaseGame *game_) : State(game_, StateType::GAME), world(createMainWorld())
 {
+	// camera view
+//	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
+//	game->setView(view);
 }
 
 GameState::~GameState()
@@ -18,6 +22,7 @@ GameState::~GameState()
 
 void GameState::tick(float delta)
 {
+
 }
 
 void GameState::render(sf::RenderWindow &window)

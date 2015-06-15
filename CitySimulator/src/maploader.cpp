@@ -12,7 +12,7 @@ TMX::PropertyType propertyTypeFromString(const std::string &s)
 		return TMX::VISIBLE;
 
 	Logger::logWarning("Unknown PropertyType: " + s);
-	return TMX::ERROR;
+	return TMX::PT_ERROR;
 }
 
 void addProperties(TMX::TileMap *tile_map, boost::property_tree::ptree tree)
@@ -22,7 +22,7 @@ void addProperties(TMX::TileMap *tile_map, boost::property_tree::ptree tree)
 	{
 		auto properties = tree.get_child("properties");
 
-		for (auto propertyPair : properties)
+		for (auto &propertyPair : properties)
 		{
 			auto name = propertyPair.second.get<std::string>("<xmlattr>.name");
 			auto value = propertyPair.second.get<std::string>("<xmlattr>.value");
@@ -41,6 +41,20 @@ void addProperties(TMX::TileMap *tile_map, boost::property_tree::ptree tree)
 }
 
 
+/// <summary>
+/// Strips flip flags from gid, and returns the blocktype
+/// </summary>
+/// <param name="flips">[0] = horizontal, [1] = vertical, [2] = diagonal</param>
+/// <returns>Real blocktype</returns>
+int TMX::stripFlip(const int &gid, std::bitset<3> &flips)
+{
+	flips.set(0, (gid & HORIZONTAL) != 0);
+	flips.set(1, (gid & VERTICAL) != 0);
+	flips.set(2, (gid & DIAGONAL) != 0);
+
+	return gid & ~(HORIZONTAL | VERTICAL | DIAGONAL);
+}
+
 TMX::TileMap* TMX::TileMap::load(const std::string filename)
 {
 	boost::property_tree::ptree tree;
@@ -54,7 +68,7 @@ TMX::TileMap* TMX::TileMap::load(const std::string filename)
 	auto treeRoot = tree.get_child("map");
 	addProperties(map, treeRoot);
 
-	for (auto pair : treeRoot)
+	for (auto &pair : treeRoot)
 	{
 		if (pair.first != "layer" && pair.first != "objectgroup")
 			continue;
@@ -86,7 +100,7 @@ TMX::TileMap* TMX::TileMap::load(const std::string filename)
 		else
 		{
 			i = 0;
-			for (auto o : pair.second)
+			for (auto &o : pair.second)
 			{
 				if (o.first == "object")
 				{

@@ -14,12 +14,12 @@ public:
 	{
 	}
 
-	TextBlock(Game *game, const std::string &message, int startY)
+	TextBlock(BaseGame *game, const std::string &message, int startY)
 	{
 		setText(game, message, startY);
 	}
 
-	void setText(Game *game, const std::string &message, int startY, int charSize = 50)
+	void setText(BaseGame *game, const std::string &message, int startY, int charSize = 50)
 	{
 		std::stringstream stream(message);
 		std::string s;
@@ -29,7 +29,7 @@ public:
 			if (!s.empty())
 			{
 				sf::Text t(s, Constants::mainFont, charSize);
-				Utils::centre(t, game, startY);
+				centre(t, startY);
 				text.push_back(t);
 				lastHeight = t.getLocalBounds().height * 1.5;
 			}
@@ -47,4 +47,9 @@ public:
 
 private:
 	std::vector<sf::Text> text;
+
+	inline void centre(sf::Text &text, int y = -1)
+	{
+		text.setPosition(Constants::windowSize.x / 2 - text.getLocalBounds().width / 2, y < 0 ? text.getPosition().y : y);
+	}
 };
