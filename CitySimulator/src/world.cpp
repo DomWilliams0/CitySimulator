@@ -32,8 +32,8 @@ Tileset::Tileset(const std::string &filename) : converted(false)
 		throw std::runtime_error("Could not load tileset");
 
 	size = image->getSize();
-	size.x /= Constants::tilesetResolution;
-	size.y /= Constants::tilesetResolution;
+	size.x /= Constants::tileSize;
+	size.y /= Constants::tileSize;
 
 	generatePoints();
 }
@@ -79,7 +79,7 @@ void Tileset::convertToTexture(const std::vector<int> &flippedGIDs)
 
 	// transfer to new image
 	sf::Image newImage;
-	newImage.create(size.x * Constants::tilesetResolution, rowsRequired * Constants::tilesetResolution);
+	newImage.create(size.x * Constants::tileSize, rowsRequired * Constants::tileSize);
 	newImage.copy(*image, 0, 0);
 
 	// update size
@@ -129,10 +129,10 @@ sf::IntRect Tileset::getTileRect(unsigned blockType)
 {
 	int tileX = blockType % size.x;
 	int tileY = blockType / size.x;
-	return sf::IntRect(tileX * Constants::tilesetResolution,
-	                   tileY * Constants::tilesetResolution,
-	                   Constants::tilesetResolution,
-	                   Constants::tilesetResolution);
+	return sf::IntRect(tileX * Constants::tileSize,
+	                   tileY * Constants::tileSize,
+	                   Constants::tileSize,
+	                   Constants::tileSize);
 }
 
 void Tileset::createTileImage(sf::Image *image, unsigned blockType)
@@ -140,7 +140,7 @@ void Tileset::createTileImage(sf::Image *image, unsigned blockType)
 	if (converted)
 		throw std::exception("Tileset has already been converted to a texture");
 
-	image->create(Constants::tilesetResolution, Constants::tilesetResolution);
+	image->create(Constants::tileSize, Constants::tileSize);
 	image->copy(*this->image, 0, 0, getTileRect(blockType));
 }
 
@@ -156,7 +156,7 @@ BaseWorld::BaseWorld(const sf::Vector2i &size) : tileSize(size), pixelSize(Utils
                                                  tileset(new Tileset("tileset.png"))
 {
 	vertices.setPrimitiveType(sf::Quads);
-	transform.scale(Constants::tileSize, Constants::tileSize);
+	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
 
 BaseWorld::~BaseWorld()
@@ -178,9 +178,9 @@ int BaseWorld::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
 }
 
 
-void BaseWorld::rotate(sf::Vertex *quad, float degrees, const sf::Vector2i &pos)
+void BaseWorld::rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos)
 {
-	sf::Vector2f centre(pos.x + Constants::tileSize / 2, pos.y + Constants::tileSize / 2);
+	sf::Vector2f centre(pos.x + 0.5, pos.y + 0.5);
 	float radians = degrees * Constants::degToRad;
 
 	for (int i = 0; i < 4; ++i)
@@ -218,14 +218,19 @@ void BaseWorld::setBlockType(const sf::Vector2i &pos, BlockType blockType, Layer
 	blockTypes[index] = blockType;
 }
 
-void BaseWorld::addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer, int rotationAngle, int flipGID)
+void BaseWorld::addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer, float rotationAngle, int flipGID)
 {
 	// TODO: simply append object vertices to world vertices; remember order of objects so vertices can be referenced in the future
 
 	std::vector<sf::Vertex> quad(4);
+	sf::Vector2f adjustedPos = sf::Vector2f(pos.x / Constants::tileSize,
+	                                        (pos.y - Constants::tileSize) / Constants::tileSize);
 
-	positionVertices(&quad[0], pos, 1);
+	positionVertices(&quad[0], adjustedPos, 1);
 	tileset->textureQuad(&quad[0], blockType, rotationAngle, flipGID);
+
+	if (rotationAngle != 0)
+		rotateObject(&quad[0], rotationAngle, adjustedPos);
 
 	for (int i = 0; i < 4; ++i)
 		vertices.append(quad[i]);
@@ -308,9 +313,9 @@ void BaseWorld::addTiles(std::vector<TMX::Layer*> layers, LayerType *types)
 	{
 		LayerType layerType = types[layerIndex++];
 
-		for (size_t x = 0; x < tileSize.x; ++x)
+		for (int x = 0; x < tileSize.x; ++x)
 		{
-			for (size_t y = 0; y < tileSize.y; ++y)
+			for (int y = 0; y < tileSize.y; ++y)
 			{
 				TMX::Tile *tile = layer->items[x + y * tileSize.x];
 				if (tile == nullptr)
@@ -324,7 +329,7 @@ void BaseWorld::addTiles(std::vector<TMX::Layer*> layers, LayerType *types)
 				if (layerType == OBJECTS)
 				{
 					TMX::Object *object = dynamic_cast<TMX::Object*>(tile);
-					addObject(object->position, blockType, layerType, tile->getRotationAngle(), tile->getFlipGID());
+					addObject(object->position, blockType, layerType, object->rotationAnglef, tile->getFlipGID());
 				}
 
 				// tiles

@@ -176,7 +176,7 @@ namespace TMX
 		}
 
 		sf::Vector2f position;
-		float rotationAngle;
+		float rotationAnglef;
 	};
 
 	struct Layer : PropertyOwner

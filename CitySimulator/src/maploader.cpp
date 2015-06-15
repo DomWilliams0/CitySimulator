@@ -75,7 +75,7 @@ TMX::TileMap* TMX::TileMap::load(const std::string filename)
 
 		Layer *layer = new Layer;
 		layer->name = pair.second.get<std::string>("<xmlattr>.name");
-		layer->visible = pair.second.get<int>("<xmlattr>.visible", 1);
+		layer->visible = pair.second.get<int>("<xmlattr>.visible", 1) != 0;
 		layer->items.resize(map->width * map->height);
 		int i(0);
 
@@ -109,7 +109,7 @@ TMX::TileMap* TMX::TileMap::load(const std::string filename)
 
 					obj->position.x = o.second.get<float>("<xmlattr>.x");
 					obj->position.y = o.second.get<float>("<xmlattr>.y");
-					obj->rotationAngle = o.second.get<float>("<xmlattr>.rotation", 0.0);
+					obj->rotationAnglef = o.second.get<float>("<xmlattr>.rotation", 0.0);
 
 					layer->items[i++] = obj;
 				}

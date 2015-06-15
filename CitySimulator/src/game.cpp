@@ -12,12 +12,12 @@ void FPSCounter::tick(float delta, sf::RenderWindow &window)
 	{
 		int fps(0);
 
-		float total = accumulate(backlog.begin(), backlog.end(), 0.0);
+		double total = accumulate(backlog.begin(), backlog.end(), 0.0);
 		if (total != 0)
 		{
-			float average = total / backlog.size();
+			double average = total / backlog.size();
 			if (average != 0)
-				fps = 1 / average;
+				fps = static_cast<int>(1.0 / average);
 		}
 
 		fpsText.setString(std::to_string(fps) + " FPS");

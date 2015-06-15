@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/System.hpp>
 #include "constants.hpp"
+#include <random>
 
 namespace Utils
 {
@@ -34,12 +35,23 @@ namespace Utils
 		return sf::Vector2<V>(v.x / Constants::tileSize, v.y / Constants::tileSize);
 	}
 
-	inline int randomRange(int min, int max)
+	inline float randomRange(float min, float max)
 	{
-		return (rand() % ((max - min) + 1)) + min;
+		static std::random_device rd;
+		static std::mt19937 gen(rd());
+		static std::uniform_real_distribution<> dis(0, 1);
+
+		return static_cast<float>(dis(gen) * (max - min) + min);
 	}
 
 	std::string searchForFile(const std::string &filename, const std::string &directory = "res");
+}
 
-	sf::Image rotateImage(const sf::Image &image, int rotation);
+namespace Debug
+{
+	template <class V>
+	inline void printVector(const sf::Vector2<V> &v, const char *msg = "")
+	{
+		printf("%s%f, %f\n", msg, v.x, v.y);
+	}
 }

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <SFML/Graphics.hpp>
 
 namespace Constants
@@ -7,10 +6,8 @@ namespace Constants
 	extern const sf::Vector2i windowSize;
 	extern const sf::Vector2i windowCentre;
 
-	extern const int tilesetResolution;
 	extern const int tileSize;
-	extern const int tileScale;
-	extern const int realTileSize;
+	extern const float tileSizef;
 
 	extern sf::Font mainFont;
 

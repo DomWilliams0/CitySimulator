@@ -98,7 +98,8 @@ private:
 
 	inline void addPoint(int x, int y)
 	{
-		points[getIndex(x, y)] = sf::Vector2f(x * Constants::tilesetResolution, y * Constants::tilesetResolution);
+		points[getIndex(x, y)] = sf::Vector2f(x * Constants::tileSizef,
+		                                      y * Constants::tileSizef);
 	}
 
 	void generatePoints();
@@ -115,7 +116,7 @@ public:
 	explicit BaseWorld(const sf::Vector2i &size);
 	~BaseWorld();
 	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = TERRAIN, int rotationAngle = 0, int flipGID = 0);
-	void addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer = OBJECTS, int rotationAngle = 0, int flipGID = 0);
+	void addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer = OBJECTS, float rotationAngle = 0, int flipGID = 0);
 
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 	static BaseWorld* loadWorld(const std::string &filename);
@@ -124,6 +125,16 @@ public:
 	inline Tileset* getTileset() const
 	{
 		return tileset;
+	}
+
+	inline sf::Vector2i getPixelSize() const
+	{
+		return pixelSize;
+	}
+
+	inline sf::Vector2i getTileSize() const
+	{
+		return tileSize;
 	}
 
 private:
@@ -141,7 +152,7 @@ private:
 	void addTiles(std::vector<TMX::Layer*> layers, LayerType *types);
 	int BaseWorld::getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
 
-	void rotate(sf::Vertex *quad, float degrees, const sf::Vector2i &pos);
+	void rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos);
 	void BaseWorld::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
 
 protected:

@@ -10,7 +10,7 @@ inline void generatePoints(const sf::FloatRect &rect, std::vector<sf::Vector2f> 
 
 inline void rotate(sf::Vertex *quad, float degrees, const sf::Vector2i &pos)
 {
-	sf::Vector2f centre(pos.x + TILE_SIZE / 2, pos.y + TILE_SIZE / 2);
+	sf::Vector2f centre(static_cast<float>(pos.x + TILE_SIZE / 2), static_cast<float>(pos.y + TILE_SIZE / 2));
 	float radians = degrees * Constants::degToRad;
 
 	for (int i = 0; i < 4; ++i)
@@ -32,7 +32,7 @@ inline void rotate(sf::Vertex *quad, float degrees, const sf::Vector2i &pos)
 
 void RotationGame::start()
 {
-	const sf::Vector2i pos(250, 250);
+	const sf::Vector2f pos(250, 250);
 
 	// reference
 	reference.setPosition(pos.x, pos.y);
@@ -49,7 +49,7 @@ void RotationGame::start()
 	tileset.convertToTexture(std::vector<int>());
 
 	// rotation
-	rotate(&vertices[0], 13, pos);
+	rotate(&vertices[0], 13, static_cast<sf::Vector2i>(pos));
 }
 
 void RotationGame::tick(float delta)
