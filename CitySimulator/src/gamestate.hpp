@@ -17,4 +17,5 @@ private:
 	BaseWorld *world;
 	sf::View view;
 
+	sf::Vector2f viewOffset;
 };

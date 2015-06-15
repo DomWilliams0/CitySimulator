@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include "state.hpp"
 #include "constants.hpp"
+#include "input.hpp"
 
 class FPSCounter
 {
@@ -46,6 +47,11 @@ public:
 		window.setView(view);
 	}
 
+	inline Input *getInput()
+	{
+		return &input;
+	}
+
 protected:
 	sf::RenderWindow window;
 
@@ -70,6 +76,7 @@ private:
 
 	sf::Color backgroundColour;
 	FPSCounter fps;
+	Input input;
 };
 
 class Game : public BaseGame

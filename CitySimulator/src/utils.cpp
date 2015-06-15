@@ -1,6 +1,7 @@
 #include <boost/filesystem.hpp>
 #include "utils.hpp"
 
+
 using namespace boost;
 
 sf::Color Utils::darken(const sf::Color &color, int delta)
@@ -122,3 +123,4 @@ void Utils::TimeTicker::reset()
 
 	current = 0;
 }
+

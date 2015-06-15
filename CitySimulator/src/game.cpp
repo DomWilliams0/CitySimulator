@@ -47,6 +47,9 @@ BaseGame::BaseGame(const sf::Vector2i &windowSize, const sf::Uint32 &style, cons
 		exit(-1);
 	}
 
+	// key bindings
+	window.setKeyRepeatEnabled(false);
+	input.registerBindings();
 
 	Logger::logDebug(title + " started");
 }
@@ -64,8 +67,21 @@ void BaseGame::beginGame()
 	{
 		while (window.pollEvent(e))
 		{
-			if (e.type == sf::Event::Closed || (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Escape))
+			if (e.type == sf::Event::Closed)
 				window.close();
+
+			// keys
+			else if (e.type == sf::Event::KeyPressed)
+			{
+				// escape to quit
+				if (e.key.code == sf::Keyboard::Escape)
+					window.close();
+				else
+					input.update(e.key.code, true);
+			}
+			else if (e.type == sf::Event::KeyReleased)
+				input.update(e.key.code, false);
+
 			else
 				handleInput(e);
 		}
@@ -76,8 +92,15 @@ void BaseGame::beginGame()
 		window.clear(backgroundColour);
 		render();
 
+		// overlay
 		if (showFPS)
+		{
+			sf::View view(window.getView());
+
+			window.setView(window.getDefaultView());
 			fps.tick(delta, window);
+			window.setView(view);
+		}
 
 		window.display();
 	}

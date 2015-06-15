@@ -11,8 +11,10 @@ BaseWorld* createMainWorld()
 GameState::GameState(BaseGame *game_) : State(game_, StateType::GAME), world(createMainWorld())
 {
 	// camera view
-//	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
-//	game->setView(view);
+	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
+//	view.zoom(1);
+
+	game->setView(view);
 }
 
 GameState::~GameState()
@@ -22,6 +24,25 @@ GameState::~GameState()
 
 void GameState::tick(float delta)
 {
+	const static float viewSpeed = 400;
+
+	Input *input = game->getInput();
+	float dx(0), dy(0);
+
+	if (input->isPressed(UP))
+		dy = -delta;
+	else if (input->isPressed(DOWN))
+		dy = delta;
+	if (input->isPressed(LEFT))
+		dx = -delta;
+	else if (input->isPressed(RIGHT))
+		dx = delta;
+
+	if (dx || dy)
+	{
+		view.move(dx * viewSpeed, dy * viewSpeed);
+		game->setView(view);
+	}
 
 }
 

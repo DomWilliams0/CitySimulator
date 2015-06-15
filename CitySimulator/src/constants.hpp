@@ -5,6 +5,7 @@
 namespace Constants
 {
 	extern const sf::Vector2i windowSize;
+	extern const sf::Vector2i windowCentre;
 
 	extern const int tilesetResolution;
 	extern const int tileSize;
