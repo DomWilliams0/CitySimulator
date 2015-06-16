@@ -115,6 +115,7 @@ class BaseWorld : public sf::Drawable
 public:
 	explicit BaseWorld(const sf::Vector2i &size);
 	~BaseWorld();
+
 	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = TERRAIN, int rotationAngle = 0, int flipGID = 0);
 	void addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer = OBJECTS, float rotationAngle = 0, int flipGID = 0);
 

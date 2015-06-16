@@ -177,27 +177,29 @@ int BaseWorld::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
 	return index;
 }
 
-
 void BaseWorld::rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos)
 {
-	sf::Vector2f centre(pos.x + 0.5, pos.y + 0.5);
-	float radians = degrees * Constants::degToRad;
+	sf::Vector2f origin(pos.x, pos.y + 1);
+
+	float radius(degrees * Constants::degToRad);
+	const float c(cos(radius));
+	const float s(sin(radius));
 
 	for (int i = 0; i < 4; ++i)
 	{
-		sf::Vector2f prev = quad[i].position;
-		prev.x -= centre.x;
-		prev.y -= centre.y;
+		sf::Vector2f vPos(quad[i].position);
+		vPos -= origin;
 
-		sf::Vector2f newVertex(prev.x * cos(radians) - prev.y * sin(radians),
-		                       prev.x * sin(radians) + prev.y * cos(radians));
+		sf::Vector2f rotated(vPos);
+		rotated.x = vPos.x * c - vPos.y * s;
+		rotated.y = vPos.x * s + vPos.y * c;
 
-		newVertex.x += centre.x;
-		newVertex.y += centre.y;
+		rotated += origin;
 
-		quad[i].position = newVertex;
+		quad[i].position = rotated;
 	}
 }
+
 
 void BaseWorld::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta)
 {
