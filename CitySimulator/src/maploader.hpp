@@ -22,30 +22,25 @@ namespace TMX
 	class PropertyOwner
 	{
 	public:
-		PropertyOwner()
-		{
-			map = new PropMap();
-		}
 
 		virtual ~PropertyOwner()
 		{
-			delete map;
 		}
 
 		inline void addProperty(PropertyType type, std::string value)
 		{
-			map->insert(std::make_pair(type, value));
+			map.insert(std::make_pair(type, value));
 		}
 
 		inline std::string getProperty(PropertyType type)
 		{
-			return map->at(type);
+			return map.at(type);
 		}
 
 
 	private:
 		typedef std::map<PropertyType, std::string> PropMap;
-		PropMap *map;
+		PropMap map;
 	};
 
 	typedef uint32_t rot;
@@ -61,9 +56,8 @@ namespace TMX
 
 	struct Tile
 	{
-		Tile()
+		Tile(): gid(0)
 		{
-			gid = 0;
 		}
 
 		virtual ~Tile()
@@ -160,15 +154,10 @@ namespace TMX
 
 	struct Object : Tile
 	{
-		Object()
-		{
-		}
-
 		explicit Object(const std::string &id)
 			: Tile(id)
 		{
 		}
-
 
 		inline bool isTile() override
 		{
@@ -181,6 +170,12 @@ namespace TMX
 
 	struct Layer : PropertyOwner
 	{
+		~Layer()
+		{
+			for (Tile *tile : items)
+				delete tile;
+		}
+
 		std::string name;
 		std::vector<Tile*> items;
 		bool visible;

@@ -16,4 +16,7 @@ namespace Logger
 	void logDebug(const std::string &msg);
 	void logWarning(const std::string &msg);
 	void logError(const std::string &msg);
+
+	void pushIndent();
+	void popIndent();
 }

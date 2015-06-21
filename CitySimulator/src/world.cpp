@@ -357,6 +357,8 @@ void BaseWorld::addTiles(const std::vector<TMX::Layer*> &layers, const std::vect
 BaseWorld* BaseWorld::loadWorld(const std::string &filename)
 {
 	Logger::logDebug(str(boost::format("Began loading world %1%") % filename));
+	Logger::pushIndent();
+
 	TMX::TileMap *tmx = TMX::TileMap::load(filename);
 
 	// failure
@@ -384,6 +386,7 @@ BaseWorld* BaseWorld::loadWorld(const std::string &filename)
 	// add tiles to world
 	world->addTiles(layers, types);
 
+	Logger::popIndent();
 	Logger::logDebug(str(boost::format("Loaded world %1%") % filename));
 	delete tmx;
 	return world;

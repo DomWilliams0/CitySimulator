@@ -59,6 +59,11 @@ class Tileset
 public:
 	explicit Tileset(const std::string &filename);
 
+	~Tileset()
+	{
+		delete points;
+	}
+
 	void textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipGID);
 
 	inline sf::Texture* getTexture()

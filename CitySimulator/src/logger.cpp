@@ -3,10 +3,14 @@
 #include <string>
 #include "logger.hpp"
 
+const std::string PREFIX_STRING("    ");
+
+
 struct _Logger
 {
 	Logger::Level level;
 	std::ostream *stream;
+	std::string prefix;
 
 	void log(std::string msg, Logger::Level level)
 	{
@@ -23,7 +27,7 @@ struct _Logger
 			break;
 		}
 
-		(*stream) << l << ": " << msg << std::endl;
+		(*stream) << l << ": " << prefix << msg << std::endl;
 	}
 };
 
@@ -53,4 +57,19 @@ void Logger::logWarning(const std::string &msg)
 void Logger::logError(const std::string &msg)
 {
 	logger.log(msg, Level::ERROR);
+}
+
+
+void Logger::pushIndent()
+{
+	logger.prefix += PREFIX_STRING;
+}
+
+void Logger::popIndent()
+{
+	auto currentLength = logger.prefix.length();
+	auto prefixLength = PREFIX_STRING.length();
+
+	if (currentLength >= prefixLength)
+		logger.prefix = logger.prefix.substr(0, currentLength - prefixLength);
 }
