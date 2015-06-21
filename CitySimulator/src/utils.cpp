@@ -1,5 +1,7 @@
 #include <boost/filesystem.hpp>
 #include "utils.hpp"
+#include <boost/format/format_fwd.hpp>
+#include <boost/format/free_funcs.hpp>
 
 
 using namespace boost;
@@ -14,6 +16,10 @@ sf::Color Utils::darken(const sf::Color &color, int delta)
 
 std::string Utils::searchForFile(const std::string &filename, const std::string &directory)
 {
+	// invalid directory given
+	if (!filesystem::exists(directory))
+		throw filenotfound_exception(str(format("Invalid directory given: %1%") % directory));
+
 	filesystem::recursive_directory_iterator itr(filesystem::absolute(directory));
 	filesystem::recursive_directory_iterator end;
 
@@ -24,7 +30,8 @@ std::string Utils::searchForFile(const std::string &filename, const std::string 
 			return path.string();
 	}
 
-	throw std::runtime_error(std::string("File not found: ") + filename);
+	// not found
+	throw filenotfound_exception(str(format("File not found: %1%") % filename));
 }
 
 
@@ -68,4 +75,3 @@ void Utils::TimeTicker::reset()
 
 	current = 0;
 }
-

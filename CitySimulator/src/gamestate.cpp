@@ -12,8 +12,8 @@ GameState::GameState(BaseGame *game_) : State(game_, StateType::GAME), world(cre
 {
 	// camera view
 	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
-	view.setCenter(world->getPixelSize().x / 2., world->getPixelSize().y / 2.);
-	view.zoom(0.35);
+	view.setCenter(world->getPixelSize().x / 2.f, world->getPixelSize().y / 2.f);
+	view.zoom(0.5);
 	game->setView(view);
 }
 

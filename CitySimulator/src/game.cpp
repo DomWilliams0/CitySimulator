@@ -3,6 +3,7 @@
 #include "logger.hpp"
 #include "gamestate.hpp"
 #include <numeric>
+#include "config.hpp"
 
 void FPSCounter::tick(float delta, sf::RenderWindow &window)
 {
@@ -36,9 +37,6 @@ BaseGame::BaseGame(const sf::Vector2i &windowSize, const sf::Uint32 &style, cons
 
 	// set icon
 	setWindowIcon("icon.png");
-
-	// create logger
-	Logger::createLogger(std::cout, Logger::DEBUG);
 
 	// load font
 	if (!Constants::mainFont.loadFromFile("res/font.ttf"))
@@ -205,22 +203,57 @@ void Game::end()
 	Logger::logDebug("Shutdown cleanly");
 }
 
+void loadConfig(int &windowStyle)
+{
+	Config::loadConfig();
+
+	int width, height;
+
+	// borderless fullscreen
+	if (Config::get<bool>("display-borderless-fullscreen"))
+	{
+		windowStyle = sf::Style::None;
+
+		auto screenSize(sf::VideoMode::getDesktopMode());
+		width = screenSize.width;
+		height = screenSize.height;
+	}
+
+	// standard window
+	else
+	{
+		windowStyle = sf::Style::Default;
+		width = Config::get<int>("display-resolution-width");
+		height = Config::get<int>("display-resolution-height");
+	}
+
+	Constants::setWindowSize(width, height);
+}
+
 
 int main()
 {
 	try
 	{
-		const sf::Vector2i windowSize = Constants::windowSize;
-		const auto style = sf::Style::Default;
+		// create logger
+		createLogger(std::cout, Logger::DEBUG);
+
+		// load window size/style
+		int style;
+		loadConfig(style);
 
 		BaseGame *game;
-		// game = new ShaderGame(windowSize, style);
-		// game = new RotationGame(windowSize, style);
-		game = new Game(windowSize, style);
+		// game = new ShaderGame(Constants::windowSize, style);
+		// game = new RotationGame(Constants::windowSize, style);
+		game = new Game(Constants::windowSize, style);
 		dynamic_cast<BaseGame*>(game)->beginGame();
 	}
-	catch (std::exception e)
+	catch (std::exception &e)
 	{
 		Logger::logError(std::string("An error occurred: ") + e.what());
+	}
+	catch (...)
+	{
+		Logger::logError("An unknown error occured");
 	}
 }

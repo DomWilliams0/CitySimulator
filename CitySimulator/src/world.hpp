@@ -148,9 +148,9 @@ private:
 
 	std::vector<BlockType> blockTypes;
 
-	void discoverLayers(std::vector<TMX::Layer*> layers, LayerType *layerTypes);
+	int discoverLayers(std::vector<TMX::Layer*> &layers, std::vector<LayerType> &layerTypes);
 	void discoverFlippedTiles(const std::vector<TMX::Layer*> &layers, std::vector<int> &flippedGIDs);
-	void addTiles(std::vector<TMX::Layer*> layers, LayerType *types);
+	void addTiles(const std::vector<TMX::Layer*> &layers, const std::vector<LayerType> &types);
 	int BaseWorld::getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
 
 	void rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos);
@@ -159,9 +159,9 @@ private:
 protected:
 	std::unordered_map<LayerType, int> layerDepths;
 
-	inline void resizeVertexArray()
+	inline void resizeVertexArray(const int &layerCount)
 	{
-		const int size = tileSize.x * tileSize.y * layerDepths.size() * 4;
+		const int size = tileSize.x * tileSize.y * layerCount * 4;
 		vertices.resize(size);
 		blockTypes.resize(size);
 	}

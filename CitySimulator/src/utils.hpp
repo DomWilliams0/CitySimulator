@@ -44,6 +44,20 @@ namespace Utils
 		return static_cast<float>(dis(gen) * (max - min) + min);
 	}
 
+	struct filenotfound_exception : std::runtime_error
+	{
+		explicit filenotfound_exception(const char* msg)
+			: runtime_error(msg)
+		{
+		}
+
+
+		explicit filenotfound_exception(const std::string& msg)
+			: runtime_error(msg)
+		{
+		}
+	};
+
 	std::string searchForFile(const std::string &filename, const std::string &directory = "res");
 }
 

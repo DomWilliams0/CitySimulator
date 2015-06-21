@@ -6,6 +6,7 @@
 #include "utils.hpp"
 #include "logger.hpp"
 #include <unordered_set>
+#include <boost/format.hpp>
 
 LayerType layerTypeFromString(const std::string &s)
 {
@@ -181,9 +182,9 @@ void BaseWorld::rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f
 {
 	sf::Vector2f origin(pos.x, pos.y + 1);
 
-	float radius(degrees * Constants::degToRad);
-	const float c(cos(radius));
-	const float s(sin(radius));
+	float radians(degrees * Constants::degToRad);
+	const float c(cos(radians));
+	const float s(sin(radians));
 
 	for (int i = 0; i < 4; ++i)
 	{
@@ -229,7 +230,7 @@ void BaseWorld::addObject(const sf::Vector2f &pos, BlockType blockType, LayerTyp
 	                                        (pos.y - Constants::tileSize) / Constants::tileSize);
 
 	positionVertices(&quad[0], adjustedPos, 1);
-	tileset->textureQuad(&quad[0], blockType, rotationAngle, flipGID);
+	tileset->textureQuad(&quad[0], blockType, 0, flipGID);
 
 	if (rotationAngle != 0)
 		rotateObject(&quad[0], rotationAngle, adjustedPos);
@@ -247,15 +248,16 @@ void BaseWorld::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	target.draw(vertices, states);
 }
 
-void BaseWorld::discoverLayers(std::vector<TMX::Layer*> layers, LayerType *layerTypes)
+int BaseWorld::discoverLayers(std::vector<TMX::Layer*> &layers, std::vector<LayerType> &layerTypes)
 {
 	auto layerIt = layers.begin();
 	int depth(1);
+	int tileLayerCount(0);
 	while (layerIt != layers.end())
 	{
 		auto layer = *layerIt;
 
-		// invalid layer type
+		// unknown layer type
 		LayerType layerType = layerTypeFromString(layer->name);
 		if (layerType == LT_ERROR)
 		{
@@ -271,13 +273,18 @@ void BaseWorld::discoverLayers(std::vector<TMX::Layer*> layers, LayerType *layer
 			continue;
 		}
 
+		if (isTileLayer(layerType))
+			++tileLayerCount;
+
 		// add layer
 		registerLayer(layerType, depth);
-		layerTypes[depth - 1] = layerType;
+		layerTypes.push_back(layerType);
 
 		++depth;
 		++layerIt;
 	}
+
+	return tileLayerCount;
 }
 
 void BaseWorld::discoverFlippedTiles(const std::vector<TMX::Layer*> &layers, std::vector<int> &flippedGIDs)
@@ -307,7 +314,7 @@ void BaseWorld::discoverFlippedTiles(const std::vector<TMX::Layer*> &layers, std
 	}
 }
 
-void BaseWorld::addTiles(std::vector<TMX::Layer*> layers, LayerType *types)
+void BaseWorld::addTiles(const std::vector<TMX::Layer*> &layers, const std::vector<LayerType> &types)
 {
 	sf::Vector2i pos;
 	int layerIndex(0);
@@ -349,6 +356,7 @@ void BaseWorld::addTiles(std::vector<TMX::Layer*> layers, LayerType *types)
 
 BaseWorld* BaseWorld::loadWorld(const std::string &filename)
 {
+	Logger::logDebug(str(boost::format("Began loading world %1%") % filename));
 	TMX::TileMap *tmx = TMX::TileMap::load(filename);
 
 	// failure
@@ -358,13 +366,15 @@ BaseWorld* BaseWorld::loadWorld(const std::string &filename)
 	sf::Vector2i size(tmx->width, tmx->height);
 	BaseWorld *world = new BaseWorld(size);
 
-	// find layer depths
+	// find layer count and depths
 	auto layers = tmx->layers;
-	LayerType types[LayerType::LT_ERROR];
-	world->discoverLayers(layers, types);
+	std::vector<LayerType> types;
+	int tileLayerCount = world->discoverLayers(layers, types);
+
+	Logger::logDebug(str(boost::format("Discovered %1% tile layer(s)") % tileLayerCount));
 
 	// resize vertex array to accomodate for layer count
-	world->resizeVertexArray();
+	world->resizeVertexArray(tileLayerCount);
 
 	// update tileset with flipped textures
 	std::vector<int> flippedGIDs;
@@ -374,6 +384,7 @@ BaseWorld* BaseWorld::loadWorld(const std::string &filename)
 	// add tiles to world
 	world->addTiles(layers, types);
 
+	Logger::logDebug(str(boost::format("Loaded world %1%") % filename));
 	delete tmx;
 	return world;
 }

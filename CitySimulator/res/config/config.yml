@@ -1,0 +1,6 @@
+config:
+  display:
+    borderless-fullscreen: false
+    resolution-width: 1080
+    resolution-height: 768
+

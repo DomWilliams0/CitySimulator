@@ -3,8 +3,10 @@
 
 namespace Constants
 {
-	extern const sf::Vector2i windowSize;
-	extern const sf::Vector2i windowCentre;
+	void setWindowSize(int x, int y);
+
+	extern sf::Vector2i windowSize;
+	extern sf::Vector2i windowCentre;
 
 	extern const int tileSize;
 	extern const float tileSizef;

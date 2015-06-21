@@ -3,8 +3,8 @@
 
 namespace Constants
 {
-	const sf::Vector2i windowSize(1080, 728);
-	const sf::Vector2i windowCentre(windowSize.x/2, windowSize.y/2);
+	sf::Vector2i windowSize(-1, -1);
+	sf::Vector2i windowCentre(-1, -1);
 
 	const int tileSize(16);
 	const float tileSizef(tileSize);
@@ -12,4 +12,13 @@ namespace Constants
 	sf::Font mainFont;
 
 	const float degToRad = static_cast<float>(M_PI / 180.0);
+
+	void setWindowSize(int x, int y)
+	{
+		windowSize.x = x;
+		windowSize.y = y;
+
+		windowCentre.x = x / 2;
+		windowCentre.y = y / 2;
+	}
 }
