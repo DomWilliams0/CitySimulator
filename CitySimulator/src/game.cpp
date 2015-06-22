@@ -1,8 +1,8 @@
 #include <SFML/Window.hpp>
+#include <numeric>
 #include "game.hpp"
 #include "logger.hpp"
 #include "gamestate.hpp"
-#include <numeric>
 #include "config.hpp"
 
 void FPSCounter::tick(float delta, sf::RenderWindow &window)
@@ -243,8 +243,6 @@ int main()
 		loadConfig(style);
 
 		BaseGame *game;
-		// game = new ShaderGame(Constants::windowSize, style);
-		// game = new RotationGame(Constants::windowSize, style);
 		game = new Game(Constants::windowSize, style);
 		dynamic_cast<BaseGame*>(game)->beginGame();
 	}

@@ -1,26 +1,19 @@
 #include "game.hpp"
 #include "state.hpp"
 #include "gamestate.hpp"
+#include "config.hpp"
 
-
-BaseWorld* createMainWorld()
+GameState::GameState(BaseGame *game_) : State(game_, StateType::GAME)
 {
-	return BaseWorld::loadWorld("small.tmx");
-}
+	world.loadFromFile(Config::get<std::string>("debug-world-name"));
 
-GameState::GameState(BaseGame *game_) : State(game_, StateType::GAME), world(createMainWorld())
-{
 	// camera view
 	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
-	view.setCenter(world->getPixelSize().x / 2.f, world->getPixelSize().y / 2.f);
+	view.setCenter(world.getPixelSize().x / 2.f, world.getPixelSize().y / 2.f);
 	view.zoom(0.5);
 	game->setView(view);
 }
 
-GameState::~GameState()
-{
-	delete world;
-}
 
 void GameState::tick(float delta)
 {
@@ -48,7 +41,7 @@ void GameState::tick(float delta)
 
 void GameState::render(sf::RenderWindow &window)
 {
-	window.draw(*world);
+	window.draw(world.getTerrain());
 }
 
 void GameState::handleInput(const sf::Event &event)

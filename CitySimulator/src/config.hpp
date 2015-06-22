@@ -32,12 +32,6 @@ public:
 		return boost::get<T>(value->second);
 	}
 
-	inline void debugPrint()
-	{
-		for (auto &pair : configMap)
-			std::cout << pair.first << " = " << pair.second << std::endl;
-	}
-
 
 	static Config &getInstance()
 	{

@@ -148,37 +148,36 @@ void Tileset::createTileImage(sf::Image *image, unsigned blockType)
 void Tileset::generatePoints()
 {
 	points = new sf::Vector2f[(size.x + 1) * (size.y + 1)];
-	for (size_t x = 0; x <= size.x; x++)
-		for (size_t y = 0; y <= size.y; y++)
+	for (size_t y = 0; y <= size.y; y++)
+		for (size_t x = 0; x <= size.x; x++)
 			addPoint(x, y);
 }
 
-BaseWorld::BaseWorld(const sf::Vector2i &size) : tileSize(size), pixelSize(Utils::toPixel(tileSize)),
-                                                 tileset(new Tileset("tileset.png"))
+WorldTerrain::WorldTerrain(World *container) : BaseWorld(container), tileset(new Tileset("tileset.png"))
 {
 	vertices.setPrimitiveType(sf::Quads);
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
 
-BaseWorld::~BaseWorld()
+WorldTerrain::~WorldTerrain()
 {
 	delete tileset;
 }
 
-int BaseWorld::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
+int WorldTerrain::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
 {
 	auto depth = layerDepths[layerType];
 	if (depth != 0)
 		depth -= 1;
 
-	int index = (pos.x + pos.y * tileSize.x);
-	index += depth * tileSize.x * tileSize.y;
+	int index = (pos.x + pos.y * container->tileSize.x);
+	index += depth * container->tileSize.x * container->tileSize.y;
 	index *= 4;
 
 	return index;
 }
 
-void BaseWorld::rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos)
+void WorldTerrain::rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos)
 {
 	sf::Vector2f origin(pos.x, pos.y + 1);
 
@@ -202,7 +201,7 @@ void BaseWorld::rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f
 }
 
 
-void BaseWorld::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta)
+void WorldTerrain::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta)
 {
 	quad[0].position = sf::Vector2f(pos.x, pos.y);
 	quad[1].position = sf::Vector2f(pos.x + delta, pos.y);
@@ -210,7 +209,15 @@ void BaseWorld::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int 
 	quad[3].position = sf::Vector2f(pos.x, pos.y + delta);
 }
 
-void BaseWorld::setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer, int rotationAngle, int flipGID)
+void WorldTerrain::resize(const int &layerCount)
+{
+	auto tileSize = container->getTileSize();
+	const int size = tileSize.x * tileSize.y * layerCount * 4;
+	vertices.resize(size);
+	blockTypes.resize(size);
+}
+
+void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer, int rotationAngle, int flipGID)
 {
 	int index = getBlockIndex(pos, layer);
 	sf::Vertex *quad = &vertices[index];
@@ -221,7 +228,7 @@ void BaseWorld::setBlockType(const sf::Vector2i &pos, BlockType blockType, Layer
 	blockTypes[index] = blockType;
 }
 
-void BaseWorld::addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer, float rotationAngle, int flipGID)
+void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer, float rotationAngle, int flipGID)
 {
 	// TODO: simply append object vertices to world vertices; remember order of objects so vertices can be referenced in the future
 
@@ -239,7 +246,7 @@ void BaseWorld::addObject(const sf::Vector2f &pos, BlockType blockType, LayerTyp
 		vertices.append(quad[i]);
 }
 
-void BaseWorld::draw(sf::RenderTarget &target, sf::RenderStates states) const
+void WorldTerrain::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
 	states.transform *= transform;
 
@@ -248,7 +255,7 @@ void BaseWorld::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	target.draw(vertices, states);
 }
 
-int BaseWorld::discoverLayers(std::vector<TMX::Layer*> &layers, std::vector<LayerType> &layerTypes)
+int WorldTerrain::discoverLayers(std::vector<TMX::Layer*> &layers, std::vector<LayerType> &layerTypes)
 {
 	auto layerIt = layers.begin();
 	int depth(1);
@@ -287,7 +294,7 @@ int BaseWorld::discoverLayers(std::vector<TMX::Layer*> &layers, std::vector<Laye
 	return tileLayerCount;
 }
 
-void BaseWorld::discoverFlippedTiles(const std::vector<TMX::Layer*> &layers, std::vector<int> &flippedGIDs)
+void WorldTerrain::discoverFlippedTiles(const std::vector<TMX::Layer*> &layers, std::vector<int> &flippedGIDs)
 {
 	std::unordered_set<int> flipped;
 
@@ -314,17 +321,19 @@ void BaseWorld::discoverFlippedTiles(const std::vector<TMX::Layer*> &layers, std
 	}
 }
 
-void BaseWorld::addTiles(const std::vector<TMX::Layer*> &layers, const std::vector<LayerType> &types)
+void WorldTerrain::addTiles(const std::vector<TMX::Layer*> &layers, const std::vector<LayerType> &types)
 {
+	sf::Vector2i tileSize = container->tileSize;
 	sf::Vector2i pos;
 	int layerIndex(0);
+
 	for (TMX::Layer *layer : layers)
 	{
 		LayerType layerType = types[layerIndex++];
 
-		for (int x = 0; x < tileSize.x; ++x)
+		for (int y = 0; y < tileSize.y; ++y)
 		{
-			for (int y = 0; y < tileSize.y; ++y)
+			for (int x = 0; x < tileSize.x; ++x)
 			{
 				TMX::Tile *tile = layer->items[x + y * tileSize.x];
 				if (tile == nullptr)
@@ -354,7 +363,28 @@ void BaseWorld::addTiles(const std::vector<TMX::Layer*> &layers, const std::vect
 	}
 }
 
-BaseWorld* BaseWorld::loadWorld(const std::string &filename)
+void WorldTerrain::load(const TMX::TileMap *tileMap)
+{
+	// find layer count and depths
+	auto layers = tileMap->layers;
+	std::vector<LayerType> types;
+	int tileLayerCount = discoverLayers(layers, types);
+
+	Logger::logDebug(str(boost::format("Discovered %1% tile layer(s)") % tileLayerCount));
+
+	// resize vertex array to accomodate for layer count
+	resize(tileLayerCount);
+
+	// update tileset with flipped textures
+	std::vector<int> flippedGIDs;
+	discoverFlippedTiles(layers, flippedGIDs);
+	tileset->convertToTexture(flippedGIDs);
+
+	// add tiles to terrain
+	addTiles(layers, types);
+}
+
+void World::loadFromFile(const std::string &filename)
 {
 	Logger::logDebug(str(boost::format("Began loading world %1%") % filename));
 	Logger::pushIndent();
@@ -363,31 +393,21 @@ BaseWorld* BaseWorld::loadWorld(const std::string &filename)
 
 	// failure
 	if (tmx == nullptr)
-		return nullptr;
+		throw std::runtime_error("Could not load world from null TileMap");
 
 	sf::Vector2i size(tmx->width, tmx->height);
-	BaseWorld *world = new BaseWorld(size);
+	resize(size);
 
-	// find layer count and depths
-	auto layers = tmx->layers;
-	std::vector<LayerType> types;
-	int tileLayerCount = world->discoverLayers(layers, types);
-
-	Logger::logDebug(str(boost::format("Discovered %1% tile layer(s)") % tileLayerCount));
-
-	// resize vertex array to accomodate for layer count
-	world->resizeVertexArray(tileLayerCount);
-
-	// update tileset with flipped textures
-	std::vector<int> flippedGIDs;
-	world->discoverFlippedTiles(layers, flippedGIDs);
-	world->tileset->convertToTexture(flippedGIDs);
-
-	// add tiles to world
-	world->addTiles(layers, types);
+	// terrain
+	terrain.load(tmx);
 
 	Logger::popIndent();
 	Logger::logDebug(str(boost::format("Loaded world %1%") % filename));
 	delete tmx;
-	return world;
+}
+
+void World::resize(sf::Vector2i size)
+{
+	tileSize = size;
+	pixelSize = Utils::toPixel(size);
 }

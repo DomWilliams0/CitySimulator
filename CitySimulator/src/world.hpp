@@ -5,8 +5,7 @@
 #include "maploader.hpp"
 #include "utils.hpp"
 
-class Object;
-class BaseWorld;
+class World;
 
 enum BlockType
 {
@@ -90,7 +89,7 @@ public:
 	sf::IntRect getTileRect(unsigned blockType);
 	void createTileImage(sf::Image *image, unsigned blockType);
 protected:
-	friend class BaseWorld;
+	friend class WorldTerrain;
 
 private:
 	sf::Image *image;
@@ -101,7 +100,7 @@ private:
 	std::unordered_map<int, int> flippedBlockTypes;
 	bool converted;
 
-	inline void addPoint(int x, int y)
+	void addPoint(int x, int y)
 	{
 		points[getIndex(x, y)] = sf::Vector2f(x * Constants::tileSizef,
 		                                      y * Constants::tileSizef);
@@ -115,22 +114,81 @@ private:
 	}
 };
 
-class BaseWorld : public sf::Drawable
+class BaseWorld
 {
 public:
-	explicit BaseWorld(const sf::Vector2i &size);
-	~BaseWorld();
+	explicit BaseWorld(World *container) : container(container)
+	{
+	}
+
+protected:
+	World *container;
+};
+
+class WorldTerrain : public BaseWorld, public sf::Drawable
+{
+public:
+
+	explicit WorldTerrain(World *container);
+	~WorldTerrain();
 
 	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = TERRAIN, int rotationAngle = 0, int flipGID = 0);
 	void addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer = OBJECTS, float rotationAngle = 0, int flipGID = 0);
 
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
-	static BaseWorld* loadWorld(const std::string &filename);
-
 
 	inline Tileset* getTileset() const
 	{
 		return tileset;
+	}
+
+private:
+	Tileset *tileset;
+
+	sf::VertexArray vertices;
+	sf::Transform transform;
+
+	std::vector<BlockType> blockTypes;
+
+	int discoverLayers(std::vector<TMX::Layer*> &layers, std::vector<LayerType> &layerTypes);
+	void discoverFlippedTiles(const std::vector<TMX::Layer*> &layers, std::vector<int> &flippedGIDs);
+	void addTiles(const std::vector<TMX::Layer*> &layers, const std::vector<LayerType> &types);
+	int WorldTerrain::getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
+
+	void rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos);
+	void WorldTerrain::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
+
+protected:
+	std::unordered_map<LayerType, int> layerDepths;
+
+	void resize(const int &layerCount);
+
+	inline void registerLayer(LayerType layerType, int depth)
+	{
+		layerDepths.insert(std::make_pair(layerType, depth));
+	}
+
+	void load(const TMX::TileMap *tileMap);
+
+	friend struct TMX::TileMap;
+	friend class World;
+};
+
+class World
+{
+public:
+
+	World() : terrain(this)
+	{
+	}
+
+	void loadFromFile(const std::string &filename);
+
+	void resize(sf::Vector2i size);
+
+	inline WorldTerrain& getTerrain()
+	{
+		return terrain;
 	}
 
 	inline sf::Vector2i getPixelSize() const
@@ -143,56 +201,14 @@ public:
 		return tileSize;
 	}
 
+
 private:
-	sf::Vector2i tileSize;
-	sf::Vector2i pixelSize;
-	Tileset *tileset;
-
-	sf::VertexArray vertices;
-	sf::Transform transform;
-
-	std::vector<BlockType> blockTypes;
-
-	int discoverLayers(std::vector<TMX::Layer*> &layers, std::vector<LayerType> &layerTypes);
-	void discoverFlippedTiles(const std::vector<TMX::Layer*> &layers, std::vector<int> &flippedGIDs);
-	void addTiles(const std::vector<TMX::Layer*> &layers, const std::vector<LayerType> &types);
-	int BaseWorld::getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
-
-	void rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos);
-	void BaseWorld::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
+	WorldTerrain terrain;
 
 protected:
-	std::unordered_map<LayerType, int> layerDepths;
+	sf::Vector2i tileSize;
+	sf::Vector2i pixelSize;
 
-	inline void resizeVertexArray(const int &layerCount)
-	{
-		const int size = tileSize.x * tileSize.y * layerCount * 4;
-		vertices.resize(size);
-		blockTypes.resize(size);
-	}
-
-	inline void registerLayer(LayerType layerType, int depth)
-	{
-		layerDepths.insert(std::make_pair(layerType, depth));
-	}
-
-	friend struct TMX::TileMap;
+	friend class BaseWorld;
+	friend class WorldTerrain;
 };
-
-//class Object : public sf::Sprite
-//{
-//public:
-//	Object(BaseWorld *world_, BlockType blockType) : sf::Sprite(*world_->getTileset()->getTexture(),
-//	                                                            world_->getTileset()->getTileRect(blockType)), world(world_)
-//	{
-//		auto r = world_->getTileset()->getTileRect(blockType);
-//		setScale(Constants::tileScale, Constants::tileScale);
-//		auto bounds(getLocalBounds());
-//		//		setOrigin(bounds.width / 2, bounds.height / 2);
-//	}
-//
-//
-//private:
-//	BaseWorld *world;
-//};
-

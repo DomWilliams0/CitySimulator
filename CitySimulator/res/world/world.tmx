@@ -169,33 +169,33 @@
   <object gid="9" x="208" y="48"/>
   <object gid="9" x="256" y="32"/>
  </objectgroup>
- <objectgroup name="_buildings">
-  <object x="288" y="224" width="144" height="80">
-   <properties>
-    <property name="building" value="single"/>
-   </properties>
-  </object>
-  <object x="672" y="176" width="176" height="192">
-   <properties>
-    <property name="building" value="double"/>
-   </properties>
-  </object>
- </objectgroup>
- <objectgroup name="_spawns">
-  <object x="0" y="80" width="528" height="128">
-   <properties>
-    <property name="entitytype" value="human"/>
-    <property name="orientation" value="R"/>
-   </properties>
-  </object>
-  <object x="272" y="112" width="64" height="48">
-   <properties>
-    <property name="entitytype" value="vehicle"/>
-    <property name="orientation" value="W"/>
-   </properties>
-  </object>
- </objectgroup>
- <objectgroup name="_road">
-  <object x="0" y="112" width="16" height="16"/>
- </objectgroup>
+<!-- <objectgroup name="_buildings">-->
+<!--  <object x="288" y="224" width="144" height="80">-->
+<!--   <properties>-->
+<!--    <property name="building" value="single"/>-->
+<!--   </properties>-->
+<!--  </object>-->
+<!--  <object x="672" y="176" width="176" height="192">-->
+<!--   <properties>-->
+<!--    <property name="building" value="double"/>-->
+<!--   </properties>-->
+<!--  </object>-->
+<!-- </objectgroup>-->
+<!-- <objectgroup name="_spawns">-->
+<!--  <object x="0" y="80" width="528" height="128">-->
+<!--   <properties>-->
+<!--    <property name="entitytype" value="human"/>-->
+<!--    <property name="orientation" value="R"/>-->
+<!--   </properties>-->
+<!--  </object>-->
+<!--  <object x="272" y="112" width="64" height="48">-->
+<!--   <properties>-->
+<!--    <property name="entitytype" value="vehicle"/>-->
+<!--    <property name="orientation" value="W"/>-->
+<!--   </properties>-->
+<!--  </object>-->
+<!-- </objectgroup>-->
+<!-- <objectgroup name="_road">-->
+<!--  <object x="0" y="112" width="16" height="16"/>-->
+<!-- </objectgroup>-->
 </map>

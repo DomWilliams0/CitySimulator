@@ -4,3 +4,5 @@ config:
     resolution-width: 1080
     resolution-height: 768
 
+debug:
+    world-name: small.tmx

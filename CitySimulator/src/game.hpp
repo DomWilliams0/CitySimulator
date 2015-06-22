@@ -10,7 +10,7 @@ class FPSCounter
 {
 public:
 
-	inline void init(float waitTime)
+	void init(float waitTime)
 	{
 		ticker.init(waitTime);
 

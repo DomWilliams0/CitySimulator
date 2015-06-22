@@ -1,6 +1,6 @@
 #include "rotation.hpp"
 
-inline void generatePoints(const sf::FloatRect &rect, std::vector<sf::Vector2f> &points)
+void generatePoints(const sf::FloatRect &rect, std::vector<sf::Vector2f> &points)
 {
 	points = {sf::Vector2f(rect.left, rect.top),
 		sf::Vector2f(rect.left + rect.width, rect.top),
@@ -8,7 +8,7 @@ inline void generatePoints(const sf::FloatRect &rect, std::vector<sf::Vector2f> 
 		sf::Vector2f(rect.left, rect.top + rect.height)};
 }
 
-inline void rotate(sf::Vertex *quad, float degrees, const sf::Vector2i &pos)
+void rotate(sf::Vertex *quad, float degrees, const sf::Vector2i &pos)
 {
 	sf::Vector2f centre(static_cast<float>(pos.x + TILE_SIZE / 2), static_cast<float>(pos.y + TILE_SIZE / 2));
 	float radians = degrees * Constants::degToRad;
