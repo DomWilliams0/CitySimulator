@@ -58,6 +58,7 @@ namespace Utils
 		}
 	};
 
+	void validateDirectory(const std::string &directory);
 	std::string searchForFile(const std::string &filename, const std::string &directory = "res");
 }
 

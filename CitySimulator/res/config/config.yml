@@ -1,8 +1,7 @@
-config:
-  display:
-    borderless-fullscreen: false
-    resolution-width: 1080
-    resolution-height: 768
-
+display:
+  borderless-fullscreen: false
+  resolution:
+    width: 1080
+    height: 768
 debug:
-    world-name: small.tmx
+  world-name: small.tmx

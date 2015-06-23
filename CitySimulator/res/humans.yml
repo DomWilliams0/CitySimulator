@@ -1,0 +1,28 @@
+human-size: 32x32
+knob:
+    humans:
+        - name: Business Man
+          sprite: business_man.png
+          size: =human-size=
+        - name: Cool Trainer
+          sprite: cool_trainer.png
+          size: =human-size=
+        - name: Girl Scout
+          sprite: girl_scout.png
+          size: =human-size=
+        - name: Goth
+          sprite: goth.png
+          size: =human-size=
+        - name: Middle Aged Man
+          sprite: middle_aged_man.png
+          size: =human-size=
+        - name: Ninja
+          sprite: ninja.png
+          size: =human-size=
+        - name: Old Man
+          sprite: poor_old_man.png
+          size: =human-size=
+        - name: Sweet Lady
+          sprite: sweet_lady.png
+          size: =human-size=
+      

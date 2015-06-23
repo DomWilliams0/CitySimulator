@@ -1,5 +1,13 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <boost/variant.hpp>
+#include <unordered_map>
+
+#define FAIL(msg, argument) throw std::runtime_error(str(boost::format(msg) % argument));
+
+typedef boost::variant<int, bool, std::string> ConfigValue;
+typedef std::unordered_map<std::string, ConfigValue> ConfigMap;
+typedef std::unordered_map<std::string, std::vector<std::pair<std::string, ConfigValue>>> EntityTags;
 
 namespace Constants
 {

@@ -14,11 +14,15 @@ sf::Color Utils::darken(const sf::Color &color, int delta)
 	return sf::Color(r, g, b);
 }
 
-std::string Utils::searchForFile(const std::string &filename, const std::string &directory)
+void Utils::validateDirectory(const std::string &directory)
 {
-	// invalid directory given
 	if (!filesystem::exists(directory))
 		throw filenotfound_exception(str(format("Invalid directory given: %1%") % directory));
+}
+
+std::string Utils::searchForFile(const std::string &filename, const std::string &directory)
+{
+	validateDirectory(directory);
 
 	filesystem::recursive_directory_iterator itr(filesystem::absolute(directory));
 	filesystem::recursive_directory_iterator end;
