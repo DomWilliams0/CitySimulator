@@ -5,7 +5,8 @@
 class GameState : public State
 {
 public:
-	explicit GameState(BaseGame *game_);
+	GameState();
+	~GameState();
 
 	virtual void tick(float delta) override;
 	virtual void render(sf::RenderWindow &window) override;

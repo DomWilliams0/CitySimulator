@@ -5,3 +5,4 @@ display:
     height: 768
 debug:
   world-name: small.tmx
+  limit-fps: false

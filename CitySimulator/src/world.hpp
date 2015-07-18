@@ -125,7 +125,7 @@ protected:
 	World *container;
 };
 
-class WorldTerrain : public BaseWorld, public sf::Drawable
+class WorldTerrain : public BaseWorld
 {
 public:
 
@@ -135,8 +135,6 @@ public:
 	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = TERRAIN, int rotationAngle = 0, int flipGID = 0);
 	void addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer = OBJECTS, float rotationAngle = 0, int flipGID = 0);
 
-	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
-
 	inline Tileset* getTileset() const
 	{
 		return tileset;
@@ -144,9 +142,7 @@ public:
 
 private:
 	Tileset *tileset;
-
 	sf::VertexArray vertices;
-	sf::Transform transform;
 
 	std::vector<BlockType> blockTypes;
 
@@ -168,18 +164,21 @@ protected:
 		layerDepths.insert(std::make_pair(layerType, depth));
 	}
 
+	void render(sf::RenderTarget &target, sf::RenderStates &states) const;
+
 	void load(const TMX::TileMap *tileMap);
 
 	friend struct TMX::TileMap;
 	friend class World;
 };
 
-class World
+class World : public sf::Drawable
 {
 public:
 
 	World() : terrain(this)
 	{
+		transform.scale(Constants::tileSizef, Constants::tileSizef);
 	}
 
 	void loadFromFile(const std::string &filename);
@@ -201,13 +200,22 @@ public:
 		return tileSize;
 	}
 
+	inline sf::Transform getTransform() const
+	{
+		return transform;
+	}
+
+	void tick(float delta);
 
 private:
 	WorldTerrain terrain;
 
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+
 protected:
 	sf::Vector2i tileSize;
 	sf::Vector2i pixelSize;
+	sf::Transform transform;
 
 	friend class BaseWorld;
 	friend class WorldTerrain;

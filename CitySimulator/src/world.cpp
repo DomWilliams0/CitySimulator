@@ -115,9 +115,6 @@ void Tileset::convertToTexture(const std::vector<int> &flippedGIDs)
 		++currentBlockType;
 	}
 
-	// debug
-	newImage.saveToFile("new_tileset.png");
-
 	// write to texture
 	if (!texture.loadFromImage(newImage))
 		throw std::exception("Could not render tileset");
@@ -131,9 +128,9 @@ sf::IntRect Tileset::getTileRect(unsigned blockType)
 	int tileX = blockType % size.x;
 	int tileY = blockType / size.x;
 	return sf::IntRect(tileX * Constants::tileSize,
-	                   tileY * Constants::tileSize,
-	                   Constants::tileSize,
-	                   Constants::tileSize);
+					   tileY * Constants::tileSize,
+					   Constants::tileSize,
+					   Constants::tileSize);
 }
 
 void Tileset::createTileImage(sf::Image *image, unsigned blockType)
@@ -156,7 +153,6 @@ void Tileset::generatePoints()
 WorldTerrain::WorldTerrain(World *container) : BaseWorld(container), tileset(new Tileset("tileset.png"))
 {
 	vertices.setPrimitiveType(sf::Quads);
-	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
 
 WorldTerrain::~WorldTerrain()
@@ -234,7 +230,7 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, Layer
 
 	std::vector<sf::Vertex> quad(4);
 	sf::Vector2f adjustedPos = sf::Vector2f(pos.x / Constants::tileSize,
-	                                        (pos.y - Constants::tileSize) / Constants::tileSize);
+											(pos.y - Constants::tileSize) / Constants::tileSize);
 
 	positionVertices(&quad[0], adjustedPos, 1);
 	tileset->textureQuad(&quad[0], blockType, 0, flipGID);
@@ -244,15 +240,6 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, Layer
 
 	for (int i = 0; i < 4; ++i)
 		vertices.append(quad[i]);
-}
-
-void WorldTerrain::draw(sf::RenderTarget &target, sf::RenderStates states) const
-{
-	states.transform *= transform;
-
-	// tile drawing
-	states.texture = tileset->getTexture();
-	target.draw(vertices, states);
 }
 
 int WorldTerrain::discoverLayers(std::vector<TMX::Layer*> &layers, std::vector<LayerType> &layerTypes)
@@ -363,6 +350,12 @@ void WorldTerrain::addTiles(const std::vector<TMX::Layer*> &layers, const std::v
 	}
 }
 
+void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states) const
+{
+	states.texture = tileset->getTexture();
+	target.draw(vertices, states);
+}
+
 void WorldTerrain::load(const TMX::TileMap *tileMap)
 {
 	// find layer count and depths
@@ -370,7 +363,7 @@ void WorldTerrain::load(const TMX::TileMap *tileMap)
 	std::vector<LayerType> types;
 	int tileLayerCount = discoverLayers(layers, types);
 
-	Logger::logDebug(str(boost::format("Discovered %1% tile layer(s)") % tileLayerCount));
+	Logger::logDebug(FORMAT("Discovered %1% tile layer(s)", tileLayerCount));
 
 	// resize vertex array to accomodate for layer count
 	resize(tileLayerCount);
@@ -410,4 +403,16 @@ void World::resize(sf::Vector2i size)
 {
 	tileSize = size;
 	pixelSize = Utils::toPixel(size);
+}
+
+void World::tick(float delta)
+{
+}
+
+void World::draw(sf::RenderTarget &target, sf::RenderStates states) const
+{
+	states.transform *= transform;
+
+	// terrain
+	terrain.render(target, states);
 }

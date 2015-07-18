@@ -31,7 +31,7 @@ void FPSCounter::tick(float delta, sf::RenderWindow &window)
 
 
 BaseGame::BaseGame(const sf::Vector2i &windowSize, const sf::Uint32 &style, const std::string &title) :
-	window(sf::RenderWindow(sf::VideoMode(windowSize.x, windowSize.y), title, style))
+window(sf::RenderWindow(sf::VideoMode(windowSize.x, windowSize.y), title, style))
 {
 	limitFrameRate(true);
 
@@ -49,11 +49,18 @@ BaseGame::BaseGame(const sf::Vector2i &windowSize, const sf::Uint32 &style, cons
 	window.setKeyRepeatEnabled(false);
 	input.registerBindings();
 
+	// set as global
+	Globals::game = this;
+
 	Logger::logDebug(title + " started");
 }
 
 void BaseGame::beginGame()
 {
+	// initially fill screen
+	window.clear(backgroundColour);
+	window.display();
+
 	start();
 
 	fps.init(0.25);
@@ -128,7 +135,10 @@ void BaseGame::setWindowIcon(const std::string &fileName)
 Game::Game(const sf::Vector2i &windowSize, const sf::Uint32 &style) : BaseGame(windowSize, style, "Dank Game Memes")
 {
 	showFPS = true;
-	limitFrameRate(false);
+
+	bool limitFPS;
+	Config::getBool("debug-limit-fps", limitFPS);
+	limitFrameRate(limitFPS);
 }
 
 Game::~Game()
@@ -138,7 +148,7 @@ Game::~Game()
 
 void Game::start()
 {
-	switchState(State::StateType::GAME);
+	switchState(StateType::GAME);
 }
 
 void Game::tick(float delta)
@@ -156,10 +166,10 @@ void Game::handleInput(sf::Event e)
 	current->handleInput(e);
 }
 
-void Game::switchState(State::StateType newStateType)
+void Game::switchState(StateType newStateType)
 {
 	// destruct current
-	if (newStateType == State::StateType::NONE)
+	if (newStateType == StateType::NONE)
 	{
 		delete current;
 		states.pop();
@@ -172,7 +182,7 @@ void Game::switchState(State::StateType newStateType)
 		State *newState(createFromStateType(newStateType));
 		if (!newState) return;
 
-		bool shouldDestruct = (current && current->type != State::GAME && newStateType != State::PAUSE);
+		bool shouldDestruct = (current && current->type != GAME && newStateType != PAUSE);
 
 		if (shouldDestruct)
 		{
@@ -187,11 +197,11 @@ void Game::switchState(State::StateType newStateType)
 	window.setMouseCursorVisible(current->showMouse);
 }
 
-State* Game::createFromStateType(State::StateType type)
+State* Game::createFromStateType(StateType type)
 {
 	switch (type)
 	{
-	case State::GAME: return new GameState(this);
+	case GAME: return new GameState;
 	default:
 		throw std::runtime_error("Not implemented");
 	}
@@ -200,17 +210,54 @@ State* Game::createFromStateType(State::StateType type)
 void Game::end()
 {
 	window.close();
-	Logger::logDebug("Shutdown cleanly");
 }
+
+
+bool ensureCWD(int argc, char** argv)
+{
+	using namespace boost::filesystem;
+	const std::string required("res");
+
+	if (!exists(current_path() / required))
+	{
+		// no args given
+		if (argc != 2)
+		{
+			std::cerr << "Root directory not found. \nUsage: " << argv[0] << " <relative path to root dir>\nPress enter to quit." << std::endl;
+			std::cin.get();
+			return false;
+		}
+
+		// try supplied relative path
+		std::string relativePath = argv[1];
+		path newPath = current_path() / relativePath;
+
+		// doesn't exist
+		if (!exists(newPath))
+		{
+			std::cerr << "Invalid path" << std::endl;
+			return false;
+		}
+
+		// update path and try again
+		current_path(newPath);
+		return ensureCWD(-1, nullptr);
+	}
+
+	return true;
+}
+
 
 void loadConfig(int &windowStyle)
 {
 	Config::loadConfig();
 
 	int width, height;
+	bool fullScreen;
 
 	// borderless fullscreen
-	if (Config::get<bool>("display-borderless-fullscreen"))
+	Config::getBool("display-borderless-fullscreen", fullScreen);
+	if (fullScreen)
 	{
 		windowStyle = sf::Style::None;
 
@@ -223,18 +270,22 @@ void loadConfig(int &windowStyle)
 	else
 	{
 		windowStyle = sf::Style::Default;
-		width = Config::get<int>("display-resolution-width");
-		height = Config::get<int>("display-resolution-height");
+		Config::getInt("display-resolution-width", width);
+		Config::getInt("display-resolution-height", height);
 	}
 
 	Constants::setWindowSize(width, height);
 }
 
 
-int main()
+int main(int argc, char** argv)
 {
 	try
 	{
+		// ensure that the program root is in the project root
+		if (!ensureCWD(argc, argv))
+			return -1;
+
 		// create logger
 		createLogger(std::cout, Logger::DEBUG);
 
@@ -245,6 +296,10 @@ int main()
 		BaseGame *game;
 		game = new Game(Constants::windowSize, style);
 		dynamic_cast<BaseGame*>(game)->beginGame();
+
+		Logger::logDebug("Shutdown cleanly");
+
+		delete game;
 	}
 	catch (std::exception &e)
 	{

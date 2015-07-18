@@ -41,6 +41,7 @@ public:
 	}
 
 	void beginGame();
+	virtual void end() = 0;
 	
 	inline void setView(const sf::View &view)
 	{
@@ -60,7 +61,6 @@ protected:
 	virtual void start() = 0;
 	virtual void tick(float delta) = 0;
 	virtual void render() = 0;
-	virtual void end() = 0;
 	virtual void handleInput(sf::Event e) = 0;
 
 	void limitFrameRate(bool limit);
@@ -85,19 +85,19 @@ public:
 	Game(const sf::Vector2i &windowSize, const sf::Uint32 &style);
 	~Game();
 
+	void end() override;
 
 protected:
 	void start() override;
-	void end() override;
 	void tick(float delta) override;
 	void render() override;
 	void handleInput(sf::Event e) override;
 
 public:
-	void switchState(State::StateType newScreenType);
+	void switchState(StateType newScreenType);
 
 private:
 	State *current;
 	std::stack<State*> states;
-	State* Game::createFromStateType(State::StateType type);
+	State* Game::createFromStateType(StateType type);
 };

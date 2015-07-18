@@ -1,6 +1,7 @@
 #pragma once
-#include <string>
 #include "constants.hpp"
+
+typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;
 
 enum EntityType
 {

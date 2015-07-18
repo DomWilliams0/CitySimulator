@@ -22,3 +22,11 @@ namespace Constants
 		windowCentre.y = y / 2;
 	}
 }
+
+namespace Globals
+{
+	BaseGame *game;
+	EntityManager *entityManager;
+	EntityFactory *entityFactory;
+	SpriteSheet *spriteSheet;
+}

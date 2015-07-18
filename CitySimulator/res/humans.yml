@@ -1,28 +1,51 @@
-human-size: 32x32
-knob:
-    humans:
-        - name: Business Man
-          sprite: business_man.png
-          size: =human-size=
-        - name: Cool Trainer
-          sprite: cool_trainer.png
-          size: =human-size=
-        - name: Girl Scout
-          sprite: girl_scout.png
-          size: =human-size=
-        - name: Goth
-          sprite: goth.png
-          size: =human-size=
-        - name: Middle Aged Man
-          sprite: middle_aged_man.png
-          size: =human-size=
-        - name: Ninja
-          sprite: ninja.png
-          size: =human-size=
-        - name: Old Man
-          sprite: poor_old_man.png
-          size: =human-size=
-        - name: Sweet Lady
-          sprite: sweet_lady.png
-          size: =human-size=
+temp-human-size: 32x32
+temp-human-anim-count: 4
+temp-human-anim-length: 4
+humans:
+    - name: Business Man
+      sprite: business_man.png
+      anim-count: =temp-human-anim-count=
+      anim-length: =temp-human-anim-length=
+      anim-dimensions-all: =temp-human-size=
+
+    - name: Cool Trainer
+      sprite: cool_trainer.png
+      anim-count: =temp-human-anim-count=
+      anim-length: =temp-human-anim-length=
+      anim-dimensions-all: =temp-human-size=
+
+    - name: Girl Scout
+      sprite: girl_scout.png
+      anim-count: =temp-human-anim-count=
+      anim-length: =temp-human-anim-length=
+      anim-dimensions-all: =temp-human-size=
+
+    - name: Goth
+      sprite: goth.png
+      anim-count: =temp-human-anim-count=
+      anim-length: =temp-human-anim-length=
+      anim-dimensions-all: =temp-human-size=
       
+    - name: Middle Aged Man
+      sprite: middle_aged_man.png
+      anim-count: =temp-human-anim-count=
+      anim-length: =temp-human-anim-length=
+      anim-dimensions-all: =temp-human-size=
+
+    - name: Ninja
+      sprite: ninja.png
+      anim-count: =temp-human-anim-count=
+      anim-length: =temp-human-anim-length=
+      anim-dimensions-all: =temp-human-size=
+
+    - name: Old Man
+      sprite: poor_old_man.png
+      anim-count: =temp-human-anim-count=
+      anim-length: =temp-human-anim-length=
+      anim-dimensions-all: =temp-human-size=
+
+    - name: Sweet Lady
+      sprite: sweet_lady.png
+      anim-count: =temp-human-anim-count=
+      anim-length: =temp-human-anim-length=
+      anim-dimensions-all: =temp-human-size=

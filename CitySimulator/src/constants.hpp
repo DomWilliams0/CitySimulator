@@ -1,13 +1,16 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <boost/variant.hpp>
+#include <boost/format.hpp>
 #include <unordered_map>
 
-#define FAIL(msg, argument) throw std::runtime_error(str(boost::format(msg) % argument));
+#define FORMAT(msg, argument) str(boost::format(msg) % argument)
+#define FAIL(msg, argument) throw std::runtime_error(FORMAT(msg, argument))
+#define FAIL2(msg, arg1, arg2) throw std::runtime_error(str(boost::format(msg) % arg1 % arg2))
 
-typedef boost::variant<int, bool, std::string> ConfigValue;
-typedef std::unordered_map<std::string, ConfigValue> ConfigMap;
-typedef std::unordered_map<std::string, std::vector<std::pair<std::string, ConfigValue>>> EntityTags;
+#define CV_TO_STRING(cv) boost::get<std::string>(cv)
+
+typedef std::unordered_map<std::string, std::string> ConfigMap;
+typedef std::map<std::string, std::string> ConfigKeyValue;
 
 namespace Constants
 {
@@ -22,4 +25,17 @@ namespace Constants
 	extern sf::Font mainFont;
 
 	extern const float degToRad;
+}
+
+class BaseGame;
+class SpriteSheet;
+class EntityManager;
+class EntityFactory;
+
+namespace Globals
+{
+	extern BaseGame *game;
+	extern SpriteSheet *spriteSheet;
+	extern EntityManager *entityManager;
+	extern EntityFactory *entityFactory;
 }

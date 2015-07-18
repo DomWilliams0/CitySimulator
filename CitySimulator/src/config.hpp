@@ -1,121 +1,89 @@
 #pragma once
-#include <boost/variant.hpp>
-#include <boost/format.hpp>
-#include <boost/filesystem.hpp>
 #include <unordered_map>
+#include <boost/filesystem.hpp>
 #include <yaml-cpp/yaml.h>
-#include "utils.hpp"
-#include "constants.hpp"
+#include <boost/variant.hpp>
 
 #define FAIL_GET(key) FAIL("Invalid config key: %1%", key)
 
+enum ValueType
+{
+	SCALAR, FLAT_LIST, MAP_LIST
+};
+
+struct ValueStruct
+{
+	std::string value;
+	ValueType type;
+};
 
 class ConfigurationFile
 {
 public:
-	virtual ~ConfigurationFile()
+	ConfigurationFile()
 	{
 	}
 
-	void load(const std::string &fileName,
-		const std::map<std::string, std::string> &rootNodes = {},
-		const std::initializer_list<std::string> &toRemove = {}, bool loadAll = false);
-
-
-	template <class T>
-	T getValue(const std::string &key)
+	// no search will be attempted
+	explicit ConfigurationFile(const std::string &fileName) : configPath(fileName)
 	{
-		ConfigValue cv = getConfigValue(key);
-
-		try
-		{
-			return boost::get<T>(cv);
-		}
-		catch (boost::bad_get&)
-		{
-			FAIL_GET(key);
-		}
 	}
 
+	void load();
+
+	void getInt(const std::string &key, int &i);
+	void getBool(const std::string &key, bool &b);
+	void getString(const std::string &key, std::string &s);
+	void getList(const std::string &key, std::vector<std::string> &l);
+	void getIntList(const std::string &key, std::vector<int> &l);
+	void getMapList(const std::string &key, std::vector<std::map<std::string, std::string>> &ml);
+
+	static int stringToInt(const std::string &s);
+	static bool stringToBool(const std::string &s);
 
 protected:
+	std::unordered_map<std::string, ValueStruct> configMap;
 	boost::filesystem::path configPath;
-	ConfigMap configMap;
 
+	friend class Config;
+
+private:
 	// path: variable name
 	std::vector<std::pair<std::string, std::string>> variablesToProcess;
 
-	void loadNode(const YAML::Node &node, const std::string &prefix);
+	ValueStruct &getValueStruct(const std::string &key, ValueType type);
+	void parseConfig(std::map<std::string, std::string>& config);
 
-	ConfigValue parseString(const std::string &s, const std::string &path);
-	virtual void loadScalar(const YAML::Node &node, const std::string &prefix);
-	virtual void loadMap(const YAML::Node &node, const std::string &prefix);
-	virtual void loadSequence(const YAML::Node &node, const std::string &prefix);
-	virtual void loadOther(const YAML::Node &node, const std::string &prefix);
-
-	virtual void substituteVariables();
-
-	ConfigValue getConfigValue(const std::string &key)
-	{
-		auto value(configMap.find(key));
-		boost::optional<ConfigValue> ret;
-
-		if (value != configMap.end())
-			ret = value->second;
-
-		if (ret)
-			return ret.get();
-
-		FAIL_GET(key);
-	}
-
-	inline bool ConfigurationFile::exists()
-	{
-		return boost::filesystem::exists(configPath);
-	}
+	void loadNode(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
+	void loadScalar(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
+	void loadMap(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
+	void loadSequence(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
+	void loadOther(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
 
 };
 
-class Config : public ConfigurationFile
+class Config
 {
 public:
-
 	static void loadConfig();
 
-	template <class T>
-	static T get(const std::string &key)
-	{
-		return getInstance().getValue<T>(key);
-	}
-
-	static Config& getInstance()
+	static Config &getInstance()
 	{
 		static Config instance;
 		return instance;
 	}
 
+	static void getInt(const std::string &key, int &i);
+	static void getBool(const std::string &key, bool &b);
+	static void getString(const std::string &key, std::string &s);
+	static void getList(const std::string &key, std::vector<std::string> &l);
+	static void getIntList(const std::string &key, std::vector<int> &l);
+	static void getMapList(const std::string &key, std::vector<std::map<std::string, std::string>> &ml);
 
 private:
+	ConfigurationFile config;
 
 	void ensureConfigExists();
 	void createDefaultConfig();
+
 };
-
-class EntityConfig : public ConfigurationFile
-{
-public:
-	EntityTags &getTags()
-	{
-		return tags;
-	}
-
-protected:
-	void loadSequence(const YAML::Node& node, const std::string& prefix) override;
-	void substituteVariables() override;
-
-private:
-	// name: list of <key, value>
-	EntityTags tags;
-};
-
-#undef FAIL_GET
