@@ -12,7 +12,7 @@ void SpriteSheet::loadSprite(ConfigKeyValue &entityTags)
 {
 	checkProcessed(false);
 
-	std::string fileName(CV_TO_STRING(entityTags["sprite"]));
+	std::string fileName(entityTags["sprite"]);
 
 	sf::Image *image = new sf::Image;
 	if (!image->loadFromFile(Utils::searchForFile(fileName, "res/sprites")))
@@ -20,8 +20,8 @@ void SpriteSheet::loadSprite(ConfigKeyValue &entityTags)
 		FAIL("Could not load sprite %1%", fileName);
 	}
 
-	preProcessSpriteImages.insert({ image, entityTags });
-	Logger::logDebug(FORMAT("Loaded sprite %1%", CV_TO_STRING(entityTags["name"])));
+	preProcessSpriteImages.insert({image, entityTags});
+	Logger::logDebug(FORMAT("Loaded sprite %1%", entityTags["name"]));
 }
 
 void SpriteSheet::processAllSprites()
@@ -68,7 +68,7 @@ void SpriteSheet::processAllSprites()
 			animCount = ConfigurationFile::stringToInt(entityTags.at("anim-count"));
 			animLength = ConfigurationFile::stringToInt(entityTags.at("anim-length"));
 		}
-		catch (std::out_of_range&)
+		catch (std::out_of_range &)
 		{
 			FAIL("Could not get animation info from %1% tags", entityTags["name"]);
 		}
@@ -76,7 +76,7 @@ void SpriteSheet::processAllSprites()
 		// all dimensions the same
 		if (entityTags.find("anim-dimensions-all") != entityTags.end())
 		{
-			sf::Vector2i dimensions(stringToVector(CV_TO_STRING(entityTags["anim-dimensions-all"])));
+			sf::Vector2i dimensions(stringToVector(entityTags["anim-dimensions-all"]));
 
 			sf::Vector2i pos(rect.left, rect.top);
 
@@ -93,7 +93,7 @@ void SpriteSheet::processAllSprites()
 			// TODO
 		}
 
-		animations.insert({ CV_TO_STRING(entityTags["name"]), anim });
+		animations.insert({entityTags["name"], anim});
 	}
 
 	preProcessSpriteImages.clear();
@@ -104,10 +104,10 @@ void SpriteSheet::positionImages(sf::Vector2i &imageSize, std::map<sf::Image*, s
 {
 	// calculate initial size of bin
 	sf::Vector2u totalSize = std::accumulate(preProcessSpriteImages.begin(), preProcessSpriteImages.end(), sf::Vector2u(),
-		[](sf::Vector2u &acc, const std::pair<sf::Image*, ConfigKeyValue> &pair)
-	{
-		return acc + pair.first->getSize();
-	});
+											 [](sf::Vector2u &acc, const std::pair<sf::Image*, ConfigKeyValue> &pair)
+											 {
+												 return acc + pair.first->getSize();
+											 });
 
 	sf::IntRect binRect(0, 0, totalSize.x, totalSize.y);
 	PackingTreeNode *node = new PackingTreeNode(binRect);
@@ -116,14 +116,14 @@ void SpriteSheet::positionImages(sf::Vector2i &imageSize, std::map<sf::Image*, s
 	std::vector<std::pair<sf::Image*, ConfigKeyValue>> asVector(preProcessSpriteImages.begin(), preProcessSpriteImages.end());
 
 	std::sort(asVector.begin(), asVector.end(),
-		[](const std::pair<sf::Image*, ConfigKeyValue> &left,
-		const std::pair<sf::Image*, ConfigKeyValue> &right)
-	{
-		sf::Vector2i leftSize(left.first->getSize());
-		sf::Vector2i rightSize(right.first->getSize());
+			  [](const std::pair<sf::Image*, ConfigKeyValue> &left,
+				  const std::pair<sf::Image*, ConfigKeyValue> &right)
+			  {
+				  sf::Vector2i leftSize(left.first->getSize());
+				  sf::Vector2i rightSize(right.first->getSize());
 
-		return (leftSize.x * leftSize.y) < (rightSize.x * rightSize.y);
-	});
+				  return (leftSize.x * leftSize.y) < (rightSize.x * rightSize.y);
+			  });
 
 	// insert one at a time
 	for (auto &pair : asVector)
@@ -138,7 +138,7 @@ void SpriteSheet::positionImages(sf::Vector2i &imageSize, std::map<sf::Image*, s
 			FAIL2("Could not pack spritesheet of size %1%, %2%", size.x, size.y);
 		}
 
-		imagePositions.insert({ pair.first, *positionedRect });
+		imagePositions.insert({pair.first, *positionedRect});
 	}
 
 	// find min bounding box

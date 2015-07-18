@@ -8,7 +8,9 @@
 
 enum ValueType
 {
-	SCALAR, FLAT_LIST, MAP_LIST
+	SCALAR,
+	FLAT_LIST,
+	MAP_LIST
 };
 
 struct ValueStruct
@@ -51,15 +53,14 @@ private:
 	// path: variable name
 	std::vector<std::pair<std::string, std::string>> variablesToProcess;
 
-	ValueStruct &getValueStruct(const std::string &key, ValueType type);
-	void parseConfig(std::map<std::string, std::string>& config);
+	ValueStruct& getValueStruct(const std::string &key, ValueType type);
+	void parseConfig(std::map<std::string, std::string> &config);
 
 	void loadNode(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
 	void loadScalar(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
 	void loadMap(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
 	void loadSequence(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
 	void loadOther(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
-
 };
 
 class Config
@@ -67,7 +68,7 @@ class Config
 public:
 	static void loadConfig();
 
-	static Config &getInstance()
+	static Config& getInstance()
 	{
 		static Config instance;
 		return instance;
@@ -85,5 +86,4 @@ private:
 
 	void ensureConfigExists();
 	void createDefaultConfig();
-
 };

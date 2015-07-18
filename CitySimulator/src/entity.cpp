@@ -30,7 +30,7 @@ void EntityFactory::loadEntities(EntityType entityType, const std::string &fileN
 		}
 
 		std::string name(nameIt->second);
-		allTags.insert({ name, entity});
+		allTags.insert({name, entity});
 	}
 
 	loadedTags[entityType] = allTags;

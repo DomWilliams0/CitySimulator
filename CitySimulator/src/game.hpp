@@ -42,13 +42,13 @@ public:
 
 	void beginGame();
 	virtual void end() = 0;
-	
+
 	inline void setView(const sf::View &view)
 	{
 		window.setView(view);
 	}
 
-	inline Input *getInput()
+	inline Input* getInput()
 	{
 		return &input;
 	}

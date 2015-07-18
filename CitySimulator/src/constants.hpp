@@ -7,8 +7,6 @@
 #define FAIL(msg, argument) throw std::runtime_error(FORMAT(msg, argument))
 #define FAIL2(msg, arg1, arg2) throw std::runtime_error(str(boost::format(msg) % arg1 % arg2))
 
-#define CV_TO_STRING(cv) boost::get<std::string>(cv)
-
 typedef std::unordered_map<std::string, std::string> ConfigMap;
 typedef std::map<std::string, std::string> ConfigKeyValue;
 

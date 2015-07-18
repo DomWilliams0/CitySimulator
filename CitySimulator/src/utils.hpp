@@ -46,13 +46,13 @@ namespace Utils
 
 	struct filenotfound_exception : std::runtime_error
 	{
-		explicit filenotfound_exception(const char* msg)
+		explicit filenotfound_exception(const char *msg)
 			: runtime_error(msg)
 		{
 		}
 
 
-		explicit filenotfound_exception(const std::string& msg)
+		explicit filenotfound_exception(const std::string &msg)
 			: runtime_error(msg)
 		{
 		}

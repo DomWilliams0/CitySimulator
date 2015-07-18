@@ -29,5 +29,4 @@ public:
 
 	const StateType type;
 	bool showMouse;
-
 };
