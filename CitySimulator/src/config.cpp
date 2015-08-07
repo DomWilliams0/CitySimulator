@@ -34,7 +34,7 @@ void ConfigurationFile::load()
 			// find value to substitute
 			auto subIt(config.find(var));
 			if (subIt == config.end())
-				FAIL("Variable not found: %1%", var);
+			FAIL("Variable not found: %1%", var);
 
 			// replace
 			pair.second = subIt->second;
@@ -58,19 +58,19 @@ void ConfigurationFile::load()
 	//	 std::cout << pair.first << " === " << pair.second.value << std::endl;
 }
 
-ValueStruct &ConfigurationFile::getValueStruct(const std::string &key, ValueType type)
+ValueStruct& ConfigurationFile::getValueStruct(const std::string &key, ValueType type)
 {
 	auto found(configMap.find(key));
 
 	// invalid key
 	if (found == configMap.end())
-		FAIL_GET(key);
+	FAIL_GET(key);
 
 	ValueStruct &value = found->second;
 
 	// invalid type
 	if (value.type != type)
-		FAIL2("Wrong valuetype given for %1% (%2%)", key, value.type);
+	FAIL2("Wrong valuetype given for %1% (%2%)", key, value.type);
 
 	return value;
 }
@@ -79,7 +79,7 @@ void splitString(const std::string &s, const char *delimiter, std::vector<std::s
 {
 	boost::char_separator<char> sep(delimiter);
 	boost::tokenizer<boost::char_separator<char>> tokens(s, sep);
-	for (auto& t : tokens)
+	for (auto &t : tokens)
 		ret.push_back(t);
 }
 
@@ -154,22 +154,20 @@ void ConfigurationFile::getMapList(const std::string &key, std::vector<std::map<
 
 			// not found
 			if (equals == std::string::npos)
-				FAIL("Invalid key=value format: %1%", kvPair);
+			FAIL("Invalid key=value format: %1%", kvPair);
 
 			std::string key(kvPair.substr(0, equals));
 			std::string val(kvPair.substr(equals + 1, kvPair.size() - 1));
 
-			map.insert({ key, val });
+			map.insert({key, val});
 		}
 
 		ml.push_back(map);
 	}
-
 }
 
 
-
-int ConfigurationFile::stringToInt(const std::string& s)
+int ConfigurationFile::stringToInt(const std::string &s)
 {
 	static std::regex noCharRegex(".*[a-zA-Z ].*");
 	if (!regex_match(s, noCharRegex))
@@ -184,12 +182,12 @@ int ConfigurationFile::stringToInt(const std::string& s)
 	FAIL("Could not convert '%1%' to int", s);
 }
 
-bool ConfigurationFile::stringToBool(const std::string& s)
+bool ConfigurationFile::stringToBool(const std::string &s)
 {
 	return boost::to_lower_copy(s) == "true";
 }
 
-void ConfigurationFile::parseConfig(std::map<std::string, std::string>& config)
+void ConfigurationFile::parseConfig(std::map<std::string, std::string> &config)
 {
 	static std::regex listRegex("^(.+)-(#{1,2})(\\d+)-?(.+)?");
 	static std::smatch match;
@@ -259,7 +257,6 @@ void ConfigurationFile::parseConfig(std::map<std::string, std::string>& config)
 
 				if (!currentList.simple)
 					currentList.storeCount();
-
 			}
 
 			// index incremented: same list
@@ -302,7 +299,7 @@ void ConfigurationFile::parseConfig(std::map<std::string, std::string>& config)
 			ValueStruct val;
 			val.type = SCALAR;
 			val.value = pair.second;
-			configMap.insert({ pair.first, val });
+			configMap.insert({pair.first, val});
 
 			// ending current list
 			if (!currentList.list.empty())
@@ -363,7 +360,7 @@ void ConfigurationFile::parseConfig(std::map<std::string, std::string>& config)
 			// store
 			std::string full(output.str());
 			val.value = full.substr(0, full.size() - 1);
-			configMap.insert({ currentList.key, val });
+			configMap.insert({currentList.key, val});
 
 			// reset and possibly add first item of next list
 			std::string next = currentList.next;
@@ -407,16 +404,15 @@ void ConfigurationFile::loadScalar(const YAML::Node &node, const std::string &pr
 
 	// reserved symbols
 	if (std::regex_match(value, reservedChars) || std::regex_match(realPrefix, reservedChars))
-		FAIL2("Reserved characters used in key %1%: %2%", realPrefix, value);
+	FAIL2("Reserved characters used in key %1%: %2%", realPrefix, value);
 
-	config.insert({ realPrefix, value });
+	config.insert({realPrefix, value});
 }
 
 void ConfigurationFile::loadMap(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config)
 {
 	for (auto &pair : node)
 		loadNode(pair.second, prefix + pair.first.as<std::string>() + "-", config);
-
 }
 
 void ConfigurationFile::loadSequence(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config)
@@ -494,32 +490,32 @@ void Config::createDefaultConfig()
 	configStream.close();
 }
 
-void Config::getInt(const std::string& key, int& i)
+void Config::getInt(const std::string &key, int &i)
 {
 	getInstance().config.getInt(key, i);
 }
 
-void Config::getBool(const std::string& key, bool& b)
+void Config::getBool(const std::string &key, bool &b)
 {
 	getInstance().config.getBool(key, b);
 }
 
-void Config::getString(const std::string& key, std::string& s)
+void Config::getString(const std::string &key, std::string &s)
 {
 	getInstance().config.getString(key, s);
 }
 
-void Config::getList(const std::string& key, std::vector<std::string>& l)
+void Config::getList(const std::string &key, std::vector<std::string> &l)
 {
 	getInstance().config.getList(key, l);
 }
 
-void Config::getIntList(const std::string& key, std::vector<int>& l)
+void Config::getIntList(const std::string &key, std::vector<int> &l)
 {
 	getInstance().config.getIntList(key, l);
 }
 
-void Config::getMapList(const std::string& key, std::vector<std::map<std::string, std::string>>& ml)
+void Config::getMapList(const std::string &key, std::vector<std::map<std::string, std::string>> &ml)
 {
 	getInstance().config.getMapList(key, ml);
 }

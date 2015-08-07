@@ -7,7 +7,7 @@
 GameState::GameState() : State(GAME)
 {
 	// create globals
-//	Globals::entityManager = new EntityManager;
+	//	Globals::entityManager = new EntityManager;
 	Globals::entityFactory = new EntityFactory;
 	Globals::spriteSheet = new SpriteSheet;
 
@@ -32,7 +32,7 @@ GameState::GameState() : State(GAME)
 
 GameState::~GameState()
 {
-//	delete Globals::entityManager;
+	//	delete Globals::entityManager;
 	delete Globals::entityFactory;
 	delete Globals::spriteSheet;
 }

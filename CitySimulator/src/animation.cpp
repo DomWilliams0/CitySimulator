@@ -1,5 +1,5 @@
 #include <boost/format.hpp>
-#include <SFML\Graphics.hpp>
+#include <SFML/Graphics.hpp>
 #include <numeric>
 #include <regex>
 #include "PackingTreeNode.h"

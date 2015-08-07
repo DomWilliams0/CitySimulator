@@ -103,7 +103,7 @@ private:
 	void addPoint(int x, int y)
 	{
 		points[getIndex(x, y)] = sf::Vector2f(x * Constants::tileSizef,
-		                                      y * Constants::tileSizef);
+											  y * Constants::tileSizef);
 	}
 
 	void generatePoints();
@@ -210,7 +210,7 @@ public:
 private:
 	WorldTerrain terrain;
 
-	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 
 protected:
 	sf::Vector2i tileSize;

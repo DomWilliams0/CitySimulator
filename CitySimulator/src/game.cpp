@@ -31,7 +31,7 @@ void FPSCounter::tick(float delta, sf::RenderWindow &window)
 
 
 BaseGame::BaseGame(const sf::Vector2i &windowSize, const sf::Uint32 &style, const std::string &title) :
-window(sf::RenderWindow(sf::VideoMode(windowSize.x, windowSize.y), title, style))
+	window(sf::RenderWindow(sf::VideoMode(windowSize.x, windowSize.y), title, style))
 {
 	limitFrameRate(true);
 
@@ -213,7 +213,7 @@ void Game::end()
 }
 
 
-bool ensureCWD(int argc, char** argv)
+bool ensureCWD(int argc, char **argv)
 {
 	using namespace boost::filesystem;
 	const std::string required("res");
@@ -278,7 +278,7 @@ void loadConfig(int &windowStyle)
 }
 
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
 	try
 	{

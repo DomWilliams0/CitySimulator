@@ -14,7 +14,7 @@ public:
 	void loadSprite(ConfigKeyValue &entityTags);
 	void processAllSprites();
 
-	Animation *getAnimation(const std::string &name)
+	Animation* getAnimation(const std::string &name)
 	{
 		return &animations.at(name);
 	}
@@ -119,7 +119,7 @@ private:
 	}
 
 public:
-	void draw(sf::RenderTarget& target, sf::RenderStates &states) const
+	void draw(sf::RenderTarget &target, sf::RenderStates &states) const
 	{
 		states.texture = animation->texture;
 		target.draw(vertices, states);

@@ -16,6 +16,4 @@ public:
 
 private:
 	std::map<EntityType, EntityTags> loadedTags;
-
 };
-

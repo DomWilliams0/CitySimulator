@@ -1,4 +1,4 @@
-#include <SFML\System\Vector2.hpp>
+#include <SFML/System\Vector2.hpp>
 #include <boost\shared_ptr.hpp>
 #include <exception>
 #include "maploader.hpp"
