@@ -1,8 +1,27 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <unordered_map>
 #include "constants.hpp"
 
-struct Animation;
+struct Animation
+{
+	typedef std::vector<sf::IntRect> Sequence;
+
+	explicit Animation(sf::Texture *animationTexture) : texture(animationTexture)
+	{
+	}
+
+	Animation* addRow(const sf::Vector2i &startPosition, const sf::Vector2i &spriteDimensions, int rowLength);
+
+
+	//	std::vector<Sequence>& getSequences()
+	//	{
+	//		return sequences;
+	//	}
+
+	sf::Texture *texture;
+	std::vector<Sequence> sequences;
+};
 
 class SpriteSheet
 {
@@ -30,26 +49,6 @@ private:
 
 	sf::Vector2i stringToVector(const std::string &s);
 	void positionImages(sf::Vector2i &imageSize, std::map<sf::Image*, sf::IntRect> &imagePositions);
-};
-
-struct Animation
-{
-	typedef std::vector<sf::IntRect> Sequence;
-
-	explicit Animation(sf::Texture *animationTexture) : texture(animationTexture)
-	{
-	}
-
-	Animation* addRow(const sf::Vector2i &startPosition, const sf::Vector2i &spriteDimensions, int rowLength);
-
-
-	//	std::vector<Sequence>& getSequences()
-	//	{
-	//		return sequences;
-	//	}
-
-	sf::Texture *texture;
-	std::vector<Sequence> sequences;
 };
 
 class Animator

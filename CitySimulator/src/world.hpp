@@ -68,7 +68,7 @@ public:
 	inline sf::Texture* getTexture()
 	{
 		if (!converted)
-			throw std::exception("Tileset has not yet been converted to a texture");
+			throw std::runtime_error("Tileset has not yet been converted to a texture");
 
 		return &texture;
 	}
@@ -76,7 +76,7 @@ public:
 	inline sf::Image* getImage() const
 	{
 		if (converted)
-			throw std::exception("Tileset has already been converted to a texture");
+			throw std::runtime_error("Tileset has already been converted to a texture");
 		return image;
 	}
 
@@ -149,13 +149,13 @@ private:
 	int discoverLayers(std::vector<TMX::Layer*> &layers, std::vector<LayerType> &layerTypes);
 	void discoverFlippedTiles(const std::vector<TMX::Layer*> &layers, std::vector<int> &flippedGIDs);
 	void addTiles(const std::vector<TMX::Layer*> &layers, const std::vector<LayerType> &types);
-	int WorldTerrain::getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
+	int getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
 
 	void rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos);
-	void WorldTerrain::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
+	void positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
 
 protected:
-	std::unordered_map<LayerType, int> layerDepths;
+	std::map<LayerType, int> layerDepths;
 
 	void resize(const int &layerCount);
 

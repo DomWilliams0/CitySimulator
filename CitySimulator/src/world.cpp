@@ -117,7 +117,7 @@ void Tileset::convertToTexture(const std::vector<int> &flippedGIDs)
 
 	// write to texture
 	if (!texture.loadFromImage(newImage))
-		throw std::exception("Could not render tileset");
+		throw std::runtime_error("Could not render tileset");
 
 	converted = true;
 	delete image;
@@ -136,7 +136,7 @@ sf::IntRect Tileset::getTileRect(unsigned blockType)
 void Tileset::createTileImage(sf::Image *image, unsigned blockType)
 {
 	if (converted)
-		throw std::exception("Tileset has already been converted to a texture");
+		throw std::runtime_error("Tileset has already been converted to a texture");
 
 	image->create(Constants::tileSize, Constants::tileSize);
 	image->copy(*this->image, 0, 0, getTileRect(blockType));

@@ -34,7 +34,7 @@ private:
 class BaseGame
 {
 public:
-	BaseGame(const sf::Vector2i &windowSize, const sf::Uint32 &style, const std::string &title);
+	BaseGame(sf::RenderWindow &window);
 
 	virtual ~BaseGame()
 	{
@@ -54,7 +54,7 @@ public:
 	}
 
 protected:
-	sf::RenderWindow window;
+	sf::RenderWindow &window;
 
 	bool showFPS;
 
@@ -82,7 +82,7 @@ private:
 class Game : public BaseGame
 {
 public:
-	Game(const sf::Vector2i &windowSize, const sf::Uint32 &style);
+	Game(sf::RenderWindow &window);
 	~Game();
 
 	void end() override;
@@ -99,5 +99,5 @@ public:
 private:
 	State *current;
 	std::stack<State*> states;
-	State* Game::createFromStateType(StateType type);
+	State* createFromStateType(StateType type);
 };

@@ -19,7 +19,7 @@ void Input::registerBindings()
 		auto msg = boost::format("Expected %1% key bindings, recieved %2% instead") % COUNT % bindings.left.size();
 
 		Logger::logError(str(msg));
-		throw std::exception("Invalid number of key bindings");
+		throw std::runtime_error("Invalid number of key bindings");
 	}
 }
 

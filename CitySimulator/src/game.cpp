@@ -30,8 +30,7 @@ void FPSCounter::tick(float delta, sf::RenderWindow &window)
 }
 
 
-BaseGame::BaseGame(const sf::Vector2i &windowSize, const sf::Uint32 &style, const std::string &title) :
-	window(sf::RenderWindow(sf::VideoMode(windowSize.x, windowSize.y), title, style))
+BaseGame::BaseGame(sf::RenderWindow &renderWindow) : window(renderWindow) 
 {
 	limitFrameRate(true);
 
@@ -52,7 +51,7 @@ BaseGame::BaseGame(const sf::Vector2i &windowSize, const sf::Uint32 &style, cons
 	// set as global
 	Globals::game = this;
 
-	Logger::logDebug(title + " started");
+	Logger::logDebug("Game started");
 }
 
 void BaseGame::beginGame()
@@ -132,8 +131,9 @@ void BaseGame::setWindowIcon(const std::string &fileName)
 }
 
 
-Game::Game(const sf::Vector2i &windowSize, const sf::Uint32 &style) : BaseGame(windowSize, style, "Dank Game Memes")
+Game::Game(sf::RenderWindow &window) : BaseGame(window)
 {
+	window.setTitle("Dank Game Memes");
 	showFPS = true;
 
 	bool limitFPS;
@@ -292,9 +292,10 @@ int main(int argc, char **argv)
 		// load window size/style
 		int style;
 		loadConfig(style);
+		sf::RenderWindow window(sf::VideoMode(Constants::windowSize.x, Constants::windowSize.y), "Game", style);
 
 		BaseGame *game;
-		game = new Game(Constants::windowSize, style);
+		game = new Game(window);
 		dynamic_cast<BaseGame*>(game)->beginGame();
 
 		Logger::logDebug("Shutdown cleanly");

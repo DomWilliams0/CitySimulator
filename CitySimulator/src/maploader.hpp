@@ -5,8 +5,6 @@
 #include <vector>
 #include <boost/lexical_cast.hpp>
 
-enum BlockType;
-
 namespace TMX
 {
 	enum PropertyType
