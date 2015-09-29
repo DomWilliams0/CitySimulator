@@ -35,13 +35,16 @@ public:
 
 	Animation* getAnimation(const std::string &name)
 	{
-		return &animations.at(name);
+		auto anim = animations.find(name);
+		if (anim == animations.end())
+			FAIL("Animation '%s' not found", name);
+
+		return &anim->second;
 	}
 
 private:
 	sf::Texture texture;
 	std::unordered_map<std::string, Animation> animations;
-
 
 	std::map<sf::Image*, ConfigKeyValue> preProcessSpriteImages;
 	bool processed;
