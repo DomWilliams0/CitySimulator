@@ -30,3 +30,13 @@ namespace Globals
 	EntityFactory *entityFactory;
 	SpriteSheet *spriteSheet;
 }
+
+namespace Direction
+{
+	const int NORTH = 0;
+	const int EAST = 1;
+	const int SOUTH = 2;
+	const int WEST = 3;
+
+	const int COUNT = 4;
+}

@@ -37,3 +37,13 @@ namespace Globals
 	extern EntityManager *entityManager;
 	extern EntityFactory *entityFactory;
 }
+
+namespace Direction
+{
+	extern const int NORTH;
+	extern const int EAST;
+	extern const int SOUTH;
+	extern const int WEST;
+
+	extern const int COUNT;
+}

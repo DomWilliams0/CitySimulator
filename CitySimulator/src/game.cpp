@@ -30,7 +30,7 @@ void FPSCounter::tick(float delta, sf::RenderWindow &window)
 }
 
 
-BaseGame::BaseGame(sf::RenderWindow &renderWindow) : window(renderWindow) 
+BaseGame::BaseGame(sf::RenderWindow &renderWindow) : window(renderWindow)
 {
 	limitFrameRate(true);
 
@@ -69,23 +69,29 @@ void BaseGame::beginGame()
 
 	while (window.isOpen())
 	{
+		input.advance();
+
 		while (window.pollEvent(e))
 		{
 			if (e.type == sf::Event::Closed)
 				window.close();
 
 			// keys
-			else if (e.type == sf::Event::KeyPressed)
+			else if (e.type == sf::Event::KeyPressed || e.type == sf::Event::KeyReleased)
 			{
-				// escape to quit
-				if (e.key.code == sf::Keyboard::Escape)
-					window.close();
-				else
-					input.update(e.key.code, true);
-			}
-			else if (e.type == sf::Event::KeyReleased)
-				input.update(e.key.code, false);
+				bool pressed = e.type == sf::Event::KeyPressed;
 
+				if (pressed)
+				{
+					// escape to quit
+					if (e.key.code == sf::Keyboard::Escape)
+						window.close();
+				}
+				input.update(e.key.code, pressed);
+				handleInput(e);
+			}
+
+			// everything else
 			else
 				handleInput(e);
 		}

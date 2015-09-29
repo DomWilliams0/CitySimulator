@@ -12,6 +12,7 @@ void Input::registerBindings()
 	bindings.insert({LEFT, Keyboard::Key::A});
 	bindings.insert({DOWN, Keyboard::Key::S});
 	bindings.insert({RIGHT, Keyboard::Key::D});
+	bindings.insert({ STOP_CONTROLLING, Keyboard::Key::Tab });
 
 	// check all keys have been registered
 	if (bindings.left.size() != COUNT)
@@ -33,7 +34,22 @@ void Input::update(Keyboard::Key key, bool press)
 	}
 }
 
+
 bool Input::isPressed(InputKey key)
 {
 	return pressed[key];
+}
+
+bool Input::isFirstPressed(InputKey key)
+{
+	return pressed[key] && !wasPressed[key];
+}
+
+void Input::advance()
+{
+	for (size_t i = 0; i < COUNT; ++i)
+	{
+		wasPressed[i] = pressed[i];
+		pressed[i] = false;
+	}
 }

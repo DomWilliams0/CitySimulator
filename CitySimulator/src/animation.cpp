@@ -196,10 +196,76 @@ Animation* Animation::addRow(const sf::Vector2i &startPosition, const sf::Vector
 	sf::IntRect rect(startPosition, spriteDimensions);
 	for (int i = 0; i < rowLength; i++)
 	{
-		rect.left += spriteDimensions.x;
 		seq.push_back(rect);
+		rect.left += spriteDimensions.x;
 	}
 
 	sequences.push_back(seq);
 	return this;
+}
+
+Animator::Animator(Animation *anim, float step) : animation(anim), frameStep(step), currentFrameTime(0),
+currentSequence(0), currentFrame(0), playing(true), direction(Direction::SOUTH)
+{
+	vertices.setPrimitiveType(sf::Quads);
+	vertices.resize(4);
+	updateFrame();
+}
+
+void Animator::tick(float delta)
+{
+	if (!playing)
+		return;
+
+	currentFrameTime += delta;
+
+	// next frame
+	if (currentFrameTime >= frameStep)
+	{
+		currentFrameTime = fmod(currentFrameTime, frameStep);
+
+		if (++currentFrame >= animation->sequences.size())
+			currentFrame = 0;
+
+		updateFrame();
+	}
+}
+
+void Animator::turn(int direction, bool reset)
+{
+	if (direction == this->direction)
+		return;
+
+	this->direction = direction;
+
+	// convert direction to sequence
+	if (direction == Direction::NORTH)
+		currentSequence = 3;
+	else if (direction == Direction::EAST)
+		currentSequence = 2;
+	else if (direction == Direction::WEST)
+		currentSequence = 1;
+	else if (direction == Direction::SOUTH)
+		currentSequence = 0;
+
+	if (reset)
+		currentFrame = 0;
+
+	updateFrame();
+}
+
+void Animator::setPlaying(bool playing, bool reset)
+{
+	this->playing = playing;
+
+	if (reset)
+	{
+		currentFrame = 0;
+		updateFrame();
+	}
+}
+
+void Animator::togglePlaying(bool resetEachTime)
+{
+	setPlaying(!playing, resetEachTime);
 }

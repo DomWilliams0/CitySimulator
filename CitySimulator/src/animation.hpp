@@ -51,31 +51,27 @@ private:
 	void positionImages(sf::Vector2i &imageSize, std::map<sf::Image*, sf::IntRect> &imagePositions);
 };
 
-class Animator
+class Animator : public sf::Drawable
 {
 public:
-	Animator(Animation *anim, float step) : animation(anim), frameStep(step), currentFrameTime(0), currentSequence(0), currentFrame(0)
-	{
-		vertices.setPrimitiveType(sf::Quads);
-		vertices.resize(4);
-		updateFrame();
-	}
+	Animator(Animation *anim, float step);
 
-	void tick(float delta)
-	{
-		currentFrameTime += delta;
+	void tick(float delta);
 
-		// next frame
-		if (currentFrameTime >= frameStep)
-		{
-			currentFrameTime = fmod(currentFrameTime, frameStep);
+	/// <summary>
+	/// Turns in the given direction.
+	/// </summary>
+	void turn(int direction, bool reset = true);
+	
+	/// <summary>
+	/// Plays/pauses the animation.
+	/// </summary>
+	void setPlaying(bool playing, bool reset = false);
 
-			if (++currentFrame >= animation->sequences.size())
-				currentFrame = 0;
-
-			updateFrame();
-		}
-	}
+	/// <summary>
+	/// Toggles the pause state of the animation.
+	/// </summary>
+	void togglePlaying(bool resetEachTime = false);
 
 private:
 	Animation *animation;
@@ -85,9 +81,12 @@ private:
 
 	size_t currentSequence;
 	size_t currentFrame;
+	bool playing;
 
 	sf::VertexArray vertices;
 	sf::Vector2f currentSize;
+
+	int direction;
 
 
 	void resizeVertices(float width, float height)
@@ -112,13 +111,14 @@ private:
 		resizeVertices(rect.width, rect.height);
 
 		vertices[0].texCoords = sf::Vector2f(rect.left, rect.top);
-		vertices[1].texCoords = sf::Vector2f(rect.left, rect.top + rect.height);
+		vertices[1].texCoords = sf::Vector2f(rect.left + rect.width, rect.top);
 		vertices[2].texCoords = sf::Vector2f(rect.left + rect.width, rect.top + rect.height);
-		vertices[3].texCoords = sf::Vector2f(rect.left + rect.width, rect.top);
+		vertices[3].texCoords = sf::Vector2f(rect.left, rect.top + rect.height);
 	}
 
-public:
-	void draw(sf::RenderTarget &target, sf::RenderStates &states) const
+protected:
+
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override
 	{
 		states.texture = animation->texture;
 		target.draw(vertices, states);

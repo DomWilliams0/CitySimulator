@@ -26,8 +26,14 @@ GameState::GameState() : State(GAME)
 	// camera view
 	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
 	view.setCenter(world.getPixelSize().x / 2.f, world.getPixelSize().y / 2.f);
-	view.zoom(0.5);
+//	view.zoom(0.5);
 	Globals::game->setView(view);
+
+	// animation test
+	std::string skin;
+	Config::getString("debug-human-skin", skin);
+	Animation *animation = Globals::spriteSheet->getAnimation(skin);
+	testAnimator = new Animator(animation, 0.18f);
 }
 
 GameState::~GameState()
@@ -42,6 +48,7 @@ void GameState::tick(float delta)
 	const static float viewSpeed = 400;
 
 	Input *input = Globals::game->getInput();
+	/*
 	float dx(0), dy(0);
 
 	if (input->isPressed(UP))
@@ -58,13 +65,35 @@ void GameState::tick(float delta)
 		view.move(dx * viewSpeed, dy * viewSpeed);
 		Globals::game->setView(view);
 	}
+	*/
 
 	world.tick(delta);
+
+
+	// todo: temporary animator turning
+	int direction = Direction::COUNT;
+	if (input->isFirstPressed(UP))
+		direction = Direction::NORTH;
+	else if (input->isFirstPressed(DOWN))
+		direction = Direction::SOUTH;
+	else if (input->isFirstPressed(LEFT))
+		direction = Direction::WEST;
+	else if (input->isFirstPressed(RIGHT))
+		direction = Direction::EAST;
+
+	if (direction != Direction::COUNT)
+		testAnimator->turn(direction, true);
+
+	if (input->isFirstPressed(STOP_CONTROLLING))
+		testAnimator->togglePlaying(true);
+
+	testAnimator->tick(delta);
 }
 
 void GameState::render(sf::RenderWindow &window)
 {
 	window.draw(world);
+	window.draw(*testAnimator);
 }
 
 void GameState::handleInput(const sf::Event &event)
