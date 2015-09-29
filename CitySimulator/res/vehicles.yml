@@ -1,9 +1,7 @@
-temp-vehicle-anim-count: 4
-temp-vehicle-anim-length: 4
 vehicles:
     - name: Standard Car
       sprite: car.png
-      anim-count: =temp-vehicle-anim-count=
-      anim-length: =temp-vehicle-anim-length=
+      anim-count: 4
+      anim-length: 4
       colour: random
       seats: 2

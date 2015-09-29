@@ -1,5 +1,5 @@
 #include <regex>
-#include <iostream>
+#include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
@@ -21,6 +21,7 @@ void ConfigurationFile::load()
 	std::map<std::string, std::string> config;
 	loadNode(root, "", config);
 
+	/*
 	// replace all variables
 	static std::regex varRegex("^=([a-zA-Z-_ ]+)=$");
 	std::smatch match;
@@ -49,6 +50,8 @@ void ConfigurationFile::load()
 		else
 			++it;
 	}
+
+	*/
 
 	// store variables in config map
 	parseConfig(config);
