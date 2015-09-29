@@ -34,6 +34,7 @@ public:
 	void load();
 
 	void getInt(const std::string &key, int &i);
+	void getFloat(const std::string &key, float &f);
 	void getBool(const std::string &key, bool &b);
 	void getString(const std::string &key, std::string &s);
 	void getList(const std::string &key, std::vector<std::string> &l);
@@ -51,8 +52,9 @@ protected:
 
 private:
 	// path: variable name
-//	std::vector<std::pair<std::string, std::string>> variablesToProcess;
+	//	std::vector<std::pair<std::string, std::string>> variablesToProcess;
 
+	template <class T> T getNumber(const std::string& key);
 	ValueStruct& getValueStruct(const std::string &key, ValueType type);
 	void parseConfig(std::map<std::string, std::string> &config);
 
@@ -75,6 +77,7 @@ public:
 	}
 
 	static void getInt(const std::string &key, int &i);
+	static void getFloat(const std::string &key, float &f);
 	static void getBool(const std::string &key, bool &b);
 	static void getString(const std::string &key, std::string &s);
 	static void getList(const std::string &key, std::vector<std::string> &l);

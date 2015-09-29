@@ -86,7 +86,8 @@ void splitString(const std::string &s, const char *delimiter, std::vector<std::s
 		ret.push_back(t);
 }
 
-void ConfigurationFile::getInt(const std::string &key, int &i)
+template <class T>
+T ConfigurationFile::getNumber(const std::string &key)
 {
 	static std::regex noCharRegex(".*[a-zA-Z ].*");
 
@@ -95,18 +96,25 @@ void ConfigurationFile::getInt(const std::string &key, int &i)
 	if (!std::regex_match(value.value, noCharRegex))
 	{
 		std::stringstream ss(value.value);
-		int testInt;
+		
+		T ret;
 
-		if (ss >> testInt)
-		{
-			i = boost::lexical_cast<int>(value.value);
-			return;
-		}
+		if (ss >> ret)
+			return boost::lexical_cast<T>(value.value);
 	}
 
 	FAIL_GET(key);
 }
 
+void ConfigurationFile::getInt(const std::string &key, int &i)
+{
+	i = getNumber<int>(key);
+}
+
+void ConfigurationFile::getFloat(const std::string& key, float& f)
+{
+	f = getNumber<float>(key);
+}
 
 void ConfigurationFile::getBool(const std::string &key, bool &b)
 {
@@ -496,6 +504,11 @@ void Config::createDefaultConfig()
 void Config::getInt(const std::string &key, int &i)
 {
 	getInstance().config.getInt(key, i);
+}
+
+void Config::getFloat(const std::string& key, float& f)
+{
+	getInstance().config.getFloat(key, f);
 }
 
 void Config::getBool(const std::string &key, bool &b)
