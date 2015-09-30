@@ -6,3 +6,5 @@ display:
 debug:
   world-name: small.tmx
   limit-fps: false
+  human-skin: Business Man
+  zoom: 0.5

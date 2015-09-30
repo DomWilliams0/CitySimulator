@@ -26,7 +26,10 @@ GameState::GameState() : State(GAME)
 	// camera view
 	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
 	view.setCenter(world.getPixelSize().x / 2.f, world.getPixelSize().y / 2.f);
-//	view.zoom(0.5);
+
+	float zoom;
+	Config::getFloat("debug-zoom", zoom);
+	view.zoom(zoom);
 	Globals::game->setView(view);
 
 	// animation test
