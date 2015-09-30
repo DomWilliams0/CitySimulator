@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #define FORMAT(msg, argument) str(boost::format(msg) % argument)
+#define FORMAT2(msg, arg1, arg2) str(boost::format(msg) % arg1 % arg2)
 #define FAIL(msg, argument) throw std::runtime_error(FORMAT(msg, argument))
 #define FAIL2(msg, arg1, arg2) throw std::runtime_error(str(boost::format(msg) % arg1 % arg2))
 

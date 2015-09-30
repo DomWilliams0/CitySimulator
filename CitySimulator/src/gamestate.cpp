@@ -7,7 +7,7 @@
 GameState::GameState() : State(GAME)
 {
 	// create globals
-	//	Globals::entityManager = new EntityManager;
+	Globals::entityManager = new EntityManager;
 	Globals::entityFactory = new EntityFactory;
 	Globals::spriteSheet = new SpriteSheet;
 
@@ -37,11 +37,17 @@ GameState::GameState() : State(GAME)
 	Config::getString("debug-human-skin", skin);
 	Animation *animation = Globals::spriteSheet->getAnimation(skin);
 	testAnimator = new Animator(animation, 0.18f);
+
+	// ecs test
+	Entity e1 = Globals::entityManager->createEntity();
+
+
+
 }
 
 GameState::~GameState()
 {
-	//	delete Globals::entityManager;
+	delete Globals::entityManager;
 	delete Globals::entityFactory;
 	delete Globals::spriteSheet;
 }
@@ -55,18 +61,18 @@ void GameState::tick(float delta)
 	float dx(0), dy(0);
 
 	if (input->isPressed(UP))
-		dy = -delta;
+	dy = -delta;
 	else if (input->isPressed(DOWN))
-		dy = delta;
+	dy = delta;
 	if (input->isPressed(LEFT))
-		dx = -delta;
+	dx = -delta;
 	else if (input->isPressed(RIGHT))
-		dx = delta;
+	dx = delta;
 
 	if (dx || dy)
 	{
-		view.move(dx * viewSpeed, dy * viewSpeed);
-		Globals::game->setView(view);
+	view.move(dx * viewSpeed, dy * viewSpeed);
+	Globals::game->setView(view);
 	}
 	*/
 
