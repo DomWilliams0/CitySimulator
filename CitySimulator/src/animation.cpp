@@ -231,7 +231,7 @@ void Animator::tick(float delta)
 	}
 }
 
-void Animator::turn(int direction, bool reset)
+void Animator::turn(DirectionType direction, bool reset)
 {
 	if (direction == this->direction)
 		return;

@@ -40,9 +40,12 @@ GameState::GameState() : State(GAME)
 
 	// ecs test
 	Entity e1 = Globals::entityManager->createEntity();
+	Globals::entityManager->addPositionComponent(e1, 50, 50);
+	Globals::entityManager->addVelocityComponent(e1, 10, 100);
 
-
-
+	Entity e2 = Globals::entityManager->createEntity();
+	Globals::entityManager->addPositionComponent(e2, 10, 10);
+	Globals::entityManager->addRenderComponent(e2, "hue", Direction::EAST, true);
 }
 
 GameState::~GameState()
@@ -52,35 +55,35 @@ GameState::~GameState()
 	delete Globals::spriteSheet;
 }
 
-void GameState::tick(float delta)
+void GameState::tempControlCamera(float delta)
 {
 	const static float viewSpeed = 400;
 
 	Input *input = Globals::game->getInput();
-	/*
 	float dx(0), dy(0);
 
 	if (input->isPressed(UP))
-	dy = -delta;
+		dy = -delta;
 	else if (input->isPressed(DOWN))
-	dy = delta;
+		dy = delta;
 	if (input->isPressed(LEFT))
-	dx = -delta;
+		dx = -delta;
 	else if (input->isPressed(RIGHT))
-	dx = delta;
+		dx = delta;
 
 	if (dx || dy)
 	{
-	view.move(dx * viewSpeed, dy * viewSpeed);
-	Globals::game->setView(view);
+		view.move(dx * viewSpeed, dy * viewSpeed);
+		Globals::game->setView(view);
 	}
-	*/
+}
 
-	world.tick(delta);
-
+void GameState::tempControlAnimation(float delta)
+{
+	Input *input = Globals::game->getInput();
 
 	// todo: temporary animator turning
-	int direction = Direction::COUNT;
+	DirectionType direction = Direction::COUNT;
 	if (input->isFirstPressed(UP))
 		direction = Direction::NORTH;
 	else if (input->isFirstPressed(DOWN))
@@ -97,6 +100,16 @@ void GameState::tick(float delta)
 		testAnimator->togglePlaying(true);
 
 	testAnimator->tick(delta);
+}
+
+void GameState::tick(float delta)
+{
+	world.tick(delta);
+
+	Globals::entityManager->tickSystems(delta);
+
+	tempControlCamera(delta);
+	
 }
 
 void GameState::render(sf::RenderWindow &window)

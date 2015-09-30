@@ -49,7 +49,7 @@ void System::tick(float dt)
 {
 	EntityManager *manager = Globals::entityManager;
 
-	for (size_t i = 0; i < manager->entityCount; ++i)
+	for (size_t i = 0; i < MAX_ENTITIES; ++i)
 	{
 		Entity e = manager->entities[i];
 		if ((e & mask) == mask)
@@ -57,9 +57,24 @@ void System::tick(float dt)
 	}
 }
 
+void PositionComponent::reset()
+{
+	pos.x = pos.y = 0;
+}
+
+void RenderComponent::reset()
+{
+}
+
+void VelocityComponent::reset()
+{
+	velocity.x = velocity.y = 0;
+}
+
+
 void MovementSystem::tickEntity(Entity e, float dt)
 {
-
+	
 }
 
 void RenderSystem::tickEntity(Entity e, float dt)
@@ -77,16 +92,33 @@ Entity EntityManager::createEntity()
 	}
 
 	// todo: use a memory pool instead to avoid iterating the entire array each time
-	for (size_t i = 0; i < MAX_ENTITIES; ++i)
-		if (entities[i] == ComponentType::COMPONENT_NONE)
-			return i;
+	for (size_t e = 0; e < MAX_ENTITIES; ++e)
+		if (!isAlive(e))
+		{
+			entityCount++;
+			return e;
+		}
 
 	return MAX_ENTITIES;
 }
 
 void EntityManager::deleteEntity(Entity e)
 {
+	if (isAlive(e))
+		entityCount--;
+
 	entities[e] = COMPONENT_NONE;
+}
+
+bool EntityManager::isAlive(Entity e)
+{
+	return entities[e] != COMPONENT_NONE;
+}
+
+void EntityManager::tickSystems(float delta)
+{
+	for (System *system : systems)
+		system->tick(delta);
 }
 
 BaseComponent* EntityManager::addComponent(Entity e, ComponentType type)
@@ -112,10 +144,30 @@ BaseComponent* EntityManager::getComponent(Entity e, ComponentType type)
 {
 	switch (type)
 	{
-	case POSITION: return &positionComponents[e];
-	case VELOCITY: return &velocityComponents[e];
-	case RENDER: return &renderComponents[e];
+	case COMPONENT_POSITION: return &positionComponents[e];
+	case COMPONENT_VELOCITY: return &velocityComponents[e];
+	case COMPONENT_RENDER: return &renderComponents[e];
 	default: FAIL("Invalid component type %1%", type);
 	}
 }
 
+void EntityManager::addPositionComponent(Entity e, float x, float y)
+{
+	PositionComponent *comp = dynamic_cast<PositionComponent*>(Globals::entityManager->addComponent(e, COMPONENT_POSITION));
+	comp->pos.x = x;
+	comp->pos.y = y;
+}
+
+void EntityManager::addVelocityComponent(Entity e, float x, float y)
+{
+	VelocityComponent *comp = dynamic_cast<VelocityComponent*>(Globals::entityManager->addComponent(e, COMPONENT_VELOCITY));
+	comp->velocity.x = x;
+	comp->velocity.y = y;
+}
+
+
+void EntityManager::addRenderComponent(Entity e, const std::string &animation, DirectionType initialDirection, bool playing)
+{
+	RenderComponent *comp = dynamic_cast<RenderComponent*>(Globals::entityManager->addComponent(e, COMPONENT_RENDER));
+	// todo
+}

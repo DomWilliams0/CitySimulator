@@ -64,7 +64,7 @@ public:
 	/// <summary>
 	/// Turns in the given direction.
 	/// </summary>
-	void turn(int direction, bool reset = true);
+	void turn(DirectionType direction, bool reset = true);
 
 	/// <summary>
 	/// Plays/pauses the animation.
@@ -89,7 +89,7 @@ private:
 	sf::VertexArray vertices;
 	sf::Vector2f currentSize;
 
-	int direction;
+	DirectionType direction;
 
 	void resizeVertices(float width, float height);
 	void updateFrame();

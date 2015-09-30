@@ -27,9 +27,9 @@ private:
 enum ComponentType
 {
 	COMPONENT_NONE = 0,
-	POSITION = 1 << 0,
-	VELOCITY = 1 << 1,
-	RENDER = 1 << 2
+	COMPONENT_POSITION = 1 << 0,
+	COMPONENT_VELOCITY = 1 << 1,
+	COMPONENT_RENDER = 1 << 2
 };
 
 // component-entity-systems
@@ -39,20 +39,25 @@ typedef int Entity;
 // components
 struct BaseComponent
 {
+	virtual void reset() = 0;
 };
 
 struct PositionComponent : public BaseComponent
 {
+	void reset() override;
 	sf::Vector2f pos;
 };
 
 struct VelocityComponent : public BaseComponent
 {
+	void reset() override;
+
 	sf::Vector2f velocity;
 };
 
 struct RenderComponent : public BaseComponent
 {
+	void reset() override;
 	Animator *anim;
 };
 
@@ -76,7 +81,7 @@ protected:
 class MovementSystem : public System
 {
 public:
-	MovementSystem() : System(POSITION | VELOCITY)
+	MovementSystem() : System(COMPONENT_POSITION | COMPONENT_VELOCITY)
 	{
 	}
 
@@ -86,7 +91,7 @@ public:
 class RenderSystem : public System
 {
 public:
-	RenderSystem() : System(POSITION | RENDER)
+	RenderSystem() : System(COMPONENT_POSITION | COMPONENT_RENDER)
 	{
 	}
 
@@ -96,28 +101,50 @@ public:
 class EntityManager
 {
 public:
-	EntityManager::EntityManager() : entityCount(0)
+	EntityManager() : entityCount(0)
 	{
+		// init entities
 		for (size_t i = 0; i < MAX_ENTITIES; ++i)
 			entities[i] = COMPONENT_NONE;
+
+		// init systems
+		systems.push_back(new MovementSystem);
+		systems.push_back(new RenderSystem);
+
+	}
+
+	~EntityManager()
+	{
+		for (System *system : systems)
+			delete system;
 	}
 
 	Entity entities[MAX_ENTITIES];
 	size_t entityCount;
+
+	// entity
+	Entity createEntity();
+	void deleteEntity(Entity e);
+	bool isAlive(Entity e);
+
+	// systems
+	std::vector<System*> systems;
+	void tickSystems(float delta);
 
 	// components
 	PositionComponent positionComponents[MAX_ENTITIES];
 	VelocityComponent velocityComponents[MAX_ENTITIES];
 	RenderComponent renderComponents[MAX_ENTITIES];
 
-	// creation/deletion
-	Entity createEntity();
-	void deleteEntity(Entity e);
-
 	// component management
 	BaseComponent* addComponent(Entity e, ComponentType type);
 	void removeComponent(Entity e, ComponentType type);
 	bool hasComponent(Entity e, ComponentType type);
 	BaseComponent* getComponent(Entity e, ComponentType type);
+
+	// helpers
+	void addPositionComponent(Entity e, float x, float y);
+	void addVelocityComponent(Entity e, float x, float y);
+	void addRenderComponent(Entity e, const std::string& animation, DirectionType initialDirection, bool playing);
 };
 

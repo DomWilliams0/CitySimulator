@@ -48,8 +48,5 @@ bool Input::isFirstPressed(InputKey key)
 void Input::advance()
 {
 	for (size_t i = 0; i < COUNT; ++i)
-	{
 		wasPressed[i] = pressed[i];
-		pressed[i] = false;
-	}
 }
