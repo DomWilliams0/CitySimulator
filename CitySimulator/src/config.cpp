@@ -442,7 +442,7 @@ void ConfigurationFile::loadOther(const YAML::Node &node, const std::string &pre
 
 void Config::loadConfig()
 {
-	getInstance().config.configPath = boost::filesystem::absolute("res/config/config.yml");
+	getInstance().config.configPath = boost::filesystem::absolute("res/config.yml");
 	getInstance().ensureConfigExists();
 	getInstance().config.load();
 }

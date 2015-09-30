@@ -15,7 +15,7 @@ void SpriteSheet::loadSprite(ConfigKeyValue &entityTags)
 	std::string fileName(entityTags["sprite"]);
 
 	sf::Image *image = new sf::Image;
-	if (!image->loadFromFile(Utils::searchForFile(fileName, "res/sprites")))
+	if (!image->loadFromFile(Utils::searchForFile(fileName, "res/entities")))
 	{
 		FAIL("Could not load sprite %1%", fileName);
 	}
