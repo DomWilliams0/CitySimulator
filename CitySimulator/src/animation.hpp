@@ -65,7 +65,7 @@ public:
 	/// Turns in the given direction.
 	/// </summary>
 	void turn(int direction, bool reset = true);
-	
+
 	/// <summary>
 	/// Plays/pauses the animation.
 	/// </summary>
@@ -91,39 +91,10 @@ private:
 
 	int direction;
 
-
-	void resizeVertices(float width, float height)
-	{
-		if (width == currentSize.x && height == currentSize.y)
-			return;
-
-		vertices[0].position = sf::Vector2f(0, 0);
-		vertices[1].position = sf::Vector2f(width, 0);
-		vertices[2].position = sf::Vector2f(width, height);
-		vertices[3].position = sf::Vector2f(0, height);
-
-		currentSize.x = width;
-		currentSize.y = height;
-	}
-
-	void updateFrame()
-	{
-		Animation::Sequence sequence(animation->sequences[currentSequence]);
-		sf::FloatRect rect(sequence[currentFrame]);
-
-		resizeVertices(rect.width, rect.height);
-
-		vertices[0].texCoords = sf::Vector2f(rect.left, rect.top);
-		vertices[1].texCoords = sf::Vector2f(rect.left + rect.width, rect.top);
-		vertices[2].texCoords = sf::Vector2f(rect.left + rect.width, rect.top + rect.height);
-		vertices[3].texCoords = sf::Vector2f(rect.left, rect.top + rect.height);
-	}
+	void resizeVertices(float width, float height);
+	void updateFrame();
 
 protected:
 
-	void draw(sf::RenderTarget& target, sf::RenderStates states) const override
-	{
-		states.texture = animation->texture;
-		target.draw(vertices, states);
-	}
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
