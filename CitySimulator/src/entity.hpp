@@ -5,6 +5,7 @@
 
 #define COMPONENT_COUNT 3
 #define MAX_ENTITIES 1024
+#include "world.hpp"
 
 typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;
 
@@ -39,6 +40,10 @@ typedef int Entity;
 // components
 struct BaseComponent
 {
+	virtual ~BaseComponent()
+	{
+	}
+
 	virtual void reset() = 0;
 };
 
@@ -51,31 +56,44 @@ struct PositionComponent : public BaseComponent
 struct VelocityComponent : public BaseComponent
 {
 	void reset() override;
-
 	sf::Vector2f velocity;
 };
 
 struct RenderComponent : public BaseComponent
 {
 	void reset() override;
-	Animator *anim;
+	Animator anim;
 };
 
 // systems
 class System
 {
 public:
-	System(int componentMask) : mask(componentMask)
+	System(int componentMask, bool renders_ = false) : mask(componentMask), renders(renders_)
+	{
+	}
+
+	virtual ~System()
 	{
 	}
 
 	void tick(float dt);
+	void render(sf::RenderWindow &window);
 
 	virtual void tickEntity(Entity e, float dt) = 0;
 
+	virtual void renderEntity(Entity e, sf::RenderWindow &window)
+	{
+	}
+
+	bool doesRender()
+	{
+		return renders;
+	}
+
 protected:
 	int mask;
-
+	bool renders;
 };
 
 class MovementSystem : public System
@@ -91,11 +109,12 @@ public:
 class RenderSystem : public System
 {
 public:
-	RenderSystem() : System(COMPONENT_POSITION | COMPONENT_RENDER)
+	RenderSystem() : System(COMPONENT_POSITION | COMPONENT_RENDER, true)
 	{
 	}
 
 	void tickEntity(Entity e, float dt) override;
+	void renderEntity(Entity e, sf::RenderWindow &window) override;
 };
 
 class EntityManager
@@ -110,7 +129,6 @@ public:
 		// init systems
 		systems.push_back(new MovementSystem);
 		systems.push_back(new RenderSystem);
-
 	}
 
 	~EntityManager()
@@ -124,11 +142,13 @@ public:
 
 	// entity
 	Entity createEntity();
+	Entity createEntityWithComponents(const std::initializer_list<ComponentType> &components);
 	void deleteEntity(Entity e);
 	bool isAlive(Entity e);
 
 	// systems
 	std::vector<System*> systems;
+	void renderSystems(sf::RenderWindow &window);
 	void tickSystems(float delta);
 
 	// components
@@ -142,9 +162,17 @@ public:
 	bool hasComponent(Entity e, ComponentType type);
 	BaseComponent* getComponent(Entity e, ComponentType type);
 
+	template <class T>
+	T* getComponent(Entity e, ComponentType type);
+
 	// helpers
 	void addPositionComponent(Entity e, float x, float y);
 	void addVelocityComponent(Entity e, float x, float y);
-	void addRenderComponent(Entity e, const std::string& animation, DirectionType initialDirection, bool playing);
+	void addRenderComponent(Entity e, const std::string &animation, float step, DirectionType initialDirection, bool playing);
 };
 
+template <class T>
+T* EntityManager::getComponent(Entity e, ComponentType type)
+{
+	return dynamic_cast<T*>(getComponent(e, type));
+}

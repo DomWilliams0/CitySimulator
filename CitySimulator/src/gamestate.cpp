@@ -32,20 +32,11 @@ GameState::GameState() : State(GAME)
 	view.zoom(zoom);
 	Globals::game->setView(view);
 
-	// animation test
-	std::string skin;
-	Config::getString("debug-human-skin", skin);
-	Animation *animation = Globals::spriteSheet->getAnimation(skin);
-	testAnimator = new Animator(animation, 0.18f);
-
-	// ecs test
-	Entity e1 = Globals::entityManager->createEntity();
-	Globals::entityManager->addPositionComponent(e1, 50, 50);
-	Globals::entityManager->addVelocityComponent(e1, 10, 100);
-
-	Entity e2 = Globals::entityManager->createEntity();
-	Globals::entityManager->addPositionComponent(e2, 10, 10);
-	Globals::entityManager->addRenderComponent(e2, "hue", Direction::EAST, true);
+	// entity test
+	Entity e = Globals::entityManager->createEntity();
+	Globals::entityManager->addPositionComponent(e, 0, 50);
+	Globals::entityManager->addRenderComponent(e, "Business Man", 0.18f, Direction::EAST, true);
+	Globals::entityManager->addVelocityComponent(e, 40, 0);
 }
 
 GameState::~GameState()
@@ -78,30 +69,6 @@ void GameState::tempControlCamera(float delta)
 	}
 }
 
-void GameState::tempControlAnimation(float delta)
-{
-	Input *input = Globals::game->getInput();
-
-	// todo: temporary animator turning
-	DirectionType direction = Direction::COUNT;
-	if (input->isFirstPressed(UP))
-		direction = Direction::NORTH;
-	else if (input->isFirstPressed(DOWN))
-		direction = Direction::SOUTH;
-	else if (input->isFirstPressed(LEFT))
-		direction = Direction::WEST;
-	else if (input->isFirstPressed(RIGHT))
-		direction = Direction::EAST;
-
-	if (direction != Direction::COUNT)
-		testAnimator->turn(direction, true);
-
-	if (input->isFirstPressed(STOP_CONTROLLING))
-		testAnimator->togglePlaying(true);
-
-	testAnimator->tick(delta);
-}
-
 void GameState::tick(float delta)
 {
 	world.tick(delta);
@@ -109,13 +76,13 @@ void GameState::tick(float delta)
 	Globals::entityManager->tickSystems(delta);
 
 	tempControlCamera(delta);
-	
 }
 
 void GameState::render(sf::RenderWindow &window)
 {
 	window.draw(world);
-	window.draw(*testAnimator);
+
+	Globals::entityManager->renderSystems(window);
 }
 
 void GameState::handleInput(const sf::Event &event)

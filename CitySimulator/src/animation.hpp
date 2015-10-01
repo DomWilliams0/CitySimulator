@@ -37,7 +37,7 @@ public:
 	{
 		auto anim = animations.find(name);
 		if (anim == animations.end())
-			FAIL("Animation '%s' not found", name);
+		FAIL("Animation '%s' not found", name);
 
 		return &anim->second;
 	}
@@ -57,7 +57,13 @@ private:
 class Animator : public sf::Drawable
 {
 public:
-	Animator(Animation *anim, float step);
+	Animator()
+	{
+		reset();
+	}
+
+	Animator(Animation *anim, float step, DirectionType initialDirection = Direction::SOUTH, bool initiallyPlaying = false);
+	void init(Animation *anim, float step, DirectionType initialDirection = Direction::SOUTH, bool initiallyPlaying = false);
 
 	void tick(float delta);
 
@@ -76,6 +82,14 @@ public:
 	/// </summary>
 	void togglePlaying(bool resetEachTime = false);
 
+	void reset()
+	{
+		init(nullptr, 0);
+	}
+
+	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
+
+
 private:
 	Animation *animation;
 
@@ -91,10 +105,7 @@ private:
 
 	DirectionType direction;
 
+
 	void resizeVertices(float width, float height);
 	void updateFrame();
-
-protected:
-
-	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
