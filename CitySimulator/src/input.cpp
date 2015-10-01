@@ -12,7 +12,7 @@ void Input::registerBindings()
 	bindings.insert({LEFT, Keyboard::Key::A});
 	bindings.insert({DOWN, Keyboard::Key::S});
 	bindings.insert({RIGHT, Keyboard::Key::D});
-	bindings.insert({ STOP_CONTROLLING, Keyboard::Key::Tab });
+	bindings.insert({STOP_CONTROLLING, Keyboard::Key::Tab});
 
 	// check all keys have been registered
 	if (bindings.left.size() != COUNT)

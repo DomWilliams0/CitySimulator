@@ -54,7 +54,8 @@ private:
 	// path: variable name
 	//	std::vector<std::pair<std::string, std::string>> variablesToProcess;
 
-	template <class T> T getNumber(const std::string& key);
+	template <class T>
+	T getNumber(const std::string &key);
 	ValueStruct& getValueStruct(const std::string &key, ValueType type);
 	void parseConfig(std::map<std::string, std::string> &config);
 
@@ -83,7 +84,6 @@ public:
 	static void getList(const std::string &key, std::vector<std::string> &l);
 	static void getIntList(const std::string &key, std::vector<int> &l);
 	static void getMapList(const std::string &key, std::vector<std::map<std::string, std::string>> &ml);
-
 
 
 private:

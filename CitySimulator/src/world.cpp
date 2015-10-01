@@ -128,9 +128,9 @@ sf::IntRect Tileset::getTileRect(unsigned blockType)
 	int tileX = blockType % size.x;
 	int tileY = blockType / size.x;
 	return sf::IntRect(tileX * Constants::tileSize,
-					   tileY * Constants::tileSize,
-					   Constants::tileSize,
-					   Constants::tileSize);
+	                   tileY * Constants::tileSize,
+	                   Constants::tileSize,
+	                   Constants::tileSize);
 }
 
 void Tileset::createTileImage(sf::Image *image, unsigned blockType)
@@ -230,7 +230,7 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, Layer
 
 	std::vector<sf::Vertex> quad(4);
 	sf::Vector2f adjustedPos = sf::Vector2f(pos.x / Constants::tileSize,
-											(pos.y - Constants::tileSize) / Constants::tileSize);
+	                                        (pos.y - Constants::tileSize) / Constants::tileSize);
 
 	positionVertices(&quad[0], adjustedPos, 1);
 	tileset->textureQuad(&quad[0], blockType, 0, flipGID);

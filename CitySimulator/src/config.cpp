@@ -96,7 +96,7 @@ T ConfigurationFile::getNumber(const std::string &key)
 	if (!std::regex_match(value.value, noCharRegex))
 	{
 		std::stringstream ss(value.value);
-		
+
 		T ret;
 
 		if (ss >> ret)
@@ -111,7 +111,7 @@ void ConfigurationFile::getInt(const std::string &key, int &i)
 	i = getNumber<int>(key);
 }
 
-void ConfigurationFile::getFloat(const std::string& key, float& f)
+void ConfigurationFile::getFloat(const std::string &key, float &f)
 {
 	f = getNumber<float>(key);
 }
@@ -506,7 +506,7 @@ void Config::getInt(const std::string &key, int &i)
 	getInstance().config.getInt(key, i);
 }
 
-void Config::getFloat(const std::string& key, float& f)
+void Config::getFloat(const std::string &key, float &f)
 {
 	getInstance().config.getFloat(key, f);
 }

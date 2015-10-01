@@ -40,6 +40,7 @@ namespace Globals
 }
 
 typedef int DirectionType;
+
 namespace Direction
 {
 	extern const int NORTH;

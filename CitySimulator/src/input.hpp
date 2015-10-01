@@ -39,7 +39,7 @@ public:
 	/// <param name="key">The key.</param>
 	/// <returns></returns>
 	bool isPressed(InputKey key);
-	
+
 	/// <summary>
 	/// Determines whether the specified key has just been pressed.
 	/// </summary>

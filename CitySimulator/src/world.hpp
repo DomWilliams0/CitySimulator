@@ -103,7 +103,7 @@ private:
 	void addPoint(int x, int y)
 	{
 		points[getIndex(x, y)] = sf::Vector2f(x * Constants::tileSizef,
-											  y * Constants::tileSizef);
+		                                      y * Constants::tileSizef);
 	}
 
 	void generatePoints();
