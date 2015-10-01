@@ -43,12 +43,12 @@ public:
 	void beginGame();
 	virtual void end() = 0;
 
-	inline void setView(const sf::View &view)
+	void setView(const sf::View &view)
 	{
 		window.setView(view);
 	}
 
-	inline Input* getInput()
+	Input* getInput()
 	{
 		return &input;
 	}
@@ -65,7 +65,7 @@ protected:
 
 	void limitFrameRate(bool limit);
 
-	inline void setBackgroundColour(const sf::Uint8 &r, const sf::Uint8 &g, const sf::Uint8 &b, const sf::Uint8 &a = 255)
+	void setBackgroundColour(const sf::Uint8 &r, const sf::Uint8 &g, const sf::Uint8 &b, const sf::Uint8 &a = 255)
 	{
 		backgroundColour = sf::Color(r, g, b, a);
 	}
