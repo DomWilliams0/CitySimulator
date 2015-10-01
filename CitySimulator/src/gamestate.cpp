@@ -32,15 +32,10 @@ GameState::GameState() : State(GAME)
 	view.zoom(zoom);
 	Globals::game->setView(view);
 
-	// entity test
-	for (int i = 0; i < 500; ++i)
-	{
-		srand(i);
-		Entity e = Globals::entityManager->createEntity();
-		Globals::entityManager->addPositionComponent(e, Utils::random<float>(0.0f, world.getPixelSize().x), Utils::random<float>(0.0f, world.getPixelSize().y));
-		Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, Globals::spriteSheet->getRandomAnimationName(ENTITY_HUMAN), 0.18f, Direction::random(), true);
-		Globals::entityManager->addVelocityComponent(e, Utils::random<float>(-40, 40), Utils::random<float>(-40, 40));
-	}
+	Entity e = Globals::entityManager->createEntity();
+	Globals::entityManager->addPositionComponent(e, Utils::random<float>(0.0f, world.getPixelSize().x), Utils::random<float>(0.0f, world.getPixelSize().y));
+	Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, Globals::spriteSheet->getRandomAnimationName(ENTITY_HUMAN), 0.18f, Direction::random(), true);
+	Globals::entityManager->addVelocityComponent(e, Utils::random<float>(-40, 40), Utils::random<float>(-40, 40));
 }
 
 GameState::~GameState()

@@ -9,6 +9,7 @@ namespace Constants
 
 	const int tileSize(16);
 	const float tileSizef(tileSize);
+	const sf::Vector2f humanScale(0.5, 0.5);
 
 	sf::Font mainFont;
 

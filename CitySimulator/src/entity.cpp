@@ -112,6 +112,7 @@ void RenderSystem::renderEntity(Entity e, sf::RenderWindow &window)
 	sf::Transform transform;
 
 	transform.translate(pos->pos);
+	transform.scale(Constants::humanScale);
 
 	states.transform *= transform;
 	render->anim.draw(window, states);

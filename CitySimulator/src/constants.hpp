@@ -21,6 +21,8 @@ namespace Constants
 	extern const int tileSize;
 	extern const float tileSizef;
 
+	extern const sf::Vector2f humanScale;
+
 	extern sf::Font mainFont;
 
 	extern const float degToRad;
