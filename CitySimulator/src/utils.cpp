@@ -1,7 +1,8 @@
 #include <boost/filesystem.hpp>
-#include "utils.hpp"
 #include <boost/format/format_fwd.hpp>
 #include <boost/format/free_funcs.hpp>
+#include "utils.hpp"
+#include <random>
 
 
 using namespace boost;
@@ -38,7 +39,6 @@ std::string Utils::searchForFile(const std::string &filename, const std::string 
 	throw filenotfound_exception(str(format("File not found: %1%") % filename));
 }
 
-
 void Utils::TimeTicker::init(float min, float max)
 {
 	current = 0;
@@ -73,7 +73,7 @@ bool Utils::TimeTicker::tick(float delta)
 void Utils::TimeTicker::reset()
 {
 	if (range)
-		currentEnd = randomRange(minDuration, maxDuration);
+		currentEnd = random<float>(minDuration, maxDuration);
 	else
 		currentEnd = maxDuration;
 

@@ -49,4 +49,5 @@ namespace Direction
 	extern const int WEST;
 
 	extern const int COUNT;
+	DirectionType random();
 }

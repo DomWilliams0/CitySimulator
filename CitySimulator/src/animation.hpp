@@ -2,6 +2,9 @@
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 #include "constants.hpp"
+#include "utils.hpp"
+
+enum EntityType;
 
 struct Animation
 {
@@ -28,25 +31,44 @@ class SpriteSheet
 public:
 	SpriteSheet() : processed(false)
 	{
+		preProcessImageData = new std::map<sf::Image*, std::pair<ConfigKeyValue, EntityType>>;
 	}
 
-	void loadSprite(ConfigKeyValue &entityTags);
+	void loadSprite(ConfigKeyValue &entityTags, EntityType entityType);
 	void processAllSprites();
 
-	Animation* getAnimation(const std::string &name)
+	Animation* getAnimation(EntityType entityType, const std::string &name)
 	{
-		auto anim = animations.find(name);
-		if (anim == animations.end())
-		FAIL("Animation '%s' not found", name);
+		auto anims = animations.find(entityType);
+		if (anims != animations.end())
+		{
+			auto anim = anims->second.find(name);
+			if (anim != anims->second.end())
+				return &anim->second;
+		}
 
-		return &anim->second;
+		FAIL("Animation '%s' not found", name);
+	}
+
+	std::string getRandomAnimationName(EntityType entityType)
+	{
+		auto anims = animations.find(entityType);
+		if (anims == animations.end())
+		{
+			FAIL("No animations found for entity type %1%", entityType);
+		}
+
+		auto it = anims->second.cbegin();
+		std::advance(it, Utils::random(static_cast<size_t>(0), anims->second.size()));
+		return it->first;
 	}
 
 private:
 	sf::Texture texture;
-	std::unordered_map<std::string, Animation> animations;
+	std::map<EntityType, std::unordered_map<std::string, Animation>> animations;
 
-	std::map<sf::Image*, ConfigKeyValue> preProcessSpriteImages;
+	std::map<sf::Image*, std::pair<ConfigKeyValue, EntityType>> *preProcessImageData;
+
 	bool processed;
 	void checkProcessed(bool shouldBe);
 

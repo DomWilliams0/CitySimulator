@@ -12,8 +12,8 @@ GameState::GameState() : State(GAME)
 	Globals::spriteSheet = new SpriteSheet;
 
 	// load entities
-	Globals::entityFactory->loadEntities(HUMAN, "humans.yml");
-	Globals::entityFactory->loadEntities(VEHICLE, "vehicles.yml");
+	Globals::entityFactory->loadEntities(ENTITY_HUMAN, "humans.yml");
+	Globals::entityFactory->loadEntities(ENTITY_VEHICLE, "vehicles.yml");
 
 	// load sprites
 	Globals::spriteSheet->processAllSprites();
@@ -33,10 +33,14 @@ GameState::GameState() : State(GAME)
 	Globals::game->setView(view);
 
 	// entity test
-	Entity e = Globals::entityManager->createEntity();
-	Globals::entityManager->addPositionComponent(e, 0, 50);
-	Globals::entityManager->addRenderComponent(e, "Business Man", 0.18f, Direction::EAST, true);
-	Globals::entityManager->addVelocityComponent(e, 40, 0);
+	for (int i = 0; i < 500; ++i)
+	{
+		srand(i);
+		Entity e = Globals::entityManager->createEntity();
+		Globals::entityManager->addPositionComponent(e, Utils::random<float>(0.0f, world.getPixelSize().x), Utils::random<float>(0.0f, world.getPixelSize().y));
+		Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, Globals::spriteSheet->getRandomAnimationName(ENTITY_HUMAN), 0.18f, Direction::random(), true);
+		Globals::entityManager->addVelocityComponent(e, Utils::random<float>(-40, 40), Utils::random<float>(-40, 40));
+	}
 }
 
 GameState::~GameState()

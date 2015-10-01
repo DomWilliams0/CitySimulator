@@ -7,8 +7,9 @@
 #include "utils.hpp"
 #include "logger.hpp"
 #include "config.hpp"
+#include "entity.hpp"
 
-void SpriteSheet::loadSprite(ConfigKeyValue &entityTags)
+void SpriteSheet::loadSprite(ConfigKeyValue &entityTags, EntityType entityType)
 {
 	checkProcessed(false);
 
@@ -20,7 +21,7 @@ void SpriteSheet::loadSprite(ConfigKeyValue &entityTags)
 		FAIL("Could not load sprite %1%", fileName);
 	}
 
-	preProcessSpriteImages.insert({image, entityTags});
+	preProcessImageData->insert({image,{entityTags, entityType}});
 	Logger::logDebug(FORMAT("Loaded sprite %1%", entityTags["name"]));
 }
 
@@ -29,7 +30,7 @@ void SpriteSheet::processAllSprites()
 	checkProcessed(false);
 
 	// no images
-	if (preProcessSpriteImages.empty())
+	if (preProcessImageData->empty())
 		return;
 
 	// position 
@@ -59,7 +60,10 @@ void SpriteSheet::processAllSprites()
 
 		sf::Image *image(rectPair.first);
 		sf::IntRect &rect(rectPair.second);
-		ConfigKeyValue entityTags(preProcessSpriteImages[image]);
+
+		auto pair = preProcessImageData->at(image);
+		ConfigKeyValue entityTags = pair.first;
+		EntityType entityType = pair.second;
 
 		int animCount, animLength;
 
@@ -91,20 +95,35 @@ void SpriteSheet::processAllSprites()
 		else
 		{
 			// TODO
+			Logger::logDebug(FORMAT("anim-dimensions-all not set for animation %1%, skipping", entityTags["name"]));
+			continue;
 		}
 
-		animations.insert({entityTags["name"], anim});
+		// store in animation map under the entity type
+		std::pair<std::string, Animation> animationPair = {entityTags["name"], anim};
+
+		auto existingAnims = animations.find(entityType);
+		if (existingAnims != animations.end())
+			existingAnims->second.insert(animationPair);
+		else
+		{
+			std::unordered_map<std::string, Animation> anims;
+			anims.insert(animationPair);
+			animations.insert({entityType, anims});
+		}
 	}
 
-	preProcessSpriteImages.clear();
+	preProcessImageData->clear();
+	delete preProcessImageData;
+
 	processed = true;
 }
 
 void SpriteSheet::positionImages(sf::Vector2i &imageSize, std::map<sf::Image*, sf::IntRect> &imagePositions)
 {
 	// calculate initial size of bin
-	sf::Vector2u totalSize = std::accumulate(preProcessSpriteImages.begin(), preProcessSpriteImages.end(), sf::Vector2u(),
-	                                         [](sf::Vector2u &acc, const std::pair<sf::Image*, ConfigKeyValue> &pair)
+	sf::Vector2u totalSize = std::accumulate(preProcessImageData->begin(), preProcessImageData->end(), sf::Vector2u(),
+	                                         [](sf::Vector2u &acc, const std::pair<sf::Image*, std::pair<ConfigKeyValue, EntityType>> &pair)
 	                                         {
 		                                         return acc + pair.first->getSize();
 	                                         });
@@ -113,11 +132,11 @@ void SpriteSheet::positionImages(sf::Vector2i &imageSize, std::map<sf::Image*, s
 	PackingTreeNode *node = new PackingTreeNode(binRect);
 
 	// sort by area (insert into a vector first)
-	std::vector<std::pair<sf::Image*, ConfigKeyValue>> asVector(preProcessSpriteImages.begin(), preProcessSpriteImages.end());
+	std::vector<std::pair<sf::Image*, std::pair<ConfigKeyValue, EntityType>>> asVector(preProcessImageData->begin(), preProcessImageData->end());
 
 	std::sort(asVector.begin(), asVector.end(),
-	          [](const std::pair<sf::Image*, ConfigKeyValue> &left,
-		          const std::pair<sf::Image*, ConfigKeyValue> &right)
+	          [](const std::pair<sf::Image*, std::pair<ConfigKeyValue, EntityType>> &left,
+		          const std::pair<sf::Image*, std::pair<ConfigKeyValue, EntityType>> &right)
 	          {
 		          sf::Vector2i leftSize(left.first->getSize());
 		          sf::Vector2i rightSize(right.first->getSize());

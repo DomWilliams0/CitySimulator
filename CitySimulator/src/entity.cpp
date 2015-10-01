@@ -41,7 +41,7 @@ void EntityFactory::loadEntities(EntityType entityType, const std::string &fileN
 		// sprites
 		auto sprite = entity.second.find("sprite");
 		if (sprite != entity.second.end())
-			Globals::spriteSheet->loadSprite(entity.second);
+			Globals::spriteSheet->loadSprite(entity.second, entityType);
 	}
 }
 
@@ -215,10 +215,10 @@ void EntityManager::addVelocityComponent(Entity e, float x, float y)
 }
 
 
-void EntityManager::addRenderComponent(Entity e, const std::string &animation, float step, DirectionType initialDirection, bool playing)
+void EntityManager::addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step, DirectionType initialDirection, bool playing)
 {
 	RenderComponent *comp = dynamic_cast<RenderComponent*>(Globals::entityManager->addComponent(e, COMPONENT_RENDER));
 
-	Animation *anim = Globals::spriteSheet->getAnimation(animation);
+	Animation *anim = Globals::spriteSheet->getAnimation(entityType, animation);
 	comp->anim.init(anim, step, initialDirection, playing);
 }

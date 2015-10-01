@@ -24,25 +24,30 @@ namespace Utils
 	sf::Color darken(const sf::Color &color, int delta);
 
 	template <class V>
-	inline sf::Vector2<V> toPixel(const sf::Vector2<V> &v)
+	sf::Vector2<V> toPixel(const sf::Vector2<V> &v)
 	{
 		return sf::Vector2<V>(v.x * Constants::tileSize, v.y * Constants::tileSize);
 	}
 
 	template <class V>
-	inline sf::Vector2<V> toTile(const sf::Vector2<V> &v)
+	sf::Vector2<V> toTile(const sf::Vector2<V> &v)
 	{
 		return sf::Vector2<V>(v.x / Constants::tileSize, v.y / Constants::tileSize);
 	}
 
-	inline float randomRange(float min, float max)
+	/// <summary>
+	/// Generates a random number between min and max-1
+	/// </summary>
+	template <class T=int>
+	T random(T min, T max)
 	{
 		static std::random_device rd;
 		static std::mt19937 gen(rd());
 		static std::uniform_real_distribution<> dis(0, 1);
 
-		return static_cast<float>(dis(gen) * (max - min) + min);
+		return static_cast<T>(dis(gen) * (max - min) + min);
 	}
+
 
 	struct filenotfound_exception : std::runtime_error
 	{

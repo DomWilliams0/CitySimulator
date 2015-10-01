@@ -1,5 +1,6 @@
 #define _USE_MATH_DEFINES
 #include "constants.hpp"
+#include "utils.hpp"
 
 namespace Constants
 {
@@ -21,6 +22,11 @@ namespace Constants
 		windowCentre.x = x / 2;
 		windowCentre.y = y / 2;
 	}
+}
+
+DirectionType Direction::random()
+{
+	return Utils::random(0, Direction::COUNT);
 }
 
 namespace Globals

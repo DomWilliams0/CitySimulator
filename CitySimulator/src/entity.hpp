@@ -11,8 +11,8 @@ typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;
 
 enum EntityType
 {
-	HUMAN,
-	VEHICLE
+	ENTITY_HUMAN,
+	ENTITY_VEHICLE
 };
 
 class EntityFactory
@@ -168,7 +168,7 @@ public:
 	// helpers
 	void addPositionComponent(Entity e, float x, float y);
 	void addVelocityComponent(Entity e, float x, float y);
-	void addRenderComponent(Entity e, const std::string &animation, float step, DirectionType initialDirection, bool playing);
+	void addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step, DirectionType initialDirection, bool playing);
 };
 
 template <class T>
