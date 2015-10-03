@@ -2,10 +2,10 @@
 #include <vector>
 #include "animation.hpp"
 #include "constants.hpp"
+#include "world.hpp"
 
 #define COMPONENT_COUNT 3
 #define MAX_ENTITIES 1024
-#include "world.hpp"
 
 typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;
 
@@ -24,18 +24,18 @@ private:
 	std::map<EntityType, EntityTags> loadedTags;
 };
 
+// component-entity-systems
+
+typedef int Entity;
 
 enum ComponentType
 {
 	COMPONENT_NONE = 0,
 	COMPONENT_POSITION = 1 << 0,
 	COMPONENT_VELOCITY = 1 << 1,
-	COMPONENT_RENDER = 1 << 2
+	COMPONENT_RENDER = 1 << 2,
+	COMPONENT_INPUT = 1 << 3
 };
-
-// component-entity-systems
-
-typedef int Entity;
 
 // components
 struct BaseComponent
@@ -44,32 +44,43 @@ struct BaseComponent
 	{
 	}
 
-	virtual void reset() = 0;
+	virtual void reset()
+	{
+	}
 };
 
-struct PositionComponent : public BaseComponent
+struct PositionComponent : BaseComponent
 {
 	void reset() override;
 	sf::Vector2f pos;
 };
 
-struct VelocityComponent : public BaseComponent
+struct VelocityComponent : BaseComponent
 {
 	void reset() override;
 	sf::Vector2f velocity;
 };
 
-struct RenderComponent : public BaseComponent
+struct RenderComponent : BaseComponent
 {
 	void reset() override;
 	Animator anim;
 };
 
+class EntityBrain;
+
+struct InputComponent : BaseComponent
+{
+	void reset() override;
+	boost::shared_ptr<EntityBrain> brain;
+};
+
+
 // systems
 class System
 {
 public:
-	System(int componentMask, bool renders_ = false) : mask(componentMask), renders(renders_)
+	explicit System(int componentMask, bool renders_ = false) : mask(componentMask), renders(renders_)
 	{
 	}
 
@@ -86,6 +97,7 @@ public:
 	{
 	}
 
+	// todo: remove this silly render flag and use a different way to render the single RenderSystem
 	bool doesRender()
 	{
 		return renders;
@@ -117,6 +129,16 @@ public:
 	void renderEntity(Entity e, sf::RenderWindow &window) override;
 };
 
+class InputSystem : public System
+{
+public:
+	InputSystem(): System(COMPONENT_INPUT)
+	{
+	}
+
+	void tickEntity(Entity e, float dt) override;
+};
+
 class EntityManager
 {
 public:
@@ -126,8 +148,10 @@ public:
 		for (size_t i = 0; i < MAX_ENTITIES; ++i)
 			entities[i] = COMPONENT_NONE;
 
-		// init systems
+		// init systems in correct order
+		systems.push_back(new InputSystem);
 		systems.push_back(new MovementSystem);
+		// todo: collision
 		systems.push_back(new RenderSystem);
 	}
 
@@ -155,9 +179,9 @@ public:
 	PositionComponent positionComponents[MAX_ENTITIES];
 	VelocityComponent velocityComponents[MAX_ENTITIES];
 	RenderComponent renderComponents[MAX_ENTITIES];
+	InputComponent inputComponents[MAX_ENTITIES];
 
 	// component management
-	BaseComponent* addComponent(Entity e, ComponentType type);
 	void removeComponent(Entity e, ComponentType type);
 	bool hasComponent(Entity e, ComponentType type);
 	BaseComponent* getComponent(Entity e, ComponentType type);
@@ -169,6 +193,12 @@ public:
 	void addPositionComponent(Entity e, float x, float y);
 	void addVelocityComponent(Entity e, float x, float y);
 	void addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step, DirectionType initialDirection, bool playing);
+	void addPlayerInputComponent(Entity e);
+	void addAIInputComponent(Entity e);
+	
+private:
+	BaseComponent* addComponent(Entity e, ComponentType type);
+	void addBrain(Entity e, bool aiBrain);
 };
 
 template <class T>

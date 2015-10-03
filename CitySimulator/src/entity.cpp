@@ -1,9 +1,11 @@
 #include <boost/property_tree/xml_parser.hpp>
+#include "ai.hpp"
 #include "entity.hpp"
 #include "config.hpp"
 #include "animation.hpp"
 #include "logger.hpp"
 #include "utils.hpp"
+#include <boost/make_shared.hpp>
 
 void EntityFactory::loadEntities(EntityType entityType, const std::string &fileName)
 {
@@ -43,79 +45,6 @@ void EntityFactory::loadEntities(EntityType entityType, const std::string &fileN
 		if (sprite != entity.second.end())
 			Globals::spriteSheet->loadSprite(entity.second, entityType);
 	}
-}
-
-void System::tick(float dt)
-{
-	EntityManager *manager = Globals::entityManager;
-
-	for (size_t e = 0; e < MAX_ENTITIES; ++e)
-	{
-		if ((manager->entities[e] & mask) == mask)
-			tickEntity(e, dt);
-	}
-}
-
-void System::render(sf::RenderWindow &window)
-{
-	EntityManager *manager = Globals::entityManager;
-
-	for (size_t e = 0; e < MAX_ENTITIES; ++e)
-	{
-		if ((manager->entities[e] & mask) == mask)
-			renderEntity(e, window);
-	}
-}
-
-void PositionComponent::reset()
-{
-	pos.x = pos.y = 0;
-}
-
-void RenderComponent::reset()
-{
-	anim.reset();
-}
-
-void VelocityComponent::reset()
-{
-	velocity.x = velocity.y = 0;
-}
-
-template <class T>
-T* get(Entity e, ComponentType type)
-{
-	return Globals::entityManager->getComponent<T>(e, type);
-}
-
-void MovementSystem::tickEntity(Entity e, float dt)
-{
-	auto pos = get<PositionComponent>(e, COMPONENT_POSITION);
-	auto vel = get<VelocityComponent>(e, COMPONENT_VELOCITY);
-
-	pos->pos += vel->velocity * dt;
-}
-
-void RenderSystem::tickEntity(Entity e, float dt)
-{
-	auto *render = get<RenderComponent>(e, COMPONENT_RENDER);
-
-	render->anim.tick(dt);
-}
-
-void RenderSystem::renderEntity(Entity e, sf::RenderWindow &window)
-{
-	auto render = get<RenderComponent>(e, COMPONENT_RENDER);
-	auto pos = get<PositionComponent>(e, COMPONENT_POSITION);
-
-	sf::RenderStates states;
-	sf::Transform transform;
-
-	transform.translate(pos->pos);
-	transform.scale(Constants::humanScale);
-
-	states.transform *= transform;
-	render->anim.draw(window, states);
 }
 
 Entity EntityManager::createEntity()
@@ -197,20 +126,21 @@ BaseComponent* EntityManager::getComponent(Entity e, ComponentType type)
 	case COMPONENT_POSITION: return &positionComponents[e];
 	case COMPONENT_VELOCITY: return &velocityComponents[e];
 	case COMPONENT_RENDER: return &renderComponents[e];
+	case COMPONENT_INPUT: return &inputComponents[e];
 	default: FAIL("Invalid component type %1%", type);
 	}
 }
 
 void EntityManager::addPositionComponent(Entity e, float x, float y)
 {
-	PositionComponent *comp = dynamic_cast<PositionComponent*>(Globals::entityManager->addComponent(e, COMPONENT_POSITION));
+	PositionComponent *comp = dynamic_cast<PositionComponent*>(addComponent(e, COMPONENT_POSITION));
 	comp->pos.x = x;
 	comp->pos.y = y;
 }
 
 void EntityManager::addVelocityComponent(Entity e, float x, float y)
 {
-	VelocityComponent *comp = dynamic_cast<VelocityComponent*>(Globals::entityManager->addComponent(e, COMPONENT_VELOCITY));
+	VelocityComponent *comp = dynamic_cast<VelocityComponent*>(addComponent(e, COMPONENT_VELOCITY));
 	comp->velocity.x = x;
 	comp->velocity.y = y;
 }
@@ -218,8 +148,28 @@ void EntityManager::addVelocityComponent(Entity e, float x, float y)
 
 void EntityManager::addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step, DirectionType initialDirection, bool playing)
 {
-	RenderComponent *comp = dynamic_cast<RenderComponent*>(Globals::entityManager->addComponent(e, COMPONENT_RENDER));
+	RenderComponent *comp = dynamic_cast<RenderComponent*>(addComponent(e, COMPONENT_RENDER));
 
 	Animation *anim = Globals::spriteSheet->getAnimation(entityType, animation);
 	comp->anim.init(anim, step, initialDirection, playing);
+}
+
+void EntityManager::addBrain(Entity e, bool aiBrain)
+{
+	InputComponent *comp = dynamic_cast<InputComponent*>(addComponent(e, COMPONENT_INPUT));
+
+	if (aiBrain)
+		comp->brain.reset(new AIBrain(e));
+	else
+		comp->brain.reset(new InputBrain(e));
+}
+
+void EntityManager::addPlayerInputComponent(Entity e)
+{
+	addBrain(e, false);
+}
+
+void EntityManager::addAIInputComponent(Entity e)
+{
+	addBrain(e, true);
 }

@@ -5,13 +5,13 @@
 
 enum InputKey
 {
-	UP,
-	LEFT,
-	DOWN,
-	RIGHT,
-	STOP_CONTROLLING,
+	KEY_UP,
+	KEY_LEFT,
+	KEY_DOWN,
+	KEY_RIGHT,
+	KEY_YIELD_CONTROL,
 
-	COUNT
+	KEY_COUNT
 };
 
 
@@ -19,7 +19,7 @@ class Input
 {
 public:
 
-	Input() : pressed(COUNT), wasPressed(COUNT)
+	Input() : pressed(KEY_COUNT), wasPressed(KEY_COUNT)
 	{
 	}
 

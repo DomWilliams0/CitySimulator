@@ -21,7 +21,7 @@ namespace Constants
 	extern const int tileSize;
 	extern const float tileSizef;
 
-	extern const sf::Vector2f humanScale;
+	extern const sf::Vector2f entityScale;
 
 	extern sf::Font mainFont;
 
@@ -32,10 +32,12 @@ class BaseGame;
 class SpriteSheet;
 class EntityManager;
 class EntityFactory;
+class Input;
 
 namespace Globals
 {
 	extern BaseGame *game;
+	extern Input *input;
 	extern SpriteSheet *spriteSheet;
 	extern EntityManager *entityManager;
 	extern EntityFactory *entityFactory;
@@ -50,6 +52,6 @@ namespace Direction
 	extern const int SOUTH;
 	extern const int WEST;
 
-	extern const int COUNT;
+	extern const int DIRECTION_COUNT;
 	DirectionType random();
 }

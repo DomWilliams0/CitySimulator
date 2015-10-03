@@ -8,16 +8,16 @@ using sf::Keyboard;
 void Input::registerBindings()
 {
 	bindings.clear();
-	bindings.insert({UP, Keyboard::Key::W});
-	bindings.insert({LEFT, Keyboard::Key::A});
-	bindings.insert({DOWN, Keyboard::Key::S});
-	bindings.insert({RIGHT, Keyboard::Key::D});
-	bindings.insert({STOP_CONTROLLING, Keyboard::Key::Tab});
+	bindings.insert({KEY_UP, Keyboard::Key::W});
+	bindings.insert({KEY_LEFT, Keyboard::Key::A});
+	bindings.insert({KEY_DOWN, Keyboard::Key::S});
+	bindings.insert({KEY_RIGHT, Keyboard::Key::D});
+	bindings.insert({KEY_YIELD_CONTROL, Keyboard::Key::Tab});
 
 	// check all keys have been registered
-	if (bindings.left.size() != COUNT)
+	if (bindings.left.size() != KEY_COUNT)
 	{
-		auto msg = boost::format("Expected %1% key bindings, recieved %2% instead") % COUNT % bindings.left.size();
+		auto msg = boost::format("Expected %1% key bindings, recieved %2% instead") % KEY_COUNT % bindings.left.size();
 
 		Logger::logError(str(msg));
 		throw std::runtime_error("Invalid number of key bindings");
@@ -47,6 +47,6 @@ bool Input::isFirstPressed(InputKey key)
 
 void Input::advance()
 {
-	for (size_t i = 0; i < COUNT; ++i)
+	for (size_t i = 0; i < KEY_COUNT; ++i)
 		wasPressed[i] = pressed[i];
 }

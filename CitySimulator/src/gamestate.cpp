@@ -3,6 +3,7 @@
 #include "config.hpp"
 #include "entity.hpp"
 #include "animation.hpp"
+#include "input.hpp"
 
 GameState::GameState() : State(GAME)
 {
@@ -33,9 +34,10 @@ GameState::GameState() : State(GAME)
 	Globals::game->setView(view);
 
 	Entity e = Globals::entityManager->createEntity();
-	Globals::entityManager->addPositionComponent(e, Utils::random<float>(0.0f, world.getPixelSize().x), Utils::random<float>(0.0f, world.getPixelSize().y));
-	Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, Globals::spriteSheet->getRandomAnimationName(ENTITY_HUMAN), 0.18f, Direction::random(), true);
-	Globals::entityManager->addVelocityComponent(e, Utils::random<float>(-40, 40), Utils::random<float>(-40, 40));
+	Globals::entityManager->addPositionComponent(e, 100.0f, 100.0f);
+	Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, "Business Man", 0.18f, Direction::EAST, false);
+	Globals::entityManager->addVelocityComponent(e, 0.0f, 0.0f);
+	Globals::entityManager->addPlayerInputComponent(e);
 }
 
 GameState::~GameState()
@@ -49,16 +51,15 @@ void GameState::tempControlCamera(float delta)
 {
 	const static float viewSpeed = 400;
 
-	Input *input = Globals::game->getInput();
 	float dx(0), dy(0);
 
-	if (input->isPressed(UP))
+	if (Globals::input->isPressed(KEY_UP))
 		dy = -delta;
-	else if (input->isPressed(DOWN))
+	else if (Globals::input->isPressed(KEY_DOWN))
 		dy = delta;
-	if (input->isPressed(LEFT))
+	if (Globals::input->isPressed(KEY_LEFT))
 		dx = -delta;
-	else if (input->isPressed(RIGHT))
+	else if (Globals::input->isPressed(KEY_RIGHT))
 		dx = delta;
 
 	if (dx || dy)
@@ -86,4 +87,12 @@ void GameState::render(sf::RenderWindow &window)
 
 void GameState::handleInput(const sf::Event &event)
 {
+	// temporary input test
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
+	{
+		if (Globals::entityManager->hasComponent(0, COMPONENT_INPUT))
+			Globals::entityManager->removeComponent(0, COMPONENT_INPUT);
+		else
+			Globals::entityManager->addPlayerInputComponent(0);
+	}
 }

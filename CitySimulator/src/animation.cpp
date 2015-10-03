@@ -243,7 +243,7 @@ void Animator::init(Animation *anim, float step, DirectionType initialDirection,
 
 	if (anim != nullptr)
 	{
-		direction = Direction::COUNT;
+		direction = Direction::DIRECTION_COUNT;
 		turn(initialDirection);
 	}
 }
@@ -253,6 +253,7 @@ void Animator::tick(float delta)
 	if (!playing)
 		return;
 
+	// todo use TimeTicker
 	currentFrameTime += delta;
 
 	// next frame

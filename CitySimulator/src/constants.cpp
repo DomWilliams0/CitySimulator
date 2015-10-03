@@ -9,7 +9,7 @@ namespace Constants
 
 	const int tileSize(16);
 	const float tileSizef(tileSize);
-	const sf::Vector2f humanScale(0.5, 0.5);
+	const sf::Vector2f entityScale(0.5, 0.5);
 
 	sf::Font mainFont;
 
@@ -27,12 +27,13 @@ namespace Constants
 
 DirectionType Direction::random()
 {
-	return Utils::random(0, Direction::COUNT);
+	return Utils::random(0, Direction::DIRECTION_COUNT);
 }
 
 namespace Globals
 {
 	BaseGame *game;
+	Input *input;
 	EntityManager *entityManager;
 	EntityFactory *entityFactory;
 	SpriteSheet *spriteSheet;
@@ -45,5 +46,5 @@ namespace Direction
 	const int SOUTH = 2;
 	const int WEST = 3;
 
-	const int COUNT = 4;
+	const int DIRECTION_COUNT = 4;
 }

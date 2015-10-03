@@ -4,6 +4,7 @@
 #include "logger.hpp"
 #include "gamestate.hpp"
 #include "config.hpp"
+#include "input.hpp"
 
 void FPSCounter::tick(float delta, sf::RenderWindow &window)
 {
@@ -46,7 +47,8 @@ BaseGame::BaseGame(sf::RenderWindow &renderWindow) : window(renderWindow)
 
 	// key bindings
 	window.setKeyRepeatEnabled(false);
-	input.registerBindings();
+	Globals::input = new Input;
+	Globals::input->registerBindings();
 
 	// set as global
 	Globals::game = this;
@@ -69,7 +71,7 @@ void BaseGame::beginGame()
 
 	while (window.isOpen())
 	{
-		input.advance();
+		Globals::input->advance();
 
 		while (window.pollEvent(e))
 		{
@@ -87,7 +89,7 @@ void BaseGame::beginGame()
 					if (e.key.code == sf::Keyboard::Escape)
 						window.close();
 				}
-				input.update(e.key.code, pressed);
+				Globals::input->update(e.key.code, pressed);
 				handleInput(e);
 			}
 
