@@ -231,8 +231,7 @@ Animator::Animator(Animation *anim, float step, DirectionType initialDirection, 
 void Animator::init(Animation *anim, float step, DirectionType initialDirection, bool initiallyPlaying)
 {
 	animation = anim;
-	frameStep = step;
-	currentFrameTime = 0;
+	ticker.init(step);
 	currentSequence = 0;
 	currentFrame = 0;
 	playing = initiallyPlaying;
@@ -253,14 +252,9 @@ void Animator::tick(float delta)
 	if (!playing)
 		return;
 
-	// todo use TimeTicker
-	currentFrameTime += delta;
-
 	// next frame
-	if (currentFrameTime >= frameStep)
+	if (ticker.tick(delta))
 	{
-		currentFrameTime = fmod(currentFrameTime, frameStep);
-
 		if (++currentFrame >= animation->sequences.size())
 			currentFrame = 0;
 

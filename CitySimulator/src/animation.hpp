@@ -115,8 +115,7 @@ public:
 private:
 	Animation *animation;
 
-	float frameStep;
-	float currentFrameTime;
+	Utils::TimeTicker ticker;
 
 	size_t currentSequence;
 	size_t currentFrame;
