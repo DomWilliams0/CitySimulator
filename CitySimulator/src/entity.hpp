@@ -80,7 +80,7 @@ struct InputComponent : BaseComponent
 class System
 {
 public:
-	explicit System(int componentMask, bool renders_ = false) : mask(componentMask), renders(renders_)
+	explicit System(int componentMask) : mask(componentMask)
 	{
 	}
 
@@ -97,15 +97,8 @@ public:
 	{
 	}
 
-	// todo: remove this silly render flag and use a different way to render the single RenderSystem
-	bool doesRender()
-	{
-		return renders;
-	}
-
 protected:
 	int mask;
-	bool renders;
 };
 
 class MovementSystem : public System
@@ -121,7 +114,7 @@ public:
 class RenderSystem : public System
 {
 public:
-	RenderSystem() : System(COMPONENT_POSITION | COMPONENT_RENDER, true)
+	RenderSystem() : System(COMPONENT_POSITION | COMPONENT_RENDER)
 	{
 	}
 
@@ -152,7 +145,10 @@ public:
 		systems.push_back(new InputSystem);
 		systems.push_back(new MovementSystem);
 		// todo: collision
-		systems.push_back(new RenderSystem);
+
+		auto render = new RenderSystem;
+		systems.push_back(render);
+		renderSystem = render;
 	}
 
 	~EntityManager()
@@ -172,6 +168,7 @@ public:
 
 	// systems
 	std::vector<System*> systems;
+	RenderSystem *renderSystem;
 	void renderSystems(sf::RenderWindow &window);
 	void tickSystems(float delta);
 

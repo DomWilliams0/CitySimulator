@@ -96,9 +96,7 @@ void EntityManager::tickSystems(float delta)
 
 void EntityManager::renderSystems(sf::RenderWindow &window)
 {
-	for (System *system : systems)
-		if (system->doesRender())
-			system->render(window);
+	renderSystem->render(window);
 }
 
 BaseComponent* EntityManager::addComponent(Entity e, ComponentType type)
