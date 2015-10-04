@@ -1,6 +1,5 @@
 #include <SFML/System\Vector2.hpp>
 #include <boost\shared_ptr.hpp>
-#include <exception>
 #include "maploader.hpp"
 #include "world.hpp"
 #include "utils.hpp"
@@ -403,10 +402,6 @@ void World::resize(sf::Vector2i size)
 {
 	tileSize = size;
 	pixelSize = Utils::toPixel(size);
-}
-
-void World::tick(float delta)
-{
 }
 
 void World::draw(sf::RenderTarget &target, sf::RenderStates states) const
