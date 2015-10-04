@@ -9,9 +9,8 @@ public:
 	explicit EntityBrain(Entity e)
 	{
 		entity = e;
-		pos = Globals::entityManager->getComponent<PositionComponent>(e, COMPONENT_POSITION);
-		vel = Globals::entityManager->getComponent<VelocityComponent>(e, COMPONENT_VELOCITY);
-		ren = Globals::entityManager->getComponent<RenderComponent>(e, COMPONENT_RENDER);
+		motion = Globals::entityManager->getComponent<MotionComponent>(e, COMPONENT_MOTION);
+		Config::getFloat("debug-movement-force", movementForce);
 	}
 
 	virtual ~EntityBrain()
@@ -22,15 +21,11 @@ public:
 
 protected:
 	Entity entity;
+	
+	float movementForce;
 
-	void turnTowards(DirectionType direction);
-	void setMoving(bool moving);
-
-	bool isMoving() const
-	{
-		static sf::Vector2f zero;
-		return vel->velocity != zero;
-	}
+//	void turnTowards(DirectionType direction);
+//	void setMoving(bool moving);
 
 	virtual void onEnable()
 	{
@@ -40,14 +35,7 @@ protected:
 	{
 	}
 
-	//	void init(Entity e);
-	//	void reset();
-
-private:
-	PositionComponent *pos;
-	VelocityComponent *vel;
-	RenderComponent *ren;
-	// todo direction -> position, start/stop -> velocity, remove render from brain
+	MotionComponent *motion;
 };
 
 class InputBrain : public EntityBrain
@@ -58,12 +46,7 @@ public:
 	{
 	}
 
-	void tick(float delta) override
-	{
-		// temporary movement toggling
-		if (input->isFirstPressed(KEY_YIELD_CONTROL))
-			setMoving(!isMoving());
-	}
+	void tick(float delta) override;
 
 private:
 	Input *input;
@@ -77,8 +60,5 @@ public:
 	{
 	}
 
-	void tick(float delta) override
-	{
-		// do things
-	}
+	void tick(float delta) override;
 };

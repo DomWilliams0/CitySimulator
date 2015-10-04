@@ -1,5 +1,6 @@
 #include "entity.hpp"
 #include "ai.hpp"
+#include "config.hpp"
 
 // systems
 
@@ -33,10 +34,19 @@ T* get(Entity e, ComponentType type)
 
 void MovementSystem::tickEntity(Entity e, float dt)
 {
-	auto pos = get<PositionComponent>(e, COMPONENT_POSITION);
-	auto vel = get<VelocityComponent>(e, COMPONENT_VELOCITY);
+	auto motion = get<MotionComponent>(e, COMPONENT_MOTION);
 
-	pos->pos += vel->velocity * dt;
+	motion->velocity += motion->steeringLinear;
+	motion->velocity *= movementDecay;
+
+	if (Math::lengthSquared(motion->velocity) < minSpeed * minSpeed)
+		motion->velocity.x = motion->velocity.y = 0.0f;
+
+	motion->position += motion->velocity * dt;
+
+//	motion->orientation += motion->steeringAngular * dt;
+//	motion->orientation += motion->rotation * dt;
+
 }
 
 void RenderSystem::tickEntity(Entity e, float dt)
@@ -48,18 +58,19 @@ void RenderSystem::tickEntity(Entity e, float dt)
 
 void InputSystem::tickEntity(Entity e, float dt)
 {
-	Globals::entityManager->getComponent<InputComponent>(e, COMPONENT_INPUT)->brain->tick(dt);
+	get<InputComponent>(e, COMPONENT_INPUT)->brain->tick(dt);
 }
 
 void RenderSystem::renderEntity(Entity e, sf::RenderWindow &window)
 {
 	auto render = get<RenderComponent>(e, COMPONENT_RENDER);
-	auto pos = get<PositionComponent>(e, COMPONENT_POSITION);
+	auto motion = get<MotionComponent>(e, COMPONENT_MOTION);
+
 
 	sf::RenderStates states;
 	sf::Transform transform;
 
-	transform.translate(pos->pos);
+	transform.translate(motion->position);
 	transform.scale(Constants::entityScale);
 
 	states.transform *= transform;
@@ -68,9 +79,14 @@ void RenderSystem::renderEntity(Entity e, sf::RenderWindow &window)
 
 // components
 
-void PositionComponent::reset()
+void MotionComponent::reset()
 {
-	pos.x = pos.y = 0;
+	position.x = position.y = 0.0f;
+	orientation = 0.0f;
+	velocity.x = velocity.y = 0.0f;
+	rotation = 0.0f;
+	steeringLinear.x = steeringLinear.y = 0.0f;
+	steeringAngular = 0.0f;
 }
 
 void RenderComponent::reset()
@@ -78,10 +94,6 @@ void RenderComponent::reset()
 	anim.reset();
 }
 
-void VelocityComponent::reset()
-{
-	velocity.x = velocity.y = 0;
-}
 
 void InputComponent::reset()
 {

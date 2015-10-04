@@ -67,6 +67,21 @@ namespace Utils
 	std::string searchForFile(const std::string &filename, const std::string &directory = "res");
 }
 
+namespace Math
+{
+	template <class V>
+	float length(const sf::Vector2<V> &v)
+	{
+		return sqrtf(lengthSquared(v));
+	}
+
+	template <class V>
+	float lengthSquared(const sf::Vector2<V> &v)
+	{
+		return v.x * v.x + v.y * v.y;
+	}
+}
+
 namespace Debug
 {
 	template <class V>

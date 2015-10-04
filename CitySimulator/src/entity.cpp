@@ -5,7 +5,6 @@
 #include "animation.hpp"
 #include "logger.hpp"
 #include "utils.hpp"
-#include <boost/make_shared.hpp>
 
 void EntityFactory::loadEntities(EntityType entityType, const std::string &fileName)
 {
@@ -102,6 +101,7 @@ void EntityManager::renderSystems(sf::RenderWindow &window)
 BaseComponent* EntityManager::addComponent(Entity e, ComponentType type)
 {
 	entities[e] |= type;
+	getComponent(e, type)->reset();
 
 	return getComponent(e, type);
 }
@@ -109,7 +109,6 @@ BaseComponent* EntityManager::addComponent(Entity e, ComponentType type)
 void EntityManager::removeComponent(Entity e, ComponentType type)
 {
 	entities[e] &= ~type;
-	getComponent(e, type)->reset();
 }
 
 bool EntityManager::hasComponent(Entity e, ComponentType type)
@@ -121,28 +120,18 @@ BaseComponent* EntityManager::getComponent(Entity e, ComponentType type)
 {
 	switch (type)
 	{
-	case COMPONENT_POSITION: return &positionComponents[e];
-	case COMPONENT_VELOCITY: return &velocityComponents[e];
+	case COMPONENT_MOTION: return &motionComponents[e];
 	case COMPONENT_RENDER: return &renderComponents[e];
 	case COMPONENT_INPUT: return &inputComponents[e];
 	default: FAIL("Invalid component type %1%", type);
 	}
 }
 
-void EntityManager::addPositionComponent(Entity e, float x, float y)
+void EntityManager::addMotionComponent(Entity e, sf::Vector2f initialPosition)
 {
-	PositionComponent *comp = dynamic_cast<PositionComponent*>(addComponent(e, COMPONENT_POSITION));
-	comp->pos.x = x;
-	comp->pos.y = y;
+	MotionComponent *comp = dynamic_cast<MotionComponent*>(addComponent(e, COMPONENT_MOTION));
+	comp->position = initialPosition;
 }
-
-void EntityManager::addVelocityComponent(Entity e, float x, float y)
-{
-	VelocityComponent *comp = dynamic_cast<VelocityComponent*>(addComponent(e, COMPONENT_VELOCITY));
-	comp->velocity.x = x;
-	comp->velocity.y = y;
-}
-
 
 void EntityManager::addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step, DirectionType initialDirection, bool playing)
 {

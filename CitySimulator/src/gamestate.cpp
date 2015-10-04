@@ -34,9 +34,8 @@ GameState::GameState() : State(GAME)
 	Globals::game->setView(view);
 
 	Entity e = Globals::entityManager->createEntity();
-	Globals::entityManager->addPositionComponent(e, 100.0f, 100.0f);
+	Globals::entityManager->addMotionComponent(e, { 200, 200 });
 	Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, "Business Man", 0.18f, Direction::EAST, false);
-	Globals::entityManager->addVelocityComponent(e, 0.0f, 0.0f);
 	Globals::entityManager->addPlayerInputComponent(e);
 }
 
@@ -71,11 +70,7 @@ void GameState::tempControlCamera(float delta)
 
 void GameState::tick(float delta)
 {
-	world.tick(delta);
-
 	Globals::entityManager->tickSystems(delta);
-
-	tempControlCamera(delta);
 }
 
 void GameState::render(sf::RenderWindow &window)
@@ -87,12 +82,4 @@ void GameState::render(sf::RenderWindow &window)
 
 void GameState::handleInput(const sf::Event &event)
 {
-	// temporary input test
-	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
-	{
-		if (Globals::entityManager->hasComponent(0, COMPONENT_INPUT))
-			Globals::entityManager->removeComponent(0, COMPONENT_INPUT);
-		else
-			Globals::entityManager->addPlayerInputComponent(0);
-	}
 }

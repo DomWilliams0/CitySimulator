@@ -5,6 +5,9 @@ display:
     height: 768
 debug:
   world-name: small.tmx
-  limit-fps: false
+  limit-fps: true
   human-skin: Business Man
   zoom: 0.5
+  movement-decay: 0.8
+  movement-force: 10
+  min-speed: 7

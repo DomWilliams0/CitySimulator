@@ -6,6 +6,7 @@
 
 #define COMPONENT_COUNT 3
 #define MAX_ENTITIES 1024
+#include "config.hpp"
 
 typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;
 
@@ -31,10 +32,9 @@ typedef int Entity;
 enum ComponentType
 {
 	COMPONENT_NONE = 0,
-	COMPONENT_POSITION = 1 << 0,
-	COMPONENT_VELOCITY = 1 << 1,
-	COMPONENT_RENDER = 1 << 2,
-	COMPONENT_INPUT = 1 << 3
+	COMPONENT_MOTION = 1 << 0,
+	COMPONENT_RENDER = 1 << 1,
+	COMPONENT_INPUT = 1 << 2
 };
 
 // components
@@ -49,16 +49,18 @@ struct BaseComponent
 	}
 };
 
-struct PositionComponent : BaseComponent
+struct MotionComponent : BaseComponent
 {
 	void reset() override;
-	sf::Vector2f pos;
-};
 
-struct VelocityComponent : BaseComponent
-{
-	void reset() override;
+	sf::Vector2f position;
+	float orientation;
+	
 	sf::Vector2f velocity;
+	float rotation;
+
+	sf::Vector2f steeringLinear;
+	float steeringAngular;
 };
 
 struct RenderComponent : BaseComponent
@@ -104,17 +106,23 @@ protected:
 class MovementSystem : public System
 {
 public:
-	MovementSystem() : System(COMPONENT_POSITION | COMPONENT_VELOCITY)
+	MovementSystem() : System(COMPONENT_MOTION)
 	{
+		Config::getFloat("debug-movement-decay", movementDecay);
+		Config::getFloat("debug-min-speed", minSpeed);
 	}
 
 	void tickEntity(Entity e, float dt) override;
+
+private:
+	float movementDecay;
+	float minSpeed;
 };
 
 class RenderSystem : public System
 {
 public:
-	RenderSystem() : System(COMPONENT_POSITION | COMPONENT_RENDER)
+	RenderSystem() : System(COMPONENT_MOTION | COMPONENT_RENDER)
 	{
 	}
 
@@ -173,8 +181,7 @@ public:
 	void tickSystems(float delta);
 
 	// components
-	PositionComponent positionComponents[MAX_ENTITIES];
-	VelocityComponent velocityComponents[MAX_ENTITIES];
+	MotionComponent motionComponents[MAX_ENTITIES];
 	RenderComponent renderComponents[MAX_ENTITIES];
 	InputComponent inputComponents[MAX_ENTITIES];
 
@@ -182,13 +189,11 @@ public:
 	void removeComponent(Entity e, ComponentType type);
 	bool hasComponent(Entity e, ComponentType type);
 	BaseComponent* getComponent(Entity e, ComponentType type);
-
 	template <class T>
 	T* getComponent(Entity e, ComponentType type);
 
 	// helpers
-	void addPositionComponent(Entity e, float x, float y);
-	void addVelocityComponent(Entity e, float x, float y);
+	void addMotionComponent(Entity e, sf::Vector2f initialPosition);
 	void addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step, DirectionType initialDirection, bool playing);
 	void addPlayerInputComponent(Entity e);
 	void addAIInputComponent(Entity e);

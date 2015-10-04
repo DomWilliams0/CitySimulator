@@ -1,14 +1,24 @@
 #include "ai.hpp"
 #include "entity.hpp"
 
-void EntityBrain::turnTowards(DirectionType direction)
+void InputBrain::tick(float delta)
 {
-	ren->anim.turn(direction);
+	if (input->isPressed(KEY_RIGHT))
+		motion->steeringLinear.x = movementForce;
+	else if (input->isPressed(KEY_LEFT))
+		motion->steeringLinear.x = -movementForce;
+	else
+		motion->steeringLinear.x = 0;
+
+	if (input->isPressed(KEY_DOWN))
+		motion->steeringLinear.y = movementForce;
+	else if (input->isPressed(KEY_UP))
+		motion->steeringLinear.y = -movementForce;
+	else
+		motion->steeringLinear.y = 0;
 }
 
-void EntityBrain::setMoving(bool moving)
+void AIBrain::tick(float delta)
 {
-	ren->anim.setPlaying(moving, true);
-	vel->velocity.x = moving ? 20 : 0;
+	// do things
 }
-
