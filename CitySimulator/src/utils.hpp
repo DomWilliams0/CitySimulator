@@ -69,6 +69,10 @@ namespace Utils
 
 namespace Math
 {
+	extern const float EPSILON;
+	extern const float degToRad;
+	extern const float radToDeg;
+
 	template <class V>
 	float length(const sf::Vector2<V> &v)
 	{
@@ -79,6 +83,29 @@ namespace Math
 	float lengthSquared(const sf::Vector2<V> &v)
 	{
 		return v.x * v.x + v.y * v.y;
+	}
+
+	template <class V>
+	sf::Vector2<V> normalize(const sf::Vector2<V> &v)
+	{
+		float length = Math::length(v);
+		if (length <= EPSILON)
+			return v;
+
+		sf::Vector2<V> ret;
+		ret.x = v.x / length;
+		ret.y = v.y / length;
+
+		return ret;
+	}
+
+	template <class V>
+	sf::Vector2<V> multiply(const sf::Vector2<V> &v, V scalar)
+	{
+		sf::Vector2<V> ret(v);
+		ret.x *= scalar;
+		ret.y *= scalar;
+		return ret;
 	}
 }
 

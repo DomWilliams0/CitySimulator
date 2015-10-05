@@ -176,7 +176,7 @@ void WorldTerrain::rotateObject(sf::Vertex *quad, float degrees, const sf::Vecto
 {
 	sf::Vector2f origin(pos.x, pos.y + 1);
 
-	float radians(degrees * Constants::degToRad);
+	float radians(degrees * Math::degToRad);
 	const float c(cos(radians));
 	const float s(sin(radians));
 

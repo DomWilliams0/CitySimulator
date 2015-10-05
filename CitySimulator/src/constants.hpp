@@ -24,8 +24,6 @@ namespace Constants
 	extern const sf::Vector2f entityScale;
 
 	extern sf::Font mainFont;
-
-	extern const float degToRad;
 }
 
 class BaseGame;
