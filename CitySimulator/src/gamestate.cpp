@@ -28,9 +28,7 @@ GameState::GameState() : State(GAME)
 	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
 	view.setCenter(world.getPixelSize().x / 2.f, world.getPixelSize().y / 2.f);
 
-	float zoom;
-	Config::getFloat("debug-zoom", zoom);
-	view.zoom(zoom);
+	view.zoom(Config::getFloat("debug-zoom"));
 	Globals::game->setView(view);
 
 	Entity e = Globals::entityManager->createEntity();

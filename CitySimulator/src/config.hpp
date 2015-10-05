@@ -33,9 +33,12 @@ public:
 
 	void load();
 
-	void getInt(const std::string &key, int &i);
-	void getFloat(const std::string &key, float &f);
-	void getBool(const std::string &key, bool &b);
+	void getIntRef(const std::string &key, int &i);
+	int getInt(const std::string &key);
+	void getFloatRef(const std::string &key, float &f);
+	float getFloat(const std::string &key);
+	void getBoolRef(const std::string &key, bool &b);
+	bool getBool(const std::string &key);
 	void getString(const std::string &key, std::string &s);
 	void getList(const std::string &key, std::vector<std::string> &l);
 	void getIntList(const std::string &key, std::vector<int> &l);
@@ -77,9 +80,9 @@ public:
 		return instance;
 	}
 
-	static void getInt(const std::string &key, int &i);
-	static void getFloat(const std::string &key, float &f);
-	static void getBool(const std::string &key, bool &b);
+	static int getInt(const std::string &key);
+	static float getFloat(const std::string &key);
+	static bool getBool(const std::string &key);
 	static void getString(const std::string &key, std::string &s);
 	static void getList(const std::string &key, std::vector<std::string> &l);
 	static void getIntList(const std::string &key, std::vector<int> &l);

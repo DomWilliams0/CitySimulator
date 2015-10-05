@@ -69,6 +69,8 @@ void BaseGame::beginGame()
 	sf::Clock clock;
 	sf::Event e;
 
+	// todo separate physics from rendering
+
 	while (window.isOpen())
 	{
 		Globals::input->advance();
@@ -143,10 +145,7 @@ Game::Game(sf::RenderWindow &window) : BaseGame(window)
 {
 	window.setTitle("Dank Game Memes");
 	showFPS = true;
-
-	bool limitFPS;
-	Config::getBool("debug-limit-fps", limitFPS);
-	limitFrameRate(limitFPS);
+	limitFrameRate(Config::getBool("debug-limit-fps"));
 }
 
 Game::~Game()
@@ -261,11 +260,9 @@ void loadConfig(int &windowStyle)
 	Config::loadConfig();
 
 	int width, height;
-	bool fullScreen;
 
 	// borderless fullscreen
-	Config::getBool("display-borderless-fullscreen", fullScreen);
-	if (fullScreen)
+	if (Config::getBool("display-borderless-fullscreen"))
 	{
 		windowStyle = sf::Style::None;
 
@@ -278,8 +275,8 @@ void loadConfig(int &windowStyle)
 	else
 	{
 		windowStyle = sf::Style::Default;
-		Config::getInt("display-resolution-width", width);
-		Config::getInt("display-resolution-height", height);
+		width = Config::getInt("display-resolution-width");
+		height = Config::getInt("display-resolution-height");
 	}
 
 	Constants::setWindowSize(width, height);

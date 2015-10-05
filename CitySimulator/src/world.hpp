@@ -65,7 +65,7 @@ public:
 
 	void textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipGID);
 
-	inline sf::Texture* getTexture()
+	sf::Texture* getTexture()
 	{
 		if (!converted)
 			throw std::runtime_error("Tileset has not yet been converted to a texture");
@@ -73,14 +73,14 @@ public:
 		return &texture;
 	}
 
-	inline sf::Image* getImage() const
+	sf::Image* getImage() const
 	{
 		if (converted)
 			throw std::runtime_error("Tileset has already been converted to a texture");
 		return image;
 	}
 
-	inline sf::Vector2u getSize() const
+	sf::Vector2u getSize() const
 	{
 		return size;
 	}
@@ -108,7 +108,7 @@ private:
 
 	void generatePoints();
 
-	inline int getIndex(int x, int y) const
+	int getIndex(int x, int y) const
 	{
 		return x + (size.x + 1) * y;
 	}
@@ -135,7 +135,7 @@ public:
 	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = TERRAIN, int rotationAngle = 0, int flipGID = 0);
 	void addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer = OBJECTS, float rotationAngle = 0, int flipGID = 0);
 
-	inline Tileset* getTileset() const
+	Tileset* getTileset() const
 	{
 		return tileset;
 	}
@@ -185,27 +185,25 @@ public:
 
 	void resize(sf::Vector2i size);
 
-	inline WorldTerrain& getTerrain()
+	WorldTerrain& getTerrain()
 	{
 		return terrain;
 	}
 
-	inline sf::Vector2i getPixelSize() const
+	sf::Vector2i getPixelSize() const
 	{
 		return pixelSize;
 	}
 
-	inline sf::Vector2i getTileSize() const
+	sf::Vector2i getTileSize() const
 	{
 		return tileSize;
 	}
 
-	inline sf::Transform getTransform() const
+	sf::Transform getTransform() const
 	{
 		return transform;
 	}
-
-	void tick(float delta);
 
 private:
 	WorldTerrain terrain;

@@ -106,20 +106,35 @@ T ConfigurationFile::getNumber(const std::string &key)
 	FAIL_GET(key);
 }
 
-void ConfigurationFile::getInt(const std::string &key, int &i)
+void ConfigurationFile::getIntRef(const std::string &key, int &i)
 {
-	i = getNumber<int>(key);
+	i = getInt(key);
 }
 
-void ConfigurationFile::getFloat(const std::string &key, float &f)
+int ConfigurationFile::getInt(const std::string &key)
 {
-	f = getNumber<float>(key);
+	return getNumber<int>(key);
 }
 
-void ConfigurationFile::getBool(const std::string &key, bool &b)
+void ConfigurationFile::getFloatRef(const std::string &key, float &f)
+{
+	f = getFloat(key);
+}
+
+float ConfigurationFile::getFloat(const std::string &key)
+{
+	return getNumber<float>(key);
+}
+
+void ConfigurationFile::getBoolRef(const std::string &key, bool &b)
+{
+	b = getBool(key);
+}
+
+bool ConfigurationFile::getBool(const std::string &key)
 {
 	ValueStruct &value = getValueStruct(key, ValueType::SCALAR);
-	b = boost::to_lower_copy(value.value) == "true";
+	return boost::to_lower_copy(value.value) == "true";
 }
 
 void ConfigurationFile::getString(const std::string &key, std::string &s)
@@ -501,19 +516,19 @@ void Config::createDefaultConfig()
 	configStream.close();
 }
 
-void Config::getInt(const std::string &key, int &i)
+int Config::getInt(const std::string &key)
 {
-	getInstance().config.getInt(key, i);
+	return getInstance().config.getInt(key);
 }
 
-void Config::getFloat(const std::string &key, float &f)
+float Config::getFloat(const std::string &key)
 {
-	getInstance().config.getFloat(key, f);
+	return getInstance().config.getFloat(key);
 }
 
-void Config::getBool(const std::string &key, bool &b)
+bool Config::getBool(const std::string &key)
 {
-	getInstance().config.getBool(key, b);
+	return getInstance().config.getBool(key);
 }
 
 void Config::getString(const std::string &key, std::string &s)
