@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include <boost/filesystem.hpp>
 #include <boost/format/format_fwd.hpp>
 #include <boost/format/free_funcs.hpp>
@@ -77,4 +78,11 @@ void Utils::TimeTicker::reset()
 		currentEnd = maxDuration;
 
 	current = 0;
+}
+
+namespace Math
+{
+	const float EPSILON = 0.000001f;
+	const float degToRad = static_cast<float>(M_PI / 180.0);
+	const float radToDeg = static_cast<float>(180.0 / M_PI);
 }

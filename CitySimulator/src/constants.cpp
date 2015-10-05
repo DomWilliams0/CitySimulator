@@ -1,4 +1,3 @@
-#define _USE_MATH_DEFINES
 #include "constants.hpp"
 #include "utils.hpp"
 
@@ -12,8 +11,6 @@ namespace Constants
 	const sf::Vector2f entityScale(0.5, 0.5);
 
 	sf::Font mainFont;
-
-	const float degToRad = static_cast<float>(M_PI / 180.0);
 
 	void setWindowSize(int x, int y)
 	{
