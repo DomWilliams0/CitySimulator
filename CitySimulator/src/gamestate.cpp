@@ -33,7 +33,7 @@ GameState::GameState() : State(GAME)
 
 	Entity e = Globals::entityManager->createEntity();
 	Globals::entityManager->addMotionComponent(e, { 200, 200 });
-	Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, "Business Man", 0.18f, Direction::EAST, false);
+	Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, "Business Man", 0.2f, Direction::EAST, false);
 	Globals::entityManager->addPlayerInputComponent(e);
 }
 

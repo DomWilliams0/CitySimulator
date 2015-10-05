@@ -27,6 +27,21 @@ DirectionType Direction::random()
 	return Utils::random(0, Direction::DIRECTION_COUNT);
 }
 
+DirectionType Direction::fromAngle(float degrees)
+{
+	const static float multiple = 360.0f / DIRECTION_COUNT;
+
+	int angle = static_cast<DirectionType>(multiple * roundf(degrees / multiple));
+
+	switch (angle)
+	{
+	case 0: return EAST;
+	case 90: return SOUTH;
+	case -90: return NORTH;
+	default: return WEST;
+	}
+}
+
 namespace Globals
 {
 	BaseGame *game;

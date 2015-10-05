@@ -3,19 +3,21 @@
 
 void InputBrain::tick(float delta)
 {
-	if (input->isPressed(KEY_RIGHT))
-		motion->steeringLinear.x = 1;
-	else if (input->isPressed(KEY_LEFT))
-		motion->steeringLinear.x = -1;
-	else
-		motion->steeringLinear.x = 0;
+	bool right = input->isPressed(KEY_RIGHT);
+	bool left = input->isPressed(KEY_LEFT);
+	bool down = input->isPressed(KEY_DOWN);
+	bool up = input->isPressed(KEY_UP);
 
-	if (input->isPressed(KEY_DOWN))
-		motion->steeringLinear.y = 1;
-	else if (input->isPressed(KEY_UP))
-		motion->steeringLinear.y = -1;
+	if (right != left)
+		motion->steeringLinear.x = right ? 1.f : -1.f;
 	else
-		motion->steeringLinear.y = 0;
+		motion->steeringLinear.x = 0.f;
+
+	if (down != up)
+		motion->steeringLinear.y = down ? 1.f : -1.f;
+	else
+		motion->steeringLinear.y = 0.f;
+
 }
 
 void AIBrain::tick(float delta)

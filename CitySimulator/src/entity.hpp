@@ -57,6 +57,7 @@ struct MotionComponent : BaseComponent
 	float orientation;
 	
 	sf::Vector2f velocity;
+	sf::Vector2f lastVelocity;
 	float rotation;
 
 	sf::Vector2f steeringLinear;

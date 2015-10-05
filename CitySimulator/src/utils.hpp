@@ -73,19 +73,19 @@ namespace Math
 	extern const float degToRad;
 	extern const float radToDeg;
 
-	template <class V>
+	template <class V=float>
 	float length(const sf::Vector2<V> &v)
 	{
 		return sqrtf(lengthSquared(v));
 	}
 
-	template <class V>
+	template <class V=float>
 	float lengthSquared(const sf::Vector2<V> &v)
 	{
 		return v.x * v.x + v.y * v.y;
 	}
 
-	template <class V>
+	template <class V=float>
 	sf::Vector2<V> normalize(const sf::Vector2<V> &v)
 	{
 		float length = Math::length(v);
@@ -99,7 +99,7 @@ namespace Math
 		return ret;
 	}
 
-	template <class V>
+	template <class V=float>
 	sf::Vector2<V> multiply(const sf::Vector2<V> &v, V scalar)
 	{
 		sf::Vector2<V> ret(v);
