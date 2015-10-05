@@ -205,6 +205,7 @@ public:
 		return transform;
 	}
 
+	BlockType getBlockAt(const sf::Vector2i &tile, LayerType layer = TERRAIN);
 private:
 	WorldTerrain terrain;
 

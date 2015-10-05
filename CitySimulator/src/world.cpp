@@ -404,6 +404,12 @@ void World::resize(sf::Vector2i size)
 	pixelSize = Utils::toPixel(size);
 }
 
+BlockType World::getBlockAt(const sf::Vector2i& tile, LayerType layer)
+{
+	int index = terrain.getBlockIndex(tile, layer);
+	return terrain.blockTypes[index];
+}
+
 void World::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
 	states.transform *= transform;

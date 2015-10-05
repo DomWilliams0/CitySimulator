@@ -4,10 +4,13 @@ display:
     width: 1080
     height: 768
 debug:
-  world-name: small.tmx
+  world-name: collision_test.tmx
   limit-fps: true
   human-skin: Business Man
   zoom: 0.5
   movement-decay: 0.77
   movement-force: 10
   min-speed: 7
+  start-pos:
+    x: 20
+    y: 24

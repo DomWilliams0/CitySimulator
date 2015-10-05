@@ -124,6 +124,14 @@ void MotionComponent::reset()
 	steeringAngular = 0.0f;
 }
 
+sf::Vector2i MotionComponent::getTilePosition() const
+{
+	sf::Vector2i tile;
+	tile.x = static_cast<int>(position.x);
+	tile.y = static_cast<int>(position.y) + 1;
+	return Utils::toTile(tile);
+}
+
 void RenderComponent::reset()
 {
 	anim.reset();

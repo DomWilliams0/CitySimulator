@@ -127,10 +127,11 @@ BaseComponent* EntityManager::getComponent(Entity e, ComponentType type)
 	}
 }
 
-void EntityManager::addMotionComponent(Entity e, sf::Vector2f initialPosition)
+void EntityManager::addMotionComponent(Entity e, World *world, sf::Vector2i initialTile)
 {
 	MotionComponent *comp = dynamic_cast<MotionComponent*>(addComponent(e, COMPONENT_MOTION));
-	comp->position = initialPosition;
+	comp->position = sf::Vector2f(Utils::toPixel(initialTile));
+	comp->world = world;
 }
 
 void EntityManager::addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step, DirectionType initialDirection, bool playing)

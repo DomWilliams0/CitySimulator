@@ -52,6 +52,7 @@ struct BaseComponent
 struct MotionComponent : BaseComponent
 {
 	void reset() override;
+	sf::Vector2i getTilePosition() const;
 
 	sf::Vector2f position;
 	float orientation;
@@ -62,6 +63,8 @@ struct MotionComponent : BaseComponent
 
 	sf::Vector2f steeringLinear;
 	float steeringAngular;
+
+	World *world;
 };
 
 struct RenderComponent : BaseComponent
@@ -194,7 +197,7 @@ public:
 	T* getComponent(Entity e, ComponentType type);
 
 	// helpers
-	void addMotionComponent(Entity e, sf::Vector2f initialPosition);
+	void addMotionComponent(Entity e, World *world, sf::Vector2i initialTile);
 	void addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step, DirectionType initialDirection, bool playing);
 	void addPlayerInputComponent(Entity e);
 	void addAIInputComponent(Entity e);

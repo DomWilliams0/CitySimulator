@@ -32,7 +32,7 @@ GameState::GameState() : State(GAME)
 	Globals::game->setView(view);
 
 	Entity e = Globals::entityManager->createEntity();
-	Globals::entityManager->addMotionComponent(e, { 200, 200 });
+	Globals::entityManager->addMotionComponent(e, &world, {Config::getInt("debug-start-pos-x"), Config::getInt("debug-start-pos-y")});
 	Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, "Business Man", 0.2f, Direction::EAST, false);
 	Globals::entityManager->addPlayerInputComponent(e);
 }
