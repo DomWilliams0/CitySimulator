@@ -108,8 +108,8 @@ class MovementSystem : public System
 public:
 	MovementSystem() : System(COMPONENT_MOTION)
 	{
-		Config::getFloat("debug-movement-decay", movementDecay);
-		Config::getFloat("debug-min-speed", minSpeed);
+		movementDecay = Config::getFloat("debug-movement-decay");
+		minSpeed = Config::getFloat("debug-min-speed");
 	}
 
 	void tickEntity(Entity e, float dt) override;

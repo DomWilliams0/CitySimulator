@@ -10,7 +10,7 @@ public:
 	{
 		entity = e;
 		motion = Globals::entityManager->getComponent<MotionComponent>(e, COMPONENT_MOTION);
-		Config::getFloat("debug-movement-force", movementForce);
+		movementForce = Config::getFloat("debug-movement-force");
 	}
 
 	virtual ~EntityBrain()
