@@ -6,22 +6,35 @@
 #include "logger.hpp"
 #include <unordered_set>
 #include <boost/format.hpp>
+#include <map>
+#include <set>
+
+bool isCollidable(BlockType blockType)
+{
+	static const std::set<BlockType> collidables({WATER, TREE, BUILDING_WALL, BUILDING_EDGE, BUILDING_ROOF, BUILDING_ROOF_CORNER});
+	return collidables.find(blockType) != collidables.end();
+}
 
 LayerType layerTypeFromString(const std::string &s)
 {
 	if (s == "underterrain")
-		return UNDERTERRAIN;
+		return LAYER_UNDERTERRAIN;
 	if (s == "terrain")
-		return TERRAIN;
+		return LAYER_TERRAIN;
 	if (s == "overterrain")
-		return OVERTERRAIN;
+		return LAYER_OVERTERRAIN;
 	if (s == "objects")
-		return OBJECTS;
+		return LAYER_OBJECTS;
 	if (s == "collisions")
-		return COLLISIONS;
+		return LAYER_COLLISIONS;
 
 	Logger::logWarning("Unknown LayerType: " + s);
-	return LT_ERROR;
+	return LAYER_COUNT;
+}
+
+bool isTileLayer(LayerType &layerType)
+{
+	return layerType == LAYER_UNDERTERRAIN || layerType == LAYER_TERRAIN || layerType == LAYER_OVERTERRAIN;
 }
 
 Tileset::Tileset(const std::string &filename) : converted(false)
@@ -36,6 +49,11 @@ Tileset::Tileset(const std::string &filename) : converted(false)
 	size.y /= Constants::tileSize;
 
 	generatePoints();
+}
+
+Tileset::~Tileset()
+{
+	delete points;
 }
 
 void Tileset::textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipGID)
@@ -66,6 +84,26 @@ void Tileset::textureQuad(sf::Vertex *quad, const BlockType &blockType, int rota
 	quad[(1 + offset) % 4].texCoords = points[getIndex(row + 1, col)];
 	quad[(2 + offset) % 4].texCoords = points[getIndex(row + 1, col + 1)];
 	quad[(3 + offset) % 4].texCoords = points[getIndex(row, col + 1)];
+}
+
+sf::Texture* Tileset::getTexture()
+{
+	if (!converted)
+		throw std::runtime_error("Tileset has not yet been converted to a texture");
+
+	return &texture;
+}
+
+sf::Image* Tileset::getImage() const
+{
+	if (converted)
+		throw std::runtime_error("Tileset has already been converted to a texture");
+	return image;
+}
+
+sf::Vector2u Tileset::getSize() const
+{
+	return size;
 }
 
 void Tileset::convertToTexture(const std::vector<int> &flippedGIDs)
@@ -141,12 +179,23 @@ void Tileset::createTileImage(sf::Image *image, unsigned blockType)
 	image->copy(*this->image, 0, 0, getTileRect(blockType));
 }
 
+void Tileset::addPoint(int x, int y)
+{
+	points[getIndex(x, y)] = sf::Vector2f(x * Constants::tileSizef,
+	                                      y * Constants::tileSizef);
+}
+
 void Tileset::generatePoints()
 {
 	points = new sf::Vector2f[(size.x + 1) * (size.y + 1)];
 	for (size_t y = 0; y <= size.y; y++)
 		for (size_t x = 0; x <= size.x; x++)
 			addPoint(x, y);
+}
+
+int Tileset::getIndex(int x, int y) const
+{
+	return x + (size.x + 1) * y;
 }
 
 WorldTerrain::WorldTerrain(World *container) : BaseWorld(container), tileset(new Tileset("tileset.png"))
@@ -212,6 +261,11 @@ void WorldTerrain::resize(const int &layerCount)
 	blockTypes.resize(size);
 }
 
+void WorldTerrain::registerLayer(LayerType layerType, int depth)
+{
+	layerDepths.insert(std::make_pair(layerType, depth));
+}
+
 void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer, int rotationAngle, int flipGID)
 {
 	int index = getBlockIndex(pos, layer);
@@ -241,6 +295,11 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, Layer
 		vertices.append(quad[i]);
 }
 
+Tileset* WorldTerrain::getTileset() const
+{
+	return tileset;
+}
+
 int WorldTerrain::discoverLayers(std::vector<TMX::Layer*> &layers, std::vector<LayerType> &layerTypes)
 {
 	auto layerIt = layers.begin();
@@ -252,7 +311,7 @@ int WorldTerrain::discoverLayers(std::vector<TMX::Layer*> &layers, std::vector<L
 
 		// unknown layer type
 		LayerType layerType = layerTypeFromString(layer->name);
-		if (layerType == LT_ERROR)
+		if (layerType == LAYER_COUNT)
 		{
 			Logger::logError("Invalid layer name: " + layer->name);
 			layerIt = layers.erase(layerIt);
@@ -330,7 +389,7 @@ void WorldTerrain::addTiles(const std::vector<TMX::Layer*> &layers, const std::v
 					continue;
 
 				// objects are not stuck to the grid
-				if (layerType == OBJECTS)
+				if (layerType == LAYER_OBJECTS)
 				{
 					TMX::Object *object = dynamic_cast<TMX::Object*>(tile);
 					addObject(object->position, blockType, layerType, object->rotationAnglef, tile->getFlipGID());
@@ -376,6 +435,34 @@ void WorldTerrain::load(const TMX::TileMap *tileMap)
 	addTiles(layers, types);
 }
 
+void CollisionMap::load()
+{
+	sf::Vector2i size = container->getTileSize();
+	WorldTerrain &terrain = container->terrain;
+
+	// find collidable tiles
+	for (auto y = 0; y < size.y; ++y)
+	{
+		for (auto x = 0; x < size.x; ++x)
+		{
+			BlockType bt = container->getBlockAt({ x, y }, LAYER_TERRAIN); // currently the only collidable layer
+			if (!isCollidable(bt))
+				continue;
+
+			// todo
+			// fill every tile with a single tile sized rectangle
+			// attempt to merge every rectangle with its adjacent rectangles (smallest/largest area first?)
+			// vertically, then horizontally, then choose the set with the least rectangles
+		}
+	}
+
+}
+
+World::World(): terrain(this), collisionMap(this)
+{
+	transform.scale(Constants::tileSizef, Constants::tileSizef);
+}
+
 void World::loadFromFile(const std::string &filename)
 {
 	Logger::logDebug(str(boost::format("Began loading world %1%") % filename));
@@ -392,6 +479,7 @@ void World::loadFromFile(const std::string &filename)
 
 	// terrain
 	terrain.load(tmx);
+	collisionMap.load();
 
 	Logger::popIndent();
 	Logger::logDebug(str(boost::format("Loaded world %1%") % filename));
@@ -404,7 +492,27 @@ void World::resize(sf::Vector2i size)
 	pixelSize = Utils::toPixel(size);
 }
 
-BlockType World::getBlockAt(const sf::Vector2i& tile, LayerType layer)
+WorldTerrain& World::getTerrain()
+{
+	return terrain;
+}
+
+sf::Vector2i World::getPixelSize() const
+{
+	return pixelSize;
+}
+
+sf::Vector2i World::getTileSize() const
+{
+	return tileSize;
+}
+
+sf::Transform World::getTransform() const
+{
+	return transform;
+}
+
+BlockType World::getBlockAt(const sf::Vector2i &tile, LayerType layer)
 {
 	int index = terrain.getBlockIndex(tile, layer);
 	return terrain.blockTypes[index];

@@ -1,9 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <string>
 #include <unordered_map>
 #include "maploader.hpp"
-#include "utils.hpp"
 
 class World;
 
@@ -35,55 +33,37 @@ enum BlockType
 	LAST
 };
 
+bool isCollidable(BlockType blockType);
+
 
 enum LayerType
 {
-	UNDERTERRAIN,
-	TERRAIN,
-	OVERTERRAIN,
-	OBJECTS,
-	COLLISIONS,
-	LT_ERROR
+	LAYER_UNDERTERRAIN,
+	LAYER_TERRAIN,
+	LAYER_OVERTERRAIN,
+	LAYER_OBJECTS,
+	LAYER_COLLISIONS,
+	LAYER_COUNT
 };
 
 LayerType layerTypeFromString(const std::string &s);
 
-inline bool isTileLayer(LayerType &layerType)
-{
-	return layerType == UNDERTERRAIN || layerType == TERRAIN || layerType == OVERTERRAIN;
-}
+bool isTileLayer(LayerType &layerType);
 
 class Tileset
 {
 public:
 	explicit Tileset(const std::string &filename);
 
-	~Tileset()
-	{
-		delete points;
-	}
+	~Tileset();
 
 	void textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipGID);
 
-	sf::Texture* getTexture()
-	{
-		if (!converted)
-			throw std::runtime_error("Tileset has not yet been converted to a texture");
+	sf::Texture* getTexture();
 
-		return &texture;
-	}
+	sf::Image* getImage() const;
 
-	sf::Image* getImage() const
-	{
-		if (converted)
-			throw std::runtime_error("Tileset has already been converted to a texture");
-		return image;
-	}
-
-	sf::Vector2u getSize() const
-	{
-		return size;
-	}
+	sf::Vector2u getSize() const;
 
 	void convertToTexture(const std::vector<int> &flippedGIDs);
 	sf::IntRect getTileRect(unsigned blockType);
@@ -100,18 +80,11 @@ private:
 	std::unordered_map<int, int> flippedBlockTypes;
 	bool converted;
 
-	void addPoint(int x, int y)
-	{
-		points[getIndex(x, y)] = sf::Vector2f(x * Constants::tileSizef,
-		                                      y * Constants::tileSizef);
-	}
+	void addPoint(int x, int y);
 
 	void generatePoints();
 
-	int getIndex(int x, int y) const
-	{
-		return x + (size.x + 1) * y;
-	}
+	int getIndex(int x, int y) const;
 };
 
 class BaseWorld
@@ -132,13 +105,10 @@ public:
 	explicit WorldTerrain(World *container);
 	~WorldTerrain();
 
-	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = TERRAIN, int rotationAngle = 0, int flipGID = 0);
-	void addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer = OBJECTS, float rotationAngle = 0, int flipGID = 0);
+	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = LAYER_TERRAIN, int rotationAngle = 0, int flipGID = 0);
+	void addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer = LAYER_OBJECTS, float rotationAngle = 0, int flipGID = 0);
 
-	Tileset* getTileset() const
-	{
-		return tileset;
-	}
+	Tileset* getTileset() const;
 
 private:
 	Tileset *tileset;
@@ -158,11 +128,7 @@ protected:
 	std::map<LayerType, int> layerDepths;
 
 	void resize(const int &layerCount);
-
-	inline void registerLayer(LayerType layerType, int depth)
-	{
-		layerDepths.insert(std::make_pair(layerType, depth));
-	}
+	void registerLayer(LayerType layerType, int depth);
 
 	void render(sf::RenderTarget &target, sf::RenderStates &states) const;
 
@@ -172,42 +138,41 @@ protected:
 	friend class World;
 };
 
+class CollisionMap : public BaseWorld
+{
+public:
+	explicit CollisionMap(World *container) : BaseWorld(container)
+	{
+	}
+
+protected:
+	void load();
+
+	friend class World;
+};
+
 class World : public sf::Drawable
 {
 public:
 
-	World() : terrain(this)
-	{
-		transform.scale(Constants::tileSizef, Constants::tileSizef);
-	}
+	World();
 
 	void loadFromFile(const std::string &filename);
 
 	void resize(sf::Vector2i size);
 
-	WorldTerrain& getTerrain()
-	{
-		return terrain;
-	}
+	WorldTerrain& getTerrain();
 
-	sf::Vector2i getPixelSize() const
-	{
-		return pixelSize;
-	}
+	sf::Vector2i getPixelSize() const;
 
-	sf::Vector2i getTileSize() const
-	{
-		return tileSize;
-	}
+	sf::Vector2i getTileSize() const;
 
-	sf::Transform getTransform() const
-	{
-		return transform;
-	}
+	sf::Transform getTransform() const;
 
-	BlockType getBlockAt(const sf::Vector2i &tile, LayerType layer = TERRAIN);
+	BlockType getBlockAt(const sf::Vector2i &tile, LayerType layer = LAYER_TERRAIN);
 private:
 	WorldTerrain terrain;
+	CollisionMap collisionMap;
 
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 
@@ -218,4 +183,5 @@ protected:
 
 	friend class BaseWorld;
 	friend class WorldTerrain;
+	friend class CollisionMap;
 };
