@@ -147,8 +147,12 @@ public:
 
 protected:
 	void load();
+	void renderDebugTiles(sf::RenderTarget &target) const;
 
 	friend class World;
+
+private:
+	std::vector<sf::FloatRect> debugRenderTiles;
 };
 
 class World : public sf::Drawable

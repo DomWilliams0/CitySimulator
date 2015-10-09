@@ -437,17 +437,30 @@ void WorldTerrain::load(const TMX::TileMap *tileMap)
 
 void CollisionMap::load()
 {
-	sf::Vector2i size = container->getTileSize();
+	sf::Vector2i worldTileSize = container->getTileSize();
 	WorldTerrain &terrain = container->terrain;
 
+	// pos: rect
+	std::unordered_map<sf::Vector2f, sf::FloatRect> rects;
+
 	// find collidable tiles
-	for (auto y = 0; y < size.y; ++y)
+	for (auto y = 0; y < worldTileSize.y; ++y)
 	{
-		for (auto x = 0; x < size.x; ++x)
+		for (auto x = 0; x < worldTileSize.x; ++x)
 		{
-			BlockType bt = container->getBlockAt({ x, y }, LAYER_TERRAIN); // currently the only collidable layer
+			BlockType bt = container->getBlockAt({x, y}, LAYER_TERRAIN); // the only collidable tile layer
 			if (!isCollidable(bt))
 				continue;
+
+			sf::Vector2f pos(static_cast<float>(x) * Constants::tileSizef, static_cast<float>(y) * Constants::tileSizef);
+			sf::Vector2f size(Constants::tileSizef, Constants::tileSizef); // todo: assuming all tiles are the same size
+
+			sf::FloatRect rect(pos, size);
+
+			// find adjacent rect
+
+
+			rects[pos] = rect;
 
 			// todo
 			// fill every tile with a single tile sized rectangle
@@ -456,6 +469,26 @@ void CollisionMap::load()
 		}
 	}
 
+	// todo do the same with object layer
+	for (auto &pair : rects)
+		debugRenderTiles.push_back(pair.second);
+
+}
+
+void CollisionMap::renderDebugTiles(sf::RenderTarget& target) const
+{
+	for (auto &r : debugRenderTiles)
+	{
+		sf::RectangleShape rect;
+		rect.setPosition(r.left, r.top);
+		rect.setSize({ r.width, r.height });
+		rect.setOutlineColor(sf::Color::Red);
+		rect.setOutlineThickness(0.5f);
+		rect.setFillColor(sf::Color::Transparent);
+
+		sf::RenderStates states;
+		target.draw(rect, states);
+	}
 }
 
 World::World(): terrain(this), collisionMap(this)
@@ -524,4 +557,7 @@ void World::draw(sf::RenderTarget &target, sf::RenderStates states) const
 
 	// terrain
 	terrain.render(target, states);
+
+	// debug tiles
+	collisionMap.renderDebugTiles(target);
 }
