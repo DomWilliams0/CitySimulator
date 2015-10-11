@@ -153,6 +153,11 @@ protected:
 
 private:
 	std::vector<sf::FloatRect> debugRenderTiles;
+
+	void findCollidableTiles(std::vector<sf::FloatRect> &rects);
+	void mergeAdjacentTiles(std::vector<sf::Rect<float>> &rects);
+	void mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar);
+	void mergeHelper(std::vector<sf::FloatRect> &rects, bool vertically, bool ( CollisionMap::* nextRowFunc)(const sf::FloatRect *last, const sf::FloatRect *current));
 };
 
 class World : public sf::Drawable

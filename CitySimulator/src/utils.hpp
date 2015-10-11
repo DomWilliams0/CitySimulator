@@ -65,6 +65,7 @@ namespace Utils
 
 	void validateDirectory(const std::string &directory);
 	std::string searchForFile(const std::string &filename, const std::string &directory = "res");
+	sf::FloatRect expandRect(const sf::FloatRect &rect, const sf::Vector2f &offset);
 }
 
 namespace Math

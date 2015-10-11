@@ -435,13 +435,32 @@ void WorldTerrain::load(const TMX::TileMap *tileMap)
 	addTiles(layers, types);
 }
 
-void CollisionMap::load()
+bool compareRectsHorizontally(const sf::FloatRect &a, const sf::FloatRect &b)
+{
+	if (a.top < b.top) return true;
+	if (b.top < a.top) return false;
+
+	if (a.left < b.left) return true;
+	if (b.left < a.left) return false;
+
+	return false;
+}
+
+bool compareRectsVertically(const sf::FloatRect &a, const sf::FloatRect &b)
+{
+	if (a.left < b.left) return true;
+	if (b.left < a.left) return false;
+
+	if (a.top < b.top) return true;
+	if (b.top < a.top) return false;
+
+	return false;
+}
+
+void CollisionMap::findCollidableTiles(std::vector<sf::FloatRect> &rectsRet)
 {
 	sf::Vector2i worldTileSize = container->getTileSize();
 	WorldTerrain &terrain = container->terrain;
-
-	// pos: rect
-	std::unordered_map<sf::Vector2f, sf::FloatRect> rects;
 
 	// find collidable tiles
 	for (auto y = 0; y < worldTileSize.y; ++y)
@@ -456,11 +475,7 @@ void CollisionMap::load()
 			sf::Vector2f size(Constants::tileSizef, Constants::tileSizef); // todo: assuming all tiles are the same size
 
 			sf::FloatRect rect(pos, size);
-
-			// find adjacent rect
-
-
-			rects[pos] = rect;
+			rectsRet.push_back(rect);
 
 			// todo
 			// fill every tile with a single tile sized rectangle
@@ -468,22 +483,105 @@ void CollisionMap::load()
 			// vertically, then horizontally, then choose the set with the least rectangles
 		}
 	}
-
-	// todo do the same with object layer
-	for (auto &pair : rects)
-		debugRenderTiles.push_back(pair.second);
-
 }
 
-void CollisionMap::renderDebugTiles(sf::RenderTarget& target) const
+void CollisionMap::mergeAdjacentTiles(std::vector<sf::Rect<float>> &rects)
+{
+	// join individual rects
+	mergeHelper(rects, true);
+
+	// join rows together
+	//	mergeHelper(rects, false);
+}
+
+void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar)
+{
+	bool (*nextRowFunc)(const sf::FloatRect *last, const sf::FloatRect *current);
+	if (moveOnIfFar)
+	{
+		nextRowFunc = [](const sf::FloatRect *lastRect, const sf::FloatRect *rect)
+			{
+				return powf(rect->left - lastRect->left, 2.f) + powf(rect->top - lastRect->top, 2.f) > Constants::tileSizef * Constants::tileSizef;
+			};;
+	}
+	else
+	{
+		nextRowFunc = [](const sf::FloatRect *lastRect, const sf::FloatRect *rect)
+			{
+				// todo
+				return true;
+			};
+	}
+
+
+	std::vector<sf::FloatRect> rectsCopy(rects.begin(), rects.end());
+	rects.clear();
+
+	sf::FloatRect *current = nullptr;
+	sf::FloatRect *lastRect = nullptr;
+
+	rectsCopy.push_back(sf::FloatRect(-100.f, -100.f, 0.f, 0.f)); // to ensure the last rect is included
+
+	for (size_t i = 0; i < rectsCopy.size(); ++i)
+	{
+		sf::FloatRect *rect = &rectsCopy[i];
+
+		// no current rect expanding
+		if (current == nullptr)
+		{
+			current = lastRect = rect;
+			continue;
+		}
+
+		// if distance is greater than 1 tile, new row/col
+		//		float distSqrd = powf(rect->left - lastRect->left, 2.f) + powf(rect->top - lastRect->top, 2.f);
+		//		if (distSqrd > Constants::tileSizef * Constants::tileSizef)
+		if ((nextRowFunc)(lastRect, rect))
+		{
+			rects.push_back(*current);
+			current = lastRect = rect;
+			continue;
+		}
+
+		// stretch current
+		current->left = std::min(current->left, rect->left);
+		current->top = std::min(current->top, rect->top);
+		current->width = std::max(current->left + current->width, rect->left + rect->width) - current->left;
+		current->height = std::max(current->top + current->height, rect->top + rect->height) - current->top;
+
+		lastRect = rect;
+	}
+}
+
+void CollisionMap::load()
+{
+	std::vector<sf::FloatRect> rects;
+
+	// gather all collidable tiles
+	findCollidableTiles(rects);
+
+	// sort by position
+	bool vertically = false;
+	sort(rects.begin(), rects.end(), vertically ? compareRectsVertically : compareRectsHorizontally);
+
+	// merge adjacents
+	mergeAdjacentTiles(rects);
+
+	// todo do the same with object layer
+
+	for (auto &rect : rects)
+		debugRenderTiles.push_back(rect);
+}
+
+void CollisionMap::renderDebugTiles(sf::RenderTarget &target) const
 {
 	for (auto &r : debugRenderTiles)
 	{
 		sf::RectangleShape rect;
-		rect.setPosition(r.left, r.top);
-		rect.setSize({ r.width, r.height });
+		rect.setPosition(r.left + 1, r.top + 1);
+		rect.setSize({r.width - 2, r.height - 1});
 		rect.setOutlineColor(sf::Color::Red);
-		rect.setOutlineThickness(0.5f);
+		rect.setOutlineThickness(1.f);
 		rect.setFillColor(sf::Color::Transparent);
 
 		sf::RenderStates states;
