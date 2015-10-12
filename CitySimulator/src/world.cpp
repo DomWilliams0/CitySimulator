@@ -488,10 +488,12 @@ void CollisionMap::findCollidableTiles(std::vector<sf::FloatRect> &rectsRet)
 void CollisionMap::mergeAdjacentTiles(std::vector<sf::Rect<float>> &rects)
 {
 	// join individual rects
+	sort(rects.begin(), rects.end(), compareRectsHorizontally);
 	mergeHelper(rects, true);
 
 	// join rows together
-	//	mergeHelper(rects, false);
+	sort(rects.begin(), rects.end(), compareRectsVertically);
+	mergeHelper(rects, false);
 }
 
 void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar)
@@ -508,8 +510,12 @@ void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfF
 	{
 		nextRowFunc = [](const sf::FloatRect *lastRect, const sf::FloatRect *rect)
 			{
-				// todo
-				return true;
+				// adjacent and same dimensions
+				return !(lastRect->left <= rect->left + rect->width &&
+					rect->left <= lastRect->left + lastRect->width &&
+					lastRect->top <= rect->top + rect->height &&
+					rect->top <= lastRect->top + lastRect->height &&
+					lastRect->width == rect->width && lastRect->height == rect->height);
 			};
 	}
 
@@ -533,9 +539,6 @@ void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfF
 			continue;
 		}
 
-		// if distance is greater than 1 tile, new row/col
-		//		float distSqrd = powf(rect->left - lastRect->left, 2.f) + powf(rect->top - lastRect->top, 2.f);
-		//		if (distSqrd > Constants::tileSizef * Constants::tileSizef)
 		if ((nextRowFunc)(lastRect, rect))
 		{
 			rects.push_back(*current);
@@ -559,10 +562,6 @@ void CollisionMap::load()
 
 	// gather all collidable tiles
 	findCollidableTiles(rects);
-
-	// sort by position
-	bool vertically = false;
-	sort(rects.begin(), rects.end(), vertically ? compareRectsVertically : compareRectsHorizontally);
 
 	// merge adjacents
 	mergeAdjacentTiles(rects);
