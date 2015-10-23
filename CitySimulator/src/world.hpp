@@ -145,6 +145,9 @@ public:
 	{
 	}
 
+	void getSurroundingTiles(const sf::Vector2i &tilePos, std::vector<sf::Rect<float>> &ret);
+	std::multimap<std::pair<int, int>, sf::FloatRect> cellGrid;
+
 protected:
 	void load();
 	void renderDebugTiles(sf::RenderTarget &target) const;
@@ -157,7 +160,6 @@ private:
 	void findCollidableTiles(std::vector<sf::FloatRect> &rects);
 	void mergeAdjacentTiles(std::vector<sf::Rect<float>> &rects);
 	void mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar);
-	void mergeHelper(std::vector<sf::FloatRect> &rects, bool vertically, bool ( CollisionMap::* nextRowFunc)(const sf::FloatRect *last, const sf::FloatRect *current));
 };
 
 class World : public sf::Drawable
@@ -179,6 +181,7 @@ public:
 	sf::Transform getTransform() const;
 
 	BlockType getBlockAt(const sf::Vector2i &tile, LayerType layer = LAYER_TERRAIN);
+	void getSurroundingTiles(const sf::Vector2i &tilePos, std::vector<sf::Rect<float>> &ret);
 private:
 	WorldTerrain terrain;
 	CollisionMap collisionMap;

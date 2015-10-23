@@ -556,6 +556,18 @@ void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfF
 	}
 }
 
+void CollisionMap::getSurroundingTiles(const sf::Vector2i &tilePos, std::vector<sf::Rect<float>> &ret)
+{
+	const static int edge = 2;
+
+	int minX = std::max(0, tilePos.x);
+	int maxX = std::min(container->getTileSize().x, tilePos.x);
+	int minY = std::max(0, tilePos.y);
+	int maxY = std::min(container->getTileSize().y, tilePos.y);
+
+	// todo gather all (unique) rects in the given range, using a map
+}
+
 void CollisionMap::load()
 {
 	std::vector<sf::FloatRect> rects;
@@ -568,8 +580,30 @@ void CollisionMap::load()
 
 	// todo do the same with object layer
 
+	// debug drawing
 	for (auto &rect : rects)
 		debugRenderTiles.push_back(rect);
+
+	// load rects into cell grid for easy access
+	const static int cellSize = Constants::tileSize;
+	for (auto &rect : rects)
+	{
+		// todo round to nearest multiple of cellsize
+		int originX = Utils::roundToMultiple(static_cast<int>(rect.left), cellSize);
+		int originY = Utils::roundToMultiple(static_cast<int>(rect.top), cellSize);
+		std::pair<int, int> origin = {originX, originY};
+		cellGrid.insert({origin, rect});
+
+		const int roundedWidth = std::max(Constants::tileSize, Utils::roundToMultiple(static_cast<int>(rect.width), cellSize));
+		const int roundedHeight = std::max(Constants::tileSize, Utils::roundToMultiple(static_cast<int>(rect.height), cellSize));
+		for (int y = 0; y < roundedHeight; y += Constants::tileSize)
+		{
+			for (int x = 0; x < roundedWidth; x += Constants::tileSize)
+			{
+				cellGrid.insert({{origin.first + x, origin.second + y}, rect});
+			}
+		}
+	}
 }
 
 void CollisionMap::renderDebugTiles(sf::RenderTarget &target) const
@@ -586,6 +620,24 @@ void CollisionMap::renderDebugTiles(sf::RenderTarget &target) const
 		sf::RenderStates states;
 		target.draw(rect, states);
 	}
+
+	for (auto &pair : cellGrid)
+	{
+		auto point = pair.first;
+		sf::FloatRect r(point.first, point.second, Constants::tileSizef, Constants::tileSizef);
+
+		sf::RectangleShape rect;
+		rect.setPosition(r.left, r.top);
+		rect.setSize({ r.width, r.height });
+		rect.setOutlineColor(sf::Color(52, 152, 219));
+		rect.setOutlineThickness(0.5f);
+		rect.setFillColor(sf::Color::Transparent);
+
+		sf::RenderStates states;
+		target.draw(rect, states);
+
+	}
+
 }
 
 World::World(): terrain(this), collisionMap(this)
@@ -646,6 +698,11 @@ BlockType World::getBlockAt(const sf::Vector2i &tile, LayerType layer)
 {
 	int index = terrain.getBlockIndex(tile, layer);
 	return terrain.blockTypes[index];
+}
+
+void World::getSurroundingTiles(const sf::Vector2i &tilePos, std::vector<sf::Rect<float>> &ret)
+{
+	return collisionMap.getSurroundingTiles(tilePos, ret);
 }
 
 void World::draw(sf::RenderTarget &target, sf::RenderStates states) const

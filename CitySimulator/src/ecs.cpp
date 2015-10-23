@@ -40,6 +40,7 @@ void MovementSystem::tickEntity(Entity e, float dt)
 
 	motion->velocity += Math::multiply(Math::normalize(motion->steeringLinear), acceleration);
 	motion->velocity *= movementDecay;
+	// todo maximum speed
 	
 	bool stopped = Math::lengthSquared(motion->velocity) < minSpeed * minSpeed;
 
@@ -80,6 +81,15 @@ void RenderSystem::tickEntity(Entity e, float dt)
 void InputSystem::tickEntity(Entity e, float dt)
 {
 	get<InputComponent>(e, COMPONENT_INPUT)->brain->tick(dt);
+}
+
+void WorldCollisionSystem::tickEntity(Entity e, float dt)
+{
+	auto *motion = get<MotionComponent>(e, COMPONENT_MOTION);
+
+	std::vector<sf::FloatRect> tiles;
+	motion->world->getSurroundingTiles(motion->getTilePosition(), tiles);
+
 }
 
 void tempDrawVector(MotionComponent *motion, const sf::Vector2f vector, sf::Color colour, sf::RenderWindow &window)
@@ -141,4 +151,9 @@ void RenderComponent::reset()
 void InputComponent::reset()
 {
 	brain.reset();
+}
+
+void CollisionComponent::reset()
+{
+	aabb = sf::FloatRect();
 }

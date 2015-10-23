@@ -81,6 +81,12 @@ struct InputComponent : BaseComponent
 	boost::shared_ptr<EntityBrain> brain;
 };
 
+struct CollisionComponent : BaseComponent
+{
+	void reset() override;
+	sf::FloatRect aabb;
+};
+
 
 // systems
 class System
@@ -138,6 +144,16 @@ class InputSystem : public System
 {
 public:
 	InputSystem(): System(COMPONENT_INPUT)
+	{
+	}
+
+	void tickEntity(Entity e, float dt) override;
+};
+
+class WorldCollisionSystem : public System
+{
+public:
+	explicit WorldCollisionSystem(): System(COMPONENT_MOTION)
 	{
 	}
 
