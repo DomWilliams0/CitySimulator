@@ -124,3 +124,60 @@ namespace Debug
 		printf("%s%f, %f\n", msg, v.x, v.y);
 	}
 }
+
+namespace sf
+{
+	// comparisons of rectangles by position only
+	template <class T>
+	inline bool operator<(const Rect<T> &a, const Rect<T> &b)
+	{
+		return a.left < b.left || (!(b.left < a.left) && a.top < b.top);
+	}
+
+	template <class T>
+
+	inline bool operator>(const Rect<T> &lhs, const Rect<T> &rhs)
+	{
+		return operator<(rhs, lhs);
+	}
+
+	template <class T>
+
+	inline bool operator<=(const Rect<T> &lhs, const Rect<T> &rhs)
+	{
+		return !operator>(lhs, rhs);
+	}
+
+	template <class T>
+	inline bool operator>=(const Rect<T> &lhs, const Rect<T> &rhs)
+	{
+		return !operator<(lhs, rhs);
+	}
+
+	// points
+	template <class T>
+	inline bool operator<(const Vector2<T> &a, const Vector2<T> &b)
+	{
+		return a.x < b.x || (!(b.x < a.x) && a.y < b.y);
+	}
+
+	template <class T>
+
+	inline bool operator>(const Vector2<T> &lhs, const Vector2<T> &rhs)
+	{
+		return operator<(rhs, lhs);
+	}
+
+	template <class T>
+
+	inline bool operator<=(const Vector2<T> &lhs, const Vector2<T> &rhs)
+	{
+		return !operator>(lhs, rhs);
+	}
+
+	template <class T>
+	inline bool operator>=(const Vector2<T> &lhs, const Vector2<T> &rhs)
+	{
+		return !operator<(lhs, rhs);
+	}
+}

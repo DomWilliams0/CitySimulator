@@ -157,7 +157,7 @@ protected:
 
 private:
 	std::vector<sf::FloatRect> debugRenderTiles;
-	std::multimap<std::pair<int, int>, sf::FloatRect> cellGrid;
+	std::multimap<sf::Vector2i, sf::FloatRect> cellGrid;
 
 	void findCollidableTiles(std::vector<sf::FloatRect> &rects);
 	void mergeAdjacentTiles(std::vector<sf::Rect<float>> &rects);

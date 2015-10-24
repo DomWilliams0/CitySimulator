@@ -570,8 +570,7 @@ void CollisionMap::getSurroundingTiles(const sf::Vector2i &tilePos, std::vector<
 
 bool CollisionMap::getRectAt(const sf::Vector2i& tilePos, sf::FloatRect &ret)
 {
-	auto posPair = std::make_pair(tilePos.x * Constants::tileSize, tilePos.y * Constants::tileSize);
-	auto result(cellGrid.find(posPair));
+	auto result(cellGrid.find(Utils::toPixel(tilePos)));
 	if (result == cellGrid.end())
 		return false;
 
@@ -602,8 +601,7 @@ void CollisionMap::load()
 		// todo round to nearest multiple of cellsize
 		int originX = Utils::roundToMultiple(static_cast<int>(rect.left), cellSize);
 		int originY = Utils::roundToMultiple(static_cast<int>(rect.top), cellSize);
-		std::pair<int, int> origin = {originX, originY};
-		cellGrid.insert({origin, rect});
+		cellGrid.insert({ { originX, originY }, rect });
 
 		const int roundedWidth = std::max(Constants::tileSize, Utils::roundToMultiple(static_cast<int>(rect.width), cellSize));
 		const int roundedHeight = std::max(Constants::tileSize, Utils::roundToMultiple(static_cast<int>(rect.height), cellSize));
@@ -611,7 +609,7 @@ void CollisionMap::load()
 		{
 			for (int x = 0; x < roundedWidth; x += Constants::tileSize)
 			{
-				cellGrid.insert({{origin.first + x, origin.second + y}, rect});
+				cellGrid.insert({{originX + x, originY + y}, rect});
 			}
 		}
 	}
@@ -635,7 +633,7 @@ void CollisionMap::renderDebugTiles(sf::RenderTarget &target) const
 	for (auto &pair : cellGrid)
 	{
 		auto point = pair.first;
-		sf::FloatRect r(point.first, point.second, Constants::tileSizef, Constants::tileSizef);
+		sf::FloatRect r(point.x, point.y, Constants::tileSizef, Constants::tileSizef);
 
 		sf::RectangleShape rect;
 		rect.setPosition(r.left, r.top);
