@@ -146,7 +146,8 @@ public:
 	}
 
 	void getSurroundingTiles(const sf::Vector2i &tilePos, std::vector<sf::Rect<float>> &ret);
-	std::multimap<std::pair<int, int>, sf::FloatRect> cellGrid;
+	bool getRectAt(const sf::Vector2i& tilePos, sf::FloatRect& ret);
+
 
 protected:
 	void load();
@@ -156,6 +157,7 @@ protected:
 
 private:
 	std::vector<sf::FloatRect> debugRenderTiles;
+	std::multimap<std::pair<int, int>, sf::FloatRect> cellGrid;
 
 	void findCollidableTiles(std::vector<sf::FloatRect> &rects);
 	void mergeAdjacentTiles(std::vector<sf::Rect<float>> &rects);
@@ -173,6 +175,7 @@ public:
 	void resize(sf::Vector2i size);
 
 	WorldTerrain& getTerrain();
+	CollisionMap& getCollisionMap();
 
 	sf::Vector2i getPixelSize() const;
 

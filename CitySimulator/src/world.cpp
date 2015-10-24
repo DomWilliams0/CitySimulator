@@ -568,6 +568,17 @@ void CollisionMap::getSurroundingTiles(const sf::Vector2i &tilePos, std::vector<
 	// todo gather all (unique) rects in the given range, using a map
 }
 
+bool CollisionMap::getRectAt(const sf::Vector2i& tilePos, sf::FloatRect &ret)
+{
+	auto posPair = std::make_pair(tilePos.x * Constants::tileSize, tilePos.y * Constants::tileSize);
+	auto result(cellGrid.find(posPair));
+	if (result == cellGrid.end())
+		return false;
+
+	ret = result->second;
+	return true;
+}
+
 void CollisionMap::load()
 {
 	std::vector<sf::FloatRect> rects;
@@ -677,6 +688,11 @@ void World::resize(sf::Vector2i size)
 WorldTerrain& World::getTerrain()
 {
 	return terrain;
+}
+
+CollisionMap& World::getCollisionMap()
+{
+	return collisionMap;
 }
 
 sf::Vector2i World::getPixelSize() const
