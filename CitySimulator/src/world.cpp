@@ -556,9 +556,9 @@ void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfF
 	}
 }
 
-void CollisionMap::getSurroundingTiles(const sf::Vector2i &tilePos, std::vector<sf::Rect<float>> &ret)
+void CollisionMap::getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::Rect<float>> &ret)
 {
-	const static int edge = 2;
+	const static int edge = 1; // todo dependent on entity size
 
 	int minX = std::max(0, tilePos.x);
 	int maxX = std::min(container->getTileSize().x, tilePos.x);
@@ -566,6 +566,16 @@ void CollisionMap::getSurroundingTiles(const sf::Vector2i &tilePos, std::vector<
 	int maxY = std::min(container->getTileSize().y, tilePos.y);
 
 	// todo gather all (unique) rects in the given range, using a map
+	sf::FloatRect rect;
+	for (int y = -edge; y <= edge; ++y)
+	{
+		for (int x = -edge; x <= edge; ++x)
+		{
+			sf::Vector2i offsetTile(tilePos.x + x, tilePos.y + y);
+			if (getRectAt(offsetTile, rect))
+				ret.insert(rect);
+		}
+	}
 }
 
 bool CollisionMap::getRectAt(const sf::Vector2i& tilePos, sf::FloatRect &ret)
@@ -633,7 +643,7 @@ void CollisionMap::renderDebugTiles(sf::RenderTarget &target) const
 	for (auto &pair : cellGrid)
 	{
 		auto point = pair.first;
-		sf::FloatRect r(point.x, point.y, Constants::tileSizef, Constants::tileSizef);
+		sf::FloatRect r(static_cast<float>(point.x), static_cast<float>(point.y), Constants::tileSizef, Constants::tileSizef);
 
 		sf::RectangleShape rect;
 		rect.setPosition(r.left, r.top);
@@ -714,7 +724,7 @@ BlockType World::getBlockAt(const sf::Vector2i &tile, LayerType layer)
 	return terrain.blockTypes[index];
 }
 
-void World::getSurroundingTiles(const sf::Vector2i &tilePos, std::vector<sf::Rect<float>> &ret)
+void World::getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::FloatRect> &ret)
 {
 	return collisionMap.getSurroundingTiles(tilePos, ret);
 }

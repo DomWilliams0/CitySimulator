@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 #include "maploader.hpp"
+#include <set>
 
 class World;
 
@@ -145,7 +146,7 @@ public:
 	{
 	}
 
-	void getSurroundingTiles(const sf::Vector2i &tilePos, std::vector<sf::Rect<float>> &ret);
+	void getSurroundingTiles(const sf::Vector2i& tilePos, std::set<sf::FloatRect>& ret);
 	bool getRectAt(const sf::Vector2i& tilePos, sf::FloatRect& ret);
 
 
@@ -184,7 +185,7 @@ public:
 	sf::Transform getTransform() const;
 
 	BlockType getBlockAt(const sf::Vector2i &tile, LayerType layer = LAYER_TERRAIN);
-	void getSurroundingTiles(const sf::Vector2i &tilePos, std::vector<sf::Rect<float>> &ret);
+	void getSurroundingTiles(const sf::Vector2i& tilePos, std::set<sf::FloatRect>& ret);
 private:
 	WorldTerrain terrain;
 	CollisionMap collisionMap;

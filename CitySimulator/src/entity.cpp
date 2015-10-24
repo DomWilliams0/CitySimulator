@@ -161,3 +161,8 @@ void EntityManager::addAIInputComponent(Entity e)
 {
 	addBrain(e, true);
 }
+
+void EntityManager::addWorldCollisionComponent(Entity e)
+{
+	CollisionComponent *coll = dynamic_cast<CollisionComponent*>(addComponent(e, COMPONENT_WORLD_COLLISION));
+}

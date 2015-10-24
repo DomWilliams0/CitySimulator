@@ -87,9 +87,10 @@ void WorldCollisionSystem::tickEntity(Entity e, float dt)
 {
 	auto *motion = get<MotionComponent>(e, COMPONENT_MOTION);
 
-	std::vector<sf::FloatRect> tiles;
+	std::set<sf::FloatRect> tiles;
 	motion->world->getSurroundingTiles(motion->getTilePosition(), tiles);
 
+	// todo resolve
 }
 
 void tempDrawVector(MotionComponent *motion, const sf::Vector2f vector, sf::Color colour, sf::RenderWindow &window)

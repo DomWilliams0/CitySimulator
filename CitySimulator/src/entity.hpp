@@ -4,7 +4,6 @@
 #include "constants.hpp"
 #include "world.hpp"
 
-#define COMPONENT_COUNT 3
 #define MAX_ENTITIES 1024
 #include "config.hpp"
 
@@ -34,7 +33,8 @@ enum ComponentType
 	COMPONENT_NONE = 0,
 	COMPONENT_MOTION = 1 << 0,
 	COMPONENT_RENDER = 1 << 1,
-	COMPONENT_INPUT = 1 << 2
+	COMPONENT_INPUT = 1 << 2,
+	COMPONENT_WORLD_COLLISION = 1 << 3
 };
 
 // components
@@ -172,7 +172,7 @@ public:
 		// init systems in correct order
 		systems.push_back(new InputSystem);
 		systems.push_back(new MovementSystem);
-		// todo: collision
+		systems.push_back(new WorldCollisionSystem);
 
 		auto render = new RenderSystem;
 		systems.push_back(render);
@@ -204,6 +204,7 @@ public:
 	MotionComponent motionComponents[MAX_ENTITIES];
 	RenderComponent renderComponents[MAX_ENTITIES];
 	InputComponent inputComponents[MAX_ENTITIES];
+	WorldCollisionSystem worldCollisionComponents[MAX_ENTITIES];
 
 	// component management
 	void removeComponent(Entity e, ComponentType type);
@@ -217,6 +218,7 @@ public:
 	void addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step, DirectionType initialDirection, bool playing);
 	void addPlayerInputComponent(Entity e);
 	void addAIInputComponent(Entity e);
+	void addWorldCollisionComponent(Entity e);
 	
 private:
 	BaseComponent* addComponent(Entity e, ComponentType type);
