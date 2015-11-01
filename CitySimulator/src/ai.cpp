@@ -18,21 +18,6 @@ void InputBrain::tick(float delta)
 		motion->steeringLinear.y = down ? 1.f : -1.f;
 	else
 		motion->steeringLinear.y = 0.f;
-
-
-	// debug
-	if (input->isFirstPressed(KEY_YIELD_CONTROL))
-	{
-		// todo get tile position from collider component instead, which will give the centre instead of corner
-		sf::Vector2i tilePos(motion->getTilePosition());
-
-		sf::FloatRect rect;
-		if (motion->world->getCollisionMap().getRectAt(tilePos, rect))
-			printf("at %d,%d which is %d, %d\n", tilePos.x, tilePos.y, (int)rect.left, (int)rect.top);
-		else
-			printf("nop\n");
-	}
-
 }
 
 void AIBrain::tick(float delta)

@@ -457,10 +457,9 @@ bool compareRectsVertically(const sf::FloatRect &a, const sf::FloatRect &b)
 	return false;
 }
 
-void CollisionMap::findCollidableTiles(std::vector<sf::FloatRect> &rectsRet)
+void CollisionMap::findCollidableTiles(std::vector<sf::FloatRect> &rectsRet) const
 {
 	sf::Vector2i worldTileSize = container->getTileSize();
-	WorldTerrain &terrain = container->terrain;
 
 	// find collidable tiles
 	for (auto y = 0; y < worldTileSize.y; ++y)
@@ -483,6 +482,8 @@ void CollisionMap::findCollidableTiles(std::vector<sf::FloatRect> &rectsRet)
 			// vertically, then horizontally, then choose the set with the least rectangles
 		}
 	}
+
+	// todo repeat for object layer
 }
 
 void CollisionMap::mergeAdjacentTiles(std::vector<sf::Rect<float>> &rects)
@@ -560,12 +561,7 @@ void CollisionMap::getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf:
 {
 	const static int edge = 1; // todo dependent on entity size
 
-	int minX = std::max(0, tilePos.x);
-	int maxX = std::min(container->getTileSize().x, tilePos.x);
-	int minY = std::max(0, tilePos.y);
-	int maxY = std::min(container->getTileSize().y, tilePos.y);
-
-	// todo gather all (unique) rects in the given range, using a map
+	// gather all (unique) rects in the given range
 	sf::FloatRect rect;
 	for (int y = -edge; y <= edge; ++y)
 	{
@@ -578,7 +574,7 @@ void CollisionMap::getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf:
 	}
 }
 
-bool CollisionMap::getRectAt(const sf::Vector2i& tilePos, sf::FloatRect &ret)
+bool CollisionMap::getRectAt(const sf::Vector2i &tilePos, sf::FloatRect &ret)
 {
 	auto result(cellGrid.find(Utils::toPixel(tilePos)));
 	if (result == cellGrid.end())
@@ -598,8 +594,6 @@ void CollisionMap::load()
 	// merge adjacents
 	mergeAdjacentTiles(rects);
 
-	// todo do the same with object layer
-
 	// debug drawing
 	for (auto &rect : rects)
 		debugRenderTiles.push_back(rect);
@@ -611,17 +605,13 @@ void CollisionMap::load()
 		// todo round to nearest multiple of cellsize
 		int originX = Utils::roundToMultiple(static_cast<int>(rect.left), cellSize);
 		int originY = Utils::roundToMultiple(static_cast<int>(rect.top), cellSize);
-		cellGrid.insert({ { originX, originY }, rect });
+		cellGrid.insert({{originX, originY}, rect});
 
 		const int roundedWidth = std::max(Constants::tileSize, Utils::roundToMultiple(static_cast<int>(rect.width), cellSize));
 		const int roundedHeight = std::max(Constants::tileSize, Utils::roundToMultiple(static_cast<int>(rect.height), cellSize));
 		for (int y = 0; y < roundedHeight; y += Constants::tileSize)
-		{
 			for (int x = 0; x < roundedWidth; x += Constants::tileSize)
-			{
 				cellGrid.insert({{originX + x, originY + y}, rect});
-			}
-		}
 	}
 }
 
@@ -639,24 +629,6 @@ void CollisionMap::renderDebugTiles(sf::RenderTarget &target) const
 		sf::RenderStates states;
 		target.draw(rect, states);
 	}
-
-	for (auto &pair : cellGrid)
-	{
-		auto point = pair.first;
-		sf::FloatRect r(static_cast<float>(point.x), static_cast<float>(point.y), Constants::tileSizef, Constants::tileSizef);
-
-		sf::RectangleShape rect;
-		rect.setPosition(r.left, r.top);
-		rect.setSize({ r.width, r.height });
-		rect.setOutlineColor(sf::Color(52, 152, 219));
-		rect.setOutlineThickness(0.5f);
-		rect.setFillColor(sf::Color::Transparent);
-
-		sf::RenderStates states;
-		target.draw(rect, states);
-
-	}
-
 }
 
 World::World(): terrain(this), collisionMap(this)
