@@ -1,8 +1,9 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <Box2D/Box2D.h>
 #include <unordered_map>
-#include "maploader.hpp"
 #include <set>
+#include "maploader.hpp"
 
 class World;
 
@@ -142,17 +143,19 @@ protected:
 class CollisionMap : public BaseWorld
 {
 public:
-	explicit CollisionMap(World *container) : BaseWorld(container)
+	explicit CollisionMap(World *container) : BaseWorld(container), world(b2Vec2(0.f, 0.f))
 	{
+		world.SetAllowSleeping(true);
 	}
 
-	void getSurroundingTiles(const sf::Vector2i& tilePos, std::set<sf::FloatRect>& ret);
-	bool getRectAt(const sf::Vector2i& tilePos, sf::FloatRect& ret);
+	void getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::FloatRect> &ret);
+	bool getRectAt(const sf::Vector2i &tilePos, sf::FloatRect &ret);
 
 
 protected:
 	void load();
 	void renderDebugTiles(sf::RenderTarget &target) const;
+	b2World world;
 
 	friend class World;
 
@@ -168,7 +171,6 @@ private:
 class World : public sf::Drawable
 {
 public:
-
 	World();
 
 	void loadFromFile(const std::string &filename);
@@ -177,6 +179,7 @@ public:
 
 	WorldTerrain& getTerrain();
 	CollisionMap& getCollisionMap();
+	b2World* getBox2DWorld();
 
 	sf::Vector2i getPixelSize() const;
 
@@ -184,8 +187,10 @@ public:
 
 	sf::Transform getTransform() const;
 
+	void tick(float delta);
 	BlockType getBlockAt(const sf::Vector2i &tile, LayerType layer = LAYER_TERRAIN);
-	void getSurroundingTiles(const sf::Vector2i& tilePos, std::set<sf::FloatRect>& ret);
+	void getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::FloatRect> &ret);
+
 private:
 	WorldTerrain terrain;
 	CollisionMap collisionMap;

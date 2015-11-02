@@ -9,8 +9,7 @@ debug:
   human-skin: Business Man
   zoom: 0.5
   movement-decay: 0.77
-  movement-force: 10
-  min-speed: 7
+  movement-force: 200
   start-pos:
-    x: 20
-    y: 24
+    x: 18
+    y: 22

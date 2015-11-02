@@ -32,7 +32,8 @@ GameState::GameState() : State(GAME)
 	Globals::game->setView(view);
 
 	Entity e = Globals::entityManager->createEntity();
-	Globals::entityManager->addMotionComponent(e, &world, {Config::getInt("debug-start-pos-x"), Config::getInt("debug-start-pos-y")});
+	sf::Vector2i tilePos = { Config::getInt("debug-start-pos-x"), Config::getInt("debug-start-pos-y") };
+	Globals::entityManager->addPhysicsComponent(e, &world, tilePos);
 	Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, "Business Man", 0.2f, Direction::EAST, false);
 	Globals::entityManager->addPlayerInputComponent(e);
 }
@@ -68,6 +69,8 @@ void GameState::tempControlCamera(float delta)
 
 void GameState::tick(float delta)
 {
+	world.tick(delta);
+
 	Globals::entityManager->tickSystems(delta);
 }
 

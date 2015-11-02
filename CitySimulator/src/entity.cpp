@@ -120,19 +120,27 @@ BaseComponent* EntityManager::getComponent(Entity e, ComponentType type)
 {
 	switch (type)
 	{
-	case COMPONENT_MOTION: return &motionComponents[e];
+	case COMPONENT_PHYSICS: return &physicsComponents[e];
 	case COMPONENT_RENDER: return &renderComponents[e];
 	case COMPONENT_INPUT: return &inputComponents[e];
 	default: FAIL("Invalid component type %1%", type);
 	}
 }
 
-void EntityManager::addMotionComponent(Entity e, World *world, sf::Vector2i initialTile)
+void EntityManager::addPhysicsComponent(Entity e, World *world, const sf::Vector2i &startTilePos)
 {
-	MotionComponent *comp = dynamic_cast<MotionComponent*>(addComponent(e, COMPONENT_MOTION));
-	comp->position = sf::Vector2f(Utils::toPixel(initialTile));
-	comp->world = world;
+	PhysicsComponent *phys = dynamic_cast<PhysicsComponent*>(addComponent(e, COMPONENT_PHYSICS));
+	sf::Vector2i startPos = Utils::toPixel(startTilePos);
+	b2World* bWorld = world->getBox2DWorld();
+
+	phys->bWorld = bWorld;
+
+	b2BodyDef def;
+	def.type = b2_dynamicBody;
+	def.position.Set(startPos.x, startPos.y);
+	phys->body = bWorld->CreateBody(&def);
 }
+
 
 void EntityManager::addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step, DirectionType initialDirection, bool playing)
 {
@@ -162,7 +170,3 @@ void EntityManager::addAIInputComponent(Entity e)
 	addBrain(e, true);
 }
 
-void EntityManager::addWorldCollisionComponent(Entity e)
-{
-	CollisionComponent *coll = dynamic_cast<CollisionComponent*>(addComponent(e, COMPONENT_WORLD_COLLISION));
-}

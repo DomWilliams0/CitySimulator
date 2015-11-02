@@ -9,7 +9,7 @@ public:
 	explicit EntityBrain(Entity e)
 	{
 		entity = e;
-		motion = Globals::entityManager->getComponent<MotionComponent>(e, COMPONENT_MOTION);
+		phys = Globals::entityManager->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
 		movementForce = Config::getFloat("debug-movement-force");
 	}
 
@@ -35,7 +35,7 @@ protected:
 	{
 	}
 
-	MotionComponent *motion;
+	PhysicsComponent *phys;
 };
 
 class InputBrain : public EntityBrain

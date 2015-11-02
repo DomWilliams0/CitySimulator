@@ -675,6 +675,11 @@ CollisionMap& World::getCollisionMap()
 	return collisionMap;
 }
 
+b2World* World::getBox2DWorld()
+{
+	return &collisionMap.world;
+}
+
 sf::Vector2i World::getPixelSize() const
 {
 	return pixelSize;
@@ -699,6 +704,12 @@ BlockType World::getBlockAt(const sf::Vector2i &tile, LayerType layer)
 void World::getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::FloatRect> &ret)
 {
 	return collisionMap.getSurroundingTiles(tilePos, ret);
+}
+
+void World::tick(float delta)
+{
+	// todo fixed time step
+	getBox2DWorld()->Step(delta, 6, 2);
 }
 
 void World::draw(sf::RenderTarget &target, sf::RenderStates states) const

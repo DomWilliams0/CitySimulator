@@ -3,10 +3,12 @@
 #include "animation.hpp"
 #include "constants.hpp"
 #include "world.hpp"
-
-#define MAX_ENTITIES 1024
 #include "config.hpp"
 
+#define MAX_ENTITIES 1024
+
+class b2World;
+class b2Body;
 typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;
 
 enum EntityType
@@ -24,6 +26,18 @@ private:
 	std::map<EntityType, EntityTags> loadedTags;
 };
 
+template <class T>
+sf::Vector2<T> fromB2Vec(const b2Vec2 &v)
+{
+	return{static_cast<T>(v.x), static_cast<T>(v.y)};
+}
+
+template <class T>
+b2Vec2 toB2Vec(const sf::Vector2<T> &v)
+{
+	return{static_cast<float>(v.x), static_cast<float>(v.y)};
+}
+
 // component-entity-systems
 
 typedef int Entity;
@@ -31,10 +45,9 @@ typedef int Entity;
 enum ComponentType
 {
 	COMPONENT_NONE = 0,
-	COMPONENT_MOTION = 1 << 0,
+	COMPONENT_PHYSICS = 1 << 0,
 	COMPONENT_RENDER = 1 << 1,
-	COMPONENT_INPUT = 1 << 2,
-	COMPONENT_WORLD_COLLISION = 1 << 3
+	COMPONENT_INPUT = 1 << 2
 };
 
 // components
@@ -47,24 +60,6 @@ struct BaseComponent
 	virtual void reset()
 	{
 	}
-};
-
-struct MotionComponent : BaseComponent
-{
-	void reset() override;
-	sf::Vector2i getTilePosition() const;
-
-	sf::Vector2f position;
-	float orientation;
-	
-	sf::Vector2f velocity;
-	sf::Vector2f lastVelocity;
-	float rotation;
-
-	sf::Vector2f steeringLinear;
-	float steeringAngular;
-
-	World *world;
 };
 
 struct RenderComponent : BaseComponent
@@ -81,10 +76,17 @@ struct InputComponent : BaseComponent
 	boost::shared_ptr<EntityBrain> brain;
 };
 
-struct CollisionComponent : BaseComponent
+struct PhysicsComponent : BaseComponent
 {
 	void reset() override;
-	sf::FloatRect aabb;
+	sf::Vector2i getTilePosition() const;
+	sf::Vector2f getPosition() const;
+	sf::Vector2f getVelocity() const;
+	sf::Vector2f getLastVelocity() const;
+
+	b2Body *body;
+	b2World *bWorld;
+	b2Vec2 lastVelocity;
 };
 
 
@@ -113,26 +115,10 @@ protected:
 	int mask;
 };
 
-class MovementSystem : public System
-{
-public:
-	MovementSystem() : System(COMPONENT_MOTION)
-	{
-		movementDecay = Config::getFloat("debug-movement-decay");
-		minSpeed = Config::getFloat("debug-min-speed");
-	}
-
-	void tickEntity(Entity e, float dt) override;
-
-private:
-	float movementDecay;
-	float minSpeed;
-};
-
 class RenderSystem : public System
 {
 public:
-	RenderSystem() : System(COMPONENT_MOTION | COMPONENT_RENDER)
+	RenderSystem() : System(COMPONENT_PHYSICS | COMPONENT_RENDER)
 	{
 	}
 
@@ -150,10 +136,10 @@ public:
 	void tickEntity(Entity e, float dt) override;
 };
 
-class WorldCollisionSystem : public System
+class PhysicsSystem : public System
 {
 public:
-	explicit WorldCollisionSystem(): System(COMPONENT_MOTION)
+	explicit PhysicsSystem(): System(COMPONENT_PHYSICS)
 	{
 	}
 
@@ -171,8 +157,7 @@ public:
 
 		// init systems in correct order
 		systems.push_back(new InputSystem);
-		systems.push_back(new MovementSystem);
-		systems.push_back(new WorldCollisionSystem);
+		systems.push_back(new PhysicsSystem);
 
 		auto render = new RenderSystem;
 		systems.push_back(render);
@@ -201,10 +186,9 @@ public:
 	void tickSystems(float delta);
 
 	// components
-	MotionComponent motionComponents[MAX_ENTITIES];
+	PhysicsComponent physicsComponents[MAX_ENTITIES];
 	RenderComponent renderComponents[MAX_ENTITIES];
 	InputComponent inputComponents[MAX_ENTITIES];
-	WorldCollisionSystem worldCollisionComponents[MAX_ENTITIES];
 
 	// component management
 	void removeComponent(Entity e, ComponentType type);
@@ -214,12 +198,11 @@ public:
 	T* getComponent(Entity e, ComponentType type);
 
 	// helpers
-	void addMotionComponent(Entity e, World *world, sf::Vector2i initialTile);
+	void addPhysicsComponent(Entity e, World *world, const sf::Vector2i &startTilePos);
 	void addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step, DirectionType initialDirection, bool playing);
 	void addPlayerInputComponent(Entity e);
 	void addAIInputComponent(Entity e);
-	void addWorldCollisionComponent(Entity e);
-	
+
 private:
 	BaseComponent* addComponent(Entity e, ComponentType type);
 	void addBrain(Entity e, bool aiBrain);
