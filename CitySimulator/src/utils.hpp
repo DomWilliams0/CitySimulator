@@ -114,6 +114,16 @@ namespace Math
 		ret.y *= scalar;
 		return ret;
 	}
+
+	template <class V=float>
+	sf::Vector2f truncate(const sf::Vector2f &v, const float newLength)
+	{
+		float l(length(v));
+		if (l != 0.f)
+			return multiply(v, newLength / l);
+
+		return sf::Vector2<V>(v);
+	}
 }
 
 namespace Debug

@@ -83,6 +83,8 @@ struct PhysicsComponent : BaseComponent
 	sf::Vector2f getPosition() const;
 	sf::Vector2f getVelocity() const;
 	sf::Vector2f getLastVelocity() const;
+	void setVelocity(const sf::Vector2f& velocity);
+	bool isStopped();
 
 	b2Body *body;
 	b2World *bWorld;

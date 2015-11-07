@@ -37,7 +37,7 @@ void RenderSystem::tickEntity(Entity e, float dt)
 	auto *physics = get<PhysicsComponent>(e, COMPONENT_PHYSICS);
 
 	// set playing
-	bool stopped = Math::lengthSquared(physics->getVelocity()) == 0;
+	bool stopped = physics->isStopped();
 	render->anim.setPlaying(!stopped, stopped);
 
 	// change animation direction
@@ -59,6 +59,22 @@ void InputSystem::tickEntity(Entity e, float dt)
 void PhysicsSystem::tickEntity(Entity e, float dt)
 {
 	auto *physics = get<PhysicsComponent>(e, COMPONENT_PHYSICS);
+
+	// maximum speed
+	float maxSpeed = Config::getFloat("debug-movement-max-speed");
+	if (Math::lengthSquared(physics->getVelocity()) > maxSpeed * maxSpeed)
+	{
+		physics->setVelocity(Math::truncate(physics->getVelocity(), maxSpeed));
+
+		// remove damping
+		physics->body->SetLinearDamping(0.f);
+	}
+	else
+		physics->body->SetLinearDamping(Config::getFloat("debug-movement-stop-decay"));
+
+	// stop
+	if (physics->isStopped())
+		physics->body->SetLinearVelocity({ 0.f, 0.f });
 
 	// store current velocity for next step
 	auto vel(physics->getVelocity());
@@ -120,6 +136,16 @@ sf::Vector2f PhysicsComponent::getVelocity() const
 sf::Vector2f PhysicsComponent::getLastVelocity() const
 {
 	return fromB2Vec<float>(lastVelocity);
+}
+
+void PhysicsComponent::setVelocity(const sf::Vector2f &velocity)
+{
+	body->SetLinearVelocity(toB2Vec(velocity));
+}
+
+bool PhysicsComponent::isStopped()
+{
+	return Math::lengthSquared(getVelocity()) < 16;
 }
 
 void RenderComponent::reset()

@@ -8,8 +8,10 @@ debug:
   limit-fps: true
   human-skin: Business Man
   zoom: 0.5
-  movement-decay: 0.77
-  movement-force: 200
+  movement:
+    stop-decay: 8
+    force: 400
+    max-speed: 40
   start-pos:
     x: 18
     y: 22

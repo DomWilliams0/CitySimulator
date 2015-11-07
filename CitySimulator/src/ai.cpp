@@ -4,7 +4,6 @@
 void InputBrain::tick(float delta)
 {
 	const static float acceleration = Config::getFloat("debug-movement-force");
-	const static float decay = Config::getFloat("debug-movement-decay");
 
 	// walking
 	bool right = input->isPressed(KEY_RIGHT);

@@ -139,6 +139,17 @@ void EntityManager::addPhysicsComponent(Entity e, World *world, const sf::Vector
 	def.type = b2_dynamicBody;
 	def.position.Set(startPos.x, startPos.y);
 	phys->body = bWorld->CreateBody(&def);
+
+	// basic fixture for some mass
+	b2CircleShape shape;
+	shape.m_p.Set(0, 0);
+	shape.m_radius = 0.5f;
+
+	b2FixtureDef fixDef;
+	fixDef.density = 985.f;
+	fixDef.shape = &shape;
+
+	phys->body->CreateFixture(&fixDef);
 }
 
 
