@@ -557,6 +557,11 @@ void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfF
 	}
 }
 
+CollisionMap::~CollisionMap()
+{
+	world.DestroyBody(worldBody);
+}
+
 void CollisionMap::getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::Rect<float>> &ret)
 {
 	const static int edge = 1; // todo dependent on entity size
@@ -598,20 +603,21 @@ void CollisionMap::load()
 	for (auto &rect : rects)
 		debugRenderTiles.push_back(rect);
 
-	// load rects into cell grid for easy access
-	const static int cellSize = Constants::tileSize;
+	// create world body
+	b2BodyDef worldBodyDef;
+	worldBodyDef.type = b2_staticBody;
+	worldBody = world.CreateBody(&worldBodyDef);
+
+	// collision fixtures
+	b2FixtureDef fixDef;
+	b2PolygonShape box;
+	fixDef.shape = &box;
 	for (auto &rect : rects)
 	{
-		// todo round to nearest multiple of cellsize
-		int originX = Utils::roundToMultiple(static_cast<int>(rect.left), cellSize);
-		int originY = Utils::roundToMultiple(static_cast<int>(rect.top), cellSize);
-		cellGrid.insert({{originX, originY}, rect});
-
-		const int roundedWidth = std::max(Constants::tileSize, Utils::roundToMultiple(static_cast<int>(rect.width), cellSize));
-		const int roundedHeight = std::max(Constants::tileSize, Utils::roundToMultiple(static_cast<int>(rect.height), cellSize));
-		for (int y = 0; y < roundedHeight; y += Constants::tileSize)
-			for (int x = 0; x < roundedWidth; x += Constants::tileSize)
-				cellGrid.insert({{originX + x, originY + y}, rect});
+		box.SetAsBox(rect.width/2, rect.height/2, b2Vec2(rect.left/2 + rect.width / 2, rect.top + rect.height / 2), 0.f);
+		Debug::printVector(sf::Vector2f(rect.left, rect.top), "pos ");
+		Debug::printVector(sf::Vector2f(rect.width, rect.height), "size ");
+		worldBody->CreateFixture(&fixDef);
 	}
 }
 

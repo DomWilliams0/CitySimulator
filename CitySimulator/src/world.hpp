@@ -143,10 +143,12 @@ protected:
 class CollisionMap : public BaseWorld
 {
 public:
-	explicit CollisionMap(World *container) : BaseWorld(container), world(b2Vec2(0.f, 0.f))
+	explicit CollisionMap(World *container) : BaseWorld(container), world(b2Vec2(0.f, 0.f)), worldBody(nullptr)
 	{
 		world.SetAllowSleeping(true);
 	}
+
+	~CollisionMap();
 
 	void getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::FloatRect> &ret);
 	bool getRectAt(const sf::Vector2i &tilePos, sf::FloatRect &ret);
@@ -155,7 +157,9 @@ public:
 protected:
 	void load();
 	void renderDebugTiles(sf::RenderTarget &target) const;
+	
 	b2World world;
+	b2Body *worldBody;
 
 	friend class World;
 
