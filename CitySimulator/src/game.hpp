@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include "state.hpp"
 #include "constants.hpp"
+#include <Box2D/Dynamics/b2World.h>
 
 class FPSCounter
 {
@@ -46,6 +47,12 @@ public:
 	{
 		window.setView(view);
 	}
+
+	sf::RenderWindow& getWindow()
+	{
+		return window;
+	}
+
 
 protected:
 	sf::RenderWindow &window;
@@ -90,6 +97,7 @@ public:
 	void switchState(StateType newScreenType);
 
 private:
+	b2World *box2DWorld;
 	State *current;
 	std::stack<State*> states;
 	State* createFromStateType(StateType type);

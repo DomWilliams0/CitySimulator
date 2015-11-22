@@ -156,6 +156,7 @@ Game::~Game()
 void Game::start()
 {
 	switchState(StateType::GAME);
+	box2DWorld = dynamic_cast<GameState*>(current)->getBox2DWorld();
 }
 
 void Game::tick(float delta)
@@ -166,6 +167,9 @@ void Game::tick(float delta)
 void Game::render()
 {
 	current->render(window);
+
+	if (box2DWorld != nullptr)
+		box2DWorld->DrawDebugData();
 }
 
 void Game::handleInput(sf::Event e)

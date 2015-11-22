@@ -141,7 +141,7 @@ void EntityManager::addPhysicsComponent(Entity e, World *world, const sf::Vector
 	phys->body = bWorld->CreateBody(&def);
 
 	// basic full body aabb
-	const static float aabbSize = Constants::tileSizef / 2;
+	const static float aabbSize = 0.5f;
 	b2PolygonShape aabb;
 	aabb.SetAsBox(aabbSize, aabbSize);
 	aabb.m_centroid.Set(aabbSize, aabbSize);

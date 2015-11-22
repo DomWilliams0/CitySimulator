@@ -71,7 +71,8 @@ void GameState::tick(float delta)
 {
 	world.tick(delta);
 
-	Globals::entityManager->tickSystems(delta);
+//	Globals::entityManager->tickSystems(delta);
+	tempControlCamera(delta);
 }
 
 void GameState::render(sf::RenderWindow &window)
@@ -83,4 +84,9 @@ void GameState::render(sf::RenderWindow &window)
 
 void GameState::handleInput(const sf::Event &event)
 {
+}
+
+b2World* GameState::getBox2DWorld()
+{
+	return world.getBox2DWorld();
 }

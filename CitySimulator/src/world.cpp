@@ -600,8 +600,8 @@ void CollisionMap::load()
 	mergeAdjacentTiles(rects);
 
 	// debug drawing
-	for (auto &rect : rects)
-		debugRenderTiles.push_back(rect);
+	world.SetDebugDraw(&b2Renderer);
+	b2Renderer.SetFlags(b2Draw::e_shapeBit);
 
 	// create world body
 	b2BodyDef worldBodyDef;
@@ -612,28 +612,14 @@ void CollisionMap::load()
 	b2FixtureDef fixDef;
 	b2PolygonShape box;
 	fixDef.shape = &box;
-	for (auto &rect : rects)
+	for (auto &unscaledRect : rects)
 	{
+		auto rect = Utils::scaleToBox2D(unscaledRect);
+
 		box.SetAsBox(rect.width/2, rect.height/2, b2Vec2(rect.left/2 + rect.width / 2, rect.top + rect.height / 2), 0.f);
 		Debug::printVector(sf::Vector2f(rect.left, rect.top), "pos ");
 		Debug::printVector(sf::Vector2f(rect.width, rect.height), "size ");
 		worldBody->CreateFixture(&fixDef);
-	}
-}
-
-void CollisionMap::renderDebugTiles(sf::RenderTarget &target) const
-{
-	for (auto &r : debugRenderTiles)
-	{
-		sf::RectangleShape rect;
-		rect.setPosition(r.left + 1, r.top + 1);
-		rect.setSize({r.width - 2, r.height - 1});
-		rect.setOutlineColor(sf::Color::Red);
-		rect.setOutlineThickness(1.f);
-		rect.setFillColor(sf::Color::Transparent);
-
-		sf::RenderStates states;
-		target.draw(rect, states);
 	}
 }
 
@@ -724,7 +710,4 @@ void World::draw(sf::RenderTarget &target, sf::RenderStates states) const
 
 	// terrain
 	terrain.render(target, states);
-
-	// debug tiles
-	collisionMap.renderDebugTiles(target);
 }

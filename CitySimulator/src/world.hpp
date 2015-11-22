@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <set>
 #include "maploader.hpp"
+#include "SFMLDebugDraw.h"
+#include "game.hpp"
 
 class World;
 
@@ -143,7 +145,7 @@ protected:
 class CollisionMap : public BaseWorld
 {
 public:
-	explicit CollisionMap(World *container) : BaseWorld(container), world(b2Vec2(0.f, 0.f)), worldBody(nullptr)
+	explicit CollisionMap(World *container) : BaseWorld(container), world(b2Vec2(0.f, 0.f)), worldBody(nullptr), b2Renderer(Globals::game->getWindow())
 	{
 		world.SetAllowSleeping(true);
 	}
@@ -153,10 +155,8 @@ public:
 	void getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::FloatRect> &ret);
 	bool getRectAt(const sf::Vector2i &tilePos, sf::FloatRect &ret);
 
-
 protected:
 	void load();
-	void renderDebugTiles(sf::RenderTarget &target) const;
 	
 	b2World world;
 	b2Body *worldBody;
@@ -164,7 +164,7 @@ protected:
 	friend class World;
 
 private:
-	std::vector<sf::FloatRect> debugRenderTiles;
+	SFMLDebugDraw b2Renderer;
 	std::multimap<sf::Vector2i, sf::FloatRect> cellGrid;
 
 	void findCollidableTiles(std::vector<sf::FloatRect> &rects) const;

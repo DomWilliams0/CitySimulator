@@ -2,6 +2,7 @@
 #include <SFML/System.hpp>
 #include "constants.hpp"
 #include <random>
+#include <Box2D/Common/b2Draw.h>
 
 namespace Utils
 {
@@ -71,6 +72,13 @@ namespace Utils
 	T roundToMultiple(T x, T multiple)
 	{
 		return static_cast<T>(multiple * round<T>(x / multiple));
+	}
+
+	template <class T>
+	sf::Rect<T> scaleToBox2D(const sf::Rect<T> &rect) 
+	{
+		return sf::Rect<T>(rect.left / Constants::tileSizef, rect.top / Constants::tileSizef,
+		                   rect.width / Constants::tileSizef, rect.height / Constants::tileSizef);
 	}
 }
 
