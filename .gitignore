@@ -1,4 +1,5 @@
 _dev/
+.idea/
 *.sln
 *.vcxproj*
 *.cd
