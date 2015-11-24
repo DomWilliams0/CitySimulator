@@ -1,0 +1,12 @@
+{
+    "vehicles": [
+        {
+            "name": "Standard Car",
+            "sprite": "car.png",
+            "anim-count": 4,
+            "anim-length": 4,
+            "colour": "random",
+            "seats": 2
+        }
+    ]
+}

@@ -61,7 +61,7 @@ void PhysicsSystem::tickEntity(Entity e, float dt)
 	auto *physics = get<PhysicsComponent>(e, COMPONENT_PHYSICS);
 
 	// maximum speed
-	float maxSpeed = Config::getFloat("debug-movement-max-speed");
+	float maxSpeed = Config::getFloat("debug.movement.max-speed");
 	if (Math::lengthSquared(physics->getVelocity()) > maxSpeed * maxSpeed)
 	{
 		physics->setVelocity(Math::truncate(physics->getVelocity(), maxSpeed));
@@ -70,7 +70,7 @@ void PhysicsSystem::tickEntity(Entity e, float dt)
 		physics->body->SetLinearDamping(0.f);
 	}
 	else
-		physics->body->SetLinearDamping(Config::getFloat("debug-movement-stop-decay"));
+		physics->body->SetLinearDamping(Config::getFloat("debug.movement.stop-decay"));
 
 	// stop
 	if (physics->isStopped())

@@ -1,9 +1,10 @@
 #pragma once
+#include <boost/smart_ptr/shared_ptr.hpp>
 #include <vector>
 #include "animation.hpp"
+#include "config.hpp"
 #include "constants.hpp"
 #include "world.hpp"
-#include "config.hpp"
 
 #define MAX_ENTITIES 1024
 

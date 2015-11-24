@@ -13,26 +13,24 @@ GameState::GameState() : State(GAME)
 	Globals::spriteSheet = new SpriteSheet;
 
 	// load entities
-	Globals::entityFactory->loadEntities(ENTITY_HUMAN, "humans.yml");
-	Globals::entityFactory->loadEntities(ENTITY_VEHICLE, "vehicles.yml");
+	Globals::entityFactory->loadEntities(ENTITY_HUMAN, "humans.json");
+	Globals::entityFactory->loadEntities(ENTITY_VEHICLE, "vehicles.json");
 
 	// load sprites
 	Globals::spriteSheet->processAllSprites();
 
 	// load world
-	std::string worldName;
-	Config::getString("debug-world-name", worldName);
-	world.loadFromFile(worldName);
+	world.loadFromFile(Config::getString("debug.world-name"));
 
 	// camera view
 	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
 	view.setCenter(world.getPixelSize().x / 2.f, world.getPixelSize().y / 2.f);
 
-	view.zoom(Config::getFloat("debug-zoom"));
+	view.zoom(Config::getFloat("debug.zoom"));
 	Globals::game->setView(view);
 
 	Entity e = Globals::entityManager->createEntity();
-	sf::Vector2i tilePos = { Config::getInt("debug-start-pos-x"), Config::getInt("debug-start-pos-y") };
+	sf::Vector2i tilePos = { Config::getInt("debug.start-pos.x"), Config::getInt("debug.start-pos.y") };
 	Globals::entityManager->addPhysicsComponent(e, &world, tilePos);
 	Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, "Business Man", 0.2f, Direction::EAST, false);
 	Globals::entityManager->addPlayerInputComponent(e);

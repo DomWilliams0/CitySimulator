@@ -1,8 +1,7 @@
 #pragma once
 #include <SFML/System.hpp>
-#include "constants.hpp"
 #include <random>
-#include <Box2D/Common/b2Draw.h>
+#include "constants.hpp"
 
 namespace Utils
 {
@@ -49,7 +48,6 @@ namespace Utils
 		return static_cast<T>(dis(gen) * (max - min) + min);
 	}
 
-
 	struct filenotfound_exception : std::runtime_error
 	{
 		explicit filenotfound_exception(const char *msg)
@@ -64,6 +62,7 @@ namespace Utils
 		}
 	};
 
+	int stringToInt(const std::string &s);
 	void validateDirectory(const std::string &directory);
 	std::string searchForFile(const std::string &filename, const std::string &directory = "res");
 	sf::FloatRect expandRect(const sf::FloatRect &rect, const sf::Vector2f &offset);

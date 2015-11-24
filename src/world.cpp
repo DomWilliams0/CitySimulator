@@ -559,7 +559,8 @@ void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfF
 
 CollisionMap::~CollisionMap()
 {
-	world.DestroyBody(worldBody);
+	if (worldBody != nullptr)
+		world.DestroyBody(worldBody);
 }
 
 void CollisionMap::getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::Rect<float>> &ret)
@@ -616,7 +617,7 @@ void CollisionMap::load()
 	{
 		auto rect = Utils::scaleToBox2D(unscaledRect);
 
-		box.SetAsBox(rect.width/2, rect.height/2, b2Vec2(rect.left/2 + rect.width / 2, rect.top + rect.height / 2), 0.f);
+		box.SetAsBox(rect.width / 2, rect.height / 2, b2Vec2(rect.left / 2 + rect.width / 2, rect.top + rect.height / 2), 0.f);
 		Debug::printVector(sf::Vector2f(rect.left, rect.top), "pos ");
 		Debug::printVector(sf::Vector2f(rect.width, rect.height), "size ");
 		worldBody->CreateFixture(&fixDef);

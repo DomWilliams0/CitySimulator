@@ -1,23 +1,9 @@
 #pragma once
-#include <unordered_map>
 #include <boost/filesystem.hpp>
-#include <yaml-cpp/yaml.h>
-#include <boost/variant.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <map>
 
-#define FAIL_GET(key) FAIL("Invalid config key: %1%", key)
-
-enum ValueType
-{
-	SCALAR,
-	FLAT_LIST,
-	MAP_LIST
-};
-
-struct ValueStruct
-{
-	std::string value;
-	ValueType type;
-};
+#define FAIL_GET(path) FAIL("Invalid config path: %1%", path)
 
 class ConfigurationFile
 {
@@ -26,47 +12,50 @@ public:
 	{
 	}
 
-	// no search will be attempted
+	/// <summary>
+	/// No search will be attempted
+	/// </summary>
 	explicit ConfigurationFile(const std::string &fileName) : configPath(fileName)
 	{
 	}
 
 	void load();
 
-	void getIntRef(const std::string &key, int &i);
-	int getInt(const std::string &key);
-	void getFloatRef(const std::string &key, float &f);
-	float getFloat(const std::string &key);
-	void getBoolRef(const std::string &key, bool &b);
-	bool getBool(const std::string &key);
-	void getString(const std::string &key, std::string &s);
-	void getList(const std::string &key, std::vector<std::string> &l);
-	void getIntList(const std::string &key, std::vector<int> &l);
-	void getMapList(const std::string &key, std::vector<std::map<std::string, std::string>> &ml);
+	void getIntRef(const std::string &path, int &i);
+	int getInt(const std::string &path);
+	void getFloatRef(const std::string &path, float &f);
+	float getFloat(const std::string &path);
+	void getBoolRef(const std::string &path, bool &b);
+	bool getBool(const std::string &path);
+	void getStringRef(const std::string &path, std::string &s);
+	std::string getString(const std::string &path);
 
-	static int stringToInt(const std::string &s);
-	static bool stringToBool(const std::string &s);
+	template <class T>
+	void getList(const std::string &path, std::vector<T> &l)
+	{
+		for (auto &item : propertyTree.get_child(path))
+			l.push_back(item.second.get_value<T>());
+	}
+
+	template <class T>
+	void getMapList(const std::string &path, std::vector<std::map<std::string, T>> &ml)
+	{
+		for (auto &item : propertyTree.get_child(path))
+		{
+			std::map<std::string, T> map;
+			for (auto &element : item.second)
+				map.insert({element.first, element.second.get_value<T>()});
+
+			ml.push_back(map);
+		}
+	}
 
 protected:
-	std::unordered_map<std::string, ValueStruct> configMap;
 	boost::filesystem::path configPath;
-
 	friend class Config;
 
 private:
-	// path: variable name
-	//	std::vector<std::pair<std::string, std::string>> variablesToProcess;
-
-	template <class T>
-	T getNumber(const std::string &key);
-	ValueStruct& getValueStruct(const std::string &key, ValueType type);
-	void parseConfig(std::map<std::string, std::string> &config);
-
-	void loadNode(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
-	void loadScalar(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
-	void loadMap(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
-	void loadSequence(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
-	void loadOther(const YAML::Node &node, const std::string &prefix, std::map<std::string, std::string> &config);
+	boost::property_tree::ptree propertyTree;
 };
 
 class Config
@@ -80,18 +69,25 @@ public:
 		return instance;
 	}
 
-	static int getInt(const std::string &key);
-	static float getFloat(const std::string &key);
-	static bool getBool(const std::string &key);
-	static void getString(const std::string &key, std::string &s);
-	static void getList(const std::string &key, std::vector<std::string> &l);
-	static void getIntList(const std::string &key, std::vector<int> &l);
-	static void getMapList(const std::string &key, std::vector<std::map<std::string, std::string>> &ml);
+	static int getInt(const std::string &path);
+	static float getFloat(const std::string &path);
+	static bool getBool(const std::string &path);
+	static std::string getString(const std::string &path);
+
+	template <class T>
+	static void getList(const std::string &path, std::vector<int> &l)
+	{
+		getInstance().config.getList<T>(path, l);
+	}
+
+	template <class T=std::string>
+	static void getMapList(const std::string &path, std::vector<std::map<std::string, T>> &ml)
+	{
+		getInstance().config.getMapList<T>(path, ml);
+	}
 
 
 private:
 	ConfigurationFile config;
-
 	void ensureConfigExists();
-	void createDefaultConfig();
 };

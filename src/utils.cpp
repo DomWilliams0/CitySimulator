@@ -2,6 +2,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/format/format_fwd.hpp>
 #include <boost/format/free_funcs.hpp>
+#include <boost/format/format_class.hpp>
+#include <regex>
+#include <boost/lexical_cast.hpp>
 #include "utils.hpp"
 
 
@@ -13,6 +16,22 @@ sf::Color Utils::darken(const sf::Color &color, int delta)
 	auto g = color.g < delta ? 0 : color.g - delta;
 	auto b = color.b < delta ? 0 : color.b - delta;
 	return sf::Color(r, g, b);
+}
+
+
+int Utils::stringToInt(const std::string& s)
+{
+	static std::regex noCharRegex(".*[a-zA-Z ].*");
+	if (!regex_match(s, noCharRegex))
+	{
+		std::stringstream ss(s);
+		int testInt;
+
+		if (ss >> testInt)
+			return lexical_cast<int>(s);
+	}
+
+	FAIL("Could not convert '%1%' to int", s);
 }
 
 void Utils::validateDirectory(const std::string &directory)
@@ -32,7 +51,7 @@ std::string Utils::searchForFile(const std::string &filename, const std::string 
 	{
 		auto path = itr->path();
 		if (path.filename() == filename)
-			return path.string();
+			return path.make_preferred().string();
 	}
 
 	// not found
