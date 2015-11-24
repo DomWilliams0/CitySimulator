@@ -5,8 +5,6 @@
 #include "constants.hpp"
 #include "utils.hpp"
 
-enum EntityType;
-
 struct Animation
 {
 	typedef std::vector<sf::IntRect> Sequence;
@@ -48,7 +46,8 @@ public:
 				return &anim->second;
 		}
 
-		FAIL("Animation '%s' not found", name);
+		// todo
+//		FAIL("Animation '%s' not found", name);
 	}
 
 	std::string getRandomAnimationName(EntityType entityType)
@@ -56,7 +55,9 @@ public:
 		auto anims = animations.find(entityType);
 		if (anims == animations.end())
 		{
-			FAIL("No animations found for entity type %1%", entityType);
+			// todo
+//			FAIL("No animations found for entity type %1%", entityType);
+			return "";
 		}
 
 		auto it = anims->second.cbegin();

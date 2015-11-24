@@ -141,7 +141,7 @@ void BaseGame::setWindowIcon(const std::string &fileName)
 }
 
 
-Game::Game(sf::RenderWindow &window) : BaseGame(window)
+Game::Game(sf::RenderWindow &window) : BaseGame(window), current(nullptr)
 {
 	window.setTitle("Dank Game Memes");
 	showFPS = true;

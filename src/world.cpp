@@ -1,5 +1,5 @@
-#include <SFML/System\Vector2.hpp>
-#include <boost\shared_ptr.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <boost/shared_ptr.hpp>
 #include "maploader.hpp"
 #include "world.hpp"
 #include "utils.hpp"

@@ -40,13 +40,6 @@ if(SFML_FOUND)
     target_link_libraries(${PROJECT_NAME} ${SFML_LIBRARIES})
 endif()
 
-# yaml-cpp
-find_package(YamlCpp REQUIRED yaml-cpp>=0.25)
-if(YAMLCPP_FOUND)
-    include_directories(${YAMLCPP_INCLUDE_DIRS})
-    link_directories(${YAMLCPP_LIBRARY_DIRS})
-endif()
-
 # boost::filesystem
 find_package(Boost 1.34.0 REQUIRED system filesystem)
 if(Boost_FOUND)

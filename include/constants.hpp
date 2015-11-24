@@ -53,3 +53,9 @@ namespace Direction
 	DirectionType random();
 	DirectionType fromAngle(float degrees);
 }
+
+enum EntityType
+{
+	ENTITY_HUMAN,
+	ENTITY_VEHICLE
+};

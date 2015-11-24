@@ -12,12 +12,6 @@ class b2World;
 class b2Body;
 typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;
 
-enum EntityType
-{
-	ENTITY_HUMAN,
-	ENTITY_VEHICLE
-};
-
 class EntityFactory
 {
 public:

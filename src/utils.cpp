@@ -1,7 +1,6 @@
 #define _USE_MATH_DEFINES
+
 #include <boost/filesystem.hpp>
-#include <boost/format/format_fwd.hpp>
-#include <boost/format/free_funcs.hpp>
 #include <boost/format/format_class.hpp>
 #include <regex>
 #include <boost/lexical_cast.hpp>
@@ -19,7 +18,7 @@ sf::Color Utils::darken(const sf::Color &color, int delta)
 }
 
 
-int Utils::stringToInt(const std::string& s)
+int Utils::stringToInt(const std::string &s)
 {
 	static std::regex noCharRegex(".*[a-zA-Z ].*");
 	if (!regex_match(s, noCharRegex))
@@ -31,13 +30,17 @@ int Utils::stringToInt(const std::string& s)
 			return lexical_cast<int>(s);
 	}
 
-	FAIL("Could not convert '%1%' to int", s);
+	// todo
+//	FAIL("Could not convert '%1%' to int", s);
+	return -1;
 }
 
 void Utils::validateDirectory(const std::string &directory)
 {
 	if (!filesystem::exists(directory))
-		throw filenotfound_exception(str(format("Invalid directory given: %1%") % directory));
+		return;
+	// todo
+//		throw filenotfound_exception(str(format("Invalid directory given: %1%") % directory));
 }
 
 std::string Utils::searchForFile(const std::string &filename, const std::string &directory)
@@ -55,7 +58,9 @@ std::string Utils::searchForFile(const std::string &filename, const std::string 
 	}
 
 	// not found
-	throw filenotfound_exception(str(format("File not found: %1%") % filename));
+//	throw filenotfound_exception(str(format("File not found: %1%") % filename));
+	// todo
+	return "";
 }
 
 sf::FloatRect Utils::expandRect(const sf::FloatRect &rect, const sf::Vector2f &offset)

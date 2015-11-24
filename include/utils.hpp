@@ -70,7 +70,7 @@ namespace Utils
 	template <class T>
 	T roundToMultiple(T x, T multiple)
 	{
-		return static_cast<T>(multiple * round<T>(x / multiple));
+		return static_cast<T>(multiple * round(x / multiple));
 	}
 
 	template <class T>
@@ -88,15 +88,15 @@ namespace Math
 	extern const float radToDeg;
 
 	template <class V=float>
-	float length(const sf::Vector2<V> &v)
-	{
-		return sqrtf(lengthSquared(v));
-	}
-
-	template <class V=float>
 	float lengthSquared(const sf::Vector2<V> &v)
 	{
 		return v.x * v.x + v.y * v.y;
+	}
+
+	template <class V=float>
+	float length(const sf::Vector2<V> &v)
+	{
+		return sqrtf(lengthSquared(v));
 	}
 
 	template <class V=float>

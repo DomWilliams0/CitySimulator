@@ -2,8 +2,8 @@
     "display": {
         "borderless-fullscreen": false,
         "resolution": {
-            "width": 1080,
-            "height": 768
+            "width": 800,
+            "height": 600
         }
     },
     "debug": {
