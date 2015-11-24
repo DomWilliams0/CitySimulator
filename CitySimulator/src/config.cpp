@@ -3,6 +3,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include "config.hpp"
 #include "utils.hpp"
 #include "logger.hpp"
@@ -15,65 +16,22 @@ void ConfigurationFile::load()
 	if (configPath.empty() || !exists(configPath))
 		throw Utils::filenotfound_exception(FORMAT("Config file not found: %1%", (configPath.empty() ? "none given" : configPath.string())));
 
-
-	// load all nodes
-	YAML::Node root = YAML::LoadFile(configPath.string());
-	std::map<std::string, std::string> config;
-	loadNode(root, "", config);
-
-	/*
-	// replace all variables
-	static std::regex varRegex("^=([a-zA-Z-_ ]+)=$");
-	std::smatch match;
-	for (auto &pair : config)
-	{
-		// variable value
-		if (regex_search(pair.second, match, varRegex))
-		{
-			std::string var(match[1]);
-
-			// find value to substitute
-			auto subIt(config.find(var));
-			if (subIt == config.end())
-			FAIL("Variable not found: %1%", var);
-
-			// replace
-			pair.second = subIt->second;
-		}
-	}
-
-	// remove temporary nodes
-	for (auto it = config.begin(); it != config.end();)
-	{
-		if (boost::starts_with(it->first, "temp"))
-			it = config.erase(it);
-		else
-			++it;
-	}
-
-	*/
-
-	// store variables in config map
-	parseConfig(config);
-
-	// debug print
-	// for (auto &pair : configMap)
-	//	 std::cout << pair.first << " === " << pair.second.value << std::endl;
+	read_json(configPath.string(), propertyTree);
 }
 
-ValueStruct& ConfigurationFile::getValueStruct(const std::string &key, ValueType type)
+ValueStruct& ConfigurationFile::getValueStruct(const std::string &path, ValueType type)
 {
-	auto found(configMap.find(key));
+	auto found(configMap.find(path));
 
-	// invalid key
+	// invalid path
 	if (found == configMap.end())
-	FAIL_GET(key);
+	FAIL_GET(path);
 
 	ValueStruct &value = found->second;
 
 	// invalid type
 	if (value.type != type)
-	FAIL2("Wrong valuetype given for %1% (%2%)", key, value.type);
+	FAIL2("Wrong valuetype given for %1% (%2%)", path, value.type);
 
 	return value;
 }
@@ -86,110 +44,43 @@ void splitString(const std::string &s, const char *delimiter, std::vector<std::s
 		ret.push_back(t);
 }
 
-template <class T>
-T ConfigurationFile::getNumber(const std::string &key)
+void ConfigurationFile::getIntRef(const std::string &path, int &i)
 {
-	static std::regex noCharRegex(".*[a-zA-Z ].*");
-
-	ValueStruct &value = getValueStruct(key, ValueType::SCALAR);
-
-	if (!std::regex_match(value.value, noCharRegex))
-	{
-		std::stringstream ss(value.value);
-
-		T ret;
-
-		if (ss >> ret)
-			return boost::lexical_cast<T>(value.value);
-	}
-
-	FAIL_GET(key);
+	i = getInt(path);
 }
 
-void ConfigurationFile::getIntRef(const std::string &key, int &i)
+int ConfigurationFile::getInt(const std::string &path)
 {
-	i = getInt(key);
+	return propertyTree.get<int>(path);
 }
 
-int ConfigurationFile::getInt(const std::string &key)
+void ConfigurationFile::getFloatRef(const std::string &path, float &f)
 {
-	return getNumber<int>(key);
+	f = getFloat(path);
 }
 
-void ConfigurationFile::getFloatRef(const std::string &key, float &f)
+float ConfigurationFile::getFloat(const std::string &path)
 {
-	f = getFloat(key);
+	return propertyTree.get<float>(path);
 }
 
-float ConfigurationFile::getFloat(const std::string &key)
+void ConfigurationFile::getBoolRef(const std::string &path, bool &b)
 {
-	return getNumber<float>(key);
+	b = getBool(path);
 }
 
-void ConfigurationFile::getBoolRef(const std::string &key, bool &b)
+bool ConfigurationFile::getBool(const std::string &path)
 {
-	b = getBool(key);
+	return propertyTree.get<bool>(path);
 }
 
-bool ConfigurationFile::getBool(const std::string &key)
+void ConfigurationFile::getStringRef(const std::string &path, std::string &s)
 {
-	ValueStruct &value = getValueStruct(key, ValueType::SCALAR);
-	return boost::to_lower_copy(value.value) == "true";
+	s = getString(path);
 }
-
-void ConfigurationFile::getString(const std::string &key, std::string &s)
+std::string ConfigurationFile::getString(const std::string &path)
 {
-	ValueStruct &value = getValueStruct(key, ValueType::SCALAR);
-	s = value.value;
-}
-
-void ConfigurationFile::getList(const std::string &key, std::vector<std::string> &l)
-{
-	ValueStruct &value = getValueStruct(key, ValueType::FLAT_LIST);
-	splitString(boost::get<std::string>(value.value), "|", l);
-}
-
-void ConfigurationFile::getIntList(const std::string &key, std::vector<int> &l)
-{
-	std::vector<std::string> strings;
-	getList(key, strings);
-
-	for (auto &s : strings)
-		l.push_back(stringToInt(s));
-}
-
-void ConfigurationFile::getMapList(const std::string &key, std::vector<std::map<std::string, std::string>> &ml)
-{
-	ValueStruct &value = getValueStruct(key, ValueType::MAP_LIST);
-
-	// split into key=value;key=value;...
-	std::vector<std::string> pairs;
-	splitString(value.value, "|", pairs);
-
-	for (std::string &pair : pairs)
-	{
-		// split into key=value;
-		std::vector<std::string> kvPairs;
-		splitString(pair, ";", kvPairs);
-
-		std::map<std::string, std::string> map;
-
-		for (std::string &kvPair : kvPairs)
-		{
-			auto equals(kvPair.find_first_of("="));
-
-			// not found
-			if (equals == std::string::npos)
-			FAIL("Invalid key=value format: %1%", kvPair);
-
-			std::string key(kvPair.substr(0, equals));
-			std::string val(kvPair.substr(equals + 1, kvPair.size() - 1));
-
-			map.insert({key, val});
-		}
-
-		ml.push_back(map);
-	}
+	return propertyTree.get<std::string>(path);
 }
 
 
@@ -225,7 +116,7 @@ void ConfigurationFile::parseConfig(std::map<std::string, std::string> &config)
 		int nonSimpleCurrentCount;
 		std::vector<int> nonSimpleCounts;
 
-		std::string key;
+		std::string path;
 		std::list<std::string> list;
 		std::string next;
 
@@ -244,7 +135,7 @@ void ConfigurationFile::parseConfig(std::map<std::string, std::string> &config)
 			nonSimpleCurrentCount = 0;
 			nonSimpleCounts.clear();
 			next.clear();
-			key.clear();
+			path.clear();
 		}
 
 		void storeCount(bool plusOne = true)
@@ -288,7 +179,7 @@ void ConfigurationFile::parseConfig(std::map<std::string, std::string> &config)
 			// index incremented: same list
 			else if (index >= currentIndex)
 			{
-				// key=value;...
+				// path=value;...
 				if (!simple)
 				{
 					currentList.list.push_back(match[4].str() + "=" + pair.second + ";");
@@ -311,8 +202,8 @@ void ConfigurationFile::parseConfig(std::map<std::string, std::string> &config)
 				currentList.index = index;
 				currentList.simple = simple;
 
-				if (currentList.key.empty())
-					currentList.key = listPath;
+				if (currentList.path.empty())
+					currentList.path = listPath;
 			}
 		}
 
@@ -386,7 +277,7 @@ void ConfigurationFile::parseConfig(std::map<std::string, std::string> &config)
 			// store
 			std::string full(output.str());
 			val.value = full.substr(0, full.size() - 1);
-			configMap.insert({currentList.key, val});
+			configMap.insert({currentList.path, val});
 
 			// reset and possibly add first item of next list
 			std::string next = currentList.next;
@@ -430,7 +321,7 @@ void ConfigurationFile::loadScalar(const YAML::Node &node, const std::string &pr
 
 	// reserved symbols
 	if (std::regex_match(value, reservedChars) || std::regex_match(realPrefix, reservedChars))
-	FAIL2("Reserved characters used in key %1%: %2%", realPrefix, value);
+	FAIL2("Reserved characters used in path %1%: %2%", realPrefix, value);
 
 	config.insert({realPrefix, value});
 }
@@ -457,7 +348,7 @@ void ConfigurationFile::loadOther(const YAML::Node &node, const std::string &pre
 
 void Config::loadConfig()
 {
-	getInstance().config.configPath = boost::filesystem::absolute("res/config.yml");
+	getInstance().config.configPath = boost::filesystem::absolute("res/config.json");
 	getInstance().ensureConfigExists();
 	getInstance().config.load();
 }
@@ -516,37 +407,22 @@ void Config::createDefaultConfig()
 	configStream.close();
 }
 
-int Config::getInt(const std::string &key)
+int Config::getInt(const std::string &path)
 {
-	return getInstance().config.getInt(key);
+	return getInstance().config.getInt(path);
 }
 
-float Config::getFloat(const std::string &key)
+float Config::getFloat(const std::string &path)
 {
-	return getInstance().config.getFloat(key);
+	return getInstance().config.getFloat(path);
 }
 
-bool Config::getBool(const std::string &key)
+bool Config::getBool(const std::string &path)
 {
-	return getInstance().config.getBool(key);
+	return getInstance().config.getBool(path);
 }
 
-void Config::getString(const std::string &key, std::string &s)
+std::string Config::getString(const std::string &path)
 {
-	getInstance().config.getString(key, s);
-}
-
-void Config::getList(const std::string &key, std::vector<std::string> &l)
-{
-	getInstance().config.getList(key, l);
-}
-
-void Config::getIntList(const std::string &key, std::vector<int> &l)
-{
-	getInstance().config.getIntList(key, l);
-}
-
-void Config::getMapList(const std::string &key, std::vector<std::map<std::string, std::string>> &ml)
-{
-	getInstance().config.getMapList(key, ml);
+	return getInstance().config.getString(path);
 }

@@ -145,7 +145,7 @@ Game::Game(sf::RenderWindow &window) : BaseGame(window)
 {
 	window.setTitle("Dank Game Memes");
 	showFPS = true;
-	limitFrameRate(Config::getBool("debug-limit-fps"));
+	limitFrameRate(Config::getBool("debug.limit-fps"));
 }
 
 Game::~Game()
@@ -266,7 +266,7 @@ void loadConfig(int &windowStyle)
 	int width, height;
 
 	// borderless fullscreen
-	if (Config::getBool("display-borderless-fullscreen"))
+	if (Config::getBool("display.borderless-fullscreen"))
 	{
 		windowStyle = sf::Style::None;
 
@@ -279,8 +279,8 @@ void loadConfig(int &windowStyle)
 	else
 	{
 		windowStyle = sf::Style::Default;
-		width = Config::getInt("display-resolution-width");
-		height = Config::getInt("display-resolution-height");
+		width = Config::getInt("display.resolution.width");
+		height = Config::getInt("display.resolution.height");
 	}
 
 	Constants::setWindowSize(width, height);
@@ -301,6 +301,7 @@ int main(int argc, char **argv)
 		// load window size/style
 		int style;
 		loadConfig(style);
+
 		sf::RenderWindow window(sf::VideoMode(Constants::windowSize.x, Constants::windowSize.y), "Game", style);
 
 		BaseGame *game;
