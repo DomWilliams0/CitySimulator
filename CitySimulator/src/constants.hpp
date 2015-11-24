@@ -1,6 +1,5 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <boost/format.hpp>
 #include <unordered_map>
 
 #define FORMAT(msg, argument) str(boost::format(msg) % argument)

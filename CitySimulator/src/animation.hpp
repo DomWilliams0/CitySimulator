@@ -1,4 +1,5 @@
 #pragma once
+#include <boost/format.hpp>
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 #include "constants.hpp"

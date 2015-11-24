@@ -6,7 +6,6 @@
 #include "animation.hpp"
 #include "utils.hpp"
 #include "logger.hpp"
-#include "config.hpp"
 #include "entity.hpp"
 
 void SpriteSheet::loadSprite(ConfigKeyValue &entityTags, EntityType entityType)
@@ -69,8 +68,8 @@ void SpriteSheet::processAllSprites()
 
 		try
 		{
-			animCount = ConfigurationFile::stringToInt(entityTags.at("anim-count"));
-			animLength = ConfigurationFile::stringToInt(entityTags.at("anim-length"));
+			animCount = Utils::stringToInt(entityTags.at("anim-count"));
+			animLength = Utils::stringToInt(entityTags.at("anim-length"));
 		}
 		catch (std::out_of_range &)
 		{
