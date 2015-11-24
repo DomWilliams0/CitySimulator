@@ -51,7 +51,7 @@ std::string Utils::searchForFile(const std::string &filename, const std::string 
 	{
 		auto path = itr->path();
 		if (path.filename() == filename)
-			return path.string();
+			return path.make_preferred().string();
 	}
 
 	// not found
