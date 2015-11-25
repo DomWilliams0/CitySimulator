@@ -28,7 +28,7 @@ void addProperties(TMX::TileMap *tile_map, boost::property_tree::ptree tree)
 			auto value = propertyPair.second.get<std::string>("<xmlattr>.value");
 
 			TMX::PropertyType type = propertyTypeFromString(name);
-			if (type != Logger::ERROR)
+			if (type != TMX::PT_ERROR)
 				tile_map->addProperty(type, value);
 		}
 	}
