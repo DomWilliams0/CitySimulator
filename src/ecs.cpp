@@ -43,7 +43,7 @@ void RenderSystem::tickEntity(Entity e, float dt)
 	// change animation direction
 	// todo get this from orientation instead of movement
 	sf::Vector2f directionVector = stopped ? physics->getLastVelocity() : physics->getVelocity();
-	float angleDeg = atan2(directionVector.y, directionVector.x) * Math::radToDeg;
+	double angleDeg = atan2(directionVector.y, directionVector.x) * Math::radToDeg;
 	DirectionType direction = Direction::fromAngle(angleDeg);
 	render->anim.turn(direction, false);
 

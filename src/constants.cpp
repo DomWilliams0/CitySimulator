@@ -27,11 +27,11 @@ DirectionType Direction::random()
 	return Utils::random(0, Direction::DIRECTION_COUNT);
 }
 
-DirectionType Direction::fromAngle(float degrees)
+DirectionType Direction::fromAngle(double degrees)
 {
-	const static float multiple = 360.0f / DIRECTION_COUNT;
+	const static double multiple = 360.0f / DIRECTION_COUNT;
 
-	int angle = static_cast<DirectionType>(multiple * roundf(degrees / multiple));
+	int angle = static_cast<DirectionType>(multiple * round(degrees / multiple));
 
 	switch (angle)
 	{

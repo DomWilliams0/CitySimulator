@@ -51,7 +51,7 @@ namespace Direction
 
 	extern const int DIRECTION_COUNT;
 	DirectionType random();
-	DirectionType fromAngle(float degrees);
+	DirectionType fromAngle(double degrees);
 }
 
 enum EntityType
