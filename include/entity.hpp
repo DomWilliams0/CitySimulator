@@ -190,9 +190,13 @@ public:
 	// component management
 	void removeComponent(Entity e, ComponentType type);
 	bool hasComponent(Entity e, ComponentType type);
-	BaseComponent* getComponent(Entity e, ComponentType type);
+	BaseComponent*getComponentOfType(Entity e, ComponentType type);
+
 	template <class T>
-	T* getComponent(Entity e, ComponentType type);
+	T* getComponent(Entity e, ComponentType type)
+	{
+		return dynamic_cast<T*>(getComponentOfType(e, type));
+	}
 
 	// helpers
 	void addPhysicsComponent(Entity e, World *world, const sf::Vector2i &startTilePos);
@@ -204,9 +208,3 @@ private:
 	BaseComponent* addComponent(Entity e, ComponentType type);
 	void addBrain(Entity e, bool aiBrain);
 };
-
-template <class T>
-T* EntityManager::getComponent(Entity e, ComponentType type)
-{
-	return dynamic_cast<T*>(getComponent(e, type));
-}

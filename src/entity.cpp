@@ -1,10 +1,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include "ai.hpp"
 #include "entity.hpp"
-#include "config.hpp"
-#include "animation.hpp"
 #include "logger.hpp"
-#include "utils.hpp"
 
 void EntityFactory::loadEntities(EntityType entityType, const std::string &fileName)
 {
@@ -101,9 +98,9 @@ void EntityManager::renderSystems(sf::RenderWindow &window)
 BaseComponent* EntityManager::addComponent(Entity e, ComponentType type)
 {
 	entities[e] |= type;
-	getComponent(e, type)->reset();
+	getComponentOfType(e, type)->reset();
 
-	return getComponent(e, type);
+	return getComponentOfType(e, type);
 }
 
 void EntityManager::removeComponent(Entity e, ComponentType type)
@@ -116,7 +113,7 @@ bool EntityManager::hasComponent(Entity e, ComponentType type)
 	return (entities[e] & type) != COMPONENT_NONE;
 }
 
-BaseComponent* EntityManager::getComponent(Entity e, ComponentType type)
+BaseComponent* EntityManager::getComponentOfType(Entity e, ComponentType type)
 {
 	switch (type)
 	{
