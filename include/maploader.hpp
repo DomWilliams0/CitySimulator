@@ -9,9 +9,9 @@ namespace TMX
 {
 	enum PropertyType
 	{
-		TYPE,
-		VISIBLE,
-		PT_ERROR
+		PROPERTY_TYPE,
+		PROPERTY_VISIBLE,
+		PROPERTY_INVALID
 	};
 
 	PropertyType propertyTypeFromString(const std::string &s);

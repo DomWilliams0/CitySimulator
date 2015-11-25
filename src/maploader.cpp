@@ -7,12 +7,12 @@
 TMX::PropertyType propertyTypeFromString(const std::string &s)
 {
 	if (s == "type")
-		return TMX::TYPE;
+		return TMX::PROPERTY_TYPE;
 	if (s == "visible")
-		return TMX::VISIBLE;
+		return TMX::PROPERTY_VISIBLE;
 
 	Logger::logWarning("Unknown PropertyType: " + s);
-	return TMX::PT_ERROR;
+	return TMX::PROPERTY_INVALID;
 }
 
 void addProperties(TMX::TileMap *tile_map, boost::property_tree::ptree tree)
@@ -28,7 +28,7 @@ void addProperties(TMX::TileMap *tile_map, boost::property_tree::ptree tree)
 			auto value = propertyPair.second.get<std::string>("<xmlattr>.value");
 
 			TMX::PropertyType type = propertyTypeFromString(name);
-			if (type != TMX::PT_ERROR)
+			if (type != TMX::PROPERTY_INVALID)
 				tile_map->addProperty(type, value);
 		}
 	}
