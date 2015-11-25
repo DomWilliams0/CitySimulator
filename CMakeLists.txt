@@ -19,8 +19,10 @@ set(SOURCE_FILES
         src/animation.cpp
         src/config.cpp
         src/constants.cpp
+        src/core.cpp
         src/ecs.cpp
         src/entity.cpp
+        src/fps.cpp
         src/game.cpp
         src/gamestate.cpp
         src/input.cpp
@@ -28,7 +30,8 @@ set(SOURCE_FILES
         src/maploader.cpp
         src/SFMLDebugDraw.cpp
         src/utils.cpp
-        src/world.cpp)
+        src/world.cpp
+        )
 
 add_executable(CitySimulator ${SOURCE_FILES})
 

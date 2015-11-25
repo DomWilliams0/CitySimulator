@@ -1,35 +1,9 @@
 #include <SFML/Window.hpp>
-#include <numeric>
 #include "game.hpp"
 #include "logger.hpp"
 #include "gamestate.hpp"
 #include "config.hpp"
 #include "input.hpp"
-
-void FPSCounter::tick(float delta, sf::RenderWindow &window)
-{
-	backlog.push_back(delta);
-
-	if (ticker.tick(delta))
-	{
-		int fps(0);
-
-		double total = accumulate(backlog.begin(), backlog.end(), 0.0);
-		if (total != 0)
-		{
-			double average = total / backlog.size();
-			if (average != 0)
-				fps = static_cast<int>(1.0 / average);
-		}
-
-		fpsText.setString(std::to_string(fps) + " FPS");
-
-		backlog.clear();
-	}
-
-	window.draw(fpsText);
-}
-
 
 BaseGame::BaseGame(sf::RenderWindow &renderWindow) : window(renderWindow)
 {
@@ -118,8 +92,12 @@ void BaseGame::beginGame()
 
 		window.display();
 	}
+}
 
+void BaseGame::endGame()
+{
 	end();
+	window.close();
 }
 
 void BaseGame::limitFrameRate(bool limit)
@@ -148,15 +126,19 @@ Game::Game(sf::RenderWindow &window) : BaseGame(window), current(nullptr)
 	limitFrameRate(Config::getBool("debug.limit-fps"));
 }
 
+void Game::start()
+{
+	switchState(StateType::GAME);
+	box2DWorld = dynamic_cast<GameState*>(current)->getBox2DWorld();
+}
+
 Game::~Game()
 {
 	delete current;
 }
 
-void Game::start()
+void Game::end()
 {
-	switchState(StateType::GAME);
-	box2DWorld = dynamic_cast<GameState*>(current)->getBox2DWorld();
 }
 
 void Game::tick(float delta)
@@ -215,109 +197,5 @@ State* Game::createFromStateType(StateType type)
 	case GAME: return new GameState;
 	default:
 		throw std::runtime_error("Not implemented");
-	}
-}
-
-void Game::end()
-{
-	window.close();
-}
-
-
-bool ensureCWD(int argc, char **argv)
-{
-	using namespace boost::filesystem;
-	const std::string required("res");
-
-	if (!exists(current_path() / required))
-	{
-		// no args given
-		if (argc != 2)
-		{
-			std::cerr << "Root directory not found. \nUsage: " << argv[0] << " <relative path to root dir>\nPress enter to quit." << std::endl;
-			std::cin.get();
-			return false;
-		}
-
-		// try supplied relative path
-		std::string relativePath = argv[1];
-		path newPath = current_path() / relativePath;
-
-		// doesn't exist
-		if (!exists(newPath))
-		{
-			std::cerr << "Invalid path" << std::endl;
-			return false;
-		}
-
-		// update path and try again
-		current_path(newPath);
-		return ensureCWD(-1, nullptr);
-	}
-
-	return true;
-}
-
-
-void loadConfig(int &windowStyle)
-{
-	Config::loadConfig();
-
-	int width, height;
-
-	// borderless fullscreen
-	if (Config::getBool("display.borderless-fullscreen"))
-	{
-		windowStyle = sf::Style::None;
-
-		auto screenSize(sf::VideoMode::getDesktopMode());
-		width = screenSize.width;
-		height = screenSize.height;
-	}
-
-	// standard window
-	else
-	{
-		windowStyle = sf::Style::Default;
-		width = Config::getInt("display.resolution.width");
-		height = Config::getInt("display.resolution.height");
-	}
-
-	Constants::setWindowSize(width, height);
-}
-
-
-int main(int argc, char **argv)
-{
-	try
-	{
-		// ensure that the program root is in the project root
-		if (!ensureCWD(argc, argv))
-			return -1;
-
-		// create logger
-		createLogger(std::cout, Logger::DEBUG);
-
-		// load window size/style
-		int style;
-		loadConfig(style);
-
-		sf::RenderWindow window(sf::VideoMode(Constants::windowSize.x, Constants::windowSize.y), "Game", style);
-
-		BaseGame *game;
-		game = new Game(window);
-		dynamic_cast<BaseGame*>(game)->beginGame();
-
-		Logger::logDebug("Shutdown cleanly");
-
-		delete game;
-	}
-	catch (std::exception &e)
-	{
-		Logger::logError(std::string("An error occurred: ") + e.what());
-	}
-	catch (...)
-	{
-		Logger::logError("An unknown error occured");
 	}
 }

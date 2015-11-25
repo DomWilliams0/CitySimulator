@@ -10,16 +10,7 @@ class FPSCounter
 {
 public:
 
-	void init(float waitTime)
-	{
-		ticker.init(waitTime);
-
-		fpsText.setFont(Constants::mainFont);
-		fpsText.setCharacterSize(20);
-		fpsText.setPosition(20, 20);
-		fpsText.setColor(sf::Color::Red);
-	}
-
+	void init(float waitTime);
 	void tick(float delta, sf::RenderWindow &window);
 
 private:
@@ -40,9 +31,6 @@ public:
 	{
 	}
 
-	void beginGame();
-	virtual void end() = 0;
-
 	void setView(const sf::View &view)
 	{
 		window.setView(view);
@@ -53,6 +41,8 @@ public:
 		return window;
 	}
 
+	void beginGame();
+	void endGame();
 
 protected:
 	sf::RenderWindow &window;
@@ -60,6 +50,7 @@ protected:
 	bool showFPS;
 
 	virtual void start() = 0;
+	virtual void end() = 0;
 	virtual void tick(float delta) = 0;
 	virtual void render() = 0;
 	virtual void handleInput(sf::Event e) = 0;
@@ -85,10 +76,9 @@ public:
 	Game(sf::RenderWindow &window);
 	~Game();
 
-	void end() override;
-
 protected:
 	void start() override;
+	void end() override;
 	void tick(float delta) override;
 	void render() override;
 	void handleInput(sf::Event e) override;
