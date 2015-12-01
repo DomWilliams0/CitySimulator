@@ -44,7 +44,7 @@ if(SFML_FOUND)
 endif()
 
 # boost::filesystem
-find_package(Boost 1.34.0 REQUIRED system filesystem)
+find_package(Boost 1.59.0 REQUIRED system filesystem)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})

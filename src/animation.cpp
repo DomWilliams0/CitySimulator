@@ -1,7 +1,7 @@
-#include <boost/format.hpp>
 #include <SFML/Graphics.hpp>
 #include <numeric>
 #include <regex>
+#include <boost/format.hpp>
 #include "PackingTreeNode.h"
 #include "animation.hpp"
 #include "utils.hpp"
@@ -131,7 +131,9 @@ void SpriteSheet::positionImages(sf::Vector2i &imageSize, std::map<sf::Image*, s
 	PackingTreeNode *node = new PackingTreeNode(binRect);
 
 	// sort by area (insert into a vector first)
-	std::vector<std::pair<sf::Image*, std::pair<ConfigKeyValue, EntityType>>> asVector(preProcessImageData->begin(), preProcessImageData->end());
+	std::vector<std::pair<sf::Image*, std::pair<ConfigKeyValue, EntityType>>> asVector;
+	for (auto it(preProcessImageData->cbegin()); it != preProcessImageData->cend(); ++it)
+		asVector.push_back(*it);
 
 	std::sort(asVector.begin(), asVector.end(),
 	          [](const std::pair<sf::Image*, std::pair<ConfigKeyValue, EntityType>> &left,
@@ -146,8 +148,8 @@ void SpriteSheet::positionImages(sf::Vector2i &imageSize, std::map<sf::Image*, s
 	// insert one at a time
 	for (auto &pair : asVector)
 	{
-		sf::Vector2i size = static_cast<sf::Vector2i>(pair.first->getSize());
-		sf::IntRect rect(0, 0, size.x, size.y);
+		sf::Vector2u size = pair.first->getSize();
+		sf::IntRect rect(0, 0, static_cast<int>(size.x), static_cast<int>(size.y));
 
 		auto positionedRect = node->insert(rect);
 
@@ -201,8 +203,8 @@ sf::Vector2i SpriteSheet::stringToVector(const std::string &s)
 		FAIL("Could not convert string to vector: %1%", s);
 	}
 
-	int x(stoi(match[1]));
-	int y(stoi(match[2]));
+	int x(std::stoi(match[1].str().c_str()));
+	int y(std::stoi(match[2].str().c_str()));
 
 	return sf::Vector2i(x, y);
 }
