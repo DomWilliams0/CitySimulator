@@ -505,7 +505,7 @@ void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfF
 		nextRowFunc = [](const sf::FloatRect *lastRect, const sf::FloatRect *rect)
 			{
 				return powf(rect->left - lastRect->left, 2.f) + powf(rect->top - lastRect->top, 2.f) > Constants::tileSizef * Constants::tileSizef;
-			};;
+			};
 	}
 	else
 	{
