@@ -3,7 +3,8 @@
 */
 
 #pragma once
-#include "SFML/Graphics.hpp"
+#include <boost/optional.hpp>
+#include <SFML/Graphics.hpp>
 
 struct PackingTreeNode
 {

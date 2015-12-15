@@ -4,7 +4,6 @@
 #include "world.hpp"
 #include "logger.hpp"
 #include <unordered_set>
-#include <boost/format.hpp>
 
 bool isCollidable(BlockType blockType)
 {

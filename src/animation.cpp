@@ -1,6 +1,5 @@
 #include <SFML/Graphics.hpp>
 #include <regex>
-#include <boost/format.hpp>
 #include "PackingTreeNode.h"
 #include "animation.hpp"
 #include "logger.hpp"

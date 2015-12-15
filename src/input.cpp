@@ -1,7 +1,7 @@
 #include <SFML/Window/Keyboard.hpp>
-#include <boost/format.hpp>
 #include "input.hpp"
 #include "logger.hpp"
+#include "constants.hpp"
 
 using sf::Keyboard;
 
@@ -17,9 +17,8 @@ void Input::registerBindings()
 	// check all keys have been registered
 	if (bindings.left.size() != KEY_COUNT)
 	{
-		auto msg = boost::format("Expected %1% key bindings, recieved %2% instead") % KEY_COUNT % bindings.left.size();
 
-		Logger::logError(str(msg));
+		Logger::logError(FORMAT2("Expected %1% key bindings, recieved %2% instead", KEY_COUNT, bindings.left.size()));
 		throw std::runtime_error("Invalid number of key bindings");
 	}
 }
