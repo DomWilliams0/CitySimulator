@@ -34,6 +34,8 @@ GameState::GameState() : State(GAME)
 	Globals::entityManager->addPhysicsComponent(e, &world, tilePos);
 	Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, "Business Man", 0.2f, Direction::EAST, false);
 	Globals::entityManager->addPlayerInputComponent(e);
+
+	entityTracking = (PhysicsComponent *) Globals::entityManager->getComponentOfType(e, COMPONENT_PHYSICS);
 }
 
 GameState::~GameState()
@@ -69,8 +71,10 @@ void GameState::tick(float delta)
 {
 	world.tick(delta);
 
-//	Globals::entityManager->tickSystems(delta);
-	tempControlCamera(delta);
+	Globals::entityManager->tickSystems(delta);
+
+	view.setCenter(entityTracking->getPosition());
+	Globals::game->setView(view);
 }
 
 void GameState::render(sf::RenderWindow &window)

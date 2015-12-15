@@ -3,6 +3,7 @@
 #include "world.hpp"
 
 class Animator;
+class PhysicsComponent;
 
 class GameState : public State
 {
@@ -16,6 +17,7 @@ public:
 private:
 	World world;
 	sf::View view;
+	PhysicsComponent *entityTracking;
 
 	sf::Vector2f viewOffset;
 
