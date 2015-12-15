@@ -155,6 +155,7 @@ void Tileset::convertToTexture(const std::vector<int> &flippedGIDs)
 	// write to texture
 	if (!texture.loadFromImage(newImage))
 		throw std::runtime_error("Could not render tileset");
+	texture.setSmooth(false);
 
 	converted = true;
 	delete image;
