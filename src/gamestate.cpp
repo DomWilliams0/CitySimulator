@@ -1,8 +1,6 @@
 #include "gamestate.hpp"
-#include "game.hpp"
 #include "config.hpp"
 #include "entity.hpp"
-#include "animation.hpp"
 #include "input.hpp"
 
 GameState::GameState() : State(GAME)

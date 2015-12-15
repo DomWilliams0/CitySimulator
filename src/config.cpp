@@ -4,7 +4,6 @@
 #include "config.hpp"
 #include "utils.hpp"
 #include "logger.hpp"
-#include "constants.hpp"
 
 
 void ConfigurationFile::load()

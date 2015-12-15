@@ -1,5 +1,4 @@
 #include "ai.hpp"
-#include "entity.hpp"
 
 void InputBrain::tick(float delta)
 {

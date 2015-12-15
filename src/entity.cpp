@@ -1,6 +1,5 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include "ai.hpp"
-#include "entity.hpp"
 #include "logger.hpp"
 
 void EntityFactory::loadEntities(EntityType entityType, const std::string &fileName)

@@ -1,5 +1,4 @@
 #include <iostream>
-#include <string>
 #include "logger.hpp"
 
 const std::string PREFIX_STRING("    ");

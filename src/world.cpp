@@ -2,12 +2,9 @@
 #include <boost/shared_ptr.hpp>
 #include "maploader.hpp"
 #include "world.hpp"
-#include "utils.hpp"
 #include "logger.hpp"
 #include <unordered_set>
 #include <boost/format.hpp>
-#include <map>
-#include <set>
 
 bool isCollidable(BlockType blockType)
 {

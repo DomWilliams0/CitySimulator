@@ -1,10 +1,8 @@
 #include <SFML/Graphics.hpp>
-#include <numeric>
 #include <regex>
 #include <boost/format.hpp>
 #include "PackingTreeNode.h"
 #include "animation.hpp"
-#include "utils.hpp"
 #include "logger.hpp"
 #include "entity.hpp"
 
