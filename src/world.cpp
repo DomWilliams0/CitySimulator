@@ -421,7 +421,7 @@ void WorldTerrain::load(const TMX::TileMap *tileMap)
 
 	Logger::logDebug(FORMAT("Discovered %1% tile layer(s)", tileLayerCount));
 
-	// resize vertex array to accomodate for layer count
+	// resize vertex array to accommodate for layer count
 	resize(tileLayerCount);
 
 	// update tileset with flipped textures
