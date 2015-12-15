@@ -4,11 +4,12 @@
         "resolution": {
             "width": 800,
             "height": 600
-        }
+        },
+      "fps-limit": 60,
+      "vsync": true
     },
     "debug": {
         "world-name": "collision_test.tmx",
-        "limit-fps": false,
 		"human-skin": "Business Man",
 		"zoom": 0.5,
 		"movement": {

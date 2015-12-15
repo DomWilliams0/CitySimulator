@@ -55,7 +55,7 @@ protected:
 	virtual void render() = 0;
 	virtual void handleInput(sf::Event e) = 0;
 
-	void limitFrameRate(bool limit);
+	void limitFrameRate(int limit, bool vsync);
 
 	void setBackgroundColour(const sf::Uint8 &r, const sf::Uint8 &g, const sf::Uint8 &b, const sf::Uint8 &a = 255)
 	{

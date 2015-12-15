@@ -7,7 +7,7 @@
 
 BaseGame::BaseGame(sf::RenderWindow &renderWindow) : window(renderWindow)
 {
-	limitFrameRate(true);
+	limitFrameRate(60, true); // default
 
 	// set icon
 	setWindowIcon("icon.png");
@@ -100,10 +100,10 @@ void BaseGame::endGame()
 	window.close();
 }
 
-void BaseGame::limitFrameRate(bool limit)
+void BaseGame::limitFrameRate(int limit, bool vsync)
 {
-	window.setFramerateLimit(limit ? 60 : 0);
-	window.setVerticalSyncEnabled(limit);
+	window.setFramerateLimit(limit);
+	window.setVerticalSyncEnabled(vsync);
 }
 
 void BaseGame::setWindowIcon(const std::string &fileName)
@@ -123,7 +123,7 @@ Game::Game(sf::RenderWindow &window) : BaseGame(window), current(nullptr)
 {
 	window.setTitle("Dank Game Memes");
 	showFPS = true;
-	limitFrameRate(Config::getBool("debug.limit-fps"));
+	limitFrameRate(Config::getInt("display.fps-limit"), Config::getBool("display.vsync"));
 }
 
 void Game::start()
