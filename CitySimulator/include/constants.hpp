@@ -21,6 +21,8 @@ namespace Constants
 	extern const sf::Vector2f entityScale;
 
 	extern sf::Font mainFont;
+
+	extern std::string configPath;
 }
 
 class BaseGame;

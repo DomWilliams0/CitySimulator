@@ -87,6 +87,8 @@ public:
 
 	static std::string getString(const std::string &path);
 
+	static std::string getResource(const std::string &path);
+
 	template<class T>
 	static void getList(const std::string &path, std::vector<int> &l)
 	{

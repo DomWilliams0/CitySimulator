@@ -59,7 +59,7 @@ std::string ConfigurationFile::getString(const std::string &path)
 
 void Config::loadConfig()
 {
-	getInstance().config.configPath = boost::filesystem::canonical("res/config.json");
+	getInstance().config.configPath = boost::filesystem::canonical(Constants::configPath);
 	getInstance().ensureConfigExists();
 	getInstance().config.load();
 }
@@ -95,4 +95,9 @@ bool Config::getBool(const std::string &path)
 std::string Config::getString(const std::string &path)
 {
 	return getInstance().config.getString(path);
+}
+
+std::string Config::getResource(const std::string &path)
+{
+	return getString("resources." + path);
 }

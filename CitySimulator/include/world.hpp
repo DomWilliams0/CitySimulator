@@ -59,7 +59,7 @@ bool isTileLayer(LayerType &layerType);
 class Tileset
 {
 public:
-	explicit Tileset(const std::string &filename);
+	Tileset();
 
 	~Tileset();
 

@@ -4,6 +4,7 @@
 #include "world.hpp"
 #include "logger.hpp"
 #include <unordered_set>
+#include <config.hpp>
 
 bool isCollidable(BlockType blockType)
 {
@@ -34,11 +35,11 @@ bool isTileLayer(LayerType &layerType)
 	return layerType == LAYER_UNDERTERRAIN || layerType == LAYER_TERRAIN || layerType == LAYER_OVERTERRAIN;
 }
 
-Tileset::Tileset(const std::string &filename) : converted(false)
+Tileset::Tileset() : converted(false)
 {
 	// load image
 	image = new sf::Image;
-	if (!image->loadFromFile(Utils::searchForFile(filename, "res/world")))
+	if (!image->loadFromFile(Config::getResource("world.tileset")))
 		throw std::runtime_error("Could not load tileset");
 
 	size = image->getSize();
@@ -196,7 +197,7 @@ int Tileset::getIndex(int x, int y) const
 	return x + (size.x + 1) * y;
 }
 
-WorldTerrain::WorldTerrain(World *container) : BaseWorld(container), tileset(new Tileset("tileset.png"))
+WorldTerrain::WorldTerrain(World *container) : BaseWorld(container), tileset(new Tileset)
 {
 	vertices.setPrimitiveType(sf::Quads);
 }

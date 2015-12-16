@@ -12,6 +12,8 @@ namespace Constants
 
 	sf::Font mainFont;
 
+	std::string configPath("res/config.json");
+
 	void setWindowSize(int x, int y)
 	{
 		windowSize.x = x;

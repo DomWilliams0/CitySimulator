@@ -12,7 +12,7 @@ void SpriteSheet::loadSprite(ConfigKeyValue &entityTags, EntityType entityType)
 	std::string fileName(entityTags["sprite"]);
 
 	sf::Image *image = new sf::Image;
-	if (!image->loadFromFile(Utils::searchForFile(fileName, "res/entities")))
+	if (!image->loadFromFile(Utils::searchForFile(fileName, Config::getResource("entities.sprites"))))
 		error("Could not load sprite %1%", fileName);
 
 	preProcessImageData->insert({image, {entityTags, entityType}});

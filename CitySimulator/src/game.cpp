@@ -13,7 +13,7 @@ BaseGame::BaseGame(sf::RenderWindow &renderWindow) : window(renderWindow)
 	setWindowIcon("icon.png");
 
 	// load font
-	if (!Constants::mainFont.loadFromFile("res/misc/font.ttf"))
+	if (!Constants::mainFont.loadFromFile(Config::getResource("font")))
 	{
 		Logger::logError("Font could not be loaded");
 		exit(-1);
