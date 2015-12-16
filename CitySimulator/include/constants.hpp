@@ -5,11 +5,6 @@
 #include <unordered_map>
 #include <boost/format.hpp>
 
-#define FORMAT(msg, argument) str(boost::format(msg) % argument)
-#define FORMAT2(msg, arg1, arg2) str(boost::format(msg) % arg1 % arg2)
-#define ERROR(msg, argument) throw std::runtime_error(FORMAT(msg, argument))
-#define ERROR2(msg, arg1, arg2) throw std::runtime_error(FORMAT2(msg, arg1, arg2))
-
 typedef std::unordered_map<std::string, std::string> ConfigMap;
 typedef std::map<std::string, std::string> ConfigKeyValue;
 

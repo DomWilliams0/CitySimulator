@@ -6,10 +6,9 @@
 
 bool ensureCWD(int argc, char **argv)
 {
-	using namespace boost::filesystem;
 	const std::string required("res");
 
-	if (!exists(current_path() / required))
+	if (!boost::filesystem::exists(boost::filesystem::current_path() / required))
 	{
 		// no args given
 		if (argc != 2)
@@ -20,17 +19,17 @@ bool ensureCWD(int argc, char **argv)
 
 		// try supplied relative path
 		std::string relativePath = argv[1];
-		path newPath = current_path() / relativePath;
+		boost::filesystem::path newPath = boost::filesystem::current_path() / relativePath;
 
 		// doesn't exist
-		if (!exists(newPath))
+		if (!boost::filesystem::exists(newPath))
 		{
 			std::cerr << "Invalid path" << std::endl;
 			return false;
 		}
 
 		// update path and try again
-		current_path(newPath);
+		boost::filesystem::current_path(newPath);
 		return ensureCWD(-1, nullptr);
 	}
 

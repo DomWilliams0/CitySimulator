@@ -13,12 +13,10 @@ void SpriteSheet::loadSprite(ConfigKeyValue &entityTags, EntityType entityType)
 
 	sf::Image *image = new sf::Image;
 	if (!image->loadFromFile(Utils::searchForFile(fileName, "res/entities")))
-	{
-		ERROR("Could not load sprite %1%", fileName);
-	}
+		error("Could not load sprite %1%", fileName);
 
 	preProcessImageData->insert({image, {entityTags, entityType}});
-	Logger::logDebug(FORMAT("Loaded sprite %1%", entityTags["name"]));
+	Logger::logDebug(format("Loaded sprite %1%", entityTags["name"]));
 }
 
 void SpriteSheet::processAllSprites()
@@ -70,7 +68,7 @@ void SpriteSheet::processAllSprites()
 		}
 		catch (std::out_of_range &)
 		{
-			ERROR("Could not get animation info from %1% tags", entityTags["name"]);
+			error("Could not get animation info from %1% tags", entityTags["name"]);
 		}
 
 		// all dimensions the same
@@ -91,7 +89,7 @@ void SpriteSheet::processAllSprites()
 		else
 		{
 			// TODO
-			Logger::logDebug(FORMAT("anim-dimensions-all not set for animation %1%, skipping", entityTags["name"]));
+			Logger::logDebug(format("anim-dimensions-all not set for animation %1%, skipping", entityTags["name"]));
 			continue;
 		}
 
@@ -152,9 +150,7 @@ void SpriteSheet::positionImages(sf::Vector2i &imageSize, std::map<sf::Image *, 
 		auto positionedRect = node->insert(rect);
 
 		if (!positionedRect)
-		{
-			ERROR2("Could not pack spritesheet of size %1%, %2%", size.x, size.y);
-		}
+			error("Could not pack spritesheet of size %1%, %2%", std::to_string(size.x), std::to_string(size.y));
 
 		imagePositions.insert({pair.first, *positionedRect});
 	}
@@ -184,9 +180,7 @@ void SpriteSheet::positionImages(sf::Vector2i &imageSize, std::map<sf::Image *, 
 void SpriteSheet::checkProcessed(bool shouldBe)
 {
 	if (shouldBe != processed)
-	{
-		ERROR("Spritesheet has %1% been processed", (shouldBe ? "not yet" : "already"));
-	}
+		error("Spritesheet has %1% been processed", (shouldBe ? "not yet" : "already"));
 }
 
 sf::Vector2i SpriteSheet::stringToVector(const std::string &s)
@@ -197,9 +191,7 @@ sf::Vector2i SpriteSheet::stringToVector(const std::string &s)
 
 	// invalid
 	if (!regex_search(s, match, reg))
-	{
-		ERROR("Could not convert string to vector: %1%", s);
-	}
+		error("Could not convert string to vector: %1%", s);
 
 	int x(std::stoi(match[1].str().c_str()));
 	int y(std::stoi(match[2].str().c_str()));

@@ -28,7 +28,7 @@ void EntityFactory::loadEntities(ConfigurationFile &config, EntityType entityTyp
 		// no name
 		if (nameIt == entity.end())
 		{
-			Logger::logWarning(FORMAT("No name found for entity of type %1%, skipping", entityType));
+			Logger::logWarning(format("No name found for entity of type %1%, skipping", std::to_string(entityType)));
 			continue;
 		}
 
@@ -52,9 +52,7 @@ Entity EntityManager::createEntity()
 {
 	// no space
 	if (entityCount == MAX_ENTITIES)
-	{
-		ERROR("Max number of entities reached (%1%)", MAX_ENTITIES);
-	}
+		error("Max number of entities reached (%1%)", std::to_string(MAX_ENTITIES));
 
 	// todo: use a memory pool instead to avoid iterating the entire array each time
 	for (size_t e = 0; e < MAX_ENTITIES; ++e)
@@ -129,7 +127,7 @@ BaseComponent *EntityManager::getComponentOfType(Entity e, ComponentType type)
 		case COMPONENT_INPUT:
 			return &inputComponents[e];
 		default:
-			ERROR("Invalid component type %1%", type);
+			error("Invalid component type %1%", std::to_string(type));
 	}
 }
 

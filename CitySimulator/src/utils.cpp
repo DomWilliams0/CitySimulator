@@ -1,13 +1,46 @@
 #define _USE_MATH_DEFINES
 
 #include <boost/filesystem.hpp>
-#include <boost/format/format_class.hpp>
+#include <boost/format.hpp>
 #include <regex>
 #include <boost/lexical_cast.hpp>
 #include "utils.hpp"
 
+std::string format(const std::string &s, const std::string &arg1)
+{
+	return boost::str(boost::format(s) % arg1);
+}
 
-using namespace boost;
+std::string format(const std::string &s, const std::string &arg1, const std::string &arg2)
+{
+	return boost::str(boost::format(s) % arg1 % arg2);
+}
+
+std::string format(const std::string &s, const std::string &arg1, const std::string &arg2, const std::string &arg3)
+{
+	return boost::str(boost::format(s) % arg1 % arg2 % arg3);
+}
+
+void error(const std::string &msg)
+{
+	throw std::runtime_error(msg);
+}
+
+void error(const std::string &msg, const std::string &arg1)
+{
+	throw std::runtime_error(format(msg, arg1));
+}
+
+void error(const std::string &msg, const std::string &arg1, const std::string &arg2)
+{
+	throw std::runtime_error(format(msg, arg1, arg2));
+}
+
+void error(const std::string &msg, const std::string &arg1, const std::string &arg2, const std::string &arg3)
+{
+	throw std::runtime_error(format(msg, arg1, arg2, arg3));
+}
+
 
 sf::Color Utils::darken(const sf::Color &color, int delta)
 {
@@ -27,24 +60,25 @@ int Utils::stringToInt(const std::string &s)
 		int testInt;
 
 		if (ss >> testInt)
-			return lexical_cast<int>(s);
+			return boost::lexical_cast<int>(s);
 	}
 
-	// todo
-//	ERROR("Could not convert '%1%' to int", s);
+	error("Could not convert '%1%' to int", s);
 	return -1;
 }
 
 void Utils::validateDirectory(const std::string &directory)
 {
-	if (!filesystem::exists(directory))
+	if (!boost::filesystem::exists(directory))
 		return;
-	// todo
-//		throw filenotfound_exception(str(format("Invalid directory given: %1%") % directory));
+
+	throw filenotfound_exception(format("Invalid directory given: %1%", directory));
 }
 
 std::string Utils::searchForFile(const std::string &filename, const std::string &directory)
 {
+	using namespace boost;
+
 	validateDirectory(directory);
 
 	filesystem::recursive_directory_iterator itr(filesystem::absolute(directory));
@@ -58,9 +92,7 @@ std::string Utils::searchForFile(const std::string &filename, const std::string 
 	}
 
 	// not found
-//	throw filenotfound_exception(str(format("File not found: %1%") % filename));
-	// todo
-	return "";
+	throw filenotfound_exception("File not found: " + filename);
 }
 
 sf::FloatRect Utils::expandRect(const sf::FloatRect &rect, const sf::Vector2f &offset)

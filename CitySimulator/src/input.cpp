@@ -1,7 +1,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include "input.hpp"
 #include "logger.hpp"
-#include "constants.hpp"
+#include "utils.hpp"
 
 using sf::Keyboard;
 
@@ -18,8 +18,10 @@ void Input::registerBindings()
 	if (bindings.left.size() != KEY_COUNT)
 	{
 
-		Logger::logError(FORMAT2("Expected %1% key bindings, recieved %2% instead", KEY_COUNT, bindings.left.size()));
-		throw std::runtime_error("Invalid number of key bindings");
+		Logger::logError(format("Expected %1% key bindings, received %2% instead",
+		                        std::to_string(KEY_COUNT), std::to_string(bindings.left.size())));
+
+		error("Invalid number of key bindings");
 	}
 }
 

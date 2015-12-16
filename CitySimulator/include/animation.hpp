@@ -48,8 +48,7 @@ public:
 				return &anim->second;
 		}
 
-		// todo
-//		FAIL("Animation '%s' not found", name);
+		error("Animation '%1%' not found", name);
 	}
 
 	std::string getRandomAnimationName(EntityType entityType)
@@ -57,8 +56,7 @@ public:
 		auto anims = animations.find(entityType);
 		if (anims == animations.end())
 		{
-			// todo
-//			FAIL("No animations found for entity type %1%", entityType);
+			error("No animations found for entity type %1%", std::to_string(entityType));
 			return "";
 		}
 

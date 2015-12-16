@@ -11,7 +11,7 @@ void ConfigurationFile::load()
 	// doesn't exist
 	if (configPath.empty() || !exists(configPath))
 		throw Utils::filenotfound_exception(
-				FORMAT("Config file not found: %1%", (configPath.empty() ? "none given" : configPath.string())));
+				format("Config file not found: %1%", (configPath.empty() ? "none given" : configPath.string())));
 
 	read_json(configPath.string(), propertyTree);
 }

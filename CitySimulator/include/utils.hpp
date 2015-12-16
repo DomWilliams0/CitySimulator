@@ -3,7 +3,24 @@
 
 #include <SFML/System.hpp>
 #include <random>
+#include <boost/format.hpp>
 #include "constants.hpp"
+
+
+std::string format(const std::string &s, const std::string &arg1);
+
+std::string format(const std::string &s, const std::string &arg1, const std::string &arg2);
+
+std::string format(const std::string &s, const std::string &arg1, const std::string &arg2, const std::string &arg3);
+
+void error(const std::string &msg);
+
+void error(const std::string &msg, const std::string &arg1);
+
+void error(const std::string &msg, const std::string &arg1, const std::string &arg2);
+
+void error(const std::string &msg, const std::string &arg1, const std::string &arg2, const std::string &arg3);
+
 
 namespace Utils
 {
