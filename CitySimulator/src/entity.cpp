@@ -55,7 +55,7 @@ Entity EntityManager::createEntity()
 		error("Max number of entities reached (%1%)", std::to_string(MAX_ENTITIES));
 
 	// todo: use a memory pool instead to avoid iterating the entire array each time
-	for (size_t e = 0; e < MAX_ENTITIES; ++e)
+	for (Entity e = 0; e < MAX_ENTITIES; ++e)
 		if (!isAlive(e))
 		{
 			entityCount++;
