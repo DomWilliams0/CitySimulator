@@ -56,3 +56,5 @@ if (BOX2D_FOUND)
     include_directories(${BOX2D_INCLUDE_DIR})
     target_link_libraries(${PROJECT_NAME} ${BOX2D_LIBRARIES})
 endif()
+
+add_subdirectory(tests)
