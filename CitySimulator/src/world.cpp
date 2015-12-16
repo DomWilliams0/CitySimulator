@@ -84,12 +84,12 @@ void Tileset::textureQuad(sf::Vertex *quad, const BlockType &blockType, int rota
 	quad[(3 + offset) % 4].texCoords = points[getIndex(row, col + 1)];
 }
 
-sf::Texture *Tileset::getTexture()
+sf::Texture *Tileset::getTexture() const
 {
 	if (!converted)
 		throw std::runtime_error("Tileset has not yet been converted to a texture");
 
-	return &texture;
+	return const_cast<sf::Texture *>(&texture);
 }
 
 sf::Image *Tileset::getImage() const
@@ -197,14 +197,13 @@ int Tileset::getIndex(int x, int y) const
 	return x + (size.x + 1) * y;
 }
 
-WorldTerrain::WorldTerrain(World *container) : BaseWorld(container), tileset(new Tileset)
+WorldTerrain::WorldTerrain(World *container) : BaseWorld(container)
 {
 	vertices.setPrimitiveType(sf::Quads);
 }
 
 WorldTerrain::~WorldTerrain()
 {
-	delete tileset;
 }
 
 int WorldTerrain::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
@@ -272,7 +271,7 @@ void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, La
 	sf::Vertex *quad = &vertices[index];
 
 	positionVertices(quad, static_cast<sf::Vector2f>(pos), 1);
-	tileset->textureQuad(quad, blockType, rotationAngle, flipGID);
+	tileset.textureQuad(quad, blockType, rotationAngle, flipGID);
 
 	blockTypes[index] = blockType;
 }
@@ -287,18 +286,13 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, Layer
 	                                        (pos.y - Constants::tileSize) / Constants::tileSize);
 
 	positionVertices(&quad[0], adjustedPos, 1);
-	tileset->textureQuad(&quad[0], blockType, 0, flipGID);
+	tileset.textureQuad(&quad[0], blockType, 0, flipGID);
 
 	if (rotationAngle != 0)
 		rotateObject(&quad[0], rotationAngle, adjustedPos);
 
 	for (int i = 0; i < 4; ++i)
 		vertices.append(quad[i]);
-}
-
-Tileset *WorldTerrain::getTileset() const
-{
-	return tileset;
 }
 
 int WorldTerrain::discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<LayerType> &layerTypes)
@@ -411,7 +405,7 @@ void WorldTerrain::addTiles(const std::vector<TMX::Layer *> &layers, const std::
 
 void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states) const
 {
-	states.texture = tileset->getTexture();
+	states.texture = tileset.getTexture();
 	target.draw(vertices, states);
 }
 
@@ -430,7 +424,7 @@ void WorldTerrain::load(const TMX::TileMap *tileMap)
 	// update tileset with flipped textures
 	std::vector<int> flippedGIDs;
 	discoverFlippedTiles(layers, flippedGIDs);
-	tileset->convertToTexture(flippedGIDs);
+	tileset.convertToTexture(flippedGIDs);
 
 	// add tiles to terrain
 	addTiles(layers, types);

@@ -65,7 +65,7 @@ public:
 
 	void textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipGID);
 
-	sf::Texture *getTexture();
+	sf::Texture *getTexture() const;
 
 	sf::Image *getImage() const;
 
@@ -121,10 +121,8 @@ public:
 	void addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer = LAYER_OBJECTS,
 	               float rotationAngle = 0, int flipGID = 0);
 
-	Tileset *getTileset() const;
-
 private:
-	Tileset *tileset;
+	Tileset tileset;
 	sf::VertexArray vertices;
 
 	std::vector<BlockType> blockTypes;
