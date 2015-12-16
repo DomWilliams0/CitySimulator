@@ -41,7 +41,7 @@ b2Vec2 toB2Vec(const sf::Vector2<T> &v)
 
 // component-entity-systems
 
-typedef int Entity;
+typedef unsigned int Entity;
 
 enum ComponentType
 {
