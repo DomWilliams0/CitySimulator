@@ -70,9 +70,7 @@ int Utils::stringToInt(const std::string &s)
 void Utils::validateDirectory(const std::string &directory)
 {
 	if (!boost::filesystem::exists(directory))
-		return;
-
-	throw filenotfound_exception(format("Invalid directory given: %1%", directory));
+		throw filenotfound_exception(format("Invalid directory given: %1%", directory));
 }
 
 std::string Utils::searchForFile(const std::string &filename, const std::string &directory)
