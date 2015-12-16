@@ -11,8 +11,7 @@ GameState::GameState() : State(GAME)
 	Globals::spriteSheet = new SpriteSheet;
 
 	// load entities
-	Globals::entityFactory->loadEntities(ENTITY_HUMAN, "humans.json");
-	Globals::entityFactory->loadEntities(ENTITY_VEHICLE, "vehicles.json");
+	Globals::entityFactory->loadEntitiesFromFile("entities.json");
 
 	// load sprites
 	Globals::spriteSheet->processAllSprites();

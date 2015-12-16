@@ -19,10 +19,12 @@ typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;
 class EntityFactory
 {
 public:
-	void loadEntities(EntityType entityType, const std::string &fileName);
+	void loadEntitiesFromFile(const std::string &fileName);
 
 private:
 	std::map<EntityType, EntityTags> loadedTags;
+
+	void loadEntities(ConfigurationFile &config, EntityType entityType, const std::string &sectionName);
 };
 
 template<class T>

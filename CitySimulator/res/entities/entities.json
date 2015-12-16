@@ -1,0 +1,71 @@
+{
+  "human": [
+    {
+      "name": "Business Man",
+      "sprite": "H_business_man.png",
+      "anim-count": 4,
+      "anim-length": 4,
+      "anim-dimensions-all": "32x32"
+    },
+    {
+      "name": "Cool Trainer",
+      "sprite": "H_cool_trainer.png",
+      "anim-count": 4,
+      "anim-length": 4,
+      "anim-dimensions-all": "32x32"
+    },
+    {
+      "name": "Girl Scout",
+      "sprite": "H_girl_scout.png",
+      "anim-count": 4,
+      "anim-length": 4,
+      "anim-dimensions-all": "32x32"
+    },
+    {
+      "name": "Goth",
+      "sprite": "H_goth.png",
+      "anim-count": 4,
+      "anim-length": 4,
+      "anim-dimensions-all": "32x32"
+    },
+    {
+      "name": "Middle Aged Man",
+      "sprite": "H_middle_aged_man.png",
+      "anim-count": 4,
+      "anim-length": 4,
+      "anim-dimensions-all": "32x32"
+    },
+    {
+      "name": "Ninja",
+      "sprite": "H_ninja.png",
+      "anim-count": 4,
+      "anim-length": 4,
+      "anim-dimensions-all": "32x32"
+    },
+    {
+      "name": "Old Man",
+      "sprite": "H_poor_old_man.png",
+      "anim-count": 4,
+      "anim-length": 4,
+      "anim-dimensions-all": "32x32"
+    },
+    {
+      "name": "Sweet Lady",
+      "sprite": "H_sweet_lady.png",
+      "anim-count": 4,
+      "anim-length": 4,
+      "anim-dimensions-all": "32x32"
+    }
+  ],
+
+  "vehicle": [
+    {
+      "name": "Standard Car",
+      "sprite": "V_standard_car.png",
+      "anim-count": 4,
+      "anim-length": 4,
+      "colour": "random",
+      "seats": 2
+    }
+  ]
+}

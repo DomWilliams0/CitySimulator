@@ -2,17 +2,23 @@
 #include "ai.hpp"
 #include "logger.hpp"
 
-void EntityFactory::loadEntities(EntityType entityType, const std::string &fileName)
+void EntityFactory::loadEntitiesFromFile(const std::string &fileName)
 {
 	ConfigurationFile config(Utils::searchForFile(fileName));
 	config.load();
 
-	// get root list name
-	std::string root = boost::filesystem::path(fileName).stem().string();
+	loadEntities(config, ENTITY_HUMAN, "human");
+	loadEntities(config, ENTITY_VEHICLE, "vehicle");
+}
+
+void EntityFactory::loadEntities(ConfigurationFile &config, EntityType entityType, const std::string &sectionName)
+{
+	std::vector<std::map<std::string, std::string>> entities;
+	config.getMapList<std::string>(sectionName, entities);
 
 	// load tags
 	std::vector<ConfigKeyValue> entityMapList;
-	config.getMapList(root, entityMapList);
+	config.getMapList(sectionName, entityMapList);
 
 	EntityTags allTags;
 	for (auto &entity : entityMapList)
