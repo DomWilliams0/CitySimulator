@@ -9,6 +9,7 @@
       "vsync": true
     },
     "debug": {
+        "window-title": "Chity Shimulator",
         "world-name": "collision_test.tmx",
 		"human-skin": "Business Man",
 		"zoom": 0.5,

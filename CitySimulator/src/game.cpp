@@ -121,7 +121,7 @@ void BaseGame::setWindowIcon(const std::string &fileName)
 
 Game::Game(sf::RenderWindow &window) : BaseGame(window), current(nullptr)
 {
-	window.setTitle("Dank Game Memes");
+	window.setTitle(Config::getString("debug.window-title"));
 	showFPS = true;
 	limitFrameRate(Config::getInt("display.fps-limit"), Config::getBool("display.vsync"));
 }
