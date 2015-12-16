@@ -14,8 +14,7 @@ bool ensureCWD(int argc, char **argv)
 		// no args given
 		if (argc != 2)
 		{
-			std::cerr << "Root directory not found. \nUsage: " << argv[0] << " <relative path to root dir>\nPress enter to quit." << std::endl;
-			std::cin.get();
+			std::cerr << "Root directory not found. \nUsage: " << argv[0] << " <relative path to root dir>" << std::endl;
 			return false;
 		}
 
