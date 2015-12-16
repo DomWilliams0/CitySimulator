@@ -87,13 +87,16 @@ int main(int argc, char **argv)
 		game.endGame();
 
 		Logger::logDebug("Shutdown cleanly");
+		return 0;
 	}
 	catch (std::exception &e)
 	{
 		Logger::logError(std::string("An error occurred: ") + e.what());
+		return 1;
 	}
 	catch (...)
 	{
 		Logger::logError("An unknown error occurred");
+		return 2;
 	}
 }
