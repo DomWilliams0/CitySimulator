@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CITYSIM_WORLD_HPP
+#define CITYSIM_WORLD_HPP
 #include <SFML/Graphics.hpp>
 #include <Box2D/Box2D.h>
 #include <unordered_map>
@@ -210,3 +211,4 @@ protected:
 	friend class WorldTerrain;
 	friend class CollisionMap;
 };
+#endif

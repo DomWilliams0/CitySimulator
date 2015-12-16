@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CITYSIM_MAPLOADER_HPP
+#define CITYSIM_MAPLOADER_HPP
 #include <map>
 #include <SFML/System/Vector2.hpp>
 #include <bitset>
@@ -194,3 +195,4 @@ namespace TMX
 		static TileMap* load(const std::string filename);
 	};
 }
+#endif

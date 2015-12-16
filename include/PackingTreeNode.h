@@ -2,7 +2,8 @@
 * Modification of https://github.com/joelverhagen/2D-Bin-Packing
 */
 
-#pragma once
+#ifndef PACKINGTREENODE_HPP
+#define PACKINGTREENODE_HPP
 #include <boost/optional.hpp>
 #include <SFML/Graphics.hpp>
 
@@ -73,3 +74,4 @@ struct PackingTreeNode
 		}
 	}
 };
+#endif

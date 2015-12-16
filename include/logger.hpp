@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CITYSIM_LOGGER_HPP
+#define CITYSIM_LOGGER_HPP
 #include <iostream>
 
 namespace Logger
@@ -20,3 +21,4 @@ namespace Logger
 	void pushIndent();
 	void popIndent();
 }
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CITYSIM_CONFIG_HPP
+#define CITYSIM_CONFIG_HPP
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <map>
@@ -91,3 +92,4 @@ private:
 	ConfigurationFile config;
 	void ensureConfigExists();
 };
+#endif

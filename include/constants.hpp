@@ -1,4 +1,6 @@
-#pragma once
+#ifndef CITYSIM_CONSTANTS_HPP
+#define CITYSIM_CONSTANTS_HPP
+
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 #include <boost/format.hpp>
@@ -60,3 +62,4 @@ enum EntityType
 	ENTITY_HUMAN,
 	ENTITY_VEHICLE
 };
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CITYSIM_UTILS_HPP
+#define CITYSIM_UTILS_HPP
 #include <SFML/System.hpp>
 #include <random>
 #include "constants.hpp"
@@ -198,3 +199,4 @@ namespace sf
 		return !operator<(lhs, rhs);
 	}
 }
+#endif

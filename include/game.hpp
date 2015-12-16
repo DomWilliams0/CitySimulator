@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CITYSIM_GAME_HPP
+#define CITYSIM_GAME_HPP
 #include <SFML/Graphics.hpp>
 #include <stack>
 #include "utils.hpp"
@@ -92,3 +93,4 @@ private:
 	std::stack<State*> states;
 	State* createFromStateType(StateType type);
 };
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CITYSIM_AI_HPP
+#define CITYSIM_AI_HPP
 #include "entity.hpp"
 #include "constants.hpp"
 #include "input.hpp"
@@ -62,3 +63,4 @@ public:
 
 	void tick(float delta) override;
 };
+#endif

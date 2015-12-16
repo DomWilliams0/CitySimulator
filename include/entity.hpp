@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CITYSIM_ENTITY_HPP
+#define CITYSIM_ENTITY_HPP
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <vector>
 #include "animation.hpp"
@@ -208,3 +209,4 @@ private:
 	BaseComponent* addComponent(Entity e, ComponentType type);
 	void addBrain(Entity e, bool aiBrain);
 };
+#endif

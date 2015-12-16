@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CITYSIM_GAMESTATE_HPP
+#define CITYSIM_GAMESTATE_HPP
 #include "state.hpp"
 #include "world.hpp"
 
@@ -23,3 +24,4 @@ private:
 
 	void tempControlCamera(float delta);
 };
+#endif

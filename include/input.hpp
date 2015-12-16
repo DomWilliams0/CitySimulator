@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CITYSIM_INPUT_HPP
+#define CITYSIM_INPUT_HPP
 #include <SFML/Window/Keyboard.hpp>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/bimap.hpp>
@@ -56,3 +57,4 @@ private:
 	boost::bimap<InputKey, sf::Keyboard::Key> bindings;
 	boost::dynamic_bitset<> pressed, wasPressed;
 };
+#endif

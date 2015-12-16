@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CITYSIM_STATE_HPP
+#define CITYSIM_STATE_HPP
 #include <SFML/Graphics.hpp>
 
 enum StateType
@@ -30,3 +31,4 @@ public:
 	const StateType type;
 	bool showMouse;
 };
+#endif

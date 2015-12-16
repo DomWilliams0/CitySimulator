@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CITYSIM_ANIMATION_HPP
+#define CITYSIM_ANIMATION_HPP
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 #include "constants.hpp"
@@ -131,3 +132,4 @@ private:
 	void resizeVertices(float width, float height);
 	void updateFrame();
 };
+#endif
