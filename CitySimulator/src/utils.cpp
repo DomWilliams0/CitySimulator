@@ -98,28 +98,6 @@ std::string Utils::searchForFile(const std::string &filename, const std::string 
 	throw filenotfound_exception("File not found: " + filename);
 }
 
-sf::FloatRect Utils::expandRect(const sf::FloatRect &rect, const sf::Vector2f &offset)
-{
-	sf::FloatRect ret(rect);
-	bool horizontal = offset.x >= Math::EPSILON;
-	bool negative = (horizontal ? offset.x : offset.y) < 0.f;
-
-	if (horizontal)
-	{
-		ret.width += offset.x;
-		if (negative)
-			ret.left -= offset.x;
-	}
-	else
-	{
-		ret.height += offset.y;
-		if (negative)
-			ret.top -= offset.y;
-	}
-
-	return ret;
-}
-
 void Utils::TimeTicker::init(float min, float max)
 {
 	current = 0;

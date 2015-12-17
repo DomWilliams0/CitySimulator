@@ -88,8 +88,6 @@ namespace Utils
 
 	std::string searchForFile(const std::string &filename, const std::string &directory = "");
 
-	sf::FloatRect expandRect(const sf::FloatRect &rect, const sf::Vector2f &offset);
-
 	template<class T>
 	T roundToMultiple(T x, T multiple)
 	{
