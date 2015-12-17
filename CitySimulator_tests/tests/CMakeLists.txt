@@ -7,8 +7,8 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 # unit tests
 set(TEST_FILES
         test_helpers.hpp
-        util.cpp
-        world.cpp
+        utils_tests.cpp
+        world_tests.cpp
         )
 
 include_directories(${CITYSIMULATOR_SOURCE_DIR}/include)
