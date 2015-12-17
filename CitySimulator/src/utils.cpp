@@ -98,6 +98,11 @@ std::string Utils::searchForFile(const std::string &filename, const std::string 
 	throw filenotfound_exception("File not found: " + filename);
 }
 
+int Utils::roundToMultiple(double x, int multiple)
+{
+	return static_cast<int>(multiple * round(x / multiple));
+}
+
 void Utils::TimeTicker::init(float min, float max)
 {
 	current = 0;

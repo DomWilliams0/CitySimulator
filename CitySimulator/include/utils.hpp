@@ -88,11 +88,7 @@ namespace Utils
 
 	std::string searchForFile(const std::string &filename, const std::string &directory = "");
 
-	template<class T>
-	T roundToMultiple(T x, T multiple)
-	{
-		return static_cast<T>(multiple * round(x / multiple));
-	}
+	int roundToMultiple(double x, int multiple);
 
 	template<class T>
 	sf::Rect<T> scaleToBox2D(const sf::Rect<T> &rect)
