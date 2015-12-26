@@ -143,9 +143,10 @@ void EntityManager::addPhysicsComponent(Entity e, World *world, const sf::Vector
 	def.type = b2_dynamicBody;
 	def.position.Set(static_cast<float>(startPos.x), static_cast<float>(startPos.y));
 	phys->body = bWorld->CreateBody(&def);
+	phys->body->SetFixedRotation(true);
 
 	// basic full body aabb
-	const static float aabbSize = 0.5f;
+	const static float aabbSize = 0.25f;
 	b2PolygonShape aabb;
 	aabb.SetAsBox(aabbSize, aabbSize);
 	aabb.m_centroid.Set(aabbSize, aabbSize);

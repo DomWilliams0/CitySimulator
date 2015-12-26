@@ -15,12 +15,12 @@
         "zoom": 0.5,
         "movement": {
             "stop-decay": 8,
-            "force": 400,
+            "force": 80,
             "max-speed": 40
         },
         "start-pos": {
-            "x": 18,
-            "y": 22
+            "x": 0,
+            "y": 0
         }
     },
     "resources": {

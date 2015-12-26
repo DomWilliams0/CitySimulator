@@ -140,6 +140,15 @@ namespace Math
 	}
 
 	template<class V=float>
+	sf::Vector2<V> multiply(const sf::Vector2<V> &v, const sf::Vector2<V> &v2)
+	{
+		sf::Vector2<V> ret(v);
+		ret.x *= v2.x;
+		ret.y *= v2.y;
+		return ret;
+	}
+
+	template<class V=float>
 	sf::Vector2f truncate(const sf::Vector2f &v, const float newLength)
 	{
 		float l(length(v));
