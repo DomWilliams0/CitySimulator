@@ -94,9 +94,6 @@ void tempDrawVector(PhysicsComponent *physics, const sf::Vector2f vector, sf::Co
 
 void RenderSystem::renderEntity(Entity e, sf::RenderWindow &window)
 {
-	static sf::Vector2f inverseScale = Math::multiply(Constants::entityScale,
-	                                                  8 * Constants::tileSizef); // why is this 8?
-
 	auto render = get<RenderComponent>(e, COMPONENT_RENDER);
 	auto *physics = get<PhysicsComponent>(e, COMPONENT_PHYSICS);
 
@@ -105,8 +102,8 @@ void RenderSystem::renderEntity(Entity e, sf::RenderWindow &window)
 
 	transform.scale(Constants::entityScale);
 	auto pos = physics->getPosition();
-	auto offsetPos = sf::Vector2f(pos.x - 0.25f, pos.y - 0.25f); // todo remove magic aabb size
-	transform.translate(Math::multiply(offsetPos, inverseScale));
+	auto offsetPos = sf::Vector2f(pos.x - 0.25f, pos.y - 0.25f);
+	transform.translate(Math::multiply(offsetPos, 128.f));
 	states.transform *= transform;
 	render->anim.draw(window, states);
 

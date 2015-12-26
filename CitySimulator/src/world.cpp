@@ -618,10 +618,9 @@ void CollisionMap::load()
 	{
 		auto rect = Utils::scaleToBox2D(unscaledRect);
 
-		box.SetAsBox(rect.width / 2, rect.height / 2,
-		             b2Vec2(rect.left / 2 + rect.width / 2, rect.top + rect.height / 2), 0.f);
-		Debug::printVector(sf::Vector2f(rect.left, rect.top), "pos ");
-		Debug::printVector(sf::Vector2f(rect.width, rect.height), "size ");
+		auto scale = 1 / Constants::entityScalef;
+		box.SetAsBox(rect.width / scale, rect.height / scale,
+		             b2Vec2((rect.left + rect.width) / scale, (rect.top + rect.height) / scale), 0.f);
 		worldBody->CreateFixture(&fixDef);
 	}
 }
