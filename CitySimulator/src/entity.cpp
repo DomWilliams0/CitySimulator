@@ -134,14 +134,13 @@ BaseComponent *EntityManager::getComponentOfType(Entity e, ComponentType type)
 void EntityManager::addPhysicsComponent(Entity e, World *world, const sf::Vector2i &startTilePos)
 {
 	PhysicsComponent *phys = dynamic_cast<PhysicsComponent *>(addComponent(e, COMPONENT_PHYSICS));
-	sf::Vector2i startPos = Utils::toPixel(startTilePos);
 	b2World *bWorld = world->getBox2DWorld();
 
 	phys->bWorld = bWorld;
 
 	b2BodyDef def;
 	def.type = b2_dynamicBody;
-	def.position.Set(static_cast<float>(startPos.x), static_cast<float>(startPos.y));
+	def.position.Set(static_cast<float>(startTilePos.x), static_cast<float>(startTilePos.y));
 	phys->body = bWorld->CreateBody(&def);
 	phys->body->SetFixedRotation(true);
 
