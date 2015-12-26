@@ -29,6 +29,7 @@ private:
 	PhysicsComponent *entityTracking;
 
 	sf::Vector2f viewOffset;
+	bool playerControl;
 
 	void tempControlCamera(float delta);
 };

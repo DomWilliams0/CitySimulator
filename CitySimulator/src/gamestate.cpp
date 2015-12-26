@@ -3,7 +3,7 @@
 #include "entity.hpp"
 #include "input.hpp"
 
-GameState::GameState() : State(GAME)
+GameState::GameState() : State(GAME), playerControl(true)
 {
 	// create globals
 	Globals::entityManager = new EntityManager;
@@ -69,10 +69,19 @@ void GameState::tick(float delta)
 {
 	world.tick(delta);
 
-	Globals::entityManager->tickSystems(delta);
+	if (Globals::input->isFirstPressed(InputKey::KEY_YIELD_CONTROL))
+		playerControl = !playerControl;
 
-	view.setCenter(entityTracking->getPosition());
-	Globals::game->setView(view);
+	// todo make sure this hack DOESN'T end up in production
+	if (playerControl)
+	{
+		Globals::entityManager->tickSystems(delta);
+		view.setCenter(entityTracking->getPosition());
+		Globals::game->setView(view);
+	}
+	else
+		tempControlCamera(delta);
+
 }
 
 void GameState::render(sf::RenderWindow &window)
