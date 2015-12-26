@@ -213,6 +213,7 @@ void CollisionMap::load()
 	b2FixtureDef fixDef;
 	b2PolygonShape box;
 	fixDef.shape = &box;
+	fixDef.friction = 0.f;
 	for (auto &unscaledRect : rects)
 	{
 		auto rect = Utils::scaleToBox2D(unscaledRect);
