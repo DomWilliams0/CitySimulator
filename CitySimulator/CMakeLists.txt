@@ -18,6 +18,7 @@ set(SOURCE_FILES
         src/SFMLDebugDraw.cpp
         src/utils.cpp
         src/world.cpp
+        src/tileset.cpp
         )
 
 set(HEADER_fILES
