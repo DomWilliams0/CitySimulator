@@ -6,8 +6,10 @@ namespace Constants
 	sf::Vector2i windowSize(-1, -1);
 	sf::Vector2i windowCentre(-1, -1);
 
-	const int tileSize(16);
+	const int tileSize(32);
 	const float tileSizef(tileSize);
+
+	const int tilesetResolution(16);
 
 	const float entityScalef(0.5f);
 	const sf::Vector2f entityScale(entityScalef, entityScalef);

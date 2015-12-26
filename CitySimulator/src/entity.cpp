@@ -146,10 +146,9 @@ void EntityManager::addPhysicsComponent(Entity e, World *world, const sf::Vector
 	phys->body->SetFixedRotation(true);
 
 	// basic full body aabb
-	const static float aabbSize = 0.25f;
 	b2PolygonShape aabb;
-	aabb.SetAsBox(aabbSize, aabbSize);
-	aabb.m_centroid.Set(aabbSize, aabbSize);
+	aabb.SetAsBox(Constants::entityScalef, Constants::entityScalef);
+	aabb.m_centroid.Set(Constants::entityScalef, Constants::entityScalef);
 
 	b2FixtureDef fixDef;
 	fixDef.density = 985.f;

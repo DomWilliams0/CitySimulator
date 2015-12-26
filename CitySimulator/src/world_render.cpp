@@ -19,8 +19,8 @@ void Tileset::load(const std::string &path)
 		error("Could not load tileset '%1%'", path);
 
 	size = image->getSize();
-	size.x /= Constants::tileSize;
-	size.y /= Constants::tileSize;
+	size.x /= Constants::tilesetResolution;
+	size.y /= Constants::tilesetResolution;
 
 	generatePoints();
 }
@@ -86,7 +86,7 @@ void Tileset::convertToTexture(const std::vector<int> &flippedGIDs)
 
 	// transfer to new image
 	sf::Image newImage;
-	newImage.create(size.x * Constants::tileSize, rowsRequired * Constants::tileSize);
+	newImage.create(size.x * Constants::tilesetResolution, rowsRequired * Constants::tilesetResolution);
 	newImage.copy(*image, 0, 0);
 
 	// update size
@@ -134,10 +134,10 @@ sf::IntRect Tileset::getTileRect(unsigned blockType)
 {
 	int tileX = blockType % size.x;
 	int tileY = blockType / size.x;
-	return sf::IntRect(tileX * Constants::tileSize,
-	                   tileY * Constants::tileSize,
-	                   Constants::tileSize,
-	                   Constants::tileSize);
+	return sf::IntRect(tileX * Constants::tilesetResolution,
+	                   tileY * Constants::tilesetResolution,
+	                   Constants::tilesetResolution,
+	                   Constants::tilesetResolution);
 }
 
 void Tileset::createTileImage(sf::Image *image, unsigned blockType)
@@ -145,14 +145,14 @@ void Tileset::createTileImage(sf::Image *image, unsigned blockType)
 	if (converted)
 		throw std::runtime_error("Tileset has already been converted to a texture");
 
-	image->create(Constants::tileSize, Constants::tileSize);
+	image->create(Constants::tilesetResolution, Constants::tilesetResolution);
 	image->copy(*this->image, 0, 0, getTileRect(blockType));
 }
 
 void Tileset::addPoint(int x, int y)
 {
-	points[getIndex(x, y)] = sf::Vector2f(x * Constants::tileSizef,
-	                                      y * Constants::tileSizef);
+	points[getIndex(x, y)] = sf::Vector2f(x * Constants::tilesetResolution,
+	                                      y * Constants::tilesetResolution);
 }
 
 void Tileset::generatePoints()
@@ -224,8 +224,8 @@ void WorldTerrain::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, i
 
 void WorldTerrain::resize(const int &layerCount)
 {
-	auto tileSize = container->getTileSize();
-	const int size = tileSize.x * tileSize.y * layerCount * 4;
+	auto tilesetResolution = container->getTileSize();
+	const int size = tilesetResolution.x * tilesetResolution.y * layerCount * 4;
 	vertices.resize(size);
 	blockTypes.resize(size);
 }
@@ -253,8 +253,8 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, Layer
 	// TODO: simply append object vertices to world vertices; remember order of objects so vertices can be referenced in the future
 
 	std::vector<sf::Vertex> quad(4);
-	sf::Vector2f adjustedPos = sf::Vector2f(pos.x / Constants::tileSize,
-	                                        (pos.y - Constants::tileSize) / Constants::tileSize);
+	sf::Vector2f adjustedPos = sf::Vector2f(pos.x / Constants::tilesetResolution,
+	                                        (pos.y - Constants::tilesetResolution) / Constants::tilesetResolution);
 
 	positionVertices(&quad[0], adjustedPos, 1);
 	tileset.textureQuad(&quad[0], blockType, 0, flipGID);
