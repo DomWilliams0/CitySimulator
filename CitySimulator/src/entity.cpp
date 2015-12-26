@@ -146,8 +146,10 @@ void EntityManager::addPhysicsComponent(Entity e, World *world, const sf::Vector
 
 	// basic full body aabb
 	b2PolygonShape aabb;
-	aabb.SetAsBox(Constants::entityScalef, Constants::entityScalef);
-	aabb.m_centroid.Set(Constants::entityScalef, Constants::entityScalef);
+
+	const auto scale = Constants::entityScalef / 2;
+	aabb.SetAsBox(scale, scale);
+	aabb.m_centroid.Set(scale, scale);
 
 	b2FixtureDef fixDef;
 	fixDef.density = 985.f;

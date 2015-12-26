@@ -2,7 +2,7 @@
 
 void InputBrain::tick(float delta)
 {
-	const static float acceleration = Config::getFloat("debug.movement.force");
+	float acceleration = Config::getFloat("debug.movement.force");
 
 	// walking
 	bool right = input->isPressed(KEY_RIGHT);

@@ -11,7 +11,7 @@ namespace Constants
 
 	const int tilesetResolution(16);
 
-	const float entityScalef(0.5f);
+	const float entityScalef(1.f);
 	const sf::Vector2f entityScale(entityScalef, entityScalef);
 
 	sf::Font mainFont;

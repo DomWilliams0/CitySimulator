@@ -100,10 +100,13 @@ void RenderSystem::renderEntity(Entity e, sf::RenderWindow &window)
 	sf::RenderStates states;
 	sf::Transform transform;
 
+	auto offsetPosition = physics->getPosition();
+	offsetPosition.x -= 0.5f;
+	offsetPosition.y -= 0.5f;
+
+	transform.translate(Utils::toPixel(offsetPosition));
 	transform.scale(Constants::entityScale);
-	auto pos = physics->getPosition();
-	auto offsetPos = sf::Vector2f(pos.x - 0.25f, pos.y - 0.25f);
-	transform.translate(Math::multiply(offsetPos, 128.f));
+
 	states.transform *= transform;
 	render->anim.draw(window, states);
 
@@ -146,7 +149,7 @@ void PhysicsComponent::setVelocity(const sf::Vector2f &velocity)
 
 bool PhysicsComponent::isStopped()
 {
-	return Math::lengthSquared(getVelocity()) < 16;
+	return Math::lengthSquared(getVelocity()) < 1;
 }
 
 void RenderComponent::reset()

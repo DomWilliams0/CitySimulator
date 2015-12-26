@@ -76,7 +76,7 @@ void GameState::tick(float delta)
 	if (playerControl)
 	{
 		Globals::entityManager->tickSystems(delta);
-		view.setCenter(entityTracking->getPosition());
+		view.setCenter(Utils::toPixel(entityTracking->getPosition()));
 		Globals::game->setView(view);
 	}
 	else
