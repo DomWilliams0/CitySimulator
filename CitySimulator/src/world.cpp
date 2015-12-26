@@ -1,5 +1,4 @@
 #include <config.hpp>
-#include <boost/shared_ptr.hpp>
 #include "maploader.hpp"
 #include "world.hpp"
 #include "logger.hpp"
@@ -208,6 +207,17 @@ void CollisionMap::load()
 	b2BodyDef worldBodyDef;
 	worldBodyDef.type = b2_staticBody;
 	worldBody = world.CreateBody(&worldBodyDef);
+
+	// world borders
+	int borderThickness = Constants::tileSize;
+	int padding = Constants::tileSize / 4;
+	auto worldSize = container->pixelSize;
+	rects.emplace_back(-borderThickness - padding, 0, borderThickness, worldSize.y);
+	rects.emplace_back(0, -borderThickness - padding, worldSize.y, borderThickness);
+	rects.emplace_back(worldSize.x + padding, 0, borderThickness, worldSize.y);
+	rects.emplace_back(0, worldSize.y + padding, worldSize.y, borderThickness);
+
+	// todo make big collision rectangles hollow to work better with box2d?
 
 	// collision fixtures
 	b2FixtureDef fixDef;
