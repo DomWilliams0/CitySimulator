@@ -5,6 +5,7 @@
 #include <random>
 #include <boost/format.hpp>
 #include "constants.hpp"
+#include "SFMLDebugDraw.h"
 
 
 std::string format(const std::string &s, const std::string &arg1);
@@ -93,8 +94,8 @@ namespace Utils
 	template<class T>
 	sf::Rect<T> scaleToBox2D(const sf::Rect<T> &rect)
 	{
-		return sf::Rect<T>(rect.left / Constants::tileSizef, rect.top / Constants::tileSizef,
-		                   rect.width / Constants::tileSizef, rect.height / Constants::tileSizef);
+		return sf::Rect<T>(rect.left / sfdd::SCALE, rect.top / sfdd::SCALE,
+		                   rect.width / sfdd::SCALE, rect.height / sfdd::SCALE);
 	}
 }
 
