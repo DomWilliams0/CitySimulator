@@ -16,6 +16,43 @@ void ConfigurationFile::load()
 	read_json(configPath.string(), propertyTree);
 }
 
+void ConfigurationFile::loadOnTop(const std::string &path)
+{
+	// load overriding config
+	ConfigurationFile loaded(path);
+	loaded.load();
+
+	// put all values
+	recurseAndOverwrite(loaded.propertyTree, "");
+}
+
+void ConfigurationFile::recurseAndOverwrite(boost::property_tree::ptree &tree, std::string prefix)
+{
+	static std::string sep = ".";
+
+	auto it = tree.begin();
+
+	// leaf
+	if (it == tree.end())
+	{
+		auto name = prefix.substr(0, prefix.length() - 1);
+		auto value = tree.get_value<std::string>();
+
+		// overwrite value
+		propertyTree.put(name, value);
+		Logger::logDebug(format("Overwriting config value '%1%' with '%2%'", name, value));
+
+		return;
+	}
+
+	// recurse
+	while (it != tree.end())
+	{
+		recurseAndOverwrite(it->second, std::string(prefix).append(it->first).append(sep));
+		it++;
+	}
+}
+
 void ConfigurationFile::getIntRef(const std::string &path, int &i)
 {
 	i = getInt(path);
@@ -59,9 +96,13 @@ std::string ConfigurationFile::getString(const std::string &path)
 
 void Config::loadConfig()
 {
-	getInstance().config.configPath = boost::filesystem::canonical(Constants::configPath);
+	// load reference
+	getInstance().config.configPath = boost::filesystem::canonical(Constants::referenceConfigPath);
 	getInstance().ensureConfigExists();
 	getInstance().config.load();
+
+	// overriding config
+	getInstance().config.loadOnTop(Constants::configPath);
 }
 
 
@@ -71,10 +112,10 @@ void Config::ensureConfigExists()
 	if (!exists(getInstance().config.configPath))
 	{
 		Logger::logInfo("Config not found!");
-		throw Utils::filenotfound_exception("Could not find config (" + getInstance().config.configPath.string() + ")");
+		error("Could not find reference config at %1%", getInstance().config.configPath.string());
 	}
 
-	Logger::logInfo("Found config");
+	Logger::logInfo("Found reference config");
 }
 
 int Config::getInt(const std::string &path)

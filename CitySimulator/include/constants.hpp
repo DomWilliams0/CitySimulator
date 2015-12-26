@@ -21,9 +21,9 @@ namespace Constants
 	extern const float entityScalef;
 	extern const sf::Vector2f entityScale;
 
-
 	extern sf::Font mainFont;
 
+	extern std::string referenceConfigPath;
 	extern std::string configPath;
 }
 

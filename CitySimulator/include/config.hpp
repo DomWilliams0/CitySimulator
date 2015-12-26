@@ -23,6 +23,10 @@ public:
 
 	void load();
 
+	void loadOnTop(const std::string &path);
+
+	void recurseAndOverwrite(boost::property_tree::ptree &tree, std::string prefix);
+
 	void getIntRef(const std::string &path, int &i);
 
 	int getInt(const std::string &path);
