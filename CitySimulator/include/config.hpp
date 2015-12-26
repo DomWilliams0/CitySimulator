@@ -10,14 +10,14 @@
 class ConfigurationFile
 {
 public:
-	ConfigurationFile()
+	ConfigurationFile() : reloadFromFile(false)
 	{
 	}
 
 	/// <summary>
 	/// No search will be attempted
 	/// </summary>
-	explicit ConfigurationFile(const std::string &fileName) : configPath(fileName)
+	explicit ConfigurationFile(const std::string &fileName) : configPath(fileName), reloadFromFile(false)
 	{
 	}
 
@@ -63,13 +63,21 @@ public:
 		}
 	}
 
+	void setReloadFromFile(bool reload);
+
+	void reload();
+
 protected:
 	boost::filesystem::path configPath;
+	boost::filesystem::path overwriteConfigPath;
 
 	friend class Config;
 
 private:
 	boost::property_tree::ptree propertyTree;
+
+	bool reloadFromFile;
+	std::time_t lastModification;
 };
 
 class Config

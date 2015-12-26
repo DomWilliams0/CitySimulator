@@ -5,6 +5,8 @@
 #include "utils.hpp"
 #include "logger.hpp"
 
+#define RELOAD if (reloadFromFile)\
+					reload()
 
 void ConfigurationFile::load()
 {
@@ -13,17 +15,28 @@ void ConfigurationFile::load()
 		throw Utils::filenotfound_exception(
 				format("Config file not found: %1%", (configPath.empty() ? "none given" : configPath.string())));
 
+	lastModification = boost::filesystem::last_write_time(configPath);
 	read_json(configPath.string(), propertyTree);
 }
 
 void ConfigurationFile::loadOnTop(const std::string &path)
 {
+	if (!boost::filesystem::exists(path))
+	{
+		Logger::logDebug(format("Overriding config not found (%1%)", path));
+		return;
+	}
+
 	// load overriding config
 	ConfigurationFile loaded(path);
 	loaded.load();
 
 	// put all values
 	recurseAndOverwrite(loaded.propertyTree, "");
+
+	// update path to overwriting
+	overwriteConfigPath = loaded.configPath;
+	lastModification = boost::filesystem::last_write_time(overwriteConfigPath);
 }
 
 void ConfigurationFile::recurseAndOverwrite(boost::property_tree::ptree &tree, std::string prefix)
@@ -60,6 +73,7 @@ void ConfigurationFile::getIntRef(const std::string &path, int &i)
 
 int ConfigurationFile::getInt(const std::string &path)
 {
+	RELOAD;
 	return propertyTree.get<int>(path);
 }
 
@@ -70,6 +84,7 @@ void ConfigurationFile::getFloatRef(const std::string &path, float &f)
 
 float ConfigurationFile::getFloat(const std::string &path)
 {
+	RELOAD;
 	return propertyTree.get<float>(path);
 }
 
@@ -80,6 +95,7 @@ void ConfigurationFile::getBoolRef(const std::string &path, bool &b)
 
 bool ConfigurationFile::getBool(const std::string &path)
 {
+	RELOAD;
 	return propertyTree.get<bool>(path);
 }
 
@@ -90,7 +106,36 @@ void ConfigurationFile::getStringRef(const std::string &path, std::string &s)
 
 std::string ConfigurationFile::getString(const std::string &path)
 {
+	RELOAD;
 	return propertyTree.get<std::string>(path);
+}
+
+void ConfigurationFile::setReloadFromFile(bool reload)
+{
+	reloadFromFile = reload;
+}
+
+void ConfigurationFile::reload()
+{
+	using namespace boost::filesystem;
+
+	if (!exists(overwriteConfigPath))
+	{
+		// Logger::logWarning(format("Could not reload config as it doesn't exist (%1%)", overwriteConfigPath.string()));
+		return;
+	}
+
+	std::time_t time = last_write_time(overwriteConfigPath);
+
+	if (time > lastModification)
+	{
+		lastModification = time;
+
+		Logger::logDebug(format("Reloading overwriting config from '%1%'", overwriteConfigPath.string()));
+		Logger::pushIndent();
+		loadOnTop(overwriteConfigPath.string());
+		Logger::popIndent();
+	}
 }
 
 
@@ -103,6 +148,9 @@ void Config::loadConfig()
 
 	// overriding config
 	getInstance().config.loadOnTop(Constants::configPath);
+
+	// reload?
+	getInstance().config.setReloadFromFile(Config::getBool("debug.reload-config"));
 }
 
 
