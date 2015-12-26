@@ -617,10 +617,14 @@ void CollisionMap::load()
 	for (auto &unscaledRect : rects)
 	{
 		auto rect = Utils::scaleToBox2D(unscaledRect);
-
-		auto scale = 1 / Constants::entityScalef;
-		box.SetAsBox(rect.width / scale, rect.height / scale,
-		             b2Vec2((rect.left + rect.width) / scale, (rect.top + rect.height) / scale), 0.f);
+		b2Vec2 rectCentre(rect.left + rect.width / 2,
+		                  rect.top + rect.height / 2);
+		box.SetAsBox(
+				rect.width / 2, // half dimensions
+				rect.height / 2,
+				rectCentre,
+				0.f
+		);
 		worldBody->CreateFixture(&fixDef);
 	}
 }
