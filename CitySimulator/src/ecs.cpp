@@ -86,8 +86,8 @@ void tempDrawVector(PhysicsComponent *physics, const sf::Vector2f vector, sf::Co
 {
 	sf::RectangleShape r;
 	r.rotate(atan2(vector.y, vector.x) * Math::radToDeg);
-	r.move(physics->getPosition() + sf::Vector2f(8.0f, 8.0f));
-	r.setSize(sf::Vector2f(Math::length(vector), 1.0f));
+	r.move(Utils::toPixel(physics->getPosition()));
+	r.setSize(sf::Vector2f(Math::length(vector) * Constants::tileSizef / 2, 1.0f));
 	r.setFillColor(colour);
 	window.draw(r);
 }
