@@ -27,7 +27,7 @@ BaseGame::BaseGame(sf::RenderWindow &renderWindow) : window(renderWindow)
 	// set as global
 	Globals::game = this;
 
-	Logger::logDebug("Game started");
+	Logger::logInfo("Game started");
 }
 
 void BaseGame::beginGame()

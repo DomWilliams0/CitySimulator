@@ -32,7 +32,9 @@ void ConfigurationFile::loadOnTop(const std::string &path)
 	loaded.load();
 
 	// put all values
+	Logger::pushIndent();
 	recurseAndOverwrite(loaded.propertyTree, "");
+	Logger::popIndent();
 
 	// update path to overwriting
 	overwriteConfigPath = loaded.configPath;

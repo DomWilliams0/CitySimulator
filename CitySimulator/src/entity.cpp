@@ -20,6 +20,8 @@ void EntityFactory::loadEntities(ConfigurationFile &config, EntityType entityTyp
 	std::vector<ConfigKeyValue> entityMapList;
 	config.getMapList(sectionName, entityMapList);
 
+	Logger::pushIndent();
+
 	EntityTags allTags;
 	for (auto &entity : entityMapList)
 	{
@@ -46,6 +48,8 @@ void EntityFactory::loadEntities(ConfigurationFile &config, EntityType entityTyp
 		if (sprite != entity.second.end())
 			Globals::spriteSheet->loadSprite(entity.second, entityType);
 	}
+
+	Logger::popIndent();
 }
 
 Entity EntityManager::createEntity()

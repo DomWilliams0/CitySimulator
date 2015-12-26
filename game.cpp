@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 		game.beginGame();
 		game.endGame();
 
-		Logger::logDebug("Shutdown cleanly");
+		Logger::logInfo("Shutdown cleanly");
 		return 0;
 	}
 	catch (std::exception &e)

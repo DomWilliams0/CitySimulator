@@ -253,7 +253,7 @@ void World::loadFromFile(const std::string &filename, const std::string &tileset
 	collisionMap.load();
 
 	Logger::popIndent();
-	Logger::logDebug(str(boost::format("Loaded world %1%") % filename));
+	Logger::logInfo(str(boost::format("Loaded world %1%") % filename));
 	delete tmx;
 }
 
