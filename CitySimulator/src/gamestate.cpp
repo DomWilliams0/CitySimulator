@@ -17,7 +17,8 @@ GameState::GameState() : State(GAME)
 	Globals::spriteSheet->processAllSprites();
 
 	// load world
-	world.loadFromFile(Config::getString("debug.world-name"));
+	world.loadFromFile(Config::getString("debug.world-name"),
+	                   Config::getResource("world.tileset"));
 
 	// camera view
 	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));

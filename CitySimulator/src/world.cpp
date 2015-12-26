@@ -1,4 +1,3 @@
-#include <SFML/System/Vector2.hpp>
 #include <boost/shared_ptr.hpp>
 #include "maploader.hpp"
 #include "world.hpp"
@@ -37,21 +36,25 @@ bool isTileLayer(LayerType &layerType)
 
 Tileset::Tileset() : converted(false)
 {
+}
+
+Tileset::~Tileset()
+{
+	delete points;
+}
+
+void Tileset::load(const std::string &path)
+{
 	// load image
 	image = new sf::Image;
-	if (!image->loadFromFile(Config::getResource("world.tileset")))
-		throw std::runtime_error("Could not load tileset");
+	if (!image->loadFromFile(path))
+		error("Could not load tileset '%1%'", path);
 
 	size = image->getSize();
 	size.x /= Constants::tileSize;
 	size.y /= Constants::tileSize;
 
 	generatePoints();
-}
-
-Tileset::~Tileset()
-{
-	delete points;
 }
 
 void Tileset::textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipGID)
@@ -409,7 +412,7 @@ void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states) co
 	target.draw(vertices, states);
 }
 
-void WorldTerrain::load(const TMX::TileMap *tileMap)
+void WorldTerrain::load(const TMX::TileMap *tileMap, const std::string &tilesetPath)
 {
 	// find layer count and depths
 	auto layers = tileMap->layers;
@@ -424,6 +427,7 @@ void WorldTerrain::load(const TMX::TileMap *tileMap)
 	// update tileset with flipped textures
 	std::vector<int> flippedGIDs;
 	discoverFlippedTiles(layers, flippedGIDs);
+	tileset.load(tilesetPath);
 	tileset.convertToTexture(flippedGIDs);
 
 	// add tiles to terrain
@@ -627,7 +631,7 @@ World::World() : terrain(this), collisionMap(this)
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
 
-void World::loadFromFile(const std::string &filename)
+void World::loadFromFile(const std::string &filename, const std::string &tileset)
 {
 	Logger::logDebug(str(boost::format("Began loading world %1%") % filename));
 	Logger::pushIndent();
@@ -642,7 +646,7 @@ void World::loadFromFile(const std::string &filename)
 	resize(size);
 
 	// terrain
-	terrain.load(tmx);
+	terrain.load(tmx, tileset);
 	collisionMap.load();
 
 	Logger::popIndent();

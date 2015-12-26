@@ -8,14 +8,10 @@ protected:
 
 	virtual void SetUp() override
 	{
-		world.loadFromFile("data/test_world.tmx");
+		world.loadFromFile("data/test_world.tmx", "data/test_tileset.png");
 	}
 
 	virtual void TearDown() override
 	{
 	}
 };
-
-TEST_F(WorldTest, EmptyTest)
-{
-}

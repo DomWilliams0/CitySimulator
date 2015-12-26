@@ -63,6 +63,8 @@ public:
 
 	~Tileset();
 
+	void load(const std::string &path);
+
 	void textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipGID);
 
 	sf::Texture *getTexture() const;
@@ -148,7 +150,7 @@ protected:
 
 	void render(sf::RenderTarget &target, sf::RenderStates &states) const;
 
-	void load(const TMX::TileMap *tileMap);
+	void load(const TMX::TileMap *tileMap, const std::string &tilesetPath);
 
 	friend struct TMX::TileMap;
 
@@ -194,7 +196,7 @@ class World : public sf::Drawable
 public:
 	World();
 
-	void loadFromFile(const std::string &filename);
+	void loadFromFile(const std::string &filename, const std::string &tileset);
 
 	void resize(sf::Vector2i size);
 
