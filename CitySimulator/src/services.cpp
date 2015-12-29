@@ -26,16 +26,17 @@ Locator::~Locator()
 void InputService::onEnable()
 {
 	bindings.clear();
-	bindings.insert({KEY_UP, sf::Keyboard::Key::W});
-	bindings.insert({KEY_LEFT, sf::Keyboard::Key::A});
-	bindings.insert({KEY_DOWN, sf::Keyboard::Key::S});
-	bindings.insert({KEY_RIGHT, sf::Keyboard::Key::D});
-	bindings.insert({KEY_YIELD_CONTROL, sf::Keyboard::Key::Tab});
+	bindings.left.insert({KEY_UP, sf::Keyboard::Key::W});
+	bindings.left.insert({KEY_LEFT, sf::Keyboard::Key::A});
+	bindings.left.insert({KEY_DOWN, sf::Keyboard::Key::S});
+	bindings.left.insert({KEY_RIGHT, sf::Keyboard::Key::D});
+	bindings.left.insert({KEY_YIELD_CONTROL, sf::Keyboard::Key::Tab});
 	// todo load from config
 
 	// check all keys have been registered
 	if (bindings.left.size() != KEY_COUNT)
 	{
+
 		Logger::logError(format("Expected %1% key bindings, received %2% instead",
 		                        std::to_string(KEY_COUNT), std::to_string(bindings.left.size())));
 
@@ -52,7 +53,6 @@ void InputService::update(sf::Keyboard::Key key, bool press)
 		pressed[index] = press;
 	}
 }
-
 
 bool InputService::isPressed(InputKey key)
 {
