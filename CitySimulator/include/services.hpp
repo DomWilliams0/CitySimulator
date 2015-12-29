@@ -3,11 +3,6 @@
 
 #include <unordered_map>
 
-class BaseService
-{
-	// todo any required shared helpers
-};
-
 enum ServiceType
 {
 	SERVICE_INPUT
@@ -23,6 +18,15 @@ public:
 private:
 	std::unordered_map<ServiceType, BaseService*> services;
 
+};
+
+// services
+
+class BaseService
+{
+public:
+	virtual void onEnable();
+	virtual void onDisable();
 };
 
 #endif
