@@ -17,8 +17,10 @@ namespace Constants
 
 	extern const int tileSize;
 	extern const float tileSizef;
-
 	extern const int tilesetResolution;
+
+	extern const float scale;
+	extern const float tileScale;
 
 	extern const float entityScalef;
 	extern const sf::Vector2f entityScale;
