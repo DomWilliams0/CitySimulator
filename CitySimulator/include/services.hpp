@@ -10,28 +10,57 @@ enum ServiceType
 	SERVICE_INPUT
 };
 
-class BaseService;
-
-class Locator
-{
-public:
-	void provide(ServiceType type, BaseService *service);
-
-	BaseService* locate(ServiceType type);
-
-private:
-	std::unordered_map<ServiceType, BaseService*, std::hash<int>> services;
-
-};
-
-// services
-
 class BaseService
 {
 public:
 	virtual void onEnable();
+
 	virtual void onDisable();
 };
+
+class Locator
+{
+public:
+
+	static void provide(ServiceType type, BaseService *service)
+	{
+		std::string verb("Provided new");
+
+		// delete old
+		auto old = locate(type);
+		if (old != nullptr)
+		{
+			verb = "Replaced";
+			old->onDisable();
+			delete old;
+		}
+
+		getInstance().services[type] = service;
+		service->onEnable();
+		Logger::logDebug(format("%1% service for service type %2%", verb, std::to_string(type)));
+	}
+
+	static BaseService *locate(ServiceType type)
+	{
+		auto service = getInstance().services.find(type);
+		return service == getInstance().services.end() ? nullptr : service->second;
+	}
+
+private:
+	Locator();
+
+	~Locator();
+
+	static Locator &getInstance()
+	{
+		static Locator instance;
+		return instance;
+	}
+
+	std::unordered_map<ServiceType, BaseService*, std::hash<int>> services;
+};
+
+// services
 
 enum InputKey
 {
