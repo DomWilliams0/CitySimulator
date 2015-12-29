@@ -3,6 +3,7 @@
 void InputBrain::tick(float delta)
 {
 	float acceleration = Config::getFloat("debug.movement.force");
+	auto input = Locator::locate<InputService>();
 
 	// walking
 	bool right = input->isPressed(KEY_RIGHT);

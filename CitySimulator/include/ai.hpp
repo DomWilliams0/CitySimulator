@@ -44,14 +44,11 @@ class InputBrain : public EntityBrain
 {
 public:
 	explicit InputBrain(Entity e)
-			: EntityBrain(e), input(Locator::locate<InputService>())
+			: EntityBrain(e)
 	{
 	}
 
 	void tick(float delta) override;
-
-private:
-	InputService *input;
 };
 
 class AIBrain : public EntityBrain
