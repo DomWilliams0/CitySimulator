@@ -5,7 +5,7 @@ void FPSCounter::init(float waitTime)
 	ticker.init(waitTime);
 
 	fpsText.setFont(Constants::mainFont);
-	fpsText.setCharacterSize(20);
+	fpsText.setCharacterSize(16);
 	fpsText.setPosition(20, 20);
 	fpsText.setColor(sf::Color::Red);
 }
@@ -13,21 +13,19 @@ void FPSCounter::init(float waitTime)
 
 void FPSCounter::tick(float delta, sf::RenderWindow &window)
 {
-	backlog.push_back(delta);
+	backlog.push_back(delta * 1000); // ms
 
 	if (ticker.tick(delta))
 	{
-		int fps(0);
+		float fps(0);
 
-		double total = accumulate(backlog.begin(), backlog.end(), 0.0);
-		if (total != 0)
-		{
-			double average = total / backlog.size();
-			if (average != 0)
-				fps = static_cast<int>(1.0 / average);
-		}
+		if (!backlog.empty())
+			fps = accumulate(backlog.begin(), backlog.end(), 0.f) / backlog.size();
 
-		fpsText.setString(std::to_string(fps) + " FPS");
+		const size_t bufferLength = 32;
+		char buffer[bufferLength];
+		snprintf(buffer, bufferLength, "%.2f mspf\n%.2f fps", fps, fps == 0 ? 0 : 1000.f / fps);
+		fpsText.setString(buffer);
 
 		backlog.clear();
 	}
