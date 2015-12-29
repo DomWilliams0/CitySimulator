@@ -10,14 +10,14 @@ void BaseService::onDisable()
 {
 }
 
-Locator::Locator()
+Locator::Locator() : services(SERVICE_COUNT, nullptr)
 {
 }
 
 Locator::~Locator()
 {
-	for (auto &pair : services)
-		delete pair.second;
+	for (auto &service : services)
+		delete service;
 }
 
 RenderService::RenderService(sf::RenderWindow &renderWindow) : window(renderWindow)

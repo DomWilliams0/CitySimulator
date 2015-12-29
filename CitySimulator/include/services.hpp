@@ -1,7 +1,6 @@
 #ifndef CITYSIM_SERVICES_HPP
 #define CITYSIM_SERVICES_HPP
 
-#include <unordered_map>
 #include <boost/bimap.hpp>
 #include "logger.hpp"
 #include "utils.hpp"
@@ -9,7 +8,9 @@
 enum ServiceType
 {
 	SERVICE_INPUT,
-	SERVICE_RENDER
+	SERVICE_RENDER,
+
+	SERVICE_COUNT
 };
 
 class BaseService
@@ -44,8 +45,7 @@ public:
 
 	static BaseService *locate(ServiceType type)
 	{
-		auto service = getInstance().services.find(type);
-		return service == getInstance().services.end() ? nullptr : service->second;
+		return getInstance().services[type];
 	}
 
 private:
@@ -59,7 +59,7 @@ private:
 		return instance;
 	}
 
-	std::unordered_map<ServiceType, BaseService*, std::hash<int>> services;
+	std::vector<BaseService*> services;
 };
 
 // services
