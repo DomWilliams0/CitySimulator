@@ -20,10 +20,11 @@
 #include <Box2D/Box2D.h>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include "constants.hpp"
 
 namespace sfdd
 {
-	const float SCALE = 32.f;
+	const float SCALE = Constants::tileSizef;
 }
 
 class SFMLDebugDraw : public b2Draw
