@@ -95,6 +95,8 @@ class InputService : public BaseService
 public:
 	virtual void onEnable() override;
 
+	void bindKey(InputKey binding, sf::Keyboard::Key key);
+
 	/// <summary>
 	/// Updates the specified key with the given pressed value
 	/// </summary>
@@ -120,6 +122,10 @@ public:
 	/// Moves forward a timestep.
 	/// </summary>
 	void advance();
+
+	sf::Keyboard::Key getKey(InputKey binding);
+
+	InputKey getBinding(sf::Keyboard::Key key);
 
 private:
 	boost::bimap<InputKey, sf::Keyboard::Key> bindings;
