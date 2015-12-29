@@ -1,4 +1,3 @@
-#include "gtest/gtest.h"
 #include "test_helpers.hpp"
 #include "config.hpp"
 #include "utils.hpp"

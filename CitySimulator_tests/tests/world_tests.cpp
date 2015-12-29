@@ -1,4 +1,4 @@
-#include "gtest/gtest.h"
+#include "test_helpers.hpp"
 #include "world.hpp"
 
 class WorldTest : public ::testing::Test
