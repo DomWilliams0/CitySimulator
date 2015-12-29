@@ -249,25 +249,21 @@ void CollisionMap::load()
 	// rotated
 	for (auto &collisionRect : rects)
 	{
-		auto rect = Utils::scaleToBox2D(collisionRect.rect);
-
-		sf::Vector2f rectCentre(rect.left + rect.width / 2,
-		                  rect.top + rect.height / 2);
+		sf::FloatRect aabb = Utils::scaleToBox2D(collisionRect.rect);
+		sf::Vector2f size(aabb.width, aabb.height);
 
 		if (collisionRect.rotation != 0.f)
 		{
 			sf::Transform transform;
-			transform.rotate(collisionRect.rotation, rect.left, rect.top + rect.height);
-			sf::Vector2f topLeft = transform.transformPoint(rect.left, rect.top);
-			rectCentre = {topLeft.x + rect.width / 2, topLeft.y + rect.height / 2};
+			transform.rotate(collisionRect.rotation, aabb.left, aabb.top + aabb.height);
+			aabb = transform.transformRect(aabb);
 		}
 
-
 		box.SetAsBox(
-				rect.width / 2, // half dimensions
-				rect.height / 2,
-				b2Vec2(rectCentre.x, rectCentre.y),
-				0.f
+				size.x / 2, // half dimensions
+				size.y / 2,
+				b2Vec2(aabb.left + aabb.width / 2, aabb.top + aabb.height / 2),
+				collisionRect.rotation
 		);
 		worldBody->CreateFixture(&fixDef);
 	}
