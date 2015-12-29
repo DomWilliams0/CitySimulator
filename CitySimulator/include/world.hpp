@@ -109,6 +109,18 @@ protected:
 	World *container;
 };
 
+struct WorldObject
+{
+	BlockType type;
+	float rotation;
+	sf::Vector2f tilePos;
+
+	WorldObject(BlockType blockType, float rotationAngle, const sf::Vector2f &position) :
+			type(blockType), rotation(rotationAngle), tilePos(position)
+	{
+	}
+};
+
 class WorldTerrain : public BaseWorld
 {
 public:
@@ -120,14 +132,16 @@ public:
 	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = LAYER_TERRAIN,
 	                  int rotationAngle = 0, int flipGID = 0);
 
-	void addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer = LAYER_OBJECTS,
-	               float rotationAngle = 0, int flipGID = 0);
+	void addObject(const sf::Vector2f &pos, BlockType blockType, float rotationAngle, int flipGID);
+
+	std::vector<WorldObject> &getObjects();
 
 private:
 	Tileset tileset;
 	sf::VertexArray vertices;
 
 	std::vector<BlockType> blockTypes;
+	std::vector<WorldObject> objects;
 
 	int discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<LayerType> &layerTypes);
 
@@ -181,12 +195,22 @@ protected:
 	friend class World;
 
 private:
+	struct CollisionRect
+	{
+		sf::FloatRect rect;
+		float rotation;
+
+		CollisionRect(const sf::FloatRect &r, float rot) : rect(r), rotation(rot)
+		{
+		}
+	};
+
 	SFMLDebugDraw b2Renderer;
 	std::multimap<sf::Vector2i, sf::FloatRect> cellGrid;
 
-	void findCollidableTiles(std::vector<sf::FloatRect> &rects) const;
+	void findCollidableTiles(std::vector<CollisionRect> &rects) const;
 
-	void mergeAdjacentTiles(std::vector<sf::Rect<float>> &rects);
+	void mergeAdjacentTiles(std::vector<CollisionRect> &rects, std::vector<sf::FloatRect> &ret);
 
 	void mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar);
 };

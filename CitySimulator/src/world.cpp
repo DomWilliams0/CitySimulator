@@ -54,11 +54,12 @@ bool compareRectsVertically(const sf::FloatRect &a, const sf::FloatRect &b)
 	return false;
 }
 
-void CollisionMap::findCollidableTiles(std::vector<sf::FloatRect> &rectsRet) const
+void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 {
 	sf::Vector2i worldTileSize = container->getTileSize();
 
 	// find collidable tiles
+	sf::Vector2f size(Constants::tileSizef, Constants::tileSizef); // todo: assuming all tiles are the same size
 	for (auto y = 0; y < worldTileSize.y; ++y)
 	{
 		for (auto x = 0; x < worldTileSize.x; ++x)
@@ -67,32 +68,51 @@ void CollisionMap::findCollidableTiles(std::vector<sf::FloatRect> &rectsRet) con
 			if (!isCollidable(bt))
 				continue;
 
-			sf::Vector2f pos(static_cast<float>(x) * Constants::tileSizef,
-			                 static_cast<float>(y) * Constants::tileSizef);
-			sf::Vector2f size(Constants::tileSizef, Constants::tileSizef); // todo: assuming all tiles are the same size
-
-			sf::FloatRect rect(pos, size);
-			rectsRet.push_back(rect);
-
-			// todo
-			// fill every tile with a single tile sized rectangle
-			// attempt to merge every rectangle with its adjacent rectangles (smallest/largest area first?)
-			// vertically, then horizontally, then choose the set with the least rectangles
+			sf::Vector2f pos(Utils::toPixel(sf::Vector2f(x, y)));
+			rects.emplace_back(sf::FloatRect(pos, size), 0.f);
 		}
 	}
 
-	// todo repeat for object layer
+	// objects
+	auto objects = container->getTerrain().getObjects();
+	float scale = Constants::tileSizef * (Constants::tileSizef / Constants::tilesetResolution);
+	for (auto &obj : objects)
+	{
+		auto pos = obj.tilePos;
+		pos.y -= 0.5f;
+		pos = Math::multiply(pos, scale);
+
+		rects.emplace_back(sf::FloatRect(pos, size), obj.rotation);
+	}
 }
 
-void CollisionMap::mergeAdjacentTiles(std::vector<sf::Rect<float>> &rects)
+void CollisionMap::mergeAdjacentTiles(std::vector<CollisionRect> &rects, std::vector<sf::FloatRect> &ret)
 {
+	std::vector<sf::FloatRect> rectangles;
+
+	auto it = rects.begin();
+	while (it != rects.end())
+	{
+		if (it->rotation == 0.f)
+		{
+			rectangles.push_back(it->rect);
+			it = rects.erase(it);
+		}
+		else
+			++it;
+	}
+
 	// join individual rects
-	sort(rects.begin(), rects.end(), compareRectsHorizontally);
-	mergeHelper(rects, true);
+	sort(rectangles.begin(), rectangles.end(), compareRectsHorizontally);
+	mergeHelper(rectangles, true);
 
 	// join rows together
-	sort(rects.begin(), rects.end(), compareRectsVertically);
-	mergeHelper(rects, false);
+	sort(rectangles.begin(), rectangles.end(), compareRectsVertically);
+	mergeHelper(rectangles, false);
+
+	// add back to returning list
+	for (auto &mergedRect : rectangles)
+		rects.emplace_back(mergedRect, 0.f);
 }
 
 void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar)
@@ -191,13 +211,14 @@ bool CollisionMap::getRectAt(const sf::Vector2i &tilePos, sf::FloatRect &ret)
 
 void CollisionMap::load()
 {
-	std::vector<sf::FloatRect> rects;
+	std::vector<CollisionRect> rects;
+	std::vector<sf::FloatRect> mergedRects;
 
 	// gather all collidable tiles
 	findCollidableTiles(rects);
 
 	// merge adjacents
-	mergeAdjacentTiles(rects);
+	mergeAdjacentTiles(rects, mergedRects);
 
 	// debug drawing
 	world.SetDebugDraw(&b2Renderer);
@@ -212,10 +233,10 @@ void CollisionMap::load()
 	int borderThickness = Constants::tileSize;
 	int padding = Constants::tileSize / 4;
 	auto worldSize = container->pixelSize;
-	rects.emplace_back(-borderThickness - padding, 0, borderThickness, worldSize.y);
-	rects.emplace_back(0, -borderThickness - padding, worldSize.y, borderThickness);
-	rects.emplace_back(worldSize.x + padding, 0, borderThickness, worldSize.y);
-	rects.emplace_back(0, worldSize.y + padding, worldSize.y, borderThickness);
+	mergedRects.emplace_back(-borderThickness - padding, 0, borderThickness, worldSize.y);
+	mergedRects.emplace_back(0, -borderThickness - padding, worldSize.y, borderThickness);
+	mergedRects.emplace_back(worldSize.x + padding, 0, borderThickness, worldSize.y);
+	mergedRects.emplace_back(0, worldSize.y + padding, worldSize.y, borderThickness);
 
 	// todo make big collision rectangles hollow to work better with box2d?
 
@@ -224,15 +245,28 @@ void CollisionMap::load()
 	b2PolygonShape box;
 	fixDef.shape = &box;
 	fixDef.friction = 0.f;
-	for (auto &unscaledRect : rects)
+
+	// rotated
+	for (auto &collisionRect : rects)
 	{
-		auto rect = Utils::scaleToBox2D(unscaledRect);
-		b2Vec2 rectCentre(rect.left + rect.width / 2,
+		auto rect = Utils::scaleToBox2D(collisionRect.rect);
+
+		sf::Vector2f rectCentre(rect.left + rect.width / 2,
 		                  rect.top + rect.height / 2);
+
+		if (collisionRect.rotation != 0.f)
+		{
+			sf::Transform transform;
+			transform.rotate(collisionRect.rotation, rect.left, rect.top + rect.height);
+			sf::Vector2f topLeft = transform.transformPoint(rect.left, rect.top);
+			rectCentre = {topLeft.x + rect.width / 2, topLeft.y + rect.height / 2};
+		}
+
+
 		box.SetAsBox(
 				rect.width / 2, // half dimensions
 				rect.height / 2,
-				rectCentre,
+				b2Vec2(rectCentre.x, rectCentre.y),
 				0.f
 		);
 		worldBody->CreateFixture(&fixDef);

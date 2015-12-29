@@ -247,8 +247,7 @@ void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, La
 	blockTypes[index] = blockType;
 }
 
-void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, LayerType layer, float rotationAngle,
-                             int flipGID)
+void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, float rotationAngle, int flipGID)
 {
 	// TODO: simply append object vertices to world vertices; remember order of objects so vertices can be referenced in the future
 
@@ -264,7 +263,15 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, Layer
 
 	for (int i = 0; i < 4; ++i)
 		vertices.append(quad[i]);
+
+	objects.emplace_back(blockType, rotationAngle, Utils::toTile(pos));
 }
+
+std::vector<WorldObject> &WorldTerrain::getObjects()
+{
+	return objects;
+}
+
 
 int WorldTerrain::discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<LayerType> &layerTypes)
 {
@@ -358,7 +365,7 @@ void WorldTerrain::addTiles(const std::vector<TMX::Layer *> &layers, const std::
 				if (layerType == LAYER_OBJECTS)
 				{
 					TMX::Object *object = dynamic_cast<TMX::Object *>(tile);
-					addObject(object->position, blockType, layerType, object->rotationAnglef, tile->getFlipGID());
+					addObject(object->position, blockType, object->rotationAnglef, tile->getFlipGID());
 				}
 
 					// tiles
