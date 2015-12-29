@@ -1,7 +1,7 @@
 #include "gamestate.hpp"
 #include "config.hpp"
 #include "entity.hpp"
-#include "input.hpp"
+#include "services.hpp"
 
 GameState::GameState() : State(GAME), playerControl(true)
 {
@@ -49,13 +49,13 @@ void GameState::tempControlCamera(float delta)
 
 	float dx(0), dy(0);
 
-	if (Globals::input->isPressed(KEY_UP))
+	if (dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->isPressed(KEY_UP))
 		dy = -delta;
-	else if (Globals::input->isPressed(KEY_DOWN))
+	else if (dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->isPressed(KEY_DOWN))
 		dy = delta;
-	if (Globals::input->isPressed(KEY_LEFT))
+	if (dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->isPressed(KEY_LEFT))
 		dx = -delta;
-	else if (Globals::input->isPressed(KEY_RIGHT))
+	else if (dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->isPressed(KEY_RIGHT))
 		dx = delta;
 
 	if (dx || dy)
@@ -69,7 +69,7 @@ void GameState::tick(float delta)
 {
 	world.tick(delta);
 
-	if (Globals::input->isFirstPressed(InputKey::KEY_YIELD_CONTROL))
+	if (dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->isFirstPressed(InputKey::KEY_YIELD_CONTROL))
 		playerControl = !playerControl;
 
 	// todo make sure this hack DOESN'T end up in production

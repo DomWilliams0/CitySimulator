@@ -1,18 +1,17 @@
 #include <SFML/Window/Keyboard.hpp>
-#include "input.hpp"
+#include "services.hpp"
 #include "logger.hpp"
 #include "utils.hpp"
 
-using sf::Keyboard;
-
-void Input::registerBindings()
+void InputService::onEnable()
 {
 	bindings.clear();
-	bindings.insert({KEY_UP, Keyboard::Key::W});
-	bindings.insert({KEY_LEFT, Keyboard::Key::A});
-	bindings.insert({KEY_DOWN, Keyboard::Key::S});
-	bindings.insert({KEY_RIGHT, Keyboard::Key::D});
-	bindings.insert({KEY_YIELD_CONTROL, Keyboard::Key::Tab});
+	bindings.left.insert({KEY_UP, sf::Keyboard::Key::W});
+	bindings.left.insert({KEY_LEFT, sf::Keyboard::Key::A});
+	bindings.left.insert({KEY_DOWN, sf::Keyboard::Key::S});
+	bindings.left.insert({KEY_RIGHT, sf::Keyboard::Key::D});
+	bindings.left.insert({KEY_YIELD_CONTROL, sf::Keyboard::Key::Tab});
+	// todo load from config
 
 	// check all keys have been registered
 	if (bindings.left.size() != KEY_COUNT)
@@ -23,9 +22,12 @@ void Input::registerBindings()
 
 		error("Invalid number of key bindings");
 	}
+
+	pressed.resize(KEY_COUNT);
+	wasPressed.resize(KEY_COUNT);
 }
 
-void Input::update(Keyboard::Key key, bool press)
+void InputService::update(sf::Keyboard::Key key, bool press)
 {
 	auto inputKey = bindings.right.find(key);
 	if (inputKey != bindings.right.end())
@@ -35,18 +37,17 @@ void Input::update(Keyboard::Key key, bool press)
 	}
 }
 
-
-bool Input::isPressed(InputKey key)
+bool InputService::isPressed(InputKey key)
 {
 	return pressed[key];
 }
 
-bool Input::isFirstPressed(InputKey key)
+bool InputService::isFirstPressed(InputKey key)
 {
 	return pressed[key] && !wasPressed[key];
 }
 
-void Input::advance()
+void InputService::advance()
 {
 	for (size_t i = 0; i < KEY_COUNT; ++i)
 		wasPressed[i] = pressed[i];

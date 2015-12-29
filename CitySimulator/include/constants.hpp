@@ -44,7 +44,6 @@ class Input;
 namespace Globals
 {
 	extern BaseGame *game;
-	extern Input *input;
 	extern SpriteSheet *spriteSheet;
 	extern EntityManager *entityManager;
 	extern EntityFactory *entityFactory;

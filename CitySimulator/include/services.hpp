@@ -2,8 +2,9 @@
 #define CITYSIM_SERVICES_HPP
 
 #include <unordered_map>
-#include <boost/dynamic_bitset.hpp>
 #include <boost/bimap.hpp>
+#include "logger.hpp"
+#include "utils.hpp"
 
 enum ServiceType
 {
@@ -106,7 +107,8 @@ public:
 
 private:
 	boost::bimap<InputKey, sf::Keyboard::Key> bindings;
-	boost::dynamic_bitset<> pressed, wasPressed;
+	std::vector<bool> pressed, wasPressed;
+	// dynamic bitset is being a pain, but this won't have much overhead
 };
 
 #endif

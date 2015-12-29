@@ -30,7 +30,6 @@ set(HEADER_fILES
         include/entity.hpp
         include/game.hpp
         include/gamestate.hpp
-        include/input.hpp
         include/logger.hpp
         include/maploader.hpp
         include/PackingTreeNode.h

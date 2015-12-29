@@ -3,7 +3,7 @@
 
 #include "entity.hpp"
 #include "constants.hpp"
-#include "input.hpp"
+#include "services.hpp"
 
 class EntityBrain
 {
@@ -44,14 +44,14 @@ class InputBrain : public EntityBrain
 {
 public:
 	explicit InputBrain(Entity e)
-			: EntityBrain(e), input(Globals::input)
+			: EntityBrain(e), input(dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT)))
 	{
 	}
 
 	void tick(float delta) override;
 
 private:
-	Input *input;
+	InputService *input;
 };
 
 class AIBrain : public EntityBrain

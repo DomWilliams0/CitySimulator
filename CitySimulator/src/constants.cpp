@@ -58,7 +58,6 @@ DirectionType Direction::fromAngle(double degrees)
 namespace Globals
 {
 	BaseGame *game;
-	Input *input;
 	EntityManager *entityManager;
 	EntityFactory *entityFactory;
 	SpriteSheet *spriteSheet;

@@ -3,7 +3,7 @@
 #include "logger.hpp"
 #include "gamestate.hpp"
 #include "config.hpp"
-#include "input.hpp"
+#include "services.hpp"
 
 BaseGame::BaseGame(sf::RenderWindow &renderWindow) : window(renderWindow)
 {
@@ -21,8 +21,7 @@ BaseGame::BaseGame(sf::RenderWindow &renderWindow) : window(renderWindow)
 
 	// key bindings
 	window.setKeyRepeatEnabled(false);
-	Globals::input = new Input;
-	Globals::input->registerBindings();
+	Locator::provide(SERVICE_INPUT, new InputService);
 
 	// set as global
 	Globals::game = this;
@@ -47,7 +46,7 @@ void BaseGame::beginGame()
 
 	while (window.isOpen())
 	{
-		Globals::input->advance();
+		dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->advance();
 
 		while (window.pollEvent(e))
 		{
@@ -65,7 +64,7 @@ void BaseGame::beginGame()
 					if (e.key.code == sf::Keyboard::Escape)
 						window.close();
 				}
-				Globals::input->update(e.key.code, pressed);
+				dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->update(e.key.code, pressed);
 				handleInput(e);
 			}
 
