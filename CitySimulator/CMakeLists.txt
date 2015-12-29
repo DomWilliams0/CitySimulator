@@ -15,6 +15,7 @@ set(SOURCE_FILES
         src/input.cpp
         src/logger.cpp
         src/maploader.cpp
+        src/services.cpp
         src/SFMLDebugDraw.cpp
         src/utils.cpp
         src/world.cpp
@@ -33,6 +34,7 @@ set(HEADER_fILES
         include/logger.hpp
         include/maploader.hpp
         include/PackingTreeNode.h
+        include/services.hpp
         include/SFMLDebugDraw.h
         include/state.hpp
         include/utils.hpp
