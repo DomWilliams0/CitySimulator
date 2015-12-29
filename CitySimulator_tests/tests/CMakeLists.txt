@@ -11,6 +11,8 @@ set(TEST_FILES
         world_tests.cpp
         )
 
+file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 include_directories(${CITYSIMULATOR_SOURCE_DIR}/include)
 add_executable(${PROJECT_NAME} ${TEST_FILES})
 
