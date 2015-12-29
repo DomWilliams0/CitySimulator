@@ -67,6 +67,10 @@ public:
 
 	void reload();
 
+	std::string getConfigPath() const;
+
+	std::string getOverwriteConfigPath() const;
+
 protected:
 	boost::filesystem::path configPath;
 	boost::filesystem::path overwriteConfigPath;

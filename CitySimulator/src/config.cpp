@@ -140,6 +140,16 @@ void ConfigurationFile::reload()
 	}
 }
 
+std::string ConfigurationFile::getConfigPath() const
+{
+	return configPath.string();
+}
+
+std::string ConfigurationFile::getOverwriteConfigPath() const
+{
+	return overwriteConfigPath.string();
+}
+
 
 void Config::loadConfig()
 {
