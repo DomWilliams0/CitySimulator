@@ -51,9 +51,21 @@ namespace Utils
 	}
 
 	template<class V>
+	sf::Vector2<V> toPixel(V x, V y)
+	{
+		return sf::Vector2<V>(x * Constants::tileSize, y * Constants::tileSize);
+	}
+
+	template<class V>
 	sf::Vector2<V> toTile(const sf::Vector2<V> &v)
 	{
 		return sf::Vector2<V>(v.x / Constants::tileSize, v.y / Constants::tileSize);
+	}
+
+	template<class V>
+	sf::Vector2<V> toTile(V x, V y)
+	{
+		return sf::Vector2<V>(x / Constants::tileSize, y / Constants::tileSize);
 	}
 
 	/// <summary>
