@@ -3,11 +3,11 @@
 #include "logger.hpp"
 #include "gamestate.hpp"
 #include "config.hpp"
-#include "services.hpp"
 
-BaseGame::BaseGame(sf::RenderWindow &renderWindow) : window(renderWindow)
+BaseGame::BaseGame(sf::RenderWindow &window)
 {
-	limitFrameRate(60, true); // default
+	// graphics backend
+	Locator::provide(SERVICE_RENDER, new RenderService(window));
 
 	// set icon
 	setWindowIcon("icon.png");
@@ -19,21 +19,21 @@ BaseGame::BaseGame(sf::RenderWindow &renderWindow) : window(renderWindow)
 		exit(-1);
 	}
 
+
 	// key bindings
 	window.setKeyRepeatEnabled(false);
 	Locator::provide(SERVICE_INPUT, new InputService);
-
-	// set as global
-	Globals::game = this;
 
 	Logger::logInfo("Game started");
 }
 
 void BaseGame::beginGame()
 {
+	sf::RenderWindow *window = dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->getWindow();
+	
 	// initially fill screen
-	window.clear(backgroundColour);
-	window.display();
+	window->clear(backgroundColour);
+	window->display();
 
 	start();
 
@@ -44,14 +44,17 @@ void BaseGame::beginGame()
 
 	// todo separate physics from rendering
 
-	while (window.isOpen())
+	while (window->isOpen())
 	{
-		dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->advance();
+		window = dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->getWindow();
+		auto input = dynamic_cast<InputService *>(Locator::locate(SERVICE_INPUT));
 
-		while (window.pollEvent(e))
+		input->advance();
+
+		while (window->pollEvent(e))
 		{
 			if (e.type == sf::Event::Closed)
-				window.close();
+				window->close();
 
 				// keys
 			else if (e.type == sf::Event::KeyPressed || e.type == sf::Event::KeyReleased)
@@ -62,47 +65,50 @@ void BaseGame::beginGame()
 				{
 					// escape to quit
 					if (e.key.code == sf::Keyboard::Escape)
-						window.close();
+						window->close();
 				}
-				dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->update(e.key.code, pressed);
+				input->update(e.key.code, pressed);
 				handleInput(e);
 			}
 
-				// everything else
 			else
+			{
+				// everything else
 				handleInput(e);
+			}
 		}
 
 		float delta(clock.restart().asSeconds());
 		tick(delta);
 
-		window.clear(backgroundColour);
-		render();
+		window->clear(backgroundColour);
+		render(*window);
 
 		// overlay
 		if (showFPS)
 		{
-			sf::View view(window.getView());
+			sf::View view(window->getView());
 
-			window.setView(window.getDefaultView());
-			fps.tick(delta, window);
-			window.setView(view);
+			window->setView(window->getDefaultView());
+			fps.tick(delta, *window);
+			window->setView(view);
 		}
 
-		window.display();
+		window->display();
 	}
 }
 
 void BaseGame::endGame()
 {
 	end();
-	window.close();
+	dynamic_cast<RenderService*>(Locator::locate(SERVICE_RENDER))->getWindow()->close();
 }
 
 void BaseGame::limitFrameRate(int limit, bool vsync)
 {
-	window.setFramerateLimit(limit);
-	window.setVerticalSyncEnabled(vsync);
+	auto window = dynamic_cast<RenderService*>(Locator::locate(SERVICE_RENDER))->getWindow();
+	window->setFramerateLimit(limit);
+	window->setVerticalSyncEnabled(vsync);
 }
 
 void BaseGame::setWindowIcon(const std::string &fileName)
@@ -114,7 +120,8 @@ void BaseGame::setWindowIcon(const std::string &fileName)
 		return;
 	}
 
-	window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+	auto window = dynamic_cast<RenderService*>(Locator::locate(SERVICE_RENDER))->getWindow();
+	window->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 }
 
 
@@ -145,7 +152,7 @@ void Game::tick(float delta)
 	current->tick(delta);
 }
 
-void Game::render()
+void Game::render(sf::RenderWindow &window)
 {
 	current->render(window);
 
@@ -186,7 +193,8 @@ void Game::switchState(StateType newStateType)
 		states.push(newState);
 	}
 
-	window.setMouseCursorVisible(current->showMouse);
+	auto window = dynamic_cast<RenderService*>(Locator::locate(SERVICE_RENDER))->getWindow();
+	window->setMouseCursorVisible(current->showMouse);
 }
 
 State *Game::createFromStateType(StateType type)

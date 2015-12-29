@@ -8,6 +8,7 @@
 #include "maploader.hpp"
 #include "SFMLDebugDraw.h"
 #include "game.hpp"
+#include "services.hpp"
 
 class World;
 
@@ -175,7 +176,7 @@ class CollisionMap : public BaseWorld
 {
 public:
 	explicit CollisionMap(World *container) : BaseWorld(container), world(b2Vec2(0.f, 0.f)), worldBody(nullptr),
-	                                          b2Renderer(Globals::game->getWindow())
+	                                          b2Renderer(*dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->getWindow())
 	{
 		world.SetAllowSleeping(true);
 	}

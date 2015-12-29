@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "services.hpp"
+#include "entity.hpp"
 
 void BaseService::onEnable()
 {
@@ -19,3 +20,17 @@ Locator::~Locator()
 		delete pair.second;
 }
 
+RenderService::RenderService(sf::RenderWindow &renderWindow) : window(renderWindow)
+{
+}
+
+sf::RenderWindow* RenderService::getWindow()
+{
+	return &window;
+}
+
+void RenderService::renderEntities()
+{
+	// todo temporary until Globals is nuked
+	Globals::entityManager->renderSystems(window);
+}

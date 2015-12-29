@@ -8,7 +8,8 @@
 
 enum ServiceType
 {
-	SERVICE_INPUT
+	SERVICE_INPUT,
+	SERVICE_RENDER
 };
 
 class BaseService
@@ -109,6 +110,20 @@ private:
 	boost::bimap<InputKey, sf::Keyboard::Key> bindings;
 	std::vector<bool> pressed, wasPressed;
 	// dynamic bitset is being a pain, but this won't have much overhead
+};
+
+class RenderService : public BaseService
+{
+public:
+	RenderService(sf::RenderWindow &renderWindow);
+
+	sf::RenderWindow* getWindow();
+
+	void renderEntities();
+
+
+private:
+	sf::RenderWindow &window;
 };
 
 #endif

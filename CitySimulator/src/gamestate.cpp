@@ -25,7 +25,7 @@ GameState::GameState() : State(GAME), playerControl(true)
 	view.setCenter(world.getPixelSize().x / 2.f, world.getPixelSize().y / 2.f);
 
 	view.zoom(Config::getFloat("debug.zoom"));
-	Globals::game->setView(view);
+	dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->getWindow()->setView(view);
 
 	Entity e = Globals::entityManager->createEntity();
 	sf::Vector2i tilePos = {Config::getInt("debug.start-pos.x"), Config::getInt("debug.start-pos.y")};
@@ -61,7 +61,7 @@ void GameState::tempControlCamera(float delta)
 	if (dx || dy)
 	{
 		view.move(dx * viewSpeed, dy * viewSpeed);
-		Globals::game->setView(view);
+		dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->getWindow()->setView(view);
 	}
 }
 
@@ -77,7 +77,7 @@ void GameState::tick(float delta)
 	{
 		Globals::entityManager->tickSystems(delta);
 		view.setCenter(Utils::toPixel(entityTracking->getPosition()));
-		Globals::game->setView(view);
+		dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->getWindow()->setView(view);
 	}
 	else
 		tempControlCamera(delta);
@@ -88,7 +88,7 @@ void GameState::render(sf::RenderWindow &window)
 {
 	window.draw(world);
 
-	Globals::entityManager->renderSystems(window);
+	dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->renderEntities();
 }
 
 void GameState::handleInput(const sf::Event &event)
