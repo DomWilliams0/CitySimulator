@@ -1,0 +1,27 @@
+{
+    "acorn": 1,
+    "butterfly": "muffin",
+    "car-battery": {
+        "inner": true,
+        "deepah": {
+            "cheetah": "woof"
+        }
+    },
+    "override-me": {
+        "pegasus": 5.5
+    },
+    "eggs": {
+        "numbahs": [1, 2, 3, -60],
+        "strangs": ["rudolph", "was", "a", "bad", "boy"],
+        "swimmers": [
+            {
+                "name": "Boris",
+                "swimming": "weak"
+            },
+            {
+                "name": "Agnes",
+                "swimming": "painful to watch"
+            }
+        ]
+    }
+}

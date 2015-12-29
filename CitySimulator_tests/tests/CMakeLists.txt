@@ -10,6 +10,7 @@ set(TEST_FILES
         test_helpers.hpp
         utils_tests.cpp
         world_tests.cpp
+        config_tests.cpp
         )
 
 file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
