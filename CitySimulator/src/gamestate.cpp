@@ -25,7 +25,7 @@ GameState::GameState() : State(GAME), playerControl(true)
 	view.setCenter(world.getPixelSize().x / 2.f, world.getPixelSize().y / 2.f);
 
 	view.zoom(Config::getFloat("debug.zoom"));
-	dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->getWindow()->setView(view);
+	Locator::locate<RenderService>()->getWindow()->setView(view);
 
 	Entity e = Globals::entityManager->createEntity();
 	sf::Vector2i tilePos = {Config::getInt("debug.start-pos.x"), Config::getInt("debug.start-pos.y")};
@@ -49,19 +49,19 @@ void GameState::tempControlCamera(float delta)
 
 	float dx(0), dy(0);
 
-	if (dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->isPressed(KEY_UP))
+	if (Locator::locate<InputService>()->isPressed(KEY_UP))
 		dy = -delta;
-	else if (dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->isPressed(KEY_DOWN))
+	else if (Locator::locate<InputService>()->isPressed(KEY_DOWN))
 		dy = delta;
-	if (dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->isPressed(KEY_LEFT))
+	if (Locator::locate<InputService>()->isPressed(KEY_LEFT))
 		dx = -delta;
-	else if (dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->isPressed(KEY_RIGHT))
+	else if (Locator::locate<InputService>()->isPressed(KEY_RIGHT))
 		dx = delta;
 
 	if (dx || dy)
 	{
 		view.move(dx * viewSpeed, dy * viewSpeed);
-		dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->getWindow()->setView(view);
+		Locator::locate<RenderService>()->getWindow()->setView(view);
 	}
 }
 
@@ -69,7 +69,7 @@ void GameState::tick(float delta)
 {
 	world.tick(delta);
 
-	if (dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT))->isFirstPressed(InputKey::KEY_YIELD_CONTROL))
+	if (Locator::locate<InputService>()->isFirstPressed(InputKey::KEY_YIELD_CONTROL))
 		playerControl = !playerControl;
 
 	// todo make sure this hack DOESN'T end up in production
@@ -77,7 +77,7 @@ void GameState::tick(float delta)
 	{
 		Globals::entityManager->tickSystems(delta);
 		view.setCenter(Utils::toPixel(entityTracking->getPosition()));
-		dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->getWindow()->setView(view);
+		Locator::locate<RenderService>()->getWindow()->setView(view);
 	}
 	else
 		tempControlCamera(delta);
@@ -88,7 +88,7 @@ void GameState::render(sf::RenderWindow &window)
 {
 	window.draw(world);
 
-	dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->renderEntities();
+	Locator::locate<RenderService>()->renderEntities();
 }
 
 void GameState::handleInput(const sf::Event &event)

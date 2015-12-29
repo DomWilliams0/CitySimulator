@@ -29,7 +29,7 @@ BaseGame::BaseGame(sf::RenderWindow &window)
 
 void BaseGame::beginGame()
 {
-	sf::RenderWindow *window = dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->getWindow();
+	sf::RenderWindow *window = Locator::locate<RenderService>()->getWindow();
 	
 	// initially fill screen
 	window->clear(backgroundColour);
@@ -46,8 +46,8 @@ void BaseGame::beginGame()
 
 	while (window->isOpen())
 	{
-		window = dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->getWindow();
-		auto input = dynamic_cast<InputService *>(Locator::locate(SERVICE_INPUT));
+		window = Locator::locate<RenderService>()->getWindow();
+		auto input = Locator::locate<InputService>();
 
 		input->advance();
 
@@ -101,12 +101,13 @@ void BaseGame::beginGame()
 void BaseGame::endGame()
 {
 	end();
-	dynamic_cast<RenderService*>(Locator::locate(SERVICE_RENDER))->getWindow()->close();
+	Locator::locate<RenderService>()->getWindow()->close();
 }
 
 void BaseGame::limitFrameRate(int limit, bool vsync)
 {
-	auto window = dynamic_cast<RenderService*>(Locator::locate(SERVICE_RENDER))->getWindow();
+	auto window = Locator::locate<RenderService>()->getWindow();
+
 	window->setFramerateLimit(limit);
 	window->setVerticalSyncEnabled(vsync);
 }
@@ -120,7 +121,7 @@ void BaseGame::setWindowIcon(const std::string &fileName)
 		return;
 	}
 
-	auto window = dynamic_cast<RenderService*>(Locator::locate(SERVICE_RENDER))->getWindow();
+	auto window = Locator::locate<RenderService>()->getWindow();
 	window->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 }
 
@@ -193,7 +194,7 @@ void Game::switchState(StateType newStateType)
 		states.push(newState);
 	}
 
-	auto window = dynamic_cast<RenderService*>(Locator::locate(SERVICE_RENDER))->getWindow();
+	auto window = Locator::locate<RenderService>()->getWindow();
 	window->setMouseCursorVisible(current->showMouse);
 }
 

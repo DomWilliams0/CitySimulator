@@ -176,7 +176,7 @@ class CollisionMap : public BaseWorld
 {
 public:
 	explicit CollisionMap(World *container) : BaseWorld(container), world(b2Vec2(0.f, 0.f)), worldBody(nullptr),
-	                                          b2Renderer(*dynamic_cast<RenderService *>(Locator::locate(SERVICE_RENDER))->getWindow())
+	                                          b2Renderer(*Locator::locate<RenderService>()->getWindow())
 	{
 		world.SetAllowSleeping(true);
 	}

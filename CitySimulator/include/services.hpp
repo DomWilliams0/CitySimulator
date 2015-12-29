@@ -21,6 +21,9 @@ public:
 	virtual void onDisable();
 };
 
+class InputService;
+class RenderService;
+
 class Locator
 {
 public:
@@ -30,7 +33,7 @@ public:
 		std::string verb("Provided new");
 
 		// delete old
-		auto old = locate(type);
+		auto old = getInstance().services[type];
 		if (old != nullptr)
 		{
 			verb = "Replaced";
@@ -43,9 +46,21 @@ public:
 		Logger::logDebug(format("%1% service for service type %2%", verb, std::to_string(type)));
 	}
 
-	static BaseService *locate(ServiceType type)
+	// helper
+	template <class T>
+	static T* locate()
 	{
-		return getInstance().services[type];
+		ServiceType type = SERVICE_COUNT;
+
+		if (typeid(T) == typeid(InputService))
+			type = SERVICE_INPUT;
+		else if (typeid(T) == typeid(RenderService))
+			type = SERVICE_RENDER;
+
+		if (type == SERVICE_COUNT)
+			error("Invalid service type given");
+
+		return dynamic_cast<T *>(getInstance().services[type]);
 	}
 
 private:

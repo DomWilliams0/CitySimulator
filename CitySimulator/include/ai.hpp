@@ -44,7 +44,7 @@ class InputBrain : public EntityBrain
 {
 public:
 	explicit InputBrain(Entity e)
-			: EntityBrain(e), input(dynamic_cast<InputService*>(Locator::locate(SERVICE_INPUT)))
+			: EntityBrain(e), input(Locator::locate<InputService>())
 	{
 	}
 
