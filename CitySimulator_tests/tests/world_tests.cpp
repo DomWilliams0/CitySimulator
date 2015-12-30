@@ -12,7 +12,7 @@ protected:
 		Locator::provide(SERVICE_CONFIG, new ConfigService("data/test_reference_config.json",
 		                                                   "data/test_config.json"));
 
-		world.loadFromFile("data/test_world.tmx", "data/test_tileset.png");
+		world.loadFromFile("test_world.tmx", "data/test_tileset.png");
 	}
 
 	virtual void TearDown() override
