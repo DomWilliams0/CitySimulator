@@ -44,23 +44,9 @@ class Locator
 {
 public:
 
-	static void provide(ServiceType type, BaseService *service)
-	{
-		std::string verb("Provided new");
+	static void provide(ServiceType type, BaseService *service);
 
-		// delete old
-		auto old = getInstance().services[type];
-		if (old != nullptr)
-		{
-			verb = "Replaced";
-			old->onDisable();
-			delete old;
-		}
-
-		getInstance().services[type] = service;
-		service->onEnable();
-		Logger::logDebug(format("%1% service for service type %2%", verb, std::to_string(type)));
-	}
+	static std::string serviceToString(ServiceType type);
 
 	// helper
 	template<class T>
@@ -76,25 +62,6 @@ public:
 		if (errorOnFail && ret == nullptr)
 			error("Could not locate service '%1%'", serviceToString(type));
 		return ret;
-	}
-
-	static std::string serviceToString(ServiceType type)
-	{
-		switch (type)
-		{
-			case SERVICE_INPUT:
-				return "Input";
-			case SERVICE_RENDER:
-				return "Render";
-			case SERVICE_CONFIG:
-				return "Config";
-			case SERVICE_ENTITY:
-				return "Entity";
-			case SERVICE_ANIMATION:
-				return "Animation";
-			default:
-				return "Unknown";
-		}
 	}
 
 private:
