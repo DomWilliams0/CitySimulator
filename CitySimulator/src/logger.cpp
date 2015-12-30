@@ -31,7 +31,6 @@ void LoggingService::log(const std::string &msg, LogLevel level)
 		if (l == levels.end())
 			error("Invalid log level %1%", std::to_string(level));
 
-		// todo syslog
 		stream << l->second << ": " << prefix << msg << std::endl;
 	}
 

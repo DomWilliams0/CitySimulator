@@ -7,8 +7,7 @@ class TestingEnvironment : public ::testing::Environment
 public:
 	virtual void SetUp() override
 	{
-		// todo null logger
-		Locator::provide(SERVICE_LOGGING, new LoggingService(std::cout, LOG_DEBUG));
+		Locator::provide(SERVICE_LOGGING, new NullLoggingService);
 	}
 
 	virtual void TearDown() override

@@ -4,6 +4,7 @@
 #include <boost/bimap.hpp>
 #include <typeindex>
 #include <typeinfo>
+#include <iostream>
 #include "entity.hpp"
 #include "utils.hpp"
 #include "config.hpp"
@@ -350,9 +351,24 @@ private:
 
 	std::unordered_map<LogLevel, std::string, std::hash<int>> levels;
 
-	void log(const std::string &msg, LogLevel level);
+	virtual void log(const std::string &msg, LogLevel level);
 
 };
+
+class NullLoggingService : public LoggingService
+{
+
+public:
+	NullLoggingService() : LoggingService(std::cerr, LOG_INFO)
+	{
+	}
+
+private:
+	virtual void log(const std::string &msg, LogLevel level) override
+	{
+	}
+};
+
 
 // helpers
 
