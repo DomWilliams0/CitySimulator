@@ -1,6 +1,6 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include "ai.hpp"
-#include "logger.hpp"
+#include "world.hpp"
 
 void EntityFactory::loadEntitiesFromFile(const std::string &fileName)
 {
@@ -52,14 +52,14 @@ void EntityFactory::loadEntities(ConfigurationFile &config, EntityType entityTyp
 	Logger::popIndent();
 }
 
-Entity EntityService::createEntity()
+EntityID EntityService::createEntity()
 {
 	// no space
 	if (entityCount == MAX_ENTITIES)
 		error("Max number of entities reached (%1%)", std::to_string(MAX_ENTITIES));
 
 	// todo: use a memory pool instead to avoid iterating the entire array each time
-	for (Entity e = 0; e < MAX_ENTITIES; ++e)
+	for (EntityID e = 0; e < MAX_ENTITIES; ++e)
 		if (!isAlive(e))
 		{
 			entityCount++;
@@ -69,7 +69,7 @@ Entity EntityService::createEntity()
 	return MAX_ENTITIES;
 }
 
-void EntityService::killEntity(Entity e)
+void EntityService::killEntity(EntityID e)
 {
 	if (isAlive(e))
 		entityCount--;
@@ -77,7 +77,7 @@ void EntityService::killEntity(Entity e)
 	entities[e] = COMPONENT_NONE;
 }
 
-bool EntityService::isAlive(Entity e)
+bool EntityService::isAlive(EntityID e)
 {
 	return entities[e] != COMPONENT_NONE;
 }
@@ -85,15 +85,15 @@ bool EntityService::isAlive(Entity e)
 void EntityService::tickSystems(float delta)
 {
 	for (System *system : systems)
-		system->tick(delta);
+		system->tick(this, delta);
 }
 
 void EntityService::renderSystems(sf::RenderWindow &window)
 {
-	renderSystem->render(window);
+	renderSystem->render(this, window);
 }
 
-BaseComponent *EntityService::addComponent(Entity e, ComponentType type)
+BaseComponent *EntityService::addComponent(EntityID e, ComponentType type)
 {
 	entities[e] |= type;
 
@@ -102,17 +102,17 @@ BaseComponent *EntityService::addComponent(Entity e, ComponentType type)
 	return comp;
 }
 
-void EntityService::removeComponent(Entity e, ComponentType type)
+void EntityService::removeComponent(EntityID e, ComponentType type)
 {
 	entities[e] &= ~type;
 }
 
-bool EntityService::hasComponent(Entity e, ComponentType type)
+bool EntityService::hasComponent(EntityID e, ComponentType type)
 {
 	return (entities[e] & type) != COMPONENT_NONE;
 }
 
-BaseComponent *EntityService::getComponentOfType(Entity e, ComponentType type)
+BaseComponent *EntityService::getComponentOfType(EntityID e, ComponentType type)
 {
 	switch (type)
 	{
@@ -127,7 +127,7 @@ BaseComponent *EntityService::getComponentOfType(Entity e, ComponentType type)
 	}
 }
 
-void EntityService::addPhysicsComponent(Entity e, World *world, const sf::Vector2i &startTilePos)
+void EntityService::addPhysicsComponent(EntityID e, World *world, const sf::Vector2i &startTilePos)
 {
 	PhysicsComponent *phys = dynamic_cast<PhysicsComponent *>(addComponent(e, COMPONENT_PHYSICS));
 	b2World *bWorld = world->getBox2DWorld();
@@ -155,7 +155,7 @@ void EntityService::addPhysicsComponent(Entity e, World *world, const sf::Vector
 }
 
 
-void EntityService::addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step,
+void EntityService::addRenderComponent(EntityID e, EntityType entityType, const std::string &animation, float step,
                                        DirectionType initialDirection, bool playing)
 {
 	RenderComponent *comp = dynamic_cast<RenderComponent *>(addComponent(e, COMPONENT_RENDER));
@@ -164,7 +164,7 @@ void EntityService::addRenderComponent(Entity e, EntityType entityType, const st
 	comp->anim.init(anim, step, initialDirection, playing);
 }
 
-void EntityService::addBrain(Entity e, bool aiBrain)
+void EntityService::addBrain(EntityID e, bool aiBrain)
 {
 	InputComponent *comp = dynamic_cast<InputComponent *>(addComponent(e, COMPONENT_INPUT));
 
@@ -174,12 +174,12 @@ void EntityService::addBrain(Entity e, bool aiBrain)
 		comp->brain.reset(new InputBrain(e));
 }
 
-void EntityService::addPlayerInputComponent(Entity e)
+void EntityService::addPlayerInputComponent(EntityID e)
 {
 	addBrain(e, false);
 }
 
-void EntityService::addAIInputComponent(Entity e)
+void EntityService::addAIInputComponent(EntityID e)
 {
 	addBrain(e, true);
 }

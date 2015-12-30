@@ -4,7 +4,7 @@
 #include "animation.hpp"
 #include "logger.hpp"
 #include "entity.hpp"
-#include "config.hpp"
+#include "services.hpp"
 
 void SpriteSheet::loadSprite(ConfigKeyValue &entityTags, EntityType entityType)
 {

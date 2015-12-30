@@ -11,6 +11,7 @@ GameState::GameState() : State(GAME), playerControl(true)
 	Globals::spriteSheet = new SpriteSheet;
 
 	// load entities
+	Locator::provide(SERVICE_ENTITY, new EntityService);
 	Globals::entityFactory->loadEntitiesFromFile("entities.json");
 
 	// load sprites
@@ -27,7 +28,7 @@ GameState::GameState() : State(GAME), playerControl(true)
 	view.zoom(Config::getFloat("debug.zoom"));
 	Locator::locate<RenderService>()->getWindow()->setView(view);
 
-//	Entity e = Globals::entityManager->createEntity();
+//	EntityID e = Globals::entityManager->createEntity();
 //	sf::Vector2i tilePos = {Config::getInt("debug.start-pos.x"), Config::getInt("debug.start-pos.y")};
 //	Globals::entityManager->addPhysicsComponent(e, &world, tilePos);
 //	Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, "Business Man", 0.2f, Direction::EAST, false);
@@ -74,8 +75,9 @@ void GameState::tick(float delta)
 	// todo make sure this hack DOESN'T end up in production
 	if (playerControl)
 	{
-		Globals::entityManager->tickSystems(delta);
-		view.setCenter(Utils::toPixel(entityTracking->getPosition()));
+		Locator::locate<EntityService>()->tickSystems(delta);
+		if (entityTracking)
+			view.setCenter(Utils::toPixel(entityTracking->getPosition()));
 		Locator::locate<RenderService>()->getWindow()->setView(view);
 	}
 	else

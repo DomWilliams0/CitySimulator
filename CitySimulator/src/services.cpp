@@ -30,8 +30,7 @@ sf::RenderWindow* RenderService::getWindow()
 
 void RenderService::renderEntities()
 {
-	// todo temporary until Globals is nuked
-	Globals::entityManager->renderSystems(*window);
+	Locator::locate<EntityService>()->renderSystems(*window);
 }
 
 void EntityService::onEnable()

@@ -1,13 +1,13 @@
 #ifndef CITYSIM_ENTITY_HPP
 #define CITYSIM_ENTITY_HPP
 
+typedef unsigned int EntityID;
+
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <vector>
 #include "animation.hpp"
 #include "config.hpp"
 #include "constants.hpp"
-#include "world.hpp"
-
 
 class b2World;
 
@@ -39,8 +39,6 @@ b2Vec2 toB2Vec(const sf::Vector2<T> &v)
 }
 
 // component-entity-systems
-
-typedef unsigned int Entity;
 
 enum ComponentType
 {
@@ -99,6 +97,7 @@ struct PhysicsComponent : BaseComponent
 	b2Vec2 lastVelocity;
 };
 
+class EntityService;
 
 // systems
 class System
@@ -112,13 +111,13 @@ public:
 	{
 	}
 
-	void tick(float dt);
+	void tick(EntityService *es, float dt);
 
-	void render(sf::RenderWindow &window);
+	void render(EntityService *es, sf::RenderWindow &window);
 
-	virtual void tickEntity(Entity e, float dt) = 0;
+	virtual void tickEntity(EntityService *es, EntityID e, float dt) = 0;
 
-	virtual void renderEntity(Entity e, sf::RenderWindow &window)
+	virtual void renderEntity(EntityService *es, EntityID e, sf::RenderWindow &window)
 	{
 	}
 
@@ -133,9 +132,9 @@ public:
 	{
 	}
 
-	void tickEntity(Entity e, float dt) override;
+	void tickEntity(EntityService *es, EntityID e, float dt) override;
 
-	void renderEntity(Entity e, sf::RenderWindow &window) override;
+	void renderEntity(EntityService *es, EntityID e, sf::RenderWindow &window) override;
 };
 
 class InputSystem : public System
@@ -145,7 +144,7 @@ public:
 	{
 	}
 
-	void tickEntity(Entity e, float dt) override;
+	void tickEntity(EntityService *es, EntityID e, float dt) override;
 };
 
 class PhysicsSystem : public System
@@ -155,7 +154,7 @@ public:
 	{
 	}
 
-	void tickEntity(Entity e, float dt) override;
+	void tickEntity(EntityService *es, EntityID e, float dt) override;
 };
 
 #endif

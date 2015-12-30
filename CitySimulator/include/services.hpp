@@ -2,16 +2,17 @@
 #define CITYSIM_SERVICES_HPP
 
 #include <boost/bimap.hpp>
+#include "entity.hpp"
 #include "logger.hpp"
 #include "utils.hpp"
 #include "config.hpp"
-#include "entity.hpp"
 
 enum ServiceType
 {
 	SERVICE_INPUT,
 	SERVICE_RENDER,
 	SERVICE_CONFIG,
+	SERVICE_ENTITY,
 
 	SERVICE_COUNT
 };
@@ -27,6 +28,7 @@ public:
 class InputService;
 class RenderService;
 class ConfigService;
+class World;
 
 class Locator
 {
@@ -62,6 +64,8 @@ public:
 			type = SERVICE_RENDER;
 		else if (typeid(T) == typeid(ConfigService))
 			type = SERVICE_CONFIG;
+		else if (typeid(T) == typeid(EntityService))
+			type = SERVICE_ENTITY;
 
 		if (type == SERVICE_COUNT)
 			error("Invalid service type given");
@@ -191,7 +195,6 @@ private:
 };
 
 const unsigned int MAX_ENTITIES = 1024;
-typedef unsigned int EntityID;
 
 class EntityService : public BaseService
 {
@@ -207,50 +210,58 @@ public:
 
 	bool isAlive(EntityID e);
 
+	inline EntityID getComponentMask(EntityID e)
+	{
+		if (e < 0 || e >= MAX_ENTITIES)
+			error("EntityID %1% out of range in getComponentMask", std::to_string(e));
+		
+		return entities[e];
+	}
+
 	// systems
 	void tickSystems(float delta);
 
 	void renderSystems(sf::RenderWindow &window);
 
+	// component management
+	void removeComponent(EntityID e, ComponentType type);
+
+	bool hasComponent(EntityID e, ComponentType type);
+
+	BaseComponent *getComponentOfType(EntityID e, ComponentType type);
+
+	template<class T>
+	T *getComponent(EntityID e, ComponentType type)
+	{
+		return dynamic_cast<T *>(getComponentOfType(e, type));
+	}
+
 private:
-	Entity entities[MAX_ENTITIES];
-	size_t entityCount;
+	EntityID entities[MAX_ENTITIES];
+	EntityID entityCount;
 
 	// components
 	PhysicsComponent physicsComponents[MAX_ENTITIES];
 	RenderComponent renderComponents[MAX_ENTITIES];
 	InputComponent inputComponents[MAX_ENTITIES];
 
-	// component management
-	void removeComponent(Entity e, ComponentType type);
-
-	bool hasComponent(Entity e, ComponentType type);
-
-	BaseComponent *getComponentOfType(Entity e, ComponentType type);
-
-	template<class T>
-	T *getComponent(Entity e, ComponentType type)
-	{
-		return dynamic_cast<T *>(getComponentOfType(e, type));
-	}
-
 	// systems
 	std::vector<System *> systems;
 	RenderSystem *renderSystem;
 
 	// helpers
-	void addPhysicsComponent(Entity e, World *world, const sf::Vector2i &startTilePos);
+	void addPhysicsComponent(EntityID e, World *world, const sf::Vector2i &startTilePos);
 
-	void addRenderComponent(Entity e, EntityType entityType, const std::string &animation,
+	void addRenderComponent(EntityID e, EntityType entityType, const std::string &animation,
 	                        float step, DirectionType initialDirection, bool playing);
 
-	void addPlayerInputComponent(Entity e);
+	void addPlayerInputComponent(EntityID e);
 
-	void addAIInputComponent(Entity e);
+	void addAIInputComponent(EntityID e);
 
-	BaseComponent *addComponent(Entity e, ComponentType type);
+	BaseComponent *addComponent(EntityID e, ComponentType type);
 
-	void addBrain(Entity e, bool aiBrain);
+	void addBrain(EntityID e, bool aiBrain);
 };
 
 // helpers

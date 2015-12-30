@@ -8,11 +8,10 @@
 class EntityBrain
 {
 public:
-	explicit EntityBrain(Entity e)
+	explicit EntityBrain(EntityID e)
 	{
 		entity = e;
-//		todo phys = Globals::entityManager->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
-		phys = nullptr;
+		phys = Locator::locate<EntityService>()->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
 		movementForce = Config::getFloat("debug.movement.force");
 	}
 
@@ -23,7 +22,7 @@ public:
 	virtual void tick(float delta) = 0;
 
 protected:
-	Entity entity;
+	EntityID entity;
 
 	float movementForce;
 
@@ -44,7 +43,7 @@ protected:
 class InputBrain : public EntityBrain
 {
 public:
-	explicit InputBrain(Entity e)
+	explicit InputBrain(EntityID e)
 			: EntityBrain(e)
 	{
 	}
@@ -55,7 +54,7 @@ public:
 class AIBrain : public EntityBrain
 {
 public:
-	explicit AIBrain(Entity e)
+	explicit AIBrain(EntityID e)
 			: EntityBrain(e)
 	{
 	}

@@ -4,38 +4,28 @@
 
 // systems
 
-void System::tick(float dt)
+void System::tick(EntityService *es, float dt)
 {
-	EntityManager *manager = Globals::entityManager;
-
-	for (size_t e = 0; e < MAX_ENTITIES; ++e)
+	for (EntityID e = 0; e < MAX_ENTITIES; ++e)
 	{
-		if ((manager->entities[e] & mask) == mask)
-			tickEntity(e, dt);
+		if ((es->getComponentMask(e) & mask) == mask)
+			tickEntity(es, e, dt);
 	}
 }
 
-void System::render(sf::RenderWindow &window)
+void System::render(EntityService *es, sf::RenderWindow &window)
 {
-	EntityManager *manager = Globals::entityManager;
-
-	for (size_t e = 0; e < MAX_ENTITIES; ++e)
+	for (EntityID e = 0; e < MAX_ENTITIES; ++e)
 	{
-		if ((manager->entities[e] & mask) == mask)
-			renderEntity(e, window);
+		if ((es->getComponentMask(e) & mask) == mask)
+			renderEntity(es, e, window);
 	}
 }
 
-template<class T>
-T *get(Entity e, ComponentType type)
+void RenderSystem::tickEntity(EntityService *es, EntityID e, float dt)
 {
-	return Globals::entityManager->getComponent<T>(e, type);
-}
-
-void RenderSystem::tickEntity(Entity e, float dt)
-{
-	auto *render = get<RenderComponent>(e, COMPONENT_RENDER);
-	auto *physics = get<PhysicsComponent>(e, COMPONENT_PHYSICS);
+	auto *render = es->getComponent<RenderComponent>(e, COMPONENT_RENDER);
+	auto *physics = es->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
 
 	// set playing
 	bool stopped = physics->isStopped();
@@ -52,14 +42,14 @@ void RenderSystem::tickEntity(Entity e, float dt)
 	render->anim.tick(dt);
 }
 
-void InputSystem::tickEntity(Entity e, float dt)
+void InputSystem::tickEntity(EntityService *es, EntityID e, float dt)
 {
-	get<InputComponent>(e, COMPONENT_INPUT)->brain->tick(dt);
+	es->getComponent<InputComponent>(e, COMPONENT_INPUT)->brain->tick(dt);
 }
 
-void PhysicsSystem::tickEntity(Entity e, float dt)
+void PhysicsSystem::tickEntity(EntityService *es, EntityID e, float dt)
 {
-	auto *physics = get<PhysicsComponent>(e, COMPONENT_PHYSICS);
+	auto *physics = es->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
 
 	// maximum speed
 	float maxSpeed = Config::getFloat("debug.movement.max-speed");
@@ -93,10 +83,10 @@ void tempDrawVector(PhysicsComponent *physics, const sf::Vector2f vector, sf::Co
 	window.draw(r);
 }
 
-void RenderSystem::renderEntity(Entity e, sf::RenderWindow &window)
+void RenderSystem::renderEntity(EntityService *es, EntityID e, sf::RenderWindow &window)
 {
-	auto render = get<RenderComponent>(e, COMPONENT_RENDER);
-	auto *physics = get<PhysicsComponent>(e, COMPONENT_PHYSICS);
+	auto render = es->getComponent<RenderComponent>(e, COMPONENT_RENDER);
+	auto *physics = es->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
 
 	sf::RenderStates states;
 	sf::Transform transform;
