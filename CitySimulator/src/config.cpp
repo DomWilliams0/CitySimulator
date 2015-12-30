@@ -4,9 +4,6 @@
 #include "config.hpp"
 #include "services.hpp"
 
-#define RELOAD if (reloadFromFile)\
-					reload()
-
 void ConfigurationFile::load()
 {
 	// doesn't exist
@@ -69,48 +66,44 @@ void ConfigurationFile::recurseAndOverwrite(boost::property_tree::ptree &tree, s
 	}
 }
 
-void ConfigurationFile::getIntRef(const std::string &path, int &i)
+void ConfigurationFile::getIntRef(const std::string &path, int &i, int defaultValue)
 {
-	i = getInt(path);
+	i = getInt(path, defaultValue);
 }
 
-int ConfigurationFile::getInt(const std::string &path)
+int ConfigurationFile::getInt(const std::string &path, int defaultValue)
 {
-	RELOAD;
-	return propertyTree.get<int>(path);
+	return get(path, defaultValue);
 }
 
-void ConfigurationFile::getFloatRef(const std::string &path, float &f)
+void ConfigurationFile::getFloatRef(const std::string &path, float &f, float defaultValue)
 {
-	f = getFloat(path);
+	f = getFloat(path, defaultValue);
 }
 
-float ConfigurationFile::getFloat(const std::string &path)
+float ConfigurationFile::getFloat(const std::string &path, float defaultValue)
 {
-	RELOAD;
-	return propertyTree.get<float>(path);
+	return get(path, defaultValue);
 }
 
-void ConfigurationFile::getBoolRef(const std::string &path, bool &b)
+void ConfigurationFile::getBoolRef(const std::string &path, bool &b, bool defaultValue)
 {
-	b = getBool(path);
+	b = getBool(path, defaultValue);
 }
 
-bool ConfigurationFile::getBool(const std::string &path)
+bool ConfigurationFile::getBool(const std::string &path, bool defaultValue)
 {
-	RELOAD;
-	return propertyTree.get<bool>(path);
+	return get(path, defaultValue);
 }
 
-void ConfigurationFile::getStringRef(const std::string &path, std::string &s)
+void ConfigurationFile::getStringRef(const std::string &path, std::string &s, const std::string &defaultValue)
 {
-	s = getString(path);
+	s = getString(path, defaultValue);
 }
 
-std::string ConfigurationFile::getString(const std::string &path)
+std::string ConfigurationFile::getString(const std::string &path, const std::string &defaultValue)
 {
-	RELOAD;
-	return propertyTree.get<std::string>(path);
+	return get(path, defaultValue);
 }
 
 void ConfigurationFile::setReloadFromFile(bool reload)
@@ -175,7 +168,7 @@ void ConfigService::onEnable()
 	config.loadOnTop();
 
 	// reload?
-	config.setReloadFromFile(ConfigService::getBool("debug.reload-config"));
+	config.setReloadFromFile(getBool("debug.reload-config"));
 }
 
 
