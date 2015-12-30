@@ -2,7 +2,6 @@
 #include "game.hpp"
 #include "logger.hpp"
 #include "gamestate.hpp"
-#include "config.hpp"
 
 BaseGame::BaseGame(sf::RenderWindow &window)
 {

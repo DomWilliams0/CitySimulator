@@ -1,7 +1,6 @@
 #include <config.hpp>
 #include "maploader.hpp"
 #include "world.hpp"
-#include "logger.hpp"
 
 bool isCollidable(BlockType blockType)
 {

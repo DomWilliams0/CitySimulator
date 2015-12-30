@@ -110,7 +110,8 @@ void EntityService::addRenderComponent(EntityID e, EntityType entityType, const 
 {
 	RenderComponent *comp = dynamic_cast<RenderComponent *>(addComponent(e, COMPONENT_RENDER));
 
-	Animation *anim = Globals::spriteSheet->getAnimation(entityType, animation);
+	AnimationService *as = Locator::locate<AnimationService>();
+	Animation *anim = as->getAnimation(entityType, animation);
 	comp->anim.init(anim, step, initialDirection, playing);
 }
 

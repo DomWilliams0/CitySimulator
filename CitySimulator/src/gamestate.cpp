@@ -1,20 +1,17 @@
 #include "gamestate.hpp"
-#include "config.hpp"
-#include "entity.hpp"
-#include "services.hpp"
 
 GameState::GameState() : State(GAME), playerControl(true)
 {
-	// create globals
-	// todo SOON TO BE VANQUISHED
-	Globals::spriteSheet = new SpriteSheet;
-
+	// load art service for queueing
+	auto animationService = new AnimationService;
+	Locator::provide(SERVICE_ANIMATION, animationService);
+	
 	// load entities
 	auto entityService = new EntityService;
 	Locator::provide(SERVICE_ENTITY, entityService);
 
-	// load sprites
-	Globals::spriteSheet->processAllSprites();
+	// load art
+	animationService->processQueuedSprites();
 
 	// load world
 	world.loadFromFile(Config::getString("debug.world-name"),
@@ -34,11 +31,6 @@ GameState::GameState() : State(GAME), playerControl(true)
 	entityService->addPlayerInputComponent(e);
 
 	entityTracking = (PhysicsComponent *) entityService->getComponentOfType(e, COMPONENT_PHYSICS);
-}
-
-GameState::~GameState()
-{
-	delete Globals::spriteSheet;
 }
 
 void GameState::tempControlCamera(float delta)

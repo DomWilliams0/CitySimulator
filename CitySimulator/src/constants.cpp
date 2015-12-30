@@ -55,11 +55,6 @@ DirectionType Direction::fromAngle(double degrees)
 	}
 }
 
-namespace Globals
-{
-	SpriteSheet *spriteSheet;
-}
-
 namespace Direction
 {
 	const int NORTH = 0;

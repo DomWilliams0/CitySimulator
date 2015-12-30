@@ -31,15 +31,6 @@ namespace Constants
 	extern std::string configPath;
 }
 
-class BaseGame;
-
-class SpriteSheet;
-
-namespace Globals
-{
-	extern SpriteSheet *spriteSheet;
-}
-
 typedef int DirectionType;
 
 namespace Direction

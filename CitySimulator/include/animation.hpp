@@ -26,60 +26,6 @@ struct Animation
 	std::vector<Sequence> sequences;
 };
 
-class SpriteSheet
-{
-public:
-	SpriteSheet() : processed(false)
-	{
-		preProcessImageData = new std::map<sf::Image *, std::pair<ConfigKeyValue, EntityType>>;
-	}
-
-	void loadSprite(ConfigKeyValue &entityTags, EntityType entityType);
-
-	void processAllSprites();
-
-	Animation *getAnimation(EntityType entityType, const std::string &name)
-	{
-		auto anims = animations.find(entityType);
-		if (anims != animations.end())
-		{
-			auto anim = anims->second.find(name);
-			if (anim != anims->second.end())
-				return &anim->second;
-		}
-
-		error("Animation '%1%' not found", name);
-	}
-
-	std::string getRandomAnimationName(EntityType entityType)
-	{
-		auto anims = animations.find(entityType);
-		if (anims == animations.end())
-		{
-			error("No animations found for entity type %1%", std::to_string(entityType));
-			return "";
-		}
-
-		auto it = anims->second.cbegin();
-		std::advance(it, Utils::random(static_cast<size_t>(0), anims->second.size()));
-		return it->first;
-	}
-
-private:
-	sf::Texture texture;
-	std::map<EntityType, std::unordered_map<std::string, Animation>> animations;
-
-	std::map<sf::Image *, std::pair<ConfigKeyValue, EntityType>> *preProcessImageData;
-
-	bool processed;
-
-	void checkProcessed(bool shouldBe);
-
-	sf::Vector2i stringToVector(const std::string &s);
-
-	void positionImages(sf::Vector2i &imageSize, std::map<sf::Image *, sf::IntRect> &imagePositions);
-};
-
 class Animator : public sf::Drawable
 {
 public:

@@ -13,6 +13,7 @@ enum ServiceType
 	SERVICE_RENDER,
 	SERVICE_CONFIG,
 	SERVICE_ENTITY,
+	SERVICE_ANIMATION,
 
 	SERVICE_COUNT
 };
@@ -26,8 +27,15 @@ public:
 };
 
 class InputService;
+
 class RenderService;
+
 class ConfigService;
+
+class EntityService;
+
+class AnimationService;
+
 class World;
 
 class Locator
@@ -53,8 +61,8 @@ public:
 	}
 
 	// helper
-	template <class T>
-	static T* locate(bool errorOnFail = true)
+	template<class T>
+	static T *locate(bool errorOnFail = true)
 	{
 		ServiceType type = SERVICE_COUNT;
 
@@ -66,6 +74,8 @@ public:
 			type = SERVICE_CONFIG;
 		else if (typeid(T) == typeid(EntityService))
 			type = SERVICE_ENTITY;
+		else if (typeid(T) == typeid(AnimationService))
+			type = SERVICE_ANIMATION;
 
 		if (type == SERVICE_COUNT)
 			error("Invalid service type given");
@@ -87,7 +97,7 @@ private:
 		return instance;
 	}
 
-	std::vector<BaseService*> services;
+	std::vector<BaseService *> services;
 };
 
 // services
@@ -151,7 +161,7 @@ class RenderService : public BaseService
 public:
 	RenderService(sf::RenderWindow *renderWindow);
 
-	sf::RenderWindow* getWindow();
+	sf::RenderWindow *getWindow();
 
 	void renderEntities();
 
@@ -215,7 +225,7 @@ public:
 	{
 		if (e < 0 || e >= MAX_ENTITIES)
 			error("EntityID %1% out of range in getComponentMask", std::to_string(e));
-		
+
 		return entities[e];
 	}
 
@@ -266,7 +276,35 @@ private:
 
 	// helpers
 	BaseComponent *addComponent(EntityID e, ComponentType type);
+
 	void addBrain(EntityID e, bool aiBrain);
+};
+
+class AnimationService : public BaseService
+{
+public:
+	virtual void onEnable() override;
+
+	void loadSprite(ConfigKeyValue &entityTags, EntityType entityType);
+
+	Animation *getAnimation(EntityType entityType, const std::string &name);
+
+	std::string getRandomAnimationName(EntityType entityType);
+
+	void processQueuedSprites();
+
+private:
+	sf::Texture texture;
+	std::map<EntityType, std::unordered_map<std::string, Animation>> animations;
+
+	std::map<sf::Image *, std::pair<ConfigKeyValue, EntityType>> *preProcessImageData;
+	bool processed;
+
+	void checkProcessed(bool shouldBe);
+
+	sf::Vector2i stringToVector(const std::string &s);
+
+	void positionImages(sf::Vector2i &imageSize, std::map<sf::Image *, sf::IntRect> &imagePositions);
 };
 
 // helpers
