@@ -27,7 +27,7 @@ void EntityService::killEntity(EntityID e)
 	entities[e] = COMPONENT_NONE;
 }
 
-bool EntityService::isAlive(EntityID e)
+bool EntityService::isAlive(EntityID e) const
 {
 	return entities[e] != COMPONENT_NONE;
 }
@@ -57,7 +57,7 @@ void EntityService::removeComponent(EntityID e, ComponentType type)
 	entities[e] &= ~type;
 }
 
-bool EntityService::hasComponent(EntityID e, ComponentType type)
+bool EntityService::hasComponent(EntityID e, ComponentType type) const
 {
 	return (entities[e] & type) != COMPONENT_NONE;
 }

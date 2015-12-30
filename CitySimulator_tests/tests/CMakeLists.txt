@@ -10,6 +10,7 @@ set(TEST_FILES
         test_helpers.hpp
         config_tests.cpp
         services_test.cpp
+        entity_tests.cpp
         utils_tests.cpp
         world_tests.cpp
         )

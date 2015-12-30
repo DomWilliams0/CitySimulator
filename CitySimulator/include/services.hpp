@@ -233,14 +233,15 @@ public:
 
 	virtual void onDisable() override;
 
-	// entity management
+	unsigned int getEntityCount() const;
+
 	EntityID createEntity();
 
 	void killEntity(EntityID e);
 
-	bool isAlive(EntityID e);
+	bool isAlive(EntityID e) const;
 
-	inline EntityID getComponentMask(EntityID e)
+	inline EntityID getComponentMask(EntityID e) const
 	{
 		if (e < 0 || e >= MAX_ENTITIES)
 			error("EntityID %1% out of range in getComponentMask", std::to_string(e));
@@ -256,7 +257,7 @@ public:
 	// component management
 	void removeComponent(EntityID e, ComponentType type);
 
-	bool hasComponent(EntityID e, ComponentType type);
+	bool hasComponent(EntityID e, ComponentType type) const;
 
 	BaseComponent *getComponentOfType(EntityID e, ComponentType type);
 

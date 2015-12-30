@@ -21,6 +21,9 @@
         "world": {
             "root": "data",
             "tileset": "data/tileset.png"
+        },
+        "entities": {
+            "config": "data/test_entities.json"
         }
     }
 }

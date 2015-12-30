@@ -335,3 +335,8 @@ void AnimationService::processQueuedSprites()
 
 	processed = true;
 }
+
+unsigned int EntityService::getEntityCount() const
+{
+	return entityCount;
+}
