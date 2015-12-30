@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "logger.hpp"
+#include "services.hpp"
 
 class TestingEnvironment : public ::testing::Environment
 {
@@ -7,7 +7,7 @@ class TestingEnvironment : public ::testing::Environment
 public:
 	virtual void SetUp() override
 	{
-		Logger::createLogger(std::cerr, Logger::DEBUG);
+		Locator::provide(SERVICE_LOGGING, new NullLoggingService);
 	}
 
 	virtual void TearDown() override

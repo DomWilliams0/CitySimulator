@@ -8,6 +8,7 @@
 #include "maploader.hpp"
 #include "SFMLDebugDraw.h"
 #include "game.hpp"
+#include "services.hpp"
 
 class World;
 
@@ -174,8 +175,8 @@ protected:
 class CollisionMap : public BaseWorld
 {
 public:
-	explicit CollisionMap(World *container) : BaseWorld(container), world(b2Vec2(0.f, 0.f)), worldBody(nullptr),
-	                                          b2Renderer(Globals::game->getWindow())
+	explicit CollisionMap(World *container) : BaseWorld(container), world(b2Vec2(0.f, 0.f)),
+	                                          worldBody(nullptr)
 	{
 		world.SetAllowSleeping(true);
 	}
@@ -205,7 +206,7 @@ private:
 		}
 	};
 
-	SFMLDebugDraw b2Renderer;
+	boost::optional<SFMLDebugDraw> b2Renderer;
 	std::multimap<sf::Vector2i, sf::FloatRect> cellGrid;
 
 	void findCollidableTiles(std::vector<CollisionRect> &rects) const;

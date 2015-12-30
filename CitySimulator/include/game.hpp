@@ -34,23 +34,11 @@ public:
 	{
 	}
 
-	void setView(const sf::View &view)
-	{
-		window.setView(view);
-	}
-
-	sf::RenderWindow &getWindow()
-	{
-		return window;
-	}
-
 	void beginGame();
 
 	void endGame();
 
 protected:
-	sf::RenderWindow &window;
-
 	bool showFPS;
 
 	virtual void start() = 0;
@@ -59,7 +47,7 @@ protected:
 
 	virtual void tick(float delta) = 0;
 
-	virtual void render() = 0;
+	virtual void render(sf::RenderWindow &window) = 0;
 
 	virtual void handleInput(sf::Event e) = 0;
 
@@ -92,7 +80,7 @@ protected:
 
 	void tick(float delta) override;
 
-	void render() override;
+	void render(sf::RenderWindow &window) override;
 
 	void handleInput(sf::Event e) override;
 

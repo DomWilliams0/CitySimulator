@@ -2,7 +2,7 @@
 #include <boost/tokenizer.hpp>
 #include "maploader.hpp"
 #include "utils.hpp"
-#include "logger.hpp"
+#include "services.hpp"
 
 TMX::PropertyType propertyTypeFromString(const std::string &s)
 {

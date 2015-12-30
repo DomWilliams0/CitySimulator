@@ -1,65 +1,15 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include "ai.hpp"
-#include "logger.hpp"
+#include "world.hpp"
 
-void EntityFactory::loadEntitiesFromFile(const std::string &fileName)
-{
-	ConfigurationFile config(Utils::searchForFile(fileName));
-	config.load();
-
-	loadEntities(config, ENTITY_HUMAN, "human");
-	loadEntities(config, ENTITY_VEHICLE, "vehicle");
-}
-
-void EntityFactory::loadEntities(ConfigurationFile &config, EntityType entityType, const std::string &sectionName)
-{
-	std::vector<std::map<std::string, std::string>> entities;
-	config.getMapList<std::string>(sectionName, entities);
-
-	// load tags
-	std::vector<ConfigKeyValue> entityMapList;
-	config.getMapList(sectionName, entityMapList);
-
-	Logger::pushIndent();
-
-	EntityTags allTags;
-	for (auto &entity : entityMapList)
-	{
-		auto nameIt(entity.find("name"));
-
-		// no name
-		if (nameIt == entity.end())
-		{
-			Logger::logWarning(format("No name found for entity of type %1%, skipping", std::to_string(entityType)));
-			continue;
-		}
-
-		std::string name(nameIt->second);
-		allTags.insert({name, entity});
-	}
-
-	loadedTags[entityType] = allTags;
-
-	// external resource loading
-	for (auto &entity : allTags)
-	{
-		// sprites
-		auto sprite = entity.second.find("sprite");
-		if (sprite != entity.second.end())
-			Globals::spriteSheet->loadSprite(entity.second, entityType);
-	}
-
-	Logger::popIndent();
-}
-
-Entity EntityManager::createEntity()
+EntityID EntityService::createEntity()
 {
 	// no space
 	if (entityCount == MAX_ENTITIES)
 		error("Max number of entities reached (%1%)", std::to_string(MAX_ENTITIES));
 
 	// todo: use a memory pool instead to avoid iterating the entire array each time
-	for (Entity e = 0; e < MAX_ENTITIES; ++e)
+	for (EntityID e = 0; e < MAX_ENTITIES; ++e)
 		if (!isAlive(e))
 		{
 			entityCount++;
@@ -69,16 +19,7 @@ Entity EntityManager::createEntity()
 	return MAX_ENTITIES;
 }
 
-Entity EntityManager::createEntityWithComponents(const std::initializer_list<ComponentType> &components)
-{
-	Entity e = createEntity();
-	for (ComponentType type : components)
-		addComponent(e, type);
-
-	return e;
-}
-
-void EntityManager::deleteEntity(Entity e)
+void EntityService::killEntity(EntityID e)
 {
 	if (isAlive(e))
 		entityCount--;
@@ -86,41 +27,42 @@ void EntityManager::deleteEntity(Entity e)
 	entities[e] = COMPONENT_NONE;
 }
 
-bool EntityManager::isAlive(Entity e)
+bool EntityService::isAlive(EntityID e) const
 {
 	return entities[e] != COMPONENT_NONE;
 }
 
-void EntityManager::tickSystems(float delta)
+void EntityService::tickSystems(float delta)
 {
 	for (System *system : systems)
-		system->tick(delta);
+		system->tick(this, delta);
 }
 
-void EntityManager::renderSystems(sf::RenderWindow &window)
+void EntityService::renderSystems(sf::RenderWindow &window)
 {
-	renderSystem->render(window);
+	renderSystem->render(this, window);
 }
 
-BaseComponent *EntityManager::addComponent(Entity e, ComponentType type)
+BaseComponent *EntityService::addComponent(EntityID e, ComponentType type)
 {
 	entities[e] |= type;
-	getComponentOfType(e, type)->reset();
 
-	return getComponentOfType(e, type);
+	auto comp = getComponentOfType(e, type);
+	comp->reset();
+	return comp;
 }
 
-void EntityManager::removeComponent(Entity e, ComponentType type)
+void EntityService::removeComponent(EntityID e, ComponentType type)
 {
 	entities[e] &= ~type;
 }
 
-bool EntityManager::hasComponent(Entity e, ComponentType type)
+bool EntityService::hasComponent(EntityID e, ComponentType type) const
 {
 	return (entities[e] & type) != COMPONENT_NONE;
 }
 
-BaseComponent *EntityManager::getComponentOfType(Entity e, ComponentType type)
+BaseComponent *EntityService::getComponentOfType(EntityID e, ComponentType type)
 {
 	switch (type)
 	{
@@ -135,7 +77,7 @@ BaseComponent *EntityManager::getComponentOfType(Entity e, ComponentType type)
 	}
 }
 
-void EntityManager::addPhysicsComponent(Entity e, World *world, const sf::Vector2i &startTilePos)
+void EntityService::addPhysicsComponent(EntityID e, World *world, const sf::Vector2i &startTilePos)
 {
 	PhysicsComponent *phys = dynamic_cast<PhysicsComponent *>(addComponent(e, COMPONENT_PHYSICS));
 	b2World *bWorld = world->getBox2DWorld();
@@ -163,16 +105,17 @@ void EntityManager::addPhysicsComponent(Entity e, World *world, const sf::Vector
 }
 
 
-void EntityManager::addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step,
+void EntityService::addRenderComponent(EntityID e, EntityType entityType, const std::string &animation, float step,
                                        DirectionType initialDirection, bool playing)
 {
 	RenderComponent *comp = dynamic_cast<RenderComponent *>(addComponent(e, COMPONENT_RENDER));
 
-	Animation *anim = Globals::spriteSheet->getAnimation(entityType, animation);
+	AnimationService *as = Locator::locate<AnimationService>();
+	Animation *anim = as->getAnimation(entityType, animation);
 	comp->anim.init(anim, step, initialDirection, playing);
 }
 
-void EntityManager::addBrain(Entity e, bool aiBrain)
+void EntityService::addBrain(EntityID e, bool aiBrain)
 {
 	InputComponent *comp = dynamic_cast<InputComponent *>(addComponent(e, COMPONENT_INPUT));
 
@@ -182,12 +125,12 @@ void EntityManager::addBrain(Entity e, bool aiBrain)
 		comp->brain.reset(new InputBrain(e));
 }
 
-void EntityManager::addPlayerInputComponent(Entity e)
+void EntityService::addPlayerInputComponent(EntityID e)
 {
 	addBrain(e, false);
 }
 
-void EntityManager::addAIInputComponent(Entity e)
+void EntityService::addAIInputComponent(EntityID e)
 {
 	addBrain(e, true);
 }

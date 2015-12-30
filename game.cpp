@@ -1,8 +1,7 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include "game.hpp"
-#include "logger.hpp"
-#include "config.hpp"
+#include "services.hpp"
 
 bool ensureCWD(int argc, char **argv)
 {
@@ -24,7 +23,7 @@ bool ensureCWD(int argc, char **argv)
 		// doesn't exist
 		if (!boost::filesystem::exists(newPath))
 		{
-			std::cerr << "Invalid path" << std::endl;
+			std::cerr << "Invalid path: " << newPath.string() << std::endl;
 			return false;
 		}
 
@@ -39,7 +38,8 @@ bool ensureCWD(int argc, char **argv)
 
 void loadConfig(int &windowStyle)
 {
-	Config::loadConfig();
+	auto config = new ConfigService(Constants::referenceConfigPath, Constants::configPath);
+	Locator::provide(SERVICE_CONFIG, config);
 
 	int width, height;
 
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
 			return -1;
 
 		// create logger
-		createLogger(std::cout, Logger::DEBUG);
+		Locator::provide(SERVICE_LOGGING, new LoggingService(std::cout, LOG_DEBUG));
 
 		// load window size/style
 		int style;

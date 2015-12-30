@@ -31,25 +31,6 @@ namespace Constants
 	extern std::string configPath;
 }
 
-class BaseGame;
-
-class SpriteSheet;
-
-class EntityManager;
-
-class EntityFactory;
-
-class Input;
-
-namespace Globals
-{
-	extern BaseGame *game;
-	extern Input *input;
-	extern SpriteSheet *spriteSheet;
-	extern EntityManager *entityManager;
-	extern EntityFactory *entityFactory;
-}
-
 typedef int DirectionType;
 
 namespace Direction

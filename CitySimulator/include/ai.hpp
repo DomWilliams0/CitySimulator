@@ -3,15 +3,15 @@
 
 #include "entity.hpp"
 #include "constants.hpp"
-#include "input.hpp"
+#include "services.hpp"
 
 class EntityBrain
 {
 public:
-	explicit EntityBrain(Entity e)
+	explicit EntityBrain(EntityID e)
 	{
 		entity = e;
-		phys = Globals::entityManager->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
+		phys = Locator::locate<EntityService>()->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
 		movementForce = Config::getFloat("debug.movement.force");
 	}
 
@@ -22,7 +22,7 @@ public:
 	virtual void tick(float delta) = 0;
 
 protected:
-	Entity entity;
+	EntityID entity;
 
 	float movementForce;
 
@@ -43,21 +43,18 @@ protected:
 class InputBrain : public EntityBrain
 {
 public:
-	explicit InputBrain(Entity e)
-			: EntityBrain(e), input(Globals::input)
+	explicit InputBrain(EntityID e)
+			: EntityBrain(e)
 	{
 	}
 
 	void tick(float delta) override;
-
-private:
-	Input *input;
 };
 
 class AIBrain : public EntityBrain
 {
 public:
-	explicit AIBrain(Entity e)
+	explicit AIBrain(EntityID e)
 			: EntityBrain(e)
 	{
 	}

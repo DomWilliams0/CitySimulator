@@ -1,31 +1,17 @@
 #ifndef CITYSIM_ENTITY_HPP
 #define CITYSIM_ENTITY_HPP
 
+typedef unsigned int EntityID;
+
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <vector>
 #include "animation.hpp"
 #include "config.hpp"
 #include "constants.hpp"
-#include "world.hpp"
-
-#define MAX_ENTITIES 1024
 
 class b2World;
 
 class b2Body;
-
-typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;
-
-class EntityFactory
-{
-public:
-	void loadEntitiesFromFile(const std::string &fileName);
-
-private:
-	std::map<EntityType, EntityTags> loadedTags;
-
-	void loadEntities(ConfigurationFile &config, EntityType entityType, const std::string &sectionName);
-};
 
 template<class T>
 sf::Vector2<T> fromB2Vec(const b2Vec2 &v)
@@ -40,8 +26,6 @@ b2Vec2 toB2Vec(const sf::Vector2<T> &v)
 }
 
 // component-entity-systems
-
-typedef unsigned int Entity;
 
 enum ComponentType
 {
@@ -100,6 +84,7 @@ struct PhysicsComponent : BaseComponent
 	b2Vec2 lastVelocity;
 };
 
+class EntityService;
 
 // systems
 class System
@@ -113,13 +98,13 @@ public:
 	{
 	}
 
-	void tick(float dt);
+	void tick(EntityService *es, float dt);
 
-	void render(sf::RenderWindow &window);
+	void render(EntityService *es, sf::RenderWindow &window);
 
-	virtual void tickEntity(Entity e, float dt) = 0;
+	virtual void tickEntity(EntityService *es, EntityID e, float dt) = 0;
 
-	virtual void renderEntity(Entity e, sf::RenderWindow &window)
+	virtual void renderEntity(EntityService *es, EntityID e, sf::RenderWindow &window)
 	{
 	}
 
@@ -134,9 +119,9 @@ public:
 	{
 	}
 
-	void tickEntity(Entity e, float dt) override;
+	void tickEntity(EntityService *es, EntityID e, float dt) override;
 
-	void renderEntity(Entity e, sf::RenderWindow &window) override;
+	void renderEntity(EntityService *es, EntityID e, sf::RenderWindow &window) override;
 };
 
 class InputSystem : public System
@@ -146,7 +131,7 @@ public:
 	{
 	}
 
-	void tickEntity(Entity e, float dt) override;
+	void tickEntity(EntityService *es, EntityID e, float dt) override;
 };
 
 class PhysicsSystem : public System
@@ -156,85 +141,7 @@ public:
 	{
 	}
 
-	void tickEntity(Entity e, float dt) override;
-};
-
-class EntityManager
-{
-public:
-	EntityManager() : entityCount(0)
-	{
-		// init entities
-		for (size_t i = 0; i < MAX_ENTITIES; ++i)
-			entities[i] = COMPONENT_NONE;
-
-		// init systems in correct order
-		systems.push_back(new InputSystem);
-		systems.push_back(new PhysicsSystem);
-
-		auto render = new RenderSystem;
-		systems.push_back(render);
-		renderSystem = render;
-	}
-
-	~EntityManager()
-	{
-		for (System *system : systems)
-			delete system;
-	}
-
-	Entity entities[MAX_ENTITIES];
-	size_t entityCount;
-
-	// entity
-	Entity createEntity();
-
-	Entity createEntityWithComponents(const std::initializer_list<ComponentType> &components);
-
-	void deleteEntity(Entity e);
-
-	bool isAlive(Entity e);
-
-	// systems
-	std::vector<System *> systems;
-	RenderSystem *renderSystem;
-
-	void renderSystems(sf::RenderWindow &window);
-
-	void tickSystems(float delta);
-
-	// components
-	PhysicsComponent physicsComponents[MAX_ENTITIES];
-	RenderComponent renderComponents[MAX_ENTITIES];
-	InputComponent inputComponents[MAX_ENTITIES];
-
-	// component management
-	void removeComponent(Entity e, ComponentType type);
-
-	bool hasComponent(Entity e, ComponentType type);
-
-	BaseComponent *getComponentOfType(Entity e, ComponentType type);
-
-	template<class T>
-	T *getComponent(Entity e, ComponentType type)
-	{
-		return dynamic_cast<T *>(getComponentOfType(e, type));
-	}
-
-	// helpers
-	void addPhysicsComponent(Entity e, World *world, const sf::Vector2i &startTilePos);
-
-	void addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step,
-	                        DirectionType initialDirection, bool playing);
-
-	void addPlayerInputComponent(Entity e);
-
-	void addAIInputComponent(Entity e);
-
-private:
-	BaseComponent *addComponent(Entity e, ComponentType type);
-
-	void addBrain(Entity e, bool aiBrain);
+	void tickEntity(EntityService *es, EntityID e, float dt) override;
 };
 
 #endif

@@ -8,9 +8,11 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 set(TEST_FILES
         tests.cpp
         test_helpers.hpp
+        config_tests.cpp
+        services_test.cpp
+        entity_tests.cpp
         utils_tests.cpp
         world_tests.cpp
-        config_tests.cpp
         )
 
 file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

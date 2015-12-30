@@ -15,13 +15,11 @@ set(SOURCE_FILES
         src/input.cpp
         src/logger.cpp
         src/maploader.cpp
+        src/services.cpp
         src/SFMLDebugDraw.cpp
         src/utils.cpp
         src/world.cpp
         src/world_render.cpp
-        )
-
-set(HEADER_fILES
         include/ai.hpp
         include/animation.hpp
         include/config.hpp
@@ -29,10 +27,9 @@ set(HEADER_fILES
         include/entity.hpp
         include/game.hpp
         include/gamestate.hpp
-        include/input.hpp
-        include/logger.hpp
         include/maploader.hpp
         include/PackingTreeNode.h
+        include/services.hpp
         include/SFMLDebugDraw.h
         include/state.hpp
         include/utils.hpp

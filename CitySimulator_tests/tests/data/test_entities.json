@@ -1,0 +1,12 @@
+{
+    "human": [
+        {
+            "name": "Test Man",
+            "sprite": "test_human_sprite.png",
+            "anim-count": 4,
+            "anim-length": 4,
+            "anim-dimensions-all": "32x32"
+        }
+    ],
+    "vehicle": []
+}

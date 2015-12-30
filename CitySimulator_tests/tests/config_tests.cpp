@@ -1,13 +1,12 @@
-#include "gtest/gtest.h"
 #include "test_helpers.hpp"
-#include "config.hpp"
-#include "utils.hpp"
+#include "services.hpp"
 
 struct ConfigTest : ::testing::Test
 {
 	virtual void SetUp() override
 	{
-		config = ConfigurationFile("data/test_reference_config.json");
+		config = ConfigurationFile("data/test_reference_config.json",
+		                           "data/test_config.json");
 		config.load();
 	}
 
@@ -80,8 +79,33 @@ TEST_F(ConfigTest, Overwriting)
 {
 	EXPECT_NE(config.getFloat("override-me.pegasus"), 100.f);
 
-	config.loadOnTop("data/test_config.json");
+	config.loadOnTop();
 
 	EXPECT_EQ(config.getFloat("override-me.pegasus"), 100.f);
 	EXPECT_EQ(config.getString("dog"), "cornichon");
 }
+
+TEST(ConfigServiceTest, ServiceAccess)
+{
+	auto service = new ConfigService("data/test_reference_config.json");
+	Locator::provide(SERVICE_CONFIG, service);
+
+	EXPECT_EQ(service->getString("butterfly"), "muffin");
+	EXPECT_EQ(service->getBool("car-battery.inner"), true);
+}
+
+TEST(ConfigServiceTest, GlobalConfig)
+{
+	Locator::provide(SERVICE_CONFIG, new ConfigService("data/test_reference_config.json"));
+
+	EXPECT_EQ(Config::getString("butterfly"), "muffin");
+	EXPECT_EQ(Config::getBool("car-battery.inner"), true);
+}
+
+TEST(ConfigServiceTest, GlobalConfigOverride)
+{
+	Locator::provide(SERVICE_CONFIG, new ConfigService("data/test_reference_config.json",
+	                                                   "data/test_config.json"));
+	EXPECT_EQ(Config::getFloat("override-me.pegasus"), 100.f);
+}
+

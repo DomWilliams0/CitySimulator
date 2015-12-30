@@ -13,8 +13,6 @@ class GameState : public State
 public:
 	GameState();
 
-	~GameState();
-
 	virtual void tick(float delta) override;
 
 	virtual void render(sf::RenderWindow &window) override;

@@ -14,34 +14,32 @@ public:
 	{
 	}
 
-	/// <summary>
-	/// No search will be attempted
-	/// </summary>
-	explicit ConfigurationFile(const std::string &fileName) : configPath(fileName), reloadFromFile(false)
+	explicit ConfigurationFile(const std::string &fileName, const std::string &overridingPath = "") :
+			configPath(fileName), overwriteConfigPath(overridingPath), reloadFromFile(false)
 	{
 	}
 
 	void load();
 
-	void loadOnTop(const std::string &path);
+	void loadOnTop();
 
 	void recurseAndOverwrite(boost::property_tree::ptree &tree, std::string prefix);
 
-	void getIntRef(const std::string &path, int &i);
+	void getIntRef(const std::string &path, int &i, int defaultValue = 0);
 
-	int getInt(const std::string &path);
+	int getInt(const std::string &path, int defaultValue = 0);
 
-	void getFloatRef(const std::string &path, float &f);
+	void getFloatRef(const std::string &path, float &f, float defaultValue = 0.f);
 
-	float getFloat(const std::string &path);
+	float getFloat(const std::string &path, float defaultValue = 0.f);
 
-	void getBoolRef(const std::string &path, bool &b);
+	void getBoolRef(const std::string &path, bool &b, bool defaultValue = false);
 
-	bool getBool(const std::string &path);
+	bool getBool(const std::string &path, bool defaultValue = false);
 
-	void getStringRef(const std::string &path, std::string &s);
+	void getStringRef(const std::string &path, std::string &s, const std::string &defaultValue = "");
 
-	std::string getString(const std::string &path);
+	std::string getString(const std::string &path, const std::string &defaultValue = "");
 
 	template<class T>
 	void getList(const std::string &path, std::vector<T> &l)
@@ -67,61 +65,31 @@ public:
 
 	void reload();
 
+	void setConfigPath(const std::string &path);
+
+	void setOverridingConfigPath(const std::string &path);
+
 	std::string getConfigPath() const;
 
 	std::string getOverwriteConfigPath() const;
-
-protected:
-	boost::filesystem::path configPath;
-	boost::filesystem::path overwriteConfigPath;
-
-	friend class Config;
 
 private:
 	boost::property_tree::ptree propertyTree;
 
 	bool reloadFromFile;
 	std::time_t lastModification;
-};
 
-class Config
-{
-public:
-	static void loadConfig();
-
-	static Config &getInstance()
-	{
-		static Config instance;
-		return instance;
-	}
-
-	static int getInt(const std::string &path);
-
-	static float getFloat(const std::string &path);
-
-	static bool getBool(const std::string &path);
-
-	static std::string getString(const std::string &path);
-
-	static std::string getResource(const std::string &path);
+	boost::filesystem::path configPath;
+	boost::filesystem::path overwriteConfigPath;
 
 	template<class T>
-	static void getList(const std::string &path, std::vector<int> &l)
+	T get(const std::string &path, T defaultValue)
 	{
-		getInstance().config.getList<T>(path, l);
+		if (reloadFromFile)
+			reload();
+
+		return propertyTree.get(path, defaultValue);
 	}
-
-	template<class T=std::string>
-	static void getMapList(const std::string &path, std::vector<std::map<std::string, T>> &ml)
-	{
-		getInstance().config.getMapList<T>(path, ml);
-	}
-
-
-private:
-	ConfigurationFile config;
-
-	void ensureConfigExists();
 };
 
 #endif

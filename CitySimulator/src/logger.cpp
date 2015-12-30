@@ -1,77 +1,52 @@
 #include <iostream>
-#include "logger.hpp"
+#include <algorithm>
+#include "services.hpp"
 
 const std::string PREFIX_STRING("    ");
 
-
-struct _Logger
+void LoggingService::onEnable()
 {
-	Logger::Level level;
-	std::ostream *stream;
-	std::string prefix;
+	levels[LOG_DEBUGGIEST] = "DEBUG";
+	levels[LOG_DEBUGGIER] = "DEBUG";
+	levels[LOG_DEBUG] = "DEBUG";
+	levels[LOG_INFO] = "INFO";
+	levels[LOG_WARNING] = "WARN";
+	levels[LOG_ERROR] = "FATAL";
 
-	void log(std::string msg, Logger::Level level)
-	{
-		std::string l;
-		switch (level)
-		{
-			case Logger::INFO:
-				l = "INFO";
-				break;
-			case Logger::DEBUG:
-				l = "DEBUG";
-				break;
-			case Logger::WARNING:
-				l = "WARNING";
-				break;
-			case Logger::ERROR:
-				l = "ERROR";
-				break;
-		}
+	// indent all levels equally
+	unsigned int longest(0);
+	for (auto &pair : levels)
+		longest = std::max(longest, static_cast<unsigned int>(pair.second.length()));
 
-		(*stream) << l << ": " << prefix << msg << std::endl;
-	}
-};
+	const int padding = 1;
+	longest += padding;
 
-_Logger logger;
-
-void Logger::createLogger(std::ostream &os, Level loggingLevel)
-{
-	logger.stream = &os;
-	logger.level = loggingLevel;
+	for (auto &pair : levels)
+		pair.second += std::string(longest - pair.second.length(), ' ');
 }
 
-void Logger::logInfo(const std::string &msg)
+void LoggingService::log(const std::string &msg, LogLevel level)
 {
-	logger.log(msg, Level::INFO);
+	if (level < this->level)
+		return;
+
+	auto l = levels.find(level);
+	if (l == levels.end())
+		error("Invalid log level %1%", std::to_string(level));
+
+	stream << l->second << ": " << prefix << msg << std::endl;
 }
 
-void Logger::logDebug(const std::string &msg)
+void LoggingService::pushIndent()
 {
-	logger.log(msg, Level::DEBUG);
+	prefix += PREFIX_STRING;
 }
 
-void Logger::logWarning(const std::string &msg)
+void LoggingService::popIndent()
 {
-	logger.log(msg, Level::WARNING);
-}
-
-void Logger::logError(const std::string &msg)
-{
-	logger.log(msg, Level::ERROR);
-}
-
-
-void Logger::pushIndent()
-{
-	logger.prefix += PREFIX_STRING;
-}
-
-void Logger::popIndent()
-{
-	auto currentLength = logger.prefix.length();
+	auto currentLength = prefix.length();
 	auto prefixLength = PREFIX_STRING.length();
 
 	if (currentLength >= prefixLength)
-		logger.prefix = logger.prefix.substr(0, currentLength - prefixLength);
+		prefix = prefix.substr(0, currentLength - prefixLength);
 }

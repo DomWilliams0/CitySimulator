@@ -1,4 +1,4 @@
-#include "gtest/gtest.h"
+#include "test_helpers.hpp"
 #include "world.hpp"
 
 class WorldTest : public ::testing::Test
@@ -8,10 +8,21 @@ protected:
 
 	virtual void SetUp() override
 	{
-		world.loadFromFile("data/test_world.tmx", "data/test_tileset.png");
+		Locator::provide(SERVICE_RENDER, new RenderService(nullptr));
+		Locator::provide(SERVICE_CONFIG, new ConfigService("data/test_reference_config.json",
+		                                                   "data/test_config.json"));
+
+		world.loadFromFile("test_world.tmx", "data/test_tileset.png");
 	}
 
 	virtual void TearDown() override
 	{
 	}
 };
+
+TEST_F(WorldTest, Size)
+{
+	auto realSize = sf::Vector2i(6, 6);
+	EXPECT_EQ(world.getTileSize(), realSize);
+	EXPECT_EQ(world.getPixelSize(), Utils::toPixel(realSize));
+}
