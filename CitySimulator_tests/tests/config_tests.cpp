@@ -1,6 +1,5 @@
 #include "test_helpers.hpp"
-#include "config.hpp"
-#include "utils.hpp"
+#include "services.hpp"
 
 struct ConfigTest : ::testing::Test
 {
@@ -85,3 +84,28 @@ TEST_F(ConfigTest, Overwriting)
 	EXPECT_EQ(config.getFloat("override-me.pegasus"), 100.f);
 	EXPECT_EQ(config.getString("dog"), "cornichon");
 }
+
+TEST(ConfigServiceTest, ServiceAccess)
+{
+	auto service = new ConfigService("data/test_reference_config.json");
+	Locator::provide(SERVICE_CONFIG, service);
+
+	EXPECT_EQ(service->getString("butterfly"), "muffin");
+	EXPECT_EQ(service->getBool("car-battery.inner"), true);
+}
+
+TEST(ConfigServiceTest, GlobalConfig)
+{
+	Locator::provide(SERVICE_CONFIG, new ConfigService("data/test_reference_config.json"));
+
+	EXPECT_EQ(Config::getString("butterfly"), "muffin");
+	EXPECT_EQ(Config::getBool("car-battery.inner"), true);
+}
+
+TEST(ConfigServiceTest, GlobalConfigOverride)
+{
+	Locator::provide(SERVICE_CONFIG, new ConfigService("data/test_reference_config.json",
+	                                                   "data/test_config.json"));
+	EXPECT_EQ(Config::getFloat("override-me.pegasus"), 100.f);
+}
+
