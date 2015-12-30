@@ -7,7 +7,7 @@
 BaseGame::BaseGame(sf::RenderWindow &window)
 {
 	// graphics backend
-	Locator::provide(SERVICE_RENDER, new RenderService(window));
+	Locator::provide(SERVICE_RENDER, new RenderService(&window));
 
 	// set icon
 	setWindowIcon("icon.png");

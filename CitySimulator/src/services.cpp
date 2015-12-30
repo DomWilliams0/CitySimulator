@@ -20,17 +20,17 @@ Locator::~Locator()
 		delete service;
 }
 
-RenderService::RenderService(sf::RenderWindow &renderWindow) : window(renderWindow)
+RenderService::RenderService(sf::RenderWindow *renderWindow) : window(renderWindow)
 {
 }
 
 sf::RenderWindow* RenderService::getWindow()
 {
-	return &window;
+	return window;
 }
 
 void RenderService::renderEntities()
 {
 	// todo temporary until Globals is nuked
-	Globals::entityManager->renderSystems(window);
+	Globals::entityManager->renderSystems(*window);
 }

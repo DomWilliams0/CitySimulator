@@ -139,15 +139,14 @@ private:
 class RenderService : public BaseService
 {
 public:
-	RenderService(sf::RenderWindow &renderWindow);
+	RenderService(sf::RenderWindow *renderWindow);
 
 	sf::RenderWindow* getWindow();
 
 	void renderEntities();
 
-
 private:
-	sf::RenderWindow &window;
+	sf::RenderWindow *window;
 };
 
 #endif

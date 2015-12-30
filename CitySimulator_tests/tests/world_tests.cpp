@@ -8,6 +8,8 @@ protected:
 
 	virtual void SetUp() override
 	{
+		Locator::provide(SERVICE_RENDER, new RenderService(nullptr));
+
 		world.loadFromFile("data/test_world.tmx", "data/test_tileset.png");
 	}
 
@@ -15,3 +17,10 @@ protected:
 	{
 	}
 };
+
+TEST_F(WorldTest, Size)
+{
+	auto realSize = sf::Vector2i(6, 6);
+	EXPECT_EQ(world.getTileSize(), realSize);
+	EXPECT_EQ(world.getPixelSize(), Utils::toPixel(realSize));
+}

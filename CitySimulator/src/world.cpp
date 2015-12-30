@@ -220,8 +220,13 @@ void CollisionMap::load()
 	mergeAdjacentTiles(rects, mergedRects);
 
 	// debug drawing
-	world.SetDebugDraw(&b2Renderer);
-	b2Renderer.SetFlags(b2Draw::e_shapeBit);
+	sf::RenderWindow *window = Locator::locate<RenderService>()->getWindow();
+	if (window != nullptr)
+	{
+		b2Renderer.emplace(*window);
+		world.SetDebugDraw(&*b2Renderer);
+		b2Renderer->SetFlags(b2Draw::e_shapeBit);
+	}
 
 	// create world body
 	b2BodyDef worldBodyDef;
