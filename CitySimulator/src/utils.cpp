@@ -6,6 +6,7 @@
 #include <boost/lexical_cast.hpp>
 #include "utils.hpp"
 #include "config.hpp"
+#include "services.hpp"
 
 std::string format(const std::string &s, const std::string &arg1)
 {

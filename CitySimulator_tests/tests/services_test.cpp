@@ -4,11 +4,11 @@
 TEST(ServicesTest, Provide)
 {
 	// locate non-existent without error
-	InputService *dead = Locator::locate<InputService>();
+	InputService *dead = Locator::locate<InputService>(false);
 	EXPECT_EQ(dead, nullptr);
 
 	// with error
-	EXPECT_ANY_THROW(Locator::locate<InputService>(true));
+	EXPECT_ANY_THROW(Locator::locate<InputService>());
 
 	InputService *old = new InputService;
 	Locator::provide(SERVICE_INPUT, old);
@@ -24,7 +24,6 @@ TEST(ServicesTest, Provide)
 TEST(ServicesTest, InputService)
 {
 	auto input = Locator::locate<InputService>();
-	ASSERT_NE(input, nullptr);
 
 	auto binding = InputKey::KEY_DOWN;
 
@@ -56,7 +55,6 @@ TEST(ServicesTest, InputService)
 TEST(ServicesTest, KeyBindings)
 {
 	auto input = Locator::locate<InputService>();
-	ASSERT_NE(input, nullptr);
 
 	input->bindKey(KEY_UP, sf::Keyboard::G);
 	EXPECT_EQ(input->getBinding(sf::Keyboard::G), KEY_UP);

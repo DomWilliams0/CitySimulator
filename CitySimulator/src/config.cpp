@@ -2,8 +2,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include "constants.hpp"
 #include "config.hpp"
-#include "utils.hpp"
-#include "logger.hpp"
+#include "services.hpp"
 
 #define RELOAD if (reloadFromFile)\
 					reload()
@@ -19,17 +18,19 @@ void ConfigurationFile::load()
 	read_json(configPath.string(), propertyTree);
 }
 
-void ConfigurationFile::loadOnTop(const std::string &path)
+void ConfigurationFile::loadOnTop()
 {
-	if (!boost::filesystem::exists(path))
+	if (!boost::filesystem::exists(overwriteConfigPath))
 	{
-		Logger::logDebug(format("Overriding config not found (%1%)", path));
+		Logger::logDebug(format("Overriding config not found (%1%)", overwriteConfigPath.string()));
 		return;
 	}
 
 	// load overriding config
-	ConfigurationFile loaded(path);
+	ConfigurationFile loaded(overwriteConfigPath.string());
 	loaded.load();
+
+	Logger::logDebug(format("Found overriding config at %1%", getOverwriteConfigPath()));
 
 	// put all values
 	Logger::pushIndent();
@@ -135,9 +136,18 @@ void ConfigurationFile::reload()
 
 		Logger::logDebug(format("Reloading overwriting config from '%1%'", overwriteConfigPath.string()));
 		Logger::pushIndent();
-		loadOnTop(overwriteConfigPath.string());
+		loadOnTop();
 		Logger::popIndent();
 	}
+}
+
+void ConfigurationFile::setConfigPath(const std::string &path)
+{
+	configPath = boost::filesystem::path(path);
+}
+void ConfigurationFile::setOverridingConfigPath(const std::string &path)
+{
+	overwriteConfigPath = boost::filesystem::path(path);
 }
 
 std::string ConfigurationFile::getConfigPath() const
@@ -150,55 +160,83 @@ std::string ConfigurationFile::getOverwriteConfigPath() const
 	return overwriteConfigPath.string();
 }
 
+ConfigService::ConfigService(const std::string &path, const std::string &overridingPath) :
+		config(path, overridingPath)
+{
+}
 
-void Config::loadConfig()
+void ConfigService::onEnable()
 {
 	// load reference
-	getInstance().config.configPath = boost::filesystem::canonical(Constants::referenceConfigPath);
-	getInstance().ensureConfigExists();
-	getInstance().config.load();
+	ensureConfigExists();
+	config.load();
 
 	// overriding config
-	getInstance().config.loadOnTop(Constants::configPath);
+	config.loadOnTop();
 
 	// reload?
-	getInstance().config.setReloadFromFile(Config::getBool("debug.reload-config"));
+	config.setReloadFromFile(ConfigService::getBool("debug.reload-config"));
 }
 
 
-void Config::ensureConfigExists()
+void ConfigService::ensureConfigExists()
 {
 	// create default config
-	if (!exists(getInstance().config.configPath))
+	if (!boost::filesystem::exists(config.getConfigPath()))
 	{
 		Logger::logInfo("Config not found!");
-		error("Could not find reference config at %1%", getInstance().config.configPath.string());
+		error("Could not find reference config at %1%", config.getConfigPath());
 	}
 
-	Logger::logInfo("Found reference config");
+	Logger::logInfo(format("Found reference config at %1%", config.getConfigPath()));
+}
+
+int ConfigService::getInt(const std::string &path)
+{
+	return config.getInt(path);
+}
+
+float ConfigService::getFloat(const std::string &path)
+{
+	return config.getFloat(path);
+}
+
+bool ConfigService::getBool(const std::string &path)
+{
+	return config.getBool(path);
+}
+
+std::string ConfigService::getString(const std::string &path)
+{
+	return config.getString(path);
+}
+
+std::string ConfigService::getResource(const std::string &path)
+{
+	return getString("resources." + path);
 }
 
 int Config::getInt(const std::string &path)
 {
-	return getInstance().config.getInt(path);
+	return Locator::locate<ConfigService>()->getInt(path);
 }
 
 float Config::getFloat(const std::string &path)
 {
-	return getInstance().config.getFloat(path);
+	return Locator::locate<ConfigService>()->getFloat(path);
 }
 
 bool Config::getBool(const std::string &path)
 {
-	return getInstance().config.getBool(path);
+	return Locator::locate<ConfigService>()->getBool(path);
 }
 
 std::string Config::getString(const std::string &path)
 {
-	return getInstance().config.getString(path);
+	return Locator::locate<ConfigService>()->getString(path);
 }
 
 std::string Config::getResource(const std::string &path)
 {
-	return getString("resources." + path);
+	return Locator::locate<ConfigService>()->getResource(path);
 }

@@ -4,11 +4,13 @@
 #include <boost/bimap.hpp>
 #include "logger.hpp"
 #include "utils.hpp"
+#include "config.hpp"
 
 enum ServiceType
 {
 	SERVICE_INPUT,
 	SERVICE_RENDER,
+	SERVICE_CONFIG,
 
 	SERVICE_COUNT
 };
@@ -23,6 +25,7 @@ public:
 
 class InputService;
 class RenderService;
+class ConfigService;
 
 class Locator
 {
@@ -56,6 +59,8 @@ public:
 			type = SERVICE_INPUT;
 		else if (typeid(T) == typeid(RenderService))
 			type = SERVICE_RENDER;
+		else if (typeid(T) == typeid(ConfigService))
+			type = SERVICE_CONFIG;
 
 		if (type == SERVICE_COUNT)
 			error("Invalid service type given");
@@ -148,5 +153,67 @@ public:
 private:
 	sf::RenderWindow *window;
 };
+
+class ConfigService : public BaseService
+{
+public:
+	ConfigService(const std::string &path, const std::string &overridingPath = "");
+
+	virtual void onEnable() override;
+
+	int getInt(const std::string &path);
+
+	float getFloat(const std::string &path);
+
+	bool getBool(const std::string &path);
+
+	std::string getString(const std::string &path);
+
+	std::string getResource(const std::string &path);
+
+	template<class T>
+	void getList(const std::string &path, std::vector<int> &l)
+	{
+		config.getList<T>(path, l);
+	}
+
+	template<class T=std::string>
+	void getMapList(const std::string &path, std::vector<std::map<std::string, T>> &ml)
+	{
+		config.getMapList<T>(path, ml);
+	}
+
+private:
+	ConfigurationFile config;
+
+	void ensureConfigExists();
+};
+
+// helpers
+
+namespace Config
+{
+	int getInt(const std::string &path);
+
+	float getFloat(const std::string &path);
+
+	bool getBool(const std::string &path);
+
+	std::string getString(const std::string &path);
+
+	std::string getResource(const std::string &path);
+
+	template<class T>
+	void getList(const std::string &path, std::vector<int> &l)
+	{
+		Locator::locate<ConfigService>()->getList<T>(path, l);
+	}
+
+	template<class T=std::string>
+	void getMapList(const std::string &path, std::vector<std::map<std::string, T>> &ml)
+	{
+		Locator::locate<ConfigService>()->getMapList<T>(path, ml);
+	}
+}
 
 #endif

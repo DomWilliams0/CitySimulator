@@ -9,6 +9,8 @@ protected:
 	virtual void SetUp() override
 	{
 		Locator::provide(SERVICE_RENDER, new RenderService(nullptr));
+		Locator::provide(SERVICE_CONFIG, new ConfigService("data/test_reference_config.json",
+		                                                   "data/test_config.json"));
 
 		world.loadFromFile("data/test_world.tmx", "data/test_tileset.png");
 	}

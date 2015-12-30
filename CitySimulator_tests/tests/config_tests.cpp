@@ -6,7 +6,8 @@ struct ConfigTest : ::testing::Test
 {
 	virtual void SetUp() override
 	{
-		config = ConfigurationFile("data/test_reference_config.json");
+		config = ConfigurationFile("data/test_reference_config.json",
+		                           "data/test_config.json");
 		config.load();
 	}
 
@@ -79,7 +80,7 @@ TEST_F(ConfigTest, Overwriting)
 {
 	EXPECT_NE(config.getFloat("override-me.pegasus"), 100.f);
 
-	config.loadOnTop("data/test_config.json");
+	config.loadOnTop();
 
 	EXPECT_EQ(config.getFloat("override-me.pegasus"), 100.f);
 	EXPECT_EQ(config.getString("dog"), "cornichon");
