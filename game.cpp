@@ -23,7 +23,7 @@ bool ensureCWD(int argc, char **argv)
 		// doesn't exist
 		if (!boost::filesystem::exists(newPath))
 		{
-			std::cerr << "Invalid path" << std::endl;
+			std::cerr << "Invalid path: " << newPath.string() << std::endl;
 			return false;
 		}
 
