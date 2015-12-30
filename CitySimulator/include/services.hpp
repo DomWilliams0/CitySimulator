@@ -2,6 +2,8 @@
 #define CITYSIM_SERVICES_HPP
 
 #include <boost/bimap.hpp>
+#include <typeindex>
+#include <typeinfo>
 #include "entity.hpp"
 #include "logger.hpp"
 #include "utils.hpp"
@@ -64,25 +66,15 @@ public:
 	template<class T>
 	static T *locate(bool errorOnFail = true)
 	{
-		ServiceType type = SERVICE_UNKNOWN;
+		auto possibleType = getInstance().types.find(typeid(T));
 
-		if (typeid(T) == typeid(InputService))
-			type = SERVICE_INPUT;
-		else if (typeid(T) == typeid(RenderService))
-			type = SERVICE_RENDER;
-		else if (typeid(T) == typeid(ConfigService))
-			type = SERVICE_CONFIG;
-		else if (typeid(T) == typeid(EntityService))
-			type = SERVICE_ENTITY;
-		else if (typeid(T) == typeid(AnimationService))
-			type = SERVICE_ANIMATION;
-
-		if (type == SERVICE_UNKNOWN)
+		if (possibleType == getInstance().types.end())
 			error("Invalid service type given");
 
-		auto ret = dynamic_cast<T *>(getInstance().services[type]);
+		ServiceType type = possibleType->second;
+		T *ret = dynamic_cast<T *>(getInstance().services[type]);
 		if (errorOnFail && ret == nullptr)
-			error("%1% service could not be located", serviceToString(type));
+			error("Could not locate service '%1%'", serviceToString(type));
 		return ret;
 	}
 
@@ -117,6 +109,8 @@ private:
 	}
 
 	std::vector<BaseService *> services;
+	std::unordered_map<std::type_index, ServiceType> types;
+
 };
 
 // services
