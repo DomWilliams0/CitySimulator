@@ -20,9 +20,6 @@ set(SOURCE_FILES
         src/utils.cpp
         src/world.cpp
         src/world_render.cpp
-        )
-
-set(HEADER_fILES
         include/ai.hpp
         include/animation.hpp
         include/config.hpp
