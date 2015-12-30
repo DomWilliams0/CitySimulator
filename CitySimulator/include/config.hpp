@@ -5,8 +5,6 @@
 #include <boost/property_tree/ptree.hpp>
 #include <map>
 
-#define FAIL_GET(path) ERROR("Invalid config path: %1%", path)
-
 class ConfigurationFile
 {
 public:
