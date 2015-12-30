@@ -38,7 +38,7 @@ void InputService::bindKey(InputKey binding, sf::Keyboard::Key key)
 	}
 
 	bindings.left.insert({binding, key});
-	Logger::logDebug(format("%1% binding for key %2%: %3%", verb, std::to_string(key), std::to_string(binding)));
+	Logger::logDebuggier(format("%1% binding for key %2%: %3%", verb, std::to_string(key), std::to_string(binding)));
 }
 
 

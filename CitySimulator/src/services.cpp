@@ -158,7 +158,7 @@ void AnimationService::loadSprite(ConfigKeyValue &entityTags, EntityType entityT
 		error("Could not load sprite %1%", fileName);
 
 	preProcessImageData->insert({image, {entityTags, entityType}});
-	Logger::logDebug(format("Loaded sprite %1%", entityTags["name"]));
+	Logger::logDebuggier(format("Loaded sprite %1%", entityTags["name"]));
 }
 
 void AnimationService::checkProcessed(bool shouldBe)

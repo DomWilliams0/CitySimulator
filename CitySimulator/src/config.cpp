@@ -53,7 +53,7 @@ void ConfigurationFile::recurseAndOverwrite(boost::property_tree::ptree &tree, s
 
 		// overwrite value
 		propertyTree.put(name, value);
-		Logger::logDebug(format("Overwriting config value '%1%' with '%2%'", name, value));
+		Logger::logDebuggiest(format("Overwriting config value '%1%' with '%2%'", name, value));
 
 		return;
 	}
