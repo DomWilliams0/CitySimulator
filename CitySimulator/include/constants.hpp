@@ -35,8 +35,6 @@ class BaseGame;
 
 class SpriteSheet;
 
-class EntityManager;
-
 class EntityFactory;
 
 class Input;
@@ -44,7 +42,6 @@ class Input;
 namespace Globals
 {
 	extern SpriteSheet *spriteSheet;
-	extern EntityManager *entityManager;
 	extern EntityFactory *entityFactory;
 }
 

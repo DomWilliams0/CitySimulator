@@ -5,6 +5,7 @@
 #include "logger.hpp"
 #include "utils.hpp"
 #include "config.hpp"
+#include "entity.hpp"
 
 enum ServiceType
 {
@@ -187,6 +188,69 @@ private:
 	ConfigurationFile config;
 
 	void ensureConfigExists();
+};
+
+const unsigned int MAX_ENTITIES = 1024;
+typedef unsigned int EntityID;
+
+class EntityService : public BaseService
+{
+public:
+	virtual void onEnable() override;
+
+	virtual void onDisable() override;
+
+	// entity management
+	EntityID createEntity();
+
+	void killEntity(EntityID e);
+
+	bool isAlive(EntityID e);
+
+	// systems
+	void tickSystems(float delta);
+
+	void renderSystems(sf::RenderWindow &window);
+
+private:
+	Entity entities[MAX_ENTITIES];
+	size_t entityCount;
+
+	// components
+	PhysicsComponent physicsComponents[MAX_ENTITIES];
+	RenderComponent renderComponents[MAX_ENTITIES];
+	InputComponent inputComponents[MAX_ENTITIES];
+
+	// component management
+	void removeComponent(Entity e, ComponentType type);
+
+	bool hasComponent(Entity e, ComponentType type);
+
+	BaseComponent *getComponentOfType(Entity e, ComponentType type);
+
+	template<class T>
+	T *getComponent(Entity e, ComponentType type)
+	{
+		return dynamic_cast<T *>(getComponentOfType(e, type));
+	}
+
+	// systems
+	std::vector<System *> systems;
+	RenderSystem *renderSystem;
+
+	// helpers
+	void addPhysicsComponent(Entity e, World *world, const sf::Vector2i &startTilePos);
+
+	void addRenderComponent(Entity e, EntityType entityType, const std::string &animation,
+	                        float step, DirectionType initialDirection, bool playing);
+
+	void addPlayerInputComponent(Entity e);
+
+	void addAIInputComponent(Entity e);
+
+	BaseComponent *addComponent(Entity e, ComponentType type);
+
+	void addBrain(Entity e, bool aiBrain);
 };
 
 // helpers

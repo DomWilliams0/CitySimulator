@@ -6,7 +6,7 @@
 GameState::GameState() : State(GAME), playerControl(true)
 {
 	// create globals
-	Globals::entityManager = new EntityManager;
+	// todo SOON TO BE VANQUISHED
 	Globals::entityFactory = new EntityFactory;
 	Globals::spriteSheet = new SpriteSheet;
 
@@ -27,18 +27,17 @@ GameState::GameState() : State(GAME), playerControl(true)
 	view.zoom(Config::getFloat("debug.zoom"));
 	Locator::locate<RenderService>()->getWindow()->setView(view);
 
-	Entity e = Globals::entityManager->createEntity();
-	sf::Vector2i tilePos = {Config::getInt("debug.start-pos.x"), Config::getInt("debug.start-pos.y")};
-	Globals::entityManager->addPhysicsComponent(e, &world, tilePos);
-	Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, "Business Man", 0.2f, Direction::EAST, false);
-	Globals::entityManager->addPlayerInputComponent(e);
-
-	entityTracking = (PhysicsComponent *) Globals::entityManager->getComponentOfType(e, COMPONENT_PHYSICS);
+//	Entity e = Globals::entityManager->createEntity();
+//	sf::Vector2i tilePos = {Config::getInt("debug.start-pos.x"), Config::getInt("debug.start-pos.y")};
+//	Globals::entityManager->addPhysicsComponent(e, &world, tilePos);
+//	Globals::entityManager->addRenderComponent(e, ENTITY_HUMAN, "Business Man", 0.2f, Direction::EAST, false);
+//	Globals::entityManager->addPlayerInputComponent(e);
+//
+//	entityTracking = (PhysicsComponent *) Globals::entityManager->getComponentOfType(e, COMPONENT_PHYSICS);
 }
 
 GameState::~GameState()
 {
-	delete Globals::entityManager;
 	delete Globals::entityFactory;
 	delete Globals::spriteSheet;
 }

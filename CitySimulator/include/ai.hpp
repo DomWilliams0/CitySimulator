@@ -11,7 +11,8 @@ public:
 	explicit EntityBrain(Entity e)
 	{
 		entity = e;
-		phys = Globals::entityManager->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
+//		todo phys = Globals::entityManager->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
+		phys = nullptr;
 		movementForce = Config::getFloat("debug.movement.force");
 	}
 

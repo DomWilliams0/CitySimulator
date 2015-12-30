@@ -8,7 +8,6 @@
 #include "constants.hpp"
 #include "world.hpp"
 
-#define MAX_ENTITIES 1024
 
 class b2World;
 
@@ -157,84 +156,6 @@ public:
 	}
 
 	void tickEntity(Entity e, float dt) override;
-};
-
-class EntityManager
-{
-public:
-	EntityManager() : entityCount(0)
-	{
-		// init entities
-		for (size_t i = 0; i < MAX_ENTITIES; ++i)
-			entities[i] = COMPONENT_NONE;
-
-		// init systems in correct order
-		systems.push_back(new InputSystem);
-		systems.push_back(new PhysicsSystem);
-
-		auto render = new RenderSystem;
-		systems.push_back(render);
-		renderSystem = render;
-	}
-
-	~EntityManager()
-	{
-		for (System *system : systems)
-			delete system;
-	}
-
-	Entity entities[MAX_ENTITIES];
-	size_t entityCount;
-
-	// entity
-	Entity createEntity();
-
-	Entity createEntityWithComponents(const std::initializer_list<ComponentType> &components);
-
-	void deleteEntity(Entity e);
-
-	bool isAlive(Entity e);
-
-	// systems
-	std::vector<System *> systems;
-	RenderSystem *renderSystem;
-
-	void renderSystems(sf::RenderWindow &window);
-
-	void tickSystems(float delta);
-
-	// components
-	PhysicsComponent physicsComponents[MAX_ENTITIES];
-	RenderComponent renderComponents[MAX_ENTITIES];
-	InputComponent inputComponents[MAX_ENTITIES];
-
-	// component management
-	void removeComponent(Entity e, ComponentType type);
-
-	bool hasComponent(Entity e, ComponentType type);
-
-	BaseComponent *getComponentOfType(Entity e, ComponentType type);
-
-	template<class T>
-	T *getComponent(Entity e, ComponentType type)
-	{
-		return dynamic_cast<T *>(getComponentOfType(e, type));
-	}
-
-	// helpers
-	void addPhysicsComponent(Entity e, World *world, const sf::Vector2i &startTilePos);
-
-	void addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step,
-	                        DirectionType initialDirection, bool playing);
-
-	void addPlayerInputComponent(Entity e);
-
-	void addAIInputComponent(Entity e);
-
-private:
-	BaseComponent *addComponent(Entity e, ComponentType type);
-
-	void addBrain(Entity e, bool aiBrain);
 };
 
 #endif

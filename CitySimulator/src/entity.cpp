@@ -52,7 +52,7 @@ void EntityFactory::loadEntities(ConfigurationFile &config, EntityType entityTyp
 	Logger::popIndent();
 }
 
-Entity EntityManager::createEntity()
+Entity EntityService::createEntity()
 {
 	// no space
 	if (entityCount == MAX_ENTITIES)
@@ -69,16 +69,7 @@ Entity EntityManager::createEntity()
 	return MAX_ENTITIES;
 }
 
-Entity EntityManager::createEntityWithComponents(const std::initializer_list<ComponentType> &components)
-{
-	Entity e = createEntity();
-	for (ComponentType type : components)
-		addComponent(e, type);
-
-	return e;
-}
-
-void EntityManager::deleteEntity(Entity e)
+void EntityService::killEntity(Entity e)
 {
 	if (isAlive(e))
 		entityCount--;
@@ -86,41 +77,42 @@ void EntityManager::deleteEntity(Entity e)
 	entities[e] = COMPONENT_NONE;
 }
 
-bool EntityManager::isAlive(Entity e)
+bool EntityService::isAlive(Entity e)
 {
 	return entities[e] != COMPONENT_NONE;
 }
 
-void EntityManager::tickSystems(float delta)
+void EntityService::tickSystems(float delta)
 {
 	for (System *system : systems)
 		system->tick(delta);
 }
 
-void EntityManager::renderSystems(sf::RenderWindow &window)
+void EntityService::renderSystems(sf::RenderWindow &window)
 {
 	renderSystem->render(window);
 }
 
-BaseComponent *EntityManager::addComponent(Entity e, ComponentType type)
+BaseComponent *EntityService::addComponent(Entity e, ComponentType type)
 {
 	entities[e] |= type;
-	getComponentOfType(e, type)->reset();
 
-	return getComponentOfType(e, type);
+	auto comp = getComponentOfType(e, type);
+	comp->reset();
+	return comp;
 }
 
-void EntityManager::removeComponent(Entity e, ComponentType type)
+void EntityService::removeComponent(Entity e, ComponentType type)
 {
 	entities[e] &= ~type;
 }
 
-bool EntityManager::hasComponent(Entity e, ComponentType type)
+bool EntityService::hasComponent(Entity e, ComponentType type)
 {
 	return (entities[e] & type) != COMPONENT_NONE;
 }
 
-BaseComponent *EntityManager::getComponentOfType(Entity e, ComponentType type)
+BaseComponent *EntityService::getComponentOfType(Entity e, ComponentType type)
 {
 	switch (type)
 	{
@@ -135,7 +127,7 @@ BaseComponent *EntityManager::getComponentOfType(Entity e, ComponentType type)
 	}
 }
 
-void EntityManager::addPhysicsComponent(Entity e, World *world, const sf::Vector2i &startTilePos)
+void EntityService::addPhysicsComponent(Entity e, World *world, const sf::Vector2i &startTilePos)
 {
 	PhysicsComponent *phys = dynamic_cast<PhysicsComponent *>(addComponent(e, COMPONENT_PHYSICS));
 	b2World *bWorld = world->getBox2DWorld();
@@ -163,7 +155,7 @@ void EntityManager::addPhysicsComponent(Entity e, World *world, const sf::Vector
 }
 
 
-void EntityManager::addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step,
+void EntityService::addRenderComponent(Entity e, EntityType entityType, const std::string &animation, float step,
                                        DirectionType initialDirection, bool playing)
 {
 	RenderComponent *comp = dynamic_cast<RenderComponent *>(addComponent(e, COMPONENT_RENDER));
@@ -172,7 +164,7 @@ void EntityManager::addRenderComponent(Entity e, EntityType entityType, const st
 	comp->anim.init(anim, step, initialDirection, playing);
 }
 
-void EntityManager::addBrain(Entity e, bool aiBrain)
+void EntityService::addBrain(Entity e, bool aiBrain)
 {
 	InputComponent *comp = dynamic_cast<InputComponent *>(addComponent(e, COMPONENT_INPUT));
 
@@ -182,12 +174,12 @@ void EntityManager::addBrain(Entity e, bool aiBrain)
 		comp->brain.reset(new InputBrain(e));
 }
 
-void EntityManager::addPlayerInputComponent(Entity e)
+void EntityService::addPlayerInputComponent(Entity e)
 {
 	addBrain(e, false);
 }
 
-void EntityManager::addAIInputComponent(Entity e)
+void EntityService::addAIInputComponent(Entity e)
 {
 	addBrain(e, true);
 }

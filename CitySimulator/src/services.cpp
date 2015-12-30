@@ -1,6 +1,5 @@
 #include <SFML/Graphics.hpp>
 #include "services.hpp"
-#include "entity.hpp"
 
 void BaseService::onEnable()
 {
@@ -33,4 +32,25 @@ void RenderService::renderEntities()
 {
 	// todo temporary until Globals is nuked
 	Globals::entityManager->renderSystems(*window);
+}
+
+void EntityService::onEnable()
+{
+	// init entities
+	for (size_t i = 0; i < MAX_ENTITIES; ++i)
+		entities[i] = COMPONENT_NONE;
+
+	// init systems in correct order
+	systems.push_back(new InputSystem);
+	systems.push_back(new PhysicsSystem);
+
+	auto render = new RenderSystem;
+	systems.push_back(render);
+	renderSystem = render;
+}
+
+void EntityService::onDisable()
+{
+	for (System *system : systems)
+		delete system;
 }
