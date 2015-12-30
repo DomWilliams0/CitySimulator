@@ -236,6 +236,15 @@ public:
 		return dynamic_cast<T *>(getComponentOfType(e, type));
 	}
 
+	void addPhysicsComponent(EntityID e, World *world, const sf::Vector2i &startTilePos);
+
+	void addRenderComponent(EntityID e, EntityType entityType, const std::string &animation,
+	                        float step, DirectionType initialDirection, bool playing);
+
+	void addPlayerInputComponent(EntityID e);
+
+	void addAIInputComponent(EntityID e);
+
 private:
 	EntityID entities[MAX_ENTITIES];
 	EntityID entityCount;
@@ -250,15 +259,6 @@ private:
 	RenderSystem *renderSystem;
 
 	// helpers
-	void addPhysicsComponent(EntityID e, World *world, const sf::Vector2i &startTilePos);
-
-	void addRenderComponent(EntityID e, EntityType entityType, const std::string &animation,
-	                        float step, DirectionType initialDirection, bool playing);
-
-	void addPlayerInputComponent(EntityID e);
-
-	void addAIInputComponent(EntityID e);
-
 	BaseComponent *addComponent(EntityID e, ComponentType type);
 
 	void addBrain(EntityID e, bool aiBrain);
