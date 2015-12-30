@@ -1,23 +1,17 @@
 #include "test_helpers.hpp"
 #include "services.hpp"
 
-struct ServicesTest : public ::testing::Test
+TEST(ServicesTest, Provide)
 {
-	virtual void SetUp() override
-	{
-		Locator::provide(SERVICE_INPUT, new InputService);
-	}
+	// locate non-existent without error
+	InputService *dead = Locator::locate<InputService>();
+	EXPECT_EQ(dead, nullptr);
 
-	virtual void TearDown() override
-	{
+	// with error
+	EXPECT_ANY_THROW(Locator::locate<InputService>(true));
 
-	}
-};
-
-TEST_F(ServicesTest, Provide)
-{
-	InputService *old = Locator::locate<InputService>();
-	EXPECT_NE(old, nullptr);
+	InputService *old = new InputService;
+	Locator::provide(SERVICE_INPUT, old);
 
 	InputService *newService = new InputService;
 	EXPECT_NE(newService, old);
@@ -27,7 +21,7 @@ TEST_F(ServicesTest, Provide)
 	EXPECT_DEATH(delete old, ".*");
 }
 
-TEST_F(ServicesTest, InputService)
+TEST(ServicesTest, InputService)
 {
 	auto input = Locator::locate<InputService>();
 	ASSERT_NE(input, nullptr);
@@ -59,7 +53,7 @@ TEST_F(ServicesTest, InputService)
 	input->advance();
 }
 
-TEST_F(ServicesTest, KeyBindings)
+TEST(ServicesTest, KeyBindings)
 {
 	auto input = Locator::locate<InputService>();
 	ASSERT_NE(input, nullptr);

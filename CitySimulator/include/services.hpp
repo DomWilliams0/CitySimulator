@@ -48,7 +48,7 @@ public:
 
 	// helper
 	template <class T>
-	static T* locate()
+	static T* locate(bool errorOnFail = true)
 	{
 		ServiceType type = SERVICE_COUNT;
 
@@ -60,7 +60,10 @@ public:
 		if (type == SERVICE_COUNT)
 			error("Invalid service type given");
 
-		return dynamic_cast<T *>(getInstance().services[type]);
+		auto ret = dynamic_cast<T *>(getInstance().services[type]);
+		if (errorOnFail && ret == nullptr)
+			error("Service could not be located");
+		return ret;
 	}
 
 private:
