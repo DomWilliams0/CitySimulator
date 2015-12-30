@@ -26,13 +26,16 @@ void LoggingService::onEnable()
 }
 
 void LoggingService::log(const std::string &msg, LogLevel level)
-	{
-		auto l = levels.find(level);
-		if (l == levels.end())
-			error("Invalid log level %1%", std::to_string(level));
+{
+	if (level < this->level)
+		return;
 
-		stream << l->second << ": " << prefix << msg << std::endl;
-	}
+	auto l = levels.find(level);
+	if (l == levels.end())
+		error("Invalid log level %1%", std::to_string(level));
+
+	stream << l->second << ": " << prefix << msg << std::endl;
+}
 
 void LoggingService::pushIndent()
 {
