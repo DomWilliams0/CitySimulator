@@ -5,7 +5,6 @@
 #include <typeindex>
 #include <typeinfo>
 #include "entity.hpp"
-#include "logger.hpp"
 #include "utils.hpp"
 #include "config.hpp"
 
@@ -16,6 +15,7 @@ enum ServiceType
 	SERVICE_CONFIG,
 	SERVICE_ENTITY,
 	SERVICE_ANIMATION,
+	SERVICE_LOGGING,
 
 	SERVICE_UNKNOWN
 };
@@ -38,6 +38,8 @@ class EntityService;
 
 class AnimationService;
 
+class LoggingService;
+
 class World;
 
 class Locator
@@ -55,7 +57,7 @@ public:
 		auto possibleType = getInstance().types.find(typeid(T));
 
 		if (possibleType == getInstance().types.end())
-			error("Invalid service type given");
+			error("Invalid service type given. Has its type been registered?");
 
 		ServiceType type = possibleType->second;
 		T *ret = dynamic_cast<T *>(getInstance().services[type]);
@@ -288,6 +290,70 @@ private:
 	void positionImages(sf::Vector2i &imageSize, std::map<sf::Image *, sf::IntRect> &imagePositions);
 };
 
+enum LogLevel
+{
+	LOG_DEBUGGIEST,
+	LOG_DEBUGGIER,
+	LOG_DEBUG,
+	LOG_INFO,
+	LOG_WARNING,
+	LOG_ERROR
+};
+
+class LoggingService : public BaseService
+{
+public:
+	LoggingService(std::ostream &stream, const LogLevel &level) : stream(stream), level(level)
+	{
+	}
+
+	virtual void onEnable() override;
+
+	inline void logDebuggier(const std::string &msg)
+	{
+		log(msg, LOG_DEBUGGIER);
+	}
+
+	inline void logDebuggiest(const std::string &msg)
+	{
+		log(msg, LOG_DEBUGGIEST);
+	}
+
+	inline void logDebug(const std::string &msg)
+	{
+		log(msg, LOG_DEBUG);
+	}
+
+	inline void logInfo(const std::string &msg)
+	{
+		log(msg, LOG_INFO);
+	}
+
+	inline void logWarning(const std::string &msg)
+	{
+		log(msg, LOG_WARNING);
+	}
+
+	inline void logError(const std::string &msg)
+	{
+		log(msg, LOG_ERROR);
+	}
+
+	void pushIndent();
+
+	void popIndent();
+
+private:
+	LogLevel level; // todo unused
+	std::ostream &stream;
+	std::string prefix;
+
+	std::unordered_map<LogLevel, std::string, std::hash<int>> levels;
+
+	void log(const std::string &msg, LogLevel level);
+
+};
+
 // helpers
 
 namespace Config
@@ -312,6 +378,49 @@ namespace Config
 	void getMapList(const std::string &path, std::vector<std::map<std::string, T>> &ml)
 	{
 		Locator::locate<ConfigService>()->getMapList<T>(path, ml);
+	}
+}
+
+namespace Logger
+{
+	inline void logDebuggiest(const std::string &msg)
+	{
+		Locator::locate<LoggingService>()->logDebuggiest(msg);
+	}
+
+	inline void logDebuggier(const std::string &msg)
+	{
+		Locator::locate<LoggingService>()->logDebuggier(msg);
+	}
+
+	inline void logDebug(const std::string &msg)
+	{
+		Locator::locate<LoggingService>()->logDebug(msg);
+	}
+
+	inline void logInfo(const std::string &msg)
+	{
+		Locator::locate<LoggingService>()->logInfo(msg);
+	}
+
+	inline void logWarning(const std::string &msg)
+	{
+		Locator::locate<LoggingService>()->logWarning(msg);
+	}
+
+	inline void logError(const std::string &msg)
+	{
+		Locator::locate<LoggingService>()->logError(msg);
+	}
+
+	inline void pushIndent()
+	{
+		Locator::locate<LoggingService>()->pushIndent();
+	}
+
+	inline void popIndent()
+	{
+		Locator::locate<LoggingService>()->popIndent();
 	}
 }
 

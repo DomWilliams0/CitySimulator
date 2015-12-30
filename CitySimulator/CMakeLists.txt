@@ -27,7 +27,6 @@ set(SOURCE_FILES
         include/entity.hpp
         include/game.hpp
         include/gamestate.hpp
-        include/logger.hpp
         include/maploader.hpp
         include/PackingTreeNode.h
         include/services.hpp

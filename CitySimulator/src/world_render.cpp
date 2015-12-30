@@ -1,5 +1,4 @@
 #include <unordered_set>
-#include "logger.hpp"
 #include "world.hpp"
 
 Tileset::Tileset() : converted(false)

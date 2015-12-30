@@ -1,6 +1,5 @@
 #include <SFML/Window.hpp>
 #include "game.hpp"
-#include "logger.hpp"
 #include "gamestate.hpp"
 
 BaseGame::BaseGame(sf::RenderWindow &window)

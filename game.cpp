@@ -73,7 +73,7 @@ int main(int argc, char **argv)
 			return -1;
 
 		// create logger
-		createLogger(std::cout, Logger::DEBUG);
+		Locator::provide(SERVICE_LOGGING, new LoggingService(std::cout, LOG_DEBUG));
 
 		// load window size/style
 		int style;

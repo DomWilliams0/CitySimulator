@@ -18,6 +18,7 @@ Locator::Locator() : services(SERVICE_UNKNOWN)
 	types[typeid(ConfigService)] = SERVICE_CONFIG;
 	types[typeid(EntityService)] = SERVICE_ENTITY;
 	types[typeid(AnimationService)] = SERVICE_ANIMATION;
+	types[(typeid(LoggingService))] = SERVICE_LOGGING;
 }
 
 Locator::~Locator()
@@ -378,6 +379,8 @@ std::string Locator::serviceToString(ServiceType type)
 			return "Entity";
 		case SERVICE_ANIMATION:
 			return "Animation";
+		case SERVICE_LOGGING:
+			return "Logging";
 		default:
 			return "Unknown";
 	}
