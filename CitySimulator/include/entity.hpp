@@ -13,19 +13,6 @@ class b2World;
 
 class b2Body;
 
-typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;
-
-class EntityFactory
-{
-public:
-	void loadEntitiesFromFile(const std::string &fileName);
-
-private:
-	std::map<EntityType, EntityTags> loadedTags;
-
-	void loadEntities(ConfigurationFile &config, EntityType entityType, const std::string &sectionName);
-};
-
 template<class T>
 sf::Vector2<T> fromB2Vec(const b2Vec2 &v)
 {

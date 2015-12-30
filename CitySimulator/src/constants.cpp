@@ -57,7 +57,6 @@ DirectionType Direction::fromAngle(double degrees)
 
 namespace Globals
 {
-	EntityFactory *entityFactory;
 	SpriteSheet *spriteSheet;
 }
 

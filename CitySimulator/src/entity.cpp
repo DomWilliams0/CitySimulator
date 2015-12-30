@@ -2,56 +2,6 @@
 #include "ai.hpp"
 #include "world.hpp"
 
-void EntityFactory::loadEntitiesFromFile(const std::string &fileName)
-{
-	ConfigurationFile config(Utils::searchForFile(fileName));
-	config.load();
-
-	loadEntities(config, ENTITY_HUMAN, "human");
-	loadEntities(config, ENTITY_VEHICLE, "vehicle");
-}
-
-void EntityFactory::loadEntities(ConfigurationFile &config, EntityType entityType, const std::string &sectionName)
-{
-	std::vector<std::map<std::string, std::string>> entities;
-	config.getMapList<std::string>(sectionName, entities);
-
-	// load tags
-	std::vector<ConfigKeyValue> entityMapList;
-	config.getMapList(sectionName, entityMapList);
-
-	Logger::pushIndent();
-
-	EntityTags allTags;
-	for (auto &entity : entityMapList)
-	{
-		auto nameIt(entity.find("name"));
-
-		// no name
-		if (nameIt == entity.end())
-		{
-			Logger::logWarning(format("No name found for entity of type %1%, skipping", std::to_string(entityType)));
-			continue;
-		}
-
-		std::string name(nameIt->second);
-		allTags.insert({name, entity});
-	}
-
-	loadedTags[entityType] = allTags;
-
-	// external resource loading
-	for (auto &entity : allTags)
-	{
-		// sprites
-		auto sprite = entity.second.find("sprite");
-		if (sprite != entity.second.end())
-			Globals::spriteSheet->loadSprite(entity.second, entityType);
-	}
-
-	Logger::popIndent();
-}
-
 EntityID EntityService::createEntity()
 {
 	// no space

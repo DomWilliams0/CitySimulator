@@ -7,13 +7,11 @@ GameState::GameState() : State(GAME), playerControl(true)
 {
 	// create globals
 	// todo SOON TO BE VANQUISHED
-	Globals::entityFactory = new EntityFactory;
 	Globals::spriteSheet = new SpriteSheet;
 
 	// load entities
 	auto entityService = new EntityService;
 	Locator::provide(SERVICE_ENTITY, entityService);
-	Globals::entityFactory->loadEntitiesFromFile("entities.json");
 
 	// load sprites
 	Globals::spriteSheet->processAllSprites();
@@ -40,7 +38,6 @@ GameState::GameState() : State(GAME), playerControl(true)
 
 GameState::~GameState()
 {
-	delete Globals::entityFactory;
 	delete Globals::spriteSheet;
 }
 

@@ -35,14 +35,9 @@ class BaseGame;
 
 class SpriteSheet;
 
-class EntityFactory;
-
-class Input;
-
 namespace Globals
 {
 	extern SpriteSheet *spriteSheet;
-	extern EntityFactory *entityFactory;
 }
 
 typedef int DirectionType;

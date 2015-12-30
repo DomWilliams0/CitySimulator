@@ -195,6 +195,7 @@ private:
 };
 
 const unsigned int MAX_ENTITIES = 1024;
+typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;
 
 class EntityService : public BaseService
 {
@@ -249,6 +250,11 @@ private:
 	EntityID entities[MAX_ENTITIES];
 	EntityID entityCount;
 
+	// loading
+	std::map<EntityType, EntityTags> loadedTags;
+
+	void loadEntities(ConfigurationFile &config, EntityType entityType, const std::string &sectionName);
+
 	// components
 	PhysicsComponent physicsComponents[MAX_ENTITIES];
 	RenderComponent renderComponents[MAX_ENTITIES];
@@ -260,7 +266,6 @@ private:
 
 	// helpers
 	BaseComponent *addComponent(EntityID e, ComponentType type);
-
 	void addBrain(EntityID e, bool aiBrain);
 };
 
