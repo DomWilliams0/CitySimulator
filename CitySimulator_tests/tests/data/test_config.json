@@ -6,7 +6,7 @@
 
     "debug": {
         "window-title": "Chity Shimulator",
-        "human-skin": "Business Man",
+        "human-skin": "Test Man",
         "zoom": 1,
         "reload-config": true,
         "movement": {

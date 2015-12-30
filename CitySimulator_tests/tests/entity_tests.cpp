@@ -11,6 +11,7 @@ struct EntityTests : public ::testing::Test
 		Locator::provide(SERVICE_RENDER, new RenderService(nullptr));
 		Locator::provide(SERVICE_ANIMATION, new AnimationService);
 		Locator::provide(SERVICE_ENTITY, new EntityService);
+		Locator::locate<AnimationService>()->processQueuedSprites();
 	}
 
 	virtual void TearDown() override
@@ -42,3 +43,13 @@ TEST_F(EntityTests, EntityLifeCycle)
 	EXPECT_EQ(es->getEntityCount(), 0);
 }
 
+TEST_F(EntityTests, Sprite)
+{
+	AnimationService *as = Locator::locate<AnimationService>();
+
+	Animation *anim = nullptr;
+	EXPECT_NO_THROW(anim = as->getAnimation(ENTITY_HUMAN, "Test Man"));
+	ASSERT_NE(anim, nullptr);
+
+	EXPECT_NO_THROW(Animator(anim, 0.25f));
+}
