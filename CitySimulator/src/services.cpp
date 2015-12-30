@@ -11,7 +11,7 @@ void BaseService::onDisable()
 {
 }
 
-Locator::Locator() : services(SERVICE_COUNT, nullptr)
+Locator::Locator() : services(SERVICE_UNKNOWN, nullptr)
 {
 }
 

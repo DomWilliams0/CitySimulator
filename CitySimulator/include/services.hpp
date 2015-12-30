@@ -15,7 +15,7 @@ enum ServiceType
 	SERVICE_ENTITY,
 	SERVICE_ANIMATION,
 
-	SERVICE_COUNT
+	SERVICE_UNKNOWN
 };
 
 class BaseService
@@ -64,7 +64,7 @@ public:
 	template<class T>
 	static T *locate(bool errorOnFail = true)
 	{
-		ServiceType type = SERVICE_COUNT;
+		ServiceType type = SERVICE_UNKNOWN;
 
 		if (typeid(T) == typeid(InputService))
 			type = SERVICE_INPUT;
@@ -77,13 +77,32 @@ public:
 		else if (typeid(T) == typeid(AnimationService))
 			type = SERVICE_ANIMATION;
 
-		if (type == SERVICE_COUNT)
+		if (type == SERVICE_UNKNOWN)
 			error("Invalid service type given");
 
 		auto ret = dynamic_cast<T *>(getInstance().services[type]);
 		if (errorOnFail && ret == nullptr)
-			error("Service could not be located");
+			error("%1% service could not be located", serviceToString(type));
 		return ret;
+	}
+
+	static std::string serviceToString(ServiceType type)
+	{
+		switch (type)
+		{
+			case SERVICE_INPUT:
+				return "Input";
+			case SERVICE_RENDER:
+				return "Render";
+			case SERVICE_CONFIG:
+				return "Config";
+			case SERVICE_ENTITY:
+				return "Entity";
+			case SERVICE_ANIMATION:
+				return "Animation";
+			default:
+				return "Unknown";
+		}
 	}
 
 private:
