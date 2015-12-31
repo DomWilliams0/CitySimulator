@@ -3,11 +3,11 @@
 #include "game.hpp"
 #include "services.hpp"
 
+const std::string RESOURCE_DIR("res"); // todo probably shouldn't be hardcoded
+
 bool ensureCWD(int argc, char **argv)
 {
-	const std::string required("res");
-
-	if (!boost::filesystem::exists(boost::filesystem::current_path() / required))
+	if (!boost::filesystem::exists(boost::filesystem::current_path() / RESOURCE_DIR))
 	{
 		// no args given
 		if (argc != 2)
@@ -38,7 +38,7 @@ bool ensureCWD(int argc, char **argv)
 
 void loadConfig(int &windowStyle)
 {
-	auto config = new ConfigService("res", Constants::referenceConfigPath, Constants::configPath);
+	auto config = new ConfigService(RESOURCE_DIR, Constants::referenceConfigPath, Constants::configPath);
 	Locator::provide(SERVICE_CONFIG, config);
 
 	int width, height;
