@@ -19,14 +19,22 @@ public:
 	void loadOnTop();
 	void recurseAndOverwrite(boost::property_tree::ptree &tree, std::string prefix);
 
-	void getIntRef(const std::string &path, int &i, int defaultValue = 0);
-	int getInt(const std::string &path, int defaultValue = 0);
-	void getFloatRef(const std::string &path, float &f, float defaultValue = 0.f);
-	float getFloat(const std::string &path, float defaultValue = 0.f);
-	void getBoolRef(const std::string &path, bool &b, bool defaultValue = false);
-	bool getBool(const std::string &path, bool defaultValue = false);
-	void getStringRef(const std::string &path, std::string &s, const std::string &defaultValue = "");
-	std::string getString(const std::string &path, const std::string &defaultValue = "");
+	void getIntRef(const std::string &path, int &i);
+	void getIntRef(const std::string &path, int &i, int defaultValue);
+	int getInt(const std::string &path);
+	int getInt(const std::string &path, int defaultValue);
+	void getFloatRef(const std::string &path, float &f);
+	void getFloatRef(const std::string &path, float &f, float defaultValue);
+	float getFloat(const std::string &path);
+	float getFloat(const std::string &path, float defaultValue);
+	void getBoolRef(const std::string &path, bool &b);
+	void getBoolRef(const std::string &path, bool &b, bool defaultValue);
+	bool getBool(const std::string &path);
+	bool getBool(const std::string &path, bool defaultValue);
+	void getStringRef(const std::string &path, std::string &s);
+	void getStringRef(const std::string &path, std::string &s, const std::string &defaultValue);
+	std::string getString(const std::string &path);
+	std::string getString(const std::string &path, const std::string &defaultValue);
 
 	template<class T>
 	void getList(const std::string &path, std::vector<T> &l)
@@ -74,6 +82,15 @@ private:
 			reload();
 
 		return propertyTree.get(path, defaultValue);
+	}
+
+	template<class T>
+	T get(const std::string &path)
+	{
+		if (reloadFromFile)
+			reload();
+
+		return propertyTree.get<T>(path);
 	}
 };
 

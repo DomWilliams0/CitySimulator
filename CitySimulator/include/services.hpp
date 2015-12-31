@@ -161,9 +161,13 @@ public:
 	virtual void onEnable() override;
 
 	int getInt(const std::string &path);
+	int getInt(const std::string &path, int defaultValue);
 	float getFloat(const std::string &path);
+	float getFloat(const std::string &path, float defaultValue);
 	bool getBool(const std::string &path);
+	bool getBool(const std::string &path, bool defaultValue);
 	std::string getString(const std::string &path);
+	std::string getString(const std::string &path, const std::string &defaultValue);
 	std::string getResource(const std::string &path);
 
 	template<class T>
@@ -378,13 +382,13 @@ private:
 namespace Config
 {
 	int getInt(const std::string &path);
-
+	int getInt(const std::string &path, int defaultValue);
 	float getFloat(const std::string &path);
-
+	float getFloat(const std::string &path, float defaultValue);
 	bool getBool(const std::string &path);
-
+	bool getBool(const std::string &path, bool defaultValue);
 	std::string getString(const std::string &path);
-
+	std::string getString(const std::string &path, const std::string &defaultValue);
 	std::string getResource(const std::string &path);
 
 	template<class T>
