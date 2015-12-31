@@ -30,26 +30,10 @@ TEST(ConfigLoading, FileNotFound)
 
 TEST_F(ConfigTest, SimpleValueGetting)
 {
-	int i;
-	config.getIntRef("acorn", i);
 	EXPECT_EQ(config.getInt("acorn"), 1);
-	EXPECT_EQ(i, 1);
-
-	std::string s;
-	config.getStringRef("butterfly", s);
 	EXPECT_EQ(config.getString("butterfly"), "muffin");
-	EXPECT_EQ(s, "muffin");
-
-	bool b;
-	config.getBoolRef("car-battery.inner", b);
 	EXPECT_EQ(config.getBool("car-battery.inner"), true);
-	EXPECT_EQ(b, true);
-
-	float f;
-	config.getFloatRef("override-me.pegasus", f);
-	EXPECT_EQ(config.getFloat("override-me.pegasus"), f);
-	EXPECT_EQ(f, 5.5f);
-
+	EXPECT_EQ(config.getFloat("override-me.pegasus"), 5.5f);
 	EXPECT_EQ(config.getString("car-battery.deepah.cheetah"), "woof");
 }
 

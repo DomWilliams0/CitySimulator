@@ -66,15 +66,6 @@ void ConfigurationFile::recurseAndOverwrite(boost::property_tree::ptree &tree, s
 	}
 }
 
-void ConfigurationFile::getIntRef(const std::string &path, int &i)
-{
-	i = getInt(path);
-}
-void ConfigurationFile::getIntRef(const std::string &path, int &i, int defaultValue)
-{
-	i = getInt(path, defaultValue);
-}
-
 int ConfigurationFile::getInt(const std::string &path)
 {
 	return get<int>(path);
@@ -83,15 +74,6 @@ int ConfigurationFile::getInt(const std::string &path)
 int ConfigurationFile::getInt(const std::string &path, int defaultValue)
 {
 	return get(path, defaultValue);
-}
-
-void ConfigurationFile::getFloatRef(const std::string &path, float &f)
-{
-	f = getFloat(path);
-}
-void ConfigurationFile::getFloatRef(const std::string &path, float &f, float defaultValue)
-{
-	f = getFloat(path, defaultValue);
 }
 
 float ConfigurationFile::getFloat(const std::string &path)
@@ -103,15 +85,6 @@ float ConfigurationFile::getFloat(const std::string &path, float defaultValue)
 	return get(path, defaultValue);
 }
 
-void ConfigurationFile::getBoolRef(const std::string &path, bool &b)
-{
-	b = getBool(path);
-}
-void ConfigurationFile::getBoolRef(const std::string &path, bool &b, bool defaultValue)
-{
-	b = getBool(path, defaultValue);
-}
-
 bool ConfigurationFile::getBool(const std::string &path)
 {
 	return get<bool>(path);
@@ -119,15 +92,6 @@ bool ConfigurationFile::getBool(const std::string &path)
 bool ConfigurationFile::getBool(const std::string &path, bool defaultValue)
 {
 	return get(path, defaultValue);
-}
-
-void ConfigurationFile::getStringRef(const std::string &path, std::string &s)
-{
-	s = getString(path);
-}
-void ConfigurationFile::getStringRef(const std::string &path, std::string &s, const std::string &defaultValue)
-{
-	s = getString(path, defaultValue);
 }
 
 std::string ConfigurationFile::getString(const std::string &path, const std::string &defaultValue)
