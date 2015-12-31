@@ -237,9 +237,9 @@ void CollisionMap::load()
 	int padding = Constants::tileSize / 4;
 	auto worldSize = container->pixelSize;
 	rects.emplace_back(sf::FloatRect(-borderThickness - padding, 0, borderThickness, worldSize.y), 0.f);
-	rects.emplace_back(sf::FloatRect(0, -borderThickness - padding, worldSize.y, borderThickness), 0.f);
+	rects.emplace_back(sf::FloatRect(0, -borderThickness - padding, worldSize.x, borderThickness), 0.f);
 	rects.emplace_back(sf::FloatRect(worldSize.x + padding, 0, borderThickness, worldSize.y), 0.f);
-	rects.emplace_back(sf::FloatRect(0, worldSize.y + padding, worldSize.y, borderThickness), 0.f);
+	rects.emplace_back(sf::FloatRect(0, worldSize.y + padding, worldSize.x, borderThickness), 0.f);
 
 	// todo make big collision rectangles hollow to work better with box2d?
 
