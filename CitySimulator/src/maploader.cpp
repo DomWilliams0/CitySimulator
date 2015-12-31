@@ -55,7 +55,7 @@ int TMX::stripFlip(const int &gid, std::bitset<3> &flips)
 	return gid & ~(HORIZONTAL | VERTICAL | DIAGONAL);
 }
 
-TMX::TileMap *TMX::TileMap::load(const std::string filePath)
+TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 {
 	boost::property_tree::ptree tree;
 	read_xml(filePath, tree);
