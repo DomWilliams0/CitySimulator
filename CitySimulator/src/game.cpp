@@ -8,7 +8,7 @@ BaseGame::BaseGame(sf::RenderWindow &window)
 	Locator::provide(SERVICE_RENDER, new RenderService(&window));
 
 	// set icon
-	setWindowIcon("icon.png");
+	setWindowIcon(Config::getResource("icon"));
 
 	// load font
 	if (!Constants::mainFont.loadFromFile(Config::getResource("font")))
@@ -110,10 +110,10 @@ void BaseGame::limitFrameRate(int limit, bool vsync)
 	window->setVerticalSyncEnabled(vsync);
 }
 
-void BaseGame::setWindowIcon(const std::string &fileName)
+void BaseGame::setWindowIcon(const std::string &path)
 {
 	sf::Image icon;
-	if (!icon.loadFromFile(Utils::searchForFile(fileName)))
+	if (!icon.loadFromFile(path))
 	{
 		Logger::logWarning("Could not load icon");
 		return;

@@ -8,11 +8,7 @@
 class ConfigurationFile
 {
 public:
-	ConfigurationFile() : reloadFromFile(false)
-	{
-	}
-
-	explicit ConfigurationFile(const std::string &appConfigPath, const std::string &userConfigPath = "") :
+	ConfigurationFile(const std::string &appConfigPath, const std::string &userConfigPath = "") :
 			reloadFromFile(false)
 	{
 		setAppConfigPath(appConfigPath);

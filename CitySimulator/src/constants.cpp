@@ -18,8 +18,8 @@ namespace Constants
 
 	sf::Font mainFont;
 
-	std::string referenceConfigPath("res/reference.json");
-	std::string configPath("res/config.json");
+	std::string referenceConfigPath("reference.json");
+	std::string configPath("config.json");
 
 	void setWindowSize(int x, int y)
 	{

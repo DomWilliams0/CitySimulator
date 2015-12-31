@@ -27,15 +27,15 @@
     "resources": {
         "root": "res",
         "entities": {
-            "config": "res/entities/entities.json",
-            "sprites": "res/entities/sprites",
-            "controller-arrow": "res/entities/misc/controller_arrow.png"
+            "config": "entities/entities.json",
+            "sprites": "entities/sprites",
+            "controller-arrow": "entities/misc/controller_arrow.png"
         },
         "world": {
-            "root": "res/world",
-            "tileset": "res/world/tileset.png"
+            "root": "world",
+            "tileset": "world/tileset.png"
         },
-        "font": "res/misc/font.ttf",
-        "icon": "res/misc/icon.png"
+        "font": "misc/font.ttf",
+        "icon": "misc/icon.png"
     }
 }

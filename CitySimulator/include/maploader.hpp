@@ -193,7 +193,7 @@ namespace TMX
 		int width, height;
 		std::vector<Layer *> layers;
 
-		static TileMap *load(const std::string filename);
+		static TileMap *load(const std::string filePath);
 	};
 }
 #endif

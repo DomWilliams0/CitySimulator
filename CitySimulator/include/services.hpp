@@ -155,7 +155,8 @@ private:
 class ConfigService : public BaseService
 {
 public:
-	ConfigService(const std::string &appConfigPath, const std::string &userConfigPath = "");
+	ConfigService(const std::string &directory,
+	              const std::string &appConfigPath, const std::string &userConfigPath = "");
 
 	virtual void onEnable() override;
 
@@ -177,8 +178,14 @@ public:
 		config.getMapList<T>(path, ml);
 	}
 
+	void setRootDirectory(const std::string &directory)
+	{
+		rootDirectory = directory;
+	}
+
 private:
 	ConfigurationFile config;
+	boost::filesystem::path rootDirectory;
 
 	void ensureConfigExists();
 };

@@ -60,7 +60,7 @@ protected:
 
 
 private:
-	void setWindowIcon(const std::string &fileName);
+	void setWindowIcon(const std::string &path);
 
 	sf::Color backgroundColour;
 	FPSCounter fps;

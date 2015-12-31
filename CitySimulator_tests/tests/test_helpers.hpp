@@ -21,3 +21,5 @@
 
 
 #endif
+
+#define DATA_ROOT "data"

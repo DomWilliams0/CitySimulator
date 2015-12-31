@@ -282,7 +282,8 @@ void World::loadFromFile(const std::string &filename, const std::string &tileset
 	Logger::logDebug(str(boost::format("Began loading world %1%") % filename));
 	Logger::pushIndent();
 
-	TMX::TileMap *tmx = TMX::TileMap::load(filename);
+	std::string path(Config::getResource("world.root") + "/" + filename); // todo use boost path /
+	TMX::TileMap *tmx = TMX::TileMap::load(path);
 
 	// failure
 	if (tmx == nullptr)

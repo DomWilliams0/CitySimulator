@@ -8,8 +8,7 @@ void ConfigurationFile::load()
 {
 	// doesn't exist
 	if (appConfigPath.empty() || !exists(appConfigPath))
-		throw Utils::filenotfound_exception(
-				format("Config file not found: %1%", (appConfigPath.empty() ? "none given" : appConfigPath.string())));
+		throw Utils::filenotfound_exception(format("Config file not found: '%1%'", appConfigPath.string()));
 
 	lastModification = boost::filesystem::last_write_time(appConfigPath);
 	read_json(appConfigPath.string(), propertyTree);
@@ -133,11 +132,11 @@ void ConfigurationFile::reload()
 
 void ConfigurationFile::setAppConfigPath(const std::string &path)
 {
-	appConfigPath = boost::filesystem::path(Utils::searchForFile(path));
+	appConfigPath = path;
 }
 void ConfigurationFile::setUserConfigPath(const std::string &path)
 {
-	userConfigPath = boost::filesystem::path(Utils::searchForFile(path));
+	userConfigPath = path;
 }
 
 std::string ConfigurationFile::getAppConfigPath() const
@@ -150,8 +149,10 @@ std::string ConfigurationFile::getUserConfigPath() const
 	return userConfigPath.string();
 }
 
-ConfigService::ConfigService(const std::string &appConfigPath, const std::string &userConfigPath) :
-		config(appConfigPath, userConfigPath)
+ConfigService::ConfigService(const std::string &directory,
+                             const std::string &appConfigPath, const std::string &userConfigPath)
+		: config((boost::filesystem::path(directory) / appConfigPath).string(),
+		         (boost::filesystem::path(directory) / userConfigPath).string()), rootDirectory(directory)
 {
 }
 
@@ -203,7 +204,7 @@ std::string ConfigService::getString(const std::string &path)
 
 std::string ConfigService::getResource(const std::string &path)
 {
-	return getString("resources." + path);
+	return (rootDirectory / getString("resources." + path)).string();
 }
 
 int Config::getInt(const std::string &path)

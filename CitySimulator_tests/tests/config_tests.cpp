@@ -3,10 +3,12 @@
 
 struct ConfigTest : ::testing::Test
 {
+	ConfigTest() : config(std::string(DATA_ROOT) + "/test_reference_config.json", std::string(DATA_ROOT) + "/test_config.json")
+	{
+	}
+
 	virtual void SetUp() override
 	{
-		config = ConfigurationFile("test_reference_config.json",
-		                           "test_config.json");
 		config.load();
 	}
 
@@ -19,14 +21,11 @@ struct ConfigTest : ::testing::Test
 
 TEST(ConfigLoading, FileNotFound)
 {
-	ConfigurationFile config("no_existerino.json");
-	EXPECT_ERROR_MESSAGE(config.load();, "Config file not found: no_existerino.json");
-}
+	ConfigurationFile noFile("no_existerino.json");
+	EXPECT_THROW(noFile.load();, Utils::filenotfound_exception);
 
-TEST(ConfigLoading, NoInitialisation)
-{
-	ConfigurationFile config;
-	EXPECT_ERROR_MESSAGE(config.load();, "Config file not found: none given");
+	ConfigurationFile noRoot("config.json");
+	EXPECT_THROW(noRoot.load(), Utils::filenotfound_exception);
 }
 
 TEST_F(ConfigTest, SimpleValueGetting)
@@ -87,7 +86,7 @@ TEST_F(ConfigTest, Overwriting)
 
 TEST(ConfigServiceTest, ServiceAccess)
 {
-	auto service = new ConfigService("data/test_reference_config.json");
+	auto service = new ConfigService(DATA_ROOT, "test_reference_config.json");
 	Locator::provide(SERVICE_CONFIG, service);
 
 	EXPECT_EQ(service->getString("butterfly"), "muffin");
@@ -96,7 +95,7 @@ TEST(ConfigServiceTest, ServiceAccess)
 
 TEST(ConfigServiceTest, GlobalConfig)
 {
-	Locator::provide(SERVICE_CONFIG, new ConfigService("data/test_reference_config.json"));
+	Locator::provide(SERVICE_CONFIG, new ConfigService(DATA_ROOT, "test_reference_config.json"));
 
 	EXPECT_EQ(Config::getString("butterfly"), "muffin");
 	EXPECT_EQ(Config::getBool("car-battery.inner"), true);
@@ -104,8 +103,8 @@ TEST(ConfigServiceTest, GlobalConfig)
 
 TEST(ConfigServiceTest, GlobalConfigOverride)
 {
-	Locator::provide(SERVICE_CONFIG, new ConfigService("data/test_reference_config.json",
-	                                                   "data/test_config.json"));
+	Locator::provide(SERVICE_CONFIG,
+	                 new ConfigService(DATA_ROOT, "test_reference_config.json", "test_config.json"));
 	EXPECT_EQ(Config::getFloat("override-me.pegasus"), 100.f);
 }
 
