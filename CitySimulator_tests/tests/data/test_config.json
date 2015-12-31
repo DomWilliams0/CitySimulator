@@ -19,10 +19,13 @@
     "resources": {
         "root": "data",
         "world": {
+            "root": "",
             "tileset": "tileset.png"
         },
         "entities": {
-            "config": "test_entities.json"
+            "root": "",
+            "config": "test_entities.json",
+            "sprites": ""
         }
     }
 }

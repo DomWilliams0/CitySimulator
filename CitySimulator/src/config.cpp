@@ -229,7 +229,7 @@ std::string ConfigService::getResource(const std::string &path)
 
 	// find section root
 	std::string rootSection(path.substr(0, firstSep));
-	std::string root = getString("resources." + rootSection + ".root");
+	std::string root = getString("resources." + rootSection + ".root", "");
 
 	// not looking for root
 	if (boost::algorithm::ends_with(path, ".root"))
