@@ -5,8 +5,7 @@ struct EntityTests : public ::testing::Test
 {
 	virtual void SetUp() override
 	{
-		Locator::provide(SERVICE_CONFIG, new ConfigService("data/test_reference_config.json",
-		                                                   "data/test_config.json"));
+		loadTestConfig();
 		Locator::provide(SERVICE_INPUT, new InputService);
 		Locator::provide(SERVICE_RENDER, new RenderService(nullptr));
 		Locator::provide(SERVICE_ANIMATION, new AnimationService);
