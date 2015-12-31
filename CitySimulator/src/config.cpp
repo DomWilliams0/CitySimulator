@@ -151,8 +151,8 @@ std::string ConfigurationFile::getUserConfigPath() const
 
 ConfigService::ConfigService(const std::string &directory,
                              const std::string &appConfigPath, const std::string &userConfigPath)
-		: config((boost::filesystem::path(directory) / appConfigPath).string(),
-		         (boost::filesystem::path(directory) / userConfigPath).string()), rootDirectory(directory)
+		: config(Utils::joinPaths(directory, appConfigPath), Utils::joinPaths(directory, userConfigPath)),
+		         rootDirectory(directory)
 {
 }
 

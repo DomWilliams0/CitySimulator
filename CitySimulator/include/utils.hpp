@@ -101,6 +101,8 @@ namespace Utils
 
 	std::string searchForFile(const std::string &filename, const std::string &directory = "");
 
+	std::string joinPaths(const std::string &root, const std::string &path);
+
 	int roundToMultiple(double x, int multiple);
 
 	template<class T>

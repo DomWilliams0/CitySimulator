@@ -95,6 +95,11 @@ std::string Utils::searchForFile(const std::string &filename, const std::string 
 	throw filenotfound_exception("File not found: " + filename);
 }
 
+std::string Utils::joinPaths(const std::string &root, const std::string &path)
+{
+	return (boost::filesystem::path(root) / path).string();
+}
+
 int Utils::roundToMultiple(double x, int multiple)
 {
 	return static_cast<int>(multiple * round(x / multiple));
