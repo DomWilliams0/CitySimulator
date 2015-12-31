@@ -362,7 +362,7 @@ void Locator::provide(ServiceType type, BaseService *service)
 
 	getInstance().services[type] = service;
 	service->onEnable();
-	Logger::logDebug(format("%1% service for service type %2%", verb, std::to_string(type)));
+	Logger::logDebug(format("%1% service for service '%2%'", verb, serviceToString(type)));
 }
 
 std::string Locator::serviceToString(ServiceType type)
