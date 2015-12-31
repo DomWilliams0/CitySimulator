@@ -37,6 +37,22 @@ TEST_F(ConfigTest, SimpleValueGetting)
 	EXPECT_EQ(config.getString("car-battery.deepah.cheetah"), "woof");
 }
 
+TEST_F(ConfigTest, Defaults)
+{
+	EXPECT_EQ(config.getInt("nonexistant", 20), 20);
+	EXPECT_EQ(config.getString("nonexistant", "monkeys"), "monkeys");
+	EXPECT_EQ(config.getBool("nonexistant", true), true);
+	EXPECT_EQ(config.getFloat("nonexistant", 49.25f), 49.25f);
+}
+
+TEST_F(ConfigTest, GettingFailures)
+{
+	EXPECT_ANY_THROW(config.getInt("nonexistant"));
+	EXPECT_ANY_THROW(config.getString("nonexistant"));
+	EXPECT_ANY_THROW(config.getBool("nonexistant"));
+	EXPECT_ANY_THROW(config.getFloat("nonexistant"));
+}
+
 TEST_F(ConfigTest, ComplexValueGetting)
 {
 	using namespace std;
