@@ -126,9 +126,9 @@ void BaseGame::setWindowIcon(const std::string &path)
 
 Game::Game(sf::RenderWindow &window) : BaseGame(window), current(nullptr)
 {
-	window.setTitle(Config::getString("debug.window-title"));
+	window.setTitle(Config::getString("debug.window-title", "Game"));
 	showFPS = true;
-	limitFrameRate(Config::getInt("display.fps-limit"), Config::getBool("display.vsync"));
+	limitFrameRate(Config::getInt("display.fps-limit", 60), Config::getBool("display.vsync", true));
 }
 
 void Game::start()

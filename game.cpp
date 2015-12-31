@@ -44,7 +44,7 @@ void loadConfig(int &windowStyle)
 	int width, height;
 
 	// borderless fullscreen
-	if (Config::getBool("display.borderless-fullscreen"))
+	if (Config::getBool("display.borderless-fullscreen", false))
 	{
 		windowStyle = sf::Style::None;
 
