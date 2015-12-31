@@ -27,15 +27,19 @@
     "resources": {
         "root": "res",
         "entities": {
-            "config": "entities/entities.json",
-            "sprites": "entities/sprites",
-            "controller-arrow": "entities/misc/controller_arrow.png"
+            "root": "entities",
+            "config": "entities.json",
+            "sprites": "sprites",
+            "controller-arrow": "/misc/controller_arrow.png"
         },
         "world": {
             "root": "world",
-            "tileset": "world/tileset.png"
+            "tileset": "tileset.png"
         },
-        "font": "misc/font.ttf",
-        "icon": "misc/icon.png"
+        "misc": {
+            "root": "misc",
+            "font": "font.ttf",
+            "icon": "icon.png"
+        }
     }
 }

@@ -19,7 +19,6 @@
     "resources": {
         "root": "data",
         "world": {
-            "root": "",
             "tileset": "tileset.png"
         },
         "entities": {

@@ -1,5 +1,6 @@
 #include <regex>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include "constants.hpp"
 #include "config.hpp"
 #include "services.hpp"
@@ -204,7 +205,23 @@ std::string ConfigService::getString(const std::string &path)
 
 std::string ConfigService::getResource(const std::string &path)
 {
-	return (rootDirectory / getString("resources." + path)).string();
+	std::string value(getString("resources." + path));
+
+	auto firstSep = path.find_first_of('.');
+
+	// no section
+	if (firstSep == std::string::npos)
+		return (rootDirectory / value).string();
+
+	// find section root
+	std::string rootSection(path.substr(0, firstSep));
+	std::string root = getString("resources." + rootSection + ".root");
+
+	// not looking for root
+	if (boost::algorithm::ends_with(path, ".root"))
+		value = "";
+
+	return (rootDirectory / root / value).string();
 }
 
 int Config::getInt(const std::string &path)

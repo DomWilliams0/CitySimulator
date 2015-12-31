@@ -8,10 +8,10 @@ BaseGame::BaseGame(sf::RenderWindow &window)
 	Locator::provide(SERVICE_RENDER, new RenderService(&window));
 
 	// set icon
-	setWindowIcon(Config::getResource("icon"));
+	setWindowIcon(Config::getResource("misc.icon"));
 
 	// load font
-	if (!Constants::mainFont.loadFromFile(Config::getResource("font")))
+	if (!Constants::mainFont.loadFromFile(Config::getResource("misc.font")))
 	{
 		Logger::logError("Font could not be loaded");
 		exit(-1);
