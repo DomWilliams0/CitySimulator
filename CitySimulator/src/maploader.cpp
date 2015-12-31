@@ -15,17 +15,25 @@ TMX::PropertyType propertyTypeFromString(const std::string &s)
 	return TMX::PROPERTY_INVALID;
 }
 
-void addProperties(TMX::TileMap *tile_map, boost::property_tree::ptree tree)
+void addProperties(TMX::TileMap *tile_map, boost::property_tree::ptree &tree)
 {
 	// properties
 	try
 	{
-		auto properties = tree.get_child("properties");
+		boost::property_tree::ptree empty;
+		boost::property_tree::ptree properties = tree.get_child("properties", empty);
+		if (properties.empty())
+		{
+			Logger::logDebug("No world properties found");
+			return;
+		}
 
 		for (auto &propertyPair : properties)
 		{
 			auto name = propertyPair.second.get<std::string>("<xmlattr>.name");
 			auto value = propertyPair.second.get<std::string>("<xmlattr>.value");
+
+			Logger::logDebuggier(format("Found world property '%1%' => '%2%'", name, value));
 
 			TMX::PropertyType type = propertyTypeFromString(name);
 			if (type != TMX::PROPERTY_INVALID)
@@ -65,7 +73,7 @@ TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 	map->width = tree.get<int>("map.<xmlattr>.width", 0);
 	map->height = tree.get<int>("map.<xmlattr>.height", 0);
 
-	auto treeRoot = tree.get_child("map");
+	boost::property_tree::ptree treeRoot = tree.get_child("map");
 	addProperties(map, treeRoot);
 
 	for (auto &pair : treeRoot)
