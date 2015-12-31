@@ -75,13 +75,9 @@ void Utils::validateDirectory(const std::string &directory)
 		throw filenotfound_exception(format("Invalid directory given: %1%", directory));
 }
 
-std::string Utils::searchForFile(const std::string &filename, const std::string &dir)
+std::string Utils::searchForFile(const std::string &filename, const std::string &directory)
 {
 	using namespace boost;
-
-	std::string directory = dir;
-	if (directory.empty())
-		directory = Config::getResource("root");
 
 	validateDirectory(directory);
 
