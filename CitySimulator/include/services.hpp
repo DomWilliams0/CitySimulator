@@ -155,18 +155,14 @@ private:
 class ConfigService : public BaseService
 {
 public:
-	ConfigService(const std::string &path, const std::string &overridingPath = "");
+	ConfigService(const std::string &appConfigPath, const std::string &userConfigPath = "");
 
 	virtual void onEnable() override;
 
 	int getInt(const std::string &path);
-
 	float getFloat(const std::string &path);
-
 	bool getBool(const std::string &path);
-
 	std::string getString(const std::string &path);
-
 	std::string getResource(const std::string &path);
 
 	template<class T>

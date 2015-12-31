@@ -21,9 +21,3 @@
 
 
 #endif
-
-inline void loadTestConfig(bool userConfig = true)
-{
-    Locator::provide(SERVICE_CONFIG, new ConfigService("data/test_reference_config.json",
-                                                       userConfig ? "data/test_config.json" : ""));
-}

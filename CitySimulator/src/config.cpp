@@ -7,27 +7,27 @@
 void ConfigurationFile::load()
 {
 	// doesn't exist
-	if (configPath.empty() || !exists(configPath))
+	if (appConfigPath.empty() || !exists(appConfigPath))
 		throw Utils::filenotfound_exception(
-				format("Config file not found: %1%", (configPath.empty() ? "none given" : configPath.string())));
+				format("Config file not found: %1%", (appConfigPath.empty() ? "none given" : appConfigPath.string())));
 
-	lastModification = boost::filesystem::last_write_time(configPath);
-	read_json(configPath.string(), propertyTree);
+	lastModification = boost::filesystem::last_write_time(appConfigPath);
+	read_json(appConfigPath.string(), propertyTree);
 }
 
 void ConfigurationFile::loadOnTop()
 {
-	if (!boost::filesystem::exists(overwriteConfigPath))
+	if (!boost::filesystem::exists(userConfigPath))
 	{
-		Logger::logDebug(format("Overriding config not found (%1%)", overwriteConfigPath.string()));
+		Logger::logDebug(format("User config not found (%1%)", userConfigPath.string()));
 		return;
 	}
 
-	// load overriding config
-	ConfigurationFile loaded(overwriteConfigPath.string());
+	// load user config
+	ConfigurationFile loaded(userConfigPath.string());
 	loaded.load();
 
-	Logger::logDebug(format("Found overriding config at %1%", getOverwriteConfigPath()));
+	Logger::logDebug(format("Found user config at %1%", getUserConfigPath()));
 
 	// put all values
 	Logger::pushIndent();
@@ -35,8 +35,8 @@ void ConfigurationFile::loadOnTop()
 	Logger::popIndent();
 
 	// update path to overwriting
-	overwriteConfigPath = loaded.configPath;
-	lastModification = boost::filesystem::last_write_time(overwriteConfigPath);
+	userConfigPath = loaded.appConfigPath;
+	lastModification = boost::filesystem::last_write_time(userConfigPath);
 }
 
 void ConfigurationFile::recurseAndOverwrite(boost::property_tree::ptree &tree, std::string prefix)
@@ -115,46 +115,43 @@ void ConfigurationFile::reload()
 {
 	using namespace boost::filesystem;
 
-	if (!exists(overwriteConfigPath))
-	{
-		// Logger::logWarning(format("Could not reload config as it doesn't exist (%1%)", overwriteConfigPath.string()));
+	if (!exists(userConfigPath))
 		return;
-	}
 
-	std::time_t time = last_write_time(overwriteConfigPath);
+	std::time_t time = last_write_time(userConfigPath);
 
 	if (time > lastModification)
 	{
 		lastModification = time;
 
-		Logger::logDebug(format("Reloading overwriting config from '%1%'", overwriteConfigPath.string()));
+		Logger::logDebug(format("Reloading overwriting config from '%1%'", userConfigPath.string()));
 		Logger::pushIndent();
 		loadOnTop();
 		Logger::popIndent();
 	}
 }
 
-void ConfigurationFile::setConfigPath(const std::string &path)
+void ConfigurationFile::setAppConfigPath(const std::string &path)
 {
-	configPath = boost::filesystem::path(path);
+	appConfigPath = boost::filesystem::path(Utils::searchForFile(path));
 }
-void ConfigurationFile::setOverridingConfigPath(const std::string &path)
+void ConfigurationFile::setUserConfigPath(const std::string &path)
 {
-	overwriteConfigPath = boost::filesystem::path(path);
-}
-
-std::string ConfigurationFile::getConfigPath() const
-{
-	return configPath.string();
+	userConfigPath = boost::filesystem::path(Utils::searchForFile(path));
 }
 
-std::string ConfigurationFile::getOverwriteConfigPath() const
+std::string ConfigurationFile::getAppConfigPath() const
 {
-	return overwriteConfigPath.string();
+	return appConfigPath.string();
 }
 
-ConfigService::ConfigService(const std::string &path, const std::string &overridingPath) :
-		config(path, overridingPath)
+std::string ConfigurationFile::getUserConfigPath() const
+{
+	return userConfigPath.string();
+}
+
+ConfigService::ConfigService(const std::string &appConfigPath, const std::string &userConfigPath) :
+		config(appConfigPath, userConfigPath)
 {
 }
 
@@ -164,7 +161,7 @@ void ConfigService::onEnable()
 	ensureConfigExists();
 	config.load();
 
-	// overriding config
+	// load user config on top
 	config.loadOnTop();
 
 	// reload?
@@ -175,13 +172,13 @@ void ConfigService::onEnable()
 void ConfigService::ensureConfigExists()
 {
 	// create default config
-	if (!boost::filesystem::exists(config.getConfigPath()))
+	if (!boost::filesystem::exists(config.getAppConfigPath()))
 	{
 		Logger::logInfo("Config not found!");
-		error("Could not find reference config at %1%", config.getConfigPath());
+		error("Could not find reference config at %1%", config.getAppConfigPath());
 	}
 
-	Logger::logInfo(format("Found reference config at %1%", config.getConfigPath()));
+	Logger::logInfo(format("Found reference config at %1%", config.getAppConfigPath()));
 }
 
 int ConfigService::getInt(const std::string &path)

@@ -5,8 +5,8 @@ struct ConfigTest : ::testing::Test
 {
 	virtual void SetUp() override
 	{
-		config = ConfigurationFile("data/test_reference_config.json",
-		                           "data/test_config.json");
+		config = ConfigurationFile("test_reference_config.json",
+		                           "test_config.json");
 		config.load();
 	}
 
