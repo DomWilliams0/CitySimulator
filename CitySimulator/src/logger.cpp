@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 #include "services.hpp"
 
 const std::string PREFIX_STRING("    ");
@@ -50,3 +51,58 @@ void LoggingService::popIndent()
 	if (currentLength >= prefixLength)
 		prefix = prefix.substr(0, currentLength - prefixLength);
 }
+
+LogLevel LoggingService::logLevelFromString(const std::string &s)
+{
+	std::string input(s);
+	boost::algorithm::to_lower(input);
+
+	if (input == "debuggiest")
+		return LOG_DEBUGGIEST;
+	else if (input == "debuggier")
+		return LOG_DEBUGGIER;
+	else if (input == "debug")
+		return LOG_DEBUG;
+	else if (input == "info")
+		return LOG_INFO;
+	else if (input == "warning")
+		return LOG_WARNING;
+	else if (input == "error")
+		return LOG_ERROR;
+	else
+		return LOG_UNKNOWN;
+}
+
+void LoggingService::setLogLevel(const std::string &s)
+{
+	LogLevel newLevel = logLevelFromString(s);
+
+	auto it = levels.find(newLevel);
+
+	if (it != levels.end())
+	{
+		// the string representations of the 3 debug levels are the same
+		// hence this hacky fix
+		// i wont tell if you dont
+
+		std::string asString;
+		switch (newLevel)
+		{
+			case LOG_DEBUGGIEST:
+				asString = "debuggiest";
+				break;
+			case LOG_DEBUGGIER:
+				asString = "debuggier";
+				break;
+			default:
+				asString = boost::trim_right_copy(it->second);
+				break;
+		}
+
+		logInfo(format("Setting log level to '%1%'", asString));
+		level = newLevel;
+	}
+	else
+		logWarning(format("Could not set log level to unknown level '%1%'", s));
+}
+

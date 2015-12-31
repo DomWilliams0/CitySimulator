@@ -305,7 +305,9 @@ enum LogLevel
 	LOG_DEBUG,
 	LOG_INFO,
 	LOG_WARNING,
-	LOG_ERROR
+	LOG_ERROR,
+
+	LOG_UNKNOWN
 };
 
 class LoggingService : public BaseService
@@ -351,14 +353,19 @@ public:
 
 	void popIndent();
 
+	// no change if invalid
+	void setLogLevel(const std::string &s);
+
 private:
-	LogLevel level; // todo unused
+	LogLevel level;
 	std::ostream &stream;
 	std::string prefix;
 
 	std::unordered_map<LogLevel, std::string, std::hash<int>> levels;
 
 	virtual void log(const std::string &msg, LogLevel level);
+	LogLevel logLevelFromString(const std::string &s);
+
 
 };
 

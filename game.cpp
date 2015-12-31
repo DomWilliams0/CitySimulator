@@ -41,6 +41,9 @@ void loadConfig(int &windowStyle)
 	auto config = new ConfigService(RESOURCE_DIR, Constants::referenceConfigPath, Constants::configPath);
 	Locator::provide(SERVICE_CONFIG, config);
 
+	// logging level
+	Locator::locate<LoggingService>()->setLogLevel(Config::getString("debug.log-level"));
+
 	int width, height;
 
 	// borderless fullscreen
