@@ -1,3 +1,4 @@
+#include <boost/filesystem.hpp>
 #include "utils.hpp"
 #include "test_helpers.hpp"
 
@@ -57,4 +58,22 @@ TEST(UtilTests, RoundDownToMultiple)
 	EXPECT_EQ(Utils::roundToMultiple(7.49, 5), 5);
 
 	EXPECT_EQ(Utils::roundToMultiple(5.1, 10), 10);
+}
+
+TEST(UtilTests, FileSearching)
+{
+	using namespace boost::filesystem;
+
+	std::string dir("data/file_searching");
+
+	EXPECT_NO_THROW(Utils::searchForFile("robert", dir));
+	EXPECT_NO_THROW(Utils::searchForFile("robert-and-bananas", dir));
+	EXPECT_NO_THROW(Utils::searchForFile("robert-and-apples", dir));
+
+	EXPECT_EQ(path(Utils::searchForFile("robert-and-apples", dir)), current_path() / "data/file_searching/apples/robert-and-apples");
+
+	EXPECT_ANY_THROW(Utils::searchForFile("rober", dir));
+	EXPECT_ANY_THROW(Utils::searchForFile("", dir));
+
+	EXPECT_ANY_THROW(Utils::searchForFile("robert", ""));
 }
