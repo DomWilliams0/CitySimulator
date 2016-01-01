@@ -11,6 +11,7 @@ set(TEST_FILES
         config_tests.cpp
         services_test.cpp
         entity_tests.cpp
+        events_test.cpp
         utils_tests.cpp
         world_tests.cpp
         )
