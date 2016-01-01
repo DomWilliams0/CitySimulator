@@ -85,9 +85,9 @@ void BaseGame::beginGame()
 		// overlay
 		if (showFPS)
 		{
-			sf::View view(window->getView());
+			// restore to default for gui display
+			window->setView(window->getDefaultView());
 			fps.tick(delta, *window);
-			window->setView(view);
 		}
 
 		window->display();
