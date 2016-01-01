@@ -77,7 +77,7 @@ void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 	for (auto &obj : objects)
 	{
 		auto pos = obj.tilePos;
-		pos.y -= 0.5f;
+		pos.y -= 1 / Constants::scale;
 		pos = Math::multiply(pos, Constants::tileScale);
 
 		rects.emplace_back(sf::FloatRect(pos, size), obj.rotation);
