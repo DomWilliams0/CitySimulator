@@ -407,3 +407,17 @@ void WorldTerrain::load(const TMX::TileMap *tileMap, const std::string &tilesetP
 	// add tiles to terrain
 	addTiles(layers, types);
 }
+
+RenderService::RenderService(sf::RenderWindow *renderWindow) : window(renderWindow)
+{
+}
+
+sf::RenderWindow *RenderService::getWindow()
+{
+	return window;
+}
+
+void RenderService::renderEntities()
+{
+	Locator::locate<EntityService>()->renderSystems(*window);
+}

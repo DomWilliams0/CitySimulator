@@ -16,11 +16,11 @@ set(SOURCE_FILES
         src/input.cpp
         src/logger.cpp
         src/maploader.cpp
+        src/rendering.cpp
         src/services.cpp
         src/SFMLDebugDraw.cpp
         src/utils.cpp
         src/world.cpp
-        src/world_render.cpp
         include/ai.hpp
         include/animation.hpp
         include/config.hpp
