@@ -91,11 +91,13 @@ void RenderSystem::renderEntity(EntityService *es, EntityID e, sf::RenderWindow 
 	sf::Transform transform;
 
 	auto offsetPosition = physics->getPosition();
-	offsetPosition.x -= 0.5f;
-	offsetPosition.y -= 0.5f;
+	const float offset = 0.5f * Constants::entityScalef;
+	offsetPosition.x -= offset;
+	offsetPosition.y -= offset;
 
+	const float scale = Constants::entityScalef * Constants::scale / 2.f;
 	transform.translate(Utils::toPixel(offsetPosition));
-	transform.scale(Constants::entityScale);
+	transform.scale(scale, scale);
 
 	states.transform *= transform;
 	render->anim.draw(window, states);
