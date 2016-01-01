@@ -75,8 +75,9 @@ int main(int argc, char **argv)
 		if (!ensureCWD(argc, argv))
 			return -1;
 
-		// create logger
+		// create essential services
 		Locator::provide(SERVICE_LOGGING, new LoggingService(std::cout, LOG_DEBUG));
+		Locator::provide(SERVICE_EVENT, new EventService);
 
 		// load window size/style
 		int style;
