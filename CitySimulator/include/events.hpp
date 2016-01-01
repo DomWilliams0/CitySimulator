@@ -17,6 +17,8 @@ enum EventType
 
 struct Event
 {
+	Event(EventType type);
+
 	EventType type;
 };
 
@@ -27,6 +29,8 @@ struct EventListener
 
 struct InputKeyEvent : public Event
 {
+	InputKeyEvent(sf::Keyboard::Key key, bool pressed);
+
 	sf::Keyboard::Key key;
 	bool pressed;
 };

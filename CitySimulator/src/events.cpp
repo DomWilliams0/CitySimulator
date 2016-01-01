@@ -36,3 +36,11 @@ void EventService::callEvent(const Event &event)
 {
 	pendingEvents.push_front(event);
 }
+
+InputKeyEvent::InputKeyEvent(sf::Keyboard::Key key, bool pressed) : Event(INPUT_KEY), key(key), pressed(pressed)
+{
+}
+
+Event::Event(EventType type) : type(type)
+{
+}
