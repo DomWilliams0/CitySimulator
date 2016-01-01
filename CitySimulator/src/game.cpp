@@ -86,8 +86,6 @@ void BaseGame::beginGame()
 		if (showFPS)
 		{
 			sf::View view(window->getView());
-
-			window->setView(window->getDefaultView());
 			fps.tick(delta, *window);
 			window->setView(view);
 		}

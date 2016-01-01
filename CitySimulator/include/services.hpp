@@ -11,13 +11,12 @@
 
 enum ServiceType
 {
-	SERVICE_INPUT,
-	SERVICE_RENDER,
+	SERVICE_ANIMATION,
 	SERVICE_CONFIG,
 	SERVICE_ENTITY,
-	SERVICE_ANIMATION,
+	SERVICE_INPUT,
 	SERVICE_LOGGING,
-
+	SERVICE_RENDER,
 	SERVICE_UNKNOWN
 };
 
@@ -29,17 +28,17 @@ public:
 	virtual void onDisable();
 };
 
-class InputService;
-
-class RenderService;
+class AnimationService;
 
 class ConfigService;
 
 class EntityService;
 
-class AnimationService;
+class InputService;
 
 class LoggingService;
+
+class RenderService;
 
 class World;
 
@@ -85,71 +84,31 @@ private:
 
 // services
 
-enum InputKey
-{
-	KEY_UP,
-	KEY_LEFT,
-	KEY_DOWN,
-	KEY_RIGHT,
-	KEY_YIELD_CONTROL,
-
-	KEY_COUNT
-};
-
-class InputService : public BaseService
+class AnimationService : public BaseService
 {
 public:
 	virtual void onEnable() override;
 
-	void bindKey(InputKey binding, sf::Keyboard::Key key);
+	void loadSprite(ConfigKeyValue &entityTags, EntityType entityType);
 
-	/// <summary>
-	/// Updates the specified key with the given pressed value
-	/// </summary>
-	/// <param name="key">The key.</param>
-	/// <param name="press">if set to <c>true</c> [press].</param>
-	void update(sf::Keyboard::Key key, bool press);
+	Animation *getAnimation(EntityType entityType, const std::string &name);
 
-	/// <summary>
-	/// Determines whether the specified key is pressed.
-	/// </summary>
-	/// <param name="key">The key.</param>
-	/// <returns></returns>
-	bool isPressed(InputKey key);
+	std::string getRandomAnimationName(EntityType entityType);
 
-	/// <summary>
-	/// Determines whether the specified key has just been pressed.
-	/// </summary>
-	/// <param name="key">The key.</param>
-	/// <returns></returns>
-	bool isFirstPressed(InputKey key);
-
-	/// <summary>
-	/// Moves forward a timestep.
-	/// </summary>
-	void advance();
-
-	sf::Keyboard::Key getKey(InputKey binding);
-
-	InputKey getBinding(sf::Keyboard::Key key);
+	void processQueuedSprites();
 
 private:
-	boost::bimap<InputKey, sf::Keyboard::Key> bindings;
-	std::vector<bool> pressed, wasPressed;
-	// dynamic bitset is being a pain, but this won't have much overhead
-};
+	sf::Texture texture;
+	std::map<EntityType, std::unordered_map<std::string, Animation>> animations;
 
-class RenderService : public BaseService
-{
-public:
-	RenderService(sf::RenderWindow *renderWindow);
+	std::map<sf::Image *, std::pair<ConfigKeyValue, EntityType>> *preProcessImageData;
+	bool processed;
 
-	sf::RenderWindow *getWindow();
+	void checkProcessed(bool shouldBe);
 
-	void renderEntities();
+	sf::Vector2i stringToVector(const std::string &s);
 
-private:
-	sf::RenderWindow *window;
+	void positionImages(sf::Vector2i &imageSize, std::map<sf::Image *, sf::IntRect> &imagePositions);
 };
 
 class ConfigService : public BaseService
@@ -271,31 +230,58 @@ private:
 	void addBrain(EntityID e, bool aiBrain);
 };
 
-class AnimationService : public BaseService
+enum InputKey
+{
+	KEY_UP,
+	KEY_LEFT,
+	KEY_DOWN,
+	KEY_RIGHT,
+	KEY_YIELD_CONTROL,
+
+	KEY_COUNT
+};
+
+class InputService : public BaseService
 {
 public:
 	virtual void onEnable() override;
 
-	void loadSprite(ConfigKeyValue &entityTags, EntityType entityType);
+	void bindKey(InputKey binding, sf::Keyboard::Key key);
 
-	Animation *getAnimation(EntityType entityType, const std::string &name);
+	/// <summary>
+	/// Updates the specified key with the given pressed value
+	/// </summary>
+	/// <param name="key">The key.</param>
+	/// <param name="press">if set to <c>true</c> [press].</param>
+	void update(sf::Keyboard::Key key, bool press);
 
-	std::string getRandomAnimationName(EntityType entityType);
+	/// <summary>
+	/// Determines whether the specified key is pressed.
+	/// </summary>
+	/// <param name="key">The key.</param>
+	/// <returns></returns>
+	bool isPressed(InputKey key);
 
-	void processQueuedSprites();
+	/// <summary>
+	/// Determines whether the specified key has just been pressed.
+	/// </summary>
+	/// <param name="key">The key.</param>
+	/// <returns></returns>
+	bool isFirstPressed(InputKey key);
+
+	/// <summary>
+	/// Moves forward a timestep.
+	/// </summary>
+	void advance();
+
+	sf::Keyboard::Key getKey(InputKey binding);
+
+	InputKey getBinding(sf::Keyboard::Key key);
 
 private:
-	sf::Texture texture;
-	std::map<EntityType, std::unordered_map<std::string, Animation>> animations;
-
-	std::map<sf::Image *, std::pair<ConfigKeyValue, EntityType>> *preProcessImageData;
-	bool processed;
-
-	void checkProcessed(bool shouldBe);
-
-	sf::Vector2i stringToVector(const std::string &s);
-
-	void positionImages(sf::Vector2i &imageSize, std::map<sf::Image *, sf::IntRect> &imagePositions);
+	boost::bimap<InputKey, sf::Keyboard::Key> bindings;
+	std::vector<bool> pressed, wasPressed;
+	// dynamic bitset is being a pain, but this won't have much overhead
 };
 
 enum LogLevel
@@ -383,6 +369,18 @@ private:
 	}
 };
 
+class RenderService : public BaseService
+{
+public:
+	RenderService(sf::RenderWindow *renderWindow);
+
+	sf::RenderWindow *getWindow();
+
+	void renderEntities();
+
+private:
+	sf::RenderWindow *window;
+};
 
 // helpers
 

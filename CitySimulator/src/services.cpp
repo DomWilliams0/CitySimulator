@@ -13,12 +13,12 @@ void BaseService::onDisable()
 
 Locator::Locator() : services(SERVICE_UNKNOWN)
 {
-	types[typeid(InputService)] = SERVICE_INPUT;
-	types[typeid(RenderService)] = SERVICE_RENDER;
+	types[typeid(AnimationService)] = SERVICE_ANIMATION;
 	types[typeid(ConfigService)] = SERVICE_CONFIG;
 	types[typeid(EntityService)] = SERVICE_ENTITY;
-	types[typeid(AnimationService)] = SERVICE_ANIMATION;
+	types[typeid(InputService)] = SERVICE_INPUT;
 	types[(typeid(LoggingService))] = SERVICE_LOGGING;
+	types[typeid(RenderService)] = SERVICE_RENDER;
 }
 
 Locator::~Locator()
