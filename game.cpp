@@ -38,7 +38,7 @@ bool ensureCWD(int argc, char **argv)
 
 void loadConfig(int &windowStyle)
 {
-	auto config = new ConfigService(RESOURCE_DIR, Constants::referenceConfigPath, Constants::configPath);
+	auto config = new ConfigService(RESOURCE_DIR, Constants::referenceConfigFileName, Constants::userConfigFileName);
 	Locator::provide(SERVICE_CONFIG, config);
 
 	// logging level

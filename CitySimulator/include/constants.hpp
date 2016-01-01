@@ -27,8 +27,8 @@ namespace Constants
 
 	extern sf::Font mainFont;
 
-	extern std::string referenceConfigPath;
-	extern std::string configPath;
+	extern std::string referenceConfigFileName;
+	extern std::string userConfigFileName;
 }
 
 typedef int DirectionType;
