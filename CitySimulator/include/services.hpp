@@ -5,7 +5,9 @@
 #include <typeindex>
 #include <typeinfo>
 #include <iostream>
+#include <forward_list>
 #include "entity.hpp"
+#include "events.hpp"
 #include "utils.hpp"
 #include "config.hpp"
 
@@ -14,6 +16,7 @@ enum ServiceType
 	SERVICE_ANIMATION,
 	SERVICE_CONFIG,
 	SERVICE_ENTITY,
+	SERVICE_EVENT,
 	SERVICE_INPUT,
 	SERVICE_LOGGING,
 	SERVICE_RENDER,
@@ -29,15 +32,11 @@ public:
 };
 
 class AnimationService;
-
 class ConfigService;
-
 class EntityService;
-
+class EventService;
 class InputService;
-
 class LoggingService;
-
 class RenderService;
 
 class World;
@@ -228,6 +227,26 @@ private:
 	BaseComponent *addComponent(EntityID e, ComponentType type);
 
 	void addBrain(EntityID e, bool aiBrain);
+};
+
+//struct
+
+class EventService : public BaseService
+{
+public:
+	virtual void onEnable() override;
+	virtual void onDisable() override;
+
+	void registerListener(EventListener *listener, EventType eventType);
+	void unregisterListener(EventListener *listener, EventType eventType);
+
+	void processQueue();
+
+	void callEvent(const Event &event);
+
+private:
+	std::forward_list<Event> pendingEvents;
+	std::unordered_map<EventType, std::forward_list<EventListener*>, std::hash<int>> listeners;
 };
 
 enum InputKey

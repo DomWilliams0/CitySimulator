@@ -9,6 +9,7 @@ set(SOURCE_FILES
         src/constants.cpp
         src/ecs.cpp
         src/entity.cpp
+        src/events.cpp
         src/fps.cpp
         src/game.cpp
         src/gamestate.cpp
@@ -25,6 +26,7 @@ set(SOURCE_FILES
         include/config.hpp
         include/constants.hpp
         include/entity.hpp
+        include/events.hpp
         include/game.hpp
         include/gamestate.hpp
         include/maploader.hpp
