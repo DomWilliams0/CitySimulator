@@ -249,7 +249,7 @@ void AnimationService::positionImages(sf::Vector2i &imageSize, std::map<sf::Imag
 
 void AnimationService::processQueuedSprites()
 {
-// no images
+	// no images
 	if (preProcessImageData->empty())
 	{
 		Logger::logWarning("No sprites were queued for loading by loadSprite");
