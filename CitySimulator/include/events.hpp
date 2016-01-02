@@ -34,7 +34,7 @@ struct EventListener
 {
 	virtual void onEvent(Event *event)
 	{ }
-	virtual void onInputKey(InputKeyEvent *event)
+	virtual void onInputKeyEvent(InputKeyEvent *event)
 	{ }
 };
 
