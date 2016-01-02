@@ -45,40 +45,26 @@ void BaseGame::beginGame()
 	while (window->isOpen())
 	{
 		window = Locator::locate<RenderService>()->getWindow();
-		auto input = Locator::locate<InputService>();
+		auto event = Locator::locate<EventService>();
 
-		input->advance();
-
+		// process OS events
 		while (window->pollEvent(e))
 		{
 			if (e.type == sf::Event::Closed)
 				window->close();
 
-				// keys
 			else if (e.type == sf::Event::KeyPressed || e.type == sf::Event::KeyReleased)
-			{
-				bool pressed = e.type == sf::Event::KeyPressed;
-
-				if (pressed)
-				{
-					// escape to quit
-					if (e.key.code == sf::Keyboard::Escape)
-						window->close();
-				}
-				input->update(e.key.code, pressed);
-				handleInput(e);
-			}
-
-			else
-			{
-				// everything else
-				handleInput(e);
-			}
+				event->callRawInputKeyEvent(e.key.code, e.type == sf::Event::KeyPressed);
 		}
 
+		// process game events
+		event->processQueue();
+
+		// tick
 		float delta(clock.restart().asSeconds());
 		tick(delta);
 
+		// render
 		window->clear(backgroundColour);
 		render(*window);
 

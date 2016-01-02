@@ -21,8 +21,9 @@ void InputService::onEnable()
 		error("Invalid number of key bindings");
 	}
 
-	pressed.resize(KEY_COUNT);
-	wasPressed.resize(KEY_COUNT);
+	// listen to input events
+	auto events = Locator::locate<EventService>();
+	events->registerListener(this, EVENT_RAW_INPUT_KEY);
 }
 
 void InputService::bindKey(InputKey binding, sf::Keyboard::Key key)
@@ -41,31 +42,9 @@ void InputService::bindKey(InputKey binding, sf::Keyboard::Key key)
 	Logger::logDebuggier(format("%1% binding for key %2%: %3%", verb, std::to_string(key), std::to_string(binding)));
 }
 
-
-void InputService::update(sf::Keyboard::Key key, bool press)
+void InputService::onEvent(const Event &event)
 {
-	auto inputKey = bindings.right.find(key);
-	if (inputKey != bindings.right.end())
-	{
-		int index = inputKey->second;
-		pressed[index] = press;
-	}
-}
-
-bool InputService::isPressed(InputKey key)
-{
-	return pressed[key];
-}
-
-bool InputService::isFirstPressed(InputKey key)
-{
-	return pressed[key] && !wasPressed[key];
-}
-
-void InputService::advance()
-{
-	for (size_t i = 0; i < KEY_COUNT; ++i)
-		wasPressed[i] = pressed[i];
+	Logger::logDebug(format("%1% raw key %2%", event.rawInputKey.pressed? "Pressed" : "Released", std::to_string(event.rawInputKey.key)));
 }
 
 sf::Keyboard::Key InputService::getKey(InputKey binding)

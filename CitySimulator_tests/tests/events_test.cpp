@@ -16,16 +16,16 @@ struct EventsTest : public ::testing::Test
 struct InputKeyListener : public EventListener
 {
 
-	virtual void onEvent(Event *event) override
+	virtual void onEvent(const Event &event) override
 	{
-		if (event->type != EVENT_INPUT_KEY)
+		if (event.type != EVENT_RAW_INPUT_KEY)
 			error("InputKeyListener received event that wasn't an input event");
 	}
 };
 
 struct ErrorOnEventListener : public EventListener
 {
-	virtual void onEvent(Event *event) override
+	virtual void onEvent(const Event &event) override
 	{
 		error("FailOnEventListener's onEvent was called");
 	}
@@ -34,29 +34,33 @@ struct ErrorOnEventListener : public EventListener
 TEST_F(EventsTest, RegisterAndUnregister)
 {
 	ErrorOnEventListener l;
+	auto key(sf::Keyboard::K);
 
-	es->callEvent(InputKeyEvent(sf::Keyboard::K, true));
+	es->callRawInputKeyEvent(key, true);
 	EXPECT_NO_THROW(es->processQueue());
 
-	es->registerListener(&l, &EventListener::onEvent, EVENT_INPUT_KEY);
-	es->callEvent(InputKeyEvent(sf::Keyboard::K, true));
+	es->registerListener(&l, EVENT_RAW_INPUT_KEY);
+	es->callRawInputKeyEvent(key, true);
 	EXPECT_ANY_THROW(es->processQueue());
 
-	es->unregisterListener(&l, &EventListener::onEvent, EVENT_INPUT_KEY);
-	es->callEvent(InputKeyEvent(sf::Keyboard::K, true));
+	es->unregisterListener(&l, EVENT_RAW_INPUT_KEY);
+	es->callRawInputKeyEvent(key, true);
 	EXPECT_NO_THROW(es->processQueue());
 }
 
 TEST_F(EventsTest, SpecificEvents)
 {
 	InputKeyListener ikl;
-	es->registerListener(&ikl, &EventListener::onEvent, EVENT_INPUT_KEY);
+	es->registerListener(&ikl, EVENT_RAW_INPUT_KEY);
 
-	es->callEvent(InputKeyEvent(sf::Keyboard::K, true));
-	es->callEvent(Event(EVENT_UNKNOWN));
+	Event badEvent;
+	badEvent.type = EVENT_UNKNOWN;
+
+	es->callRawInputKeyEvent(sf::Keyboard::K, true);
+	es->callEvent(badEvent);
 	EXPECT_NO_THROW(es->processQueue());
 
-	es->registerListener(&ikl, &EventListener::onEvent, EVENT_UNKNOWN);
-	es->callEvent(Event(EVENT_UNKNOWN));
+	es->registerListener(&ikl, EVENT_UNKNOWN);
+	es->callEvent(badEvent);
 	EXPECT_ANY_THROW(es->processQueue());
 }

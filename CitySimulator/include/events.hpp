@@ -5,8 +5,8 @@
 
 enum EventType
 {
-	EVENT_INPUT_KEY,
-	EVENT_INPUT_CLICK,
+	EVENT_RAW_INPUT_KEY,
+	EVENT_RAW_INPUT_CLICK,
 
 	EVENT_HUMAN_SPAWN,
 	EVENT_HUMAN_DEATH,
@@ -17,25 +17,25 @@ enum EventType
 
 struct Event
 {
-	Event(EventType type);
+	// event types
+	struct RawInputKeyEvent
+	{
+		sf::Keyboard::Key key;
+		bool pressed;
+	};
 
 	EventType type;
+
+	union
+	{
+		RawInputKeyEvent rawInputKey;
+	};
 };
 
-struct InputKeyEvent : public Event
-{
-	InputKeyEvent(sf::Keyboard::Key key, bool pressed);
-
-	sf::Keyboard::Key key;
-	bool pressed;
-};
 
 struct EventListener
 {
-	virtual void onEvent(Event *event)
-	{ }
-	virtual void onInputKeyEvent(InputKeyEvent *event)
-	{ }
+	virtual void onEvent(const Event &event) = 0;
 };
 
 #endif

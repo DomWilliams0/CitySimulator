@@ -6,7 +6,7 @@ void InputBrain::tick(float delta)
 	auto input = Locator::locate<InputService>();
 
 	// walking
-	bool right = input->isPressed(KEY_RIGHT);
+/*	bool right = input->isPressed(KEY_RIGHT);
 	bool left = input->isPressed(KEY_LEFT);
 	bool down = input->isPressed(KEY_DOWN);
 	bool up = input->isPressed(KEY_UP);
@@ -26,7 +26,7 @@ void InputBrain::tick(float delta)
 
 	impulse -= phys->getVelocity();
 	impulse *= phys->body->GetMass();
-	phys->body->ApplyForce(toB2Vec(impulse), phys->body->GetWorldCenter(), true);
+	phys->body->ApplyForce(toB2Vec(impulse), phys->body->GetWorldCenter(), true);*/
 
 	//	if (right != left)
 //		phys->steeringLinear.x = right ? 1.f : -1.f;

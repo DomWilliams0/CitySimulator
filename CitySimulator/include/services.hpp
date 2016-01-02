@@ -229,7 +229,7 @@ private:
 	void addBrain(EntityID e, bool aiBrain);
 };
 
-typedef void(EventListener::*EventCallback)(Event *);
+typedef void(EventListener::*EventCallback)(Event &);
 
 class EventService : public BaseService
 {
@@ -237,16 +237,17 @@ public:
 	virtual void onEnable() override;
 	virtual void onDisable() override;
 
-	void registerListener(EventListener *listener, EventCallback callback, EventType eventType);
-	void unregisterListener(EventListener *listener, EventCallback callback, EventType eventType);
+	void registerListener(EventListener *listener, EventType eventType);
+	void unregisterListener(EventListener *listener, EventType eventType);
 
 	void processQueue();
 
 	void callEvent(const Event &event);
+	void callRawInputKeyEvent(sf::Keyboard::Key key, bool pressed);
 
 private:
 	std::forward_list<Event> pendingEvents;
-	std::unordered_map<EventType, std::forward_list<std::pair<EventListener *, EventCallback>>, std::hash<int>> listeners;
+	std::unordered_map<EventType, std::forward_list<EventListener *>, std::hash<int>> listeners;
 };
 
 enum InputKey
@@ -260,47 +261,21 @@ enum InputKey
 	KEY_COUNT
 };
 
-class InputService : public BaseService
+class InputService : public BaseService, public EventListener
 {
 public:
 	virtual void onEnable() override;
 
 	void bindKey(InputKey binding, sf::Keyboard::Key key);
 
-	/// <summary>
-	/// Updates the specified key with the given pressed value
-	/// </summary>
-	/// <param name="key">The key.</param>
-	/// <param name="press">if set to <c>true</c> [press].</param>
-	void update(sf::Keyboard::Key key, bool press);
-
-	/// <summary>
-	/// Determines whether the specified key is pressed.
-	/// </summary>
-	/// <param name="key">The key.</param>
-	/// <returns></returns>
-	bool isPressed(InputKey key);
-
-	/// <summary>
-	/// Determines whether the specified key has just been pressed.
-	/// </summary>
-	/// <param name="key">The key.</param>
-	/// <returns></returns>
-	bool isFirstPressed(InputKey key);
-
-	/// <summary>
-	/// Moves forward a timestep.
-	/// </summary>
-	void advance();
-
 	sf::Keyboard::Key getKey(InputKey binding);
 
 	InputKey getBinding(sf::Keyboard::Key key);
 
+
+	virtual void onEvent(const Event &event) override;
 private:
 	boost::bimap<InputKey, sf::Keyboard::Key> bindings;
-	std::vector<bool> pressed, wasPressed;
-	// dynamic bitset is being a pain, but this won't have much overhead
 };
 
 enum LogLevel

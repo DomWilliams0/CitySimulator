@@ -21,7 +21,7 @@ TEST(ServicesTest, Provide)
 	EXPECT_DEATH(delete old, ".*");
 }
 
-TEST(ServicesTest, InputService)
+/*TEST(ServicesTest, InputService)
 {
 	auto input = Locator::locate<InputService>();
 
@@ -50,9 +50,9 @@ TEST(ServicesTest, InputService)
 	EXPECT_FALSE(input->isFirstPressed(binding));
 	EXPECT_FALSE(input->isPressed(binding));
 	input->advance();
-}
+}*/
 
-TEST(ServicesTest, KeyBindings)
+TEST(ServicesTest, InputKeyBindings)
 {
 	auto input = Locator::locate<InputService>();
 

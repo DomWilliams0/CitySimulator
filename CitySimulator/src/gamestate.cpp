@@ -39,7 +39,7 @@ void GameState::tempControlCamera(float delta)
 
 	float dx(0), dy(0);
 
-	if (Locator::locate<InputService>()->isPressed(KEY_UP))
+/*	if (Locator::locate<InputService>()->isPressed(KEY_UP))
 		dy = -delta;
 	else if (Locator::locate<InputService>()->isPressed(KEY_DOWN))
 		dy = delta;
@@ -52,15 +52,15 @@ void GameState::tempControlCamera(float delta)
 	{
 		view.move(dx * viewSpeed, dy * viewSpeed);
 		Locator::locate<RenderService>()->getWindow()->setView(view);
-	}
+	}*/
 }
 
 void GameState::tick(float delta)
 {
 	world.tick(delta);
 
-	if (Locator::locate<InputService>()->isFirstPressed(InputKey::KEY_YIELD_CONTROL))
-		playerControl = !playerControl;
+//	if (Locator::locate<InputService>()->isFirstPressed(InputKey::KEY_YIELD_CONTROL))
+//		playerControl = !playerControl;
 
 	// todo make sure this hack DOESN'T end up in production
 	if (playerControl)

@@ -8,14 +8,14 @@ void EventService::onDisable()
 {
 }
 
-void EventService::registerListener(EventListener *listener, EventCallback callback, EventType eventType)
+void EventService::registerListener(EventListener *listener, EventType eventType)
 {
 	Logger::logDebuggier(format("Registering listener for event %1%", std::to_string(eventType)));
-	listeners[eventType].push_front({listener, callback});
+	listeners[eventType].push_front(listener);
 }
-void EventService::unregisterListener(EventListener *listener, EventCallback callback, EventType eventType)
+void EventService::unregisterListener(EventListener *listener, EventType eventType)
 {
-	listeners[eventType].remove({listener, callback});
+	listeners[eventType].remove(listener);
 	Logger::logDebuggier(format("Unregistering listener for event %1%", std::to_string(eventType)));
 }
 
@@ -25,13 +25,8 @@ void EventService::processQueue()
 	for (Event &e : pendingEvents)
 	{
 		auto eventListeners = listeners[e.type];
-		for (auto &pair : eventListeners)
-		{
-			EventListener *listener = pair.first;
-			EventCallback callback = pair.second;
-			(listener->*callback)(&e);
-
-		}
+		for (EventListener *listener : eventListeners)
+			listener->onEvent(e);
 	}
 
 	pendingEvents.clear();
@@ -42,10 +37,11 @@ void EventService::callEvent(const Event &event)
 	pendingEvents.push_front(event);
 }
 
-InputKeyEvent::InputKeyEvent(sf::Keyboard::Key key, bool pressed) : Event(EVENT_INPUT_KEY), key(key), pressed(pressed)
+void EventService::callRawInputKeyEvent(sf::Keyboard::Key key, bool pressed)
 {
-}
-
-Event::Event(EventType type) : type(type)
-{
+	Event e;
+	e.type = EVENT_RAW_INPUT_KEY;
+	e.rawInputKey.key = key;
+	e.rawInputKey.pressed = pressed;
+	callEvent(e);
 }
