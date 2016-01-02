@@ -143,11 +143,6 @@ void Game::render(sf::RenderWindow &window)
 		box2DWorld->DrawDebugData();
 }
 
-void Game::handleInput(sf::Event e)
-{
-	current->handleInput(e);
-}
-
 void Game::switchState(StateType newStateType)
 {
 	// destruct current

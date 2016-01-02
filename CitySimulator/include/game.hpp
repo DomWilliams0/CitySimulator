@@ -49,8 +49,6 @@ protected:
 
 	virtual void render(sf::RenderWindow &window) = 0;
 
-	virtual void handleInput(sf::Event e) = 0;
-
 	void limitFrameRate(int limit, bool vsync);
 
 	void setBackgroundColour(const sf::Uint8 &r, const sf::Uint8 &g, const sf::Uint8 &b, const sf::Uint8 &a = 255)
@@ -81,8 +79,6 @@ protected:
 	void tick(float delta) override;
 
 	void render(sf::RenderWindow &window) override;
-
-	void handleInput(sf::Event e) override;
 
 public:
 	void switchState(StateType newScreenType);

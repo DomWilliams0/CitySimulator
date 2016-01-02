@@ -82,10 +82,6 @@ void GameState::render(sf::RenderWindow &window)
 	Locator::locate<RenderService>()->renderEntities();
 }
 
-void GameState::handleInput(const sf::Event &event)
-{
-}
-
 b2World *GameState::getBox2DWorld()
 {
 	return world.getBox2DWorld();
