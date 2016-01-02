@@ -15,15 +15,17 @@ struct EventsTest : public ::testing::Test
 
 struct InputKeyListener : public EventListener
 {
-	virtual void onEvent(const Event &event) override
+
+	virtual void onEvent(Event *event) override
 	{
-		if (event.type != EVENT_INPUT_KEY)
+		if (event->type != EVENT_INPUT_KEY)
 			error("InputKeyListener received event that wasn't an input event");
 	}
 };
+
 struct ErrorOnEventListener : public EventListener
 {
-	virtual void onEvent(const Event &event) override
+	virtual void onEvent(Event *event) override
 	{
 		error("FailOnEventListener's onEvent was called");
 	}
@@ -36,11 +38,11 @@ TEST_F(EventsTest, RegisterAndUnregister)
 	es->callEvent(InputKeyEvent(sf::Keyboard::K, true));
 	EXPECT_NO_THROW(es->processQueue());
 
-	es->registerListener(&l, EVENT_INPUT_KEY);
+	es->registerListener(&l, &EventListener::onEvent, EVENT_INPUT_KEY);
 	es->callEvent(InputKeyEvent(sf::Keyboard::K, true));
 	EXPECT_ANY_THROW(es->processQueue());
 
-	es->unregisterListener(&l, EVENT_INPUT_KEY);
+	es->unregisterListener(&l, &EventListener::onEvent, EVENT_INPUT_KEY);
 	es->callEvent(InputKeyEvent(sf::Keyboard::K, true));
 	EXPECT_NO_THROW(es->processQueue());
 }
@@ -48,13 +50,13 @@ TEST_F(EventsTest, RegisterAndUnregister)
 TEST_F(EventsTest, SpecificEvents)
 {
 	InputKeyListener ikl;
-	es->registerListener(&ikl, EVENT_INPUT_KEY);
+	es->registerListener(&ikl, &EventListener::onEvent, EVENT_INPUT_KEY);
 
 	es->callEvent(InputKeyEvent(sf::Keyboard::K, true));
 	es->callEvent(Event(EVENT_UNKNOWN));
 	EXPECT_NO_THROW(es->processQueue());
 
-	es->registerListener(&ikl, EVENT_UNKNOWN);
+	es->registerListener(&ikl, &EventListener::onEvent, EVENT_UNKNOWN);
 	es->callEvent(Event(EVENT_UNKNOWN));
 	EXPECT_ANY_THROW(es->processQueue());
 }

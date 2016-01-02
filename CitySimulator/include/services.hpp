@@ -229,7 +229,7 @@ private:
 	void addBrain(EntityID e, bool aiBrain);
 };
 
-//struct
+typedef void(EventListener::*EventCallback)(Event *);
 
 class EventService : public BaseService
 {
@@ -237,8 +237,8 @@ public:
 	virtual void onEnable() override;
 	virtual void onDisable() override;
 
-	void registerListener(EventListener *listener, EventType eventType);
-	void unregisterListener(EventListener *listener, EventType eventType);
+	void registerListener(EventListener *listener, EventCallback callback, EventType eventType);
+	void unregisterListener(EventListener *listener, EventCallback callback, EventType eventType);
 
 	void processQueue();
 
@@ -246,7 +246,7 @@ public:
 
 private:
 	std::forward_list<Event> pendingEvents;
-	std::unordered_map<EventType, std::forward_list<EventListener*>, std::hash<int>> listeners;
+	std::unordered_map<EventType, std::forward_list<std::pair<EventListener *, EventCallback>>, std::hash<int>> listeners;
 };
 
 enum InputKey

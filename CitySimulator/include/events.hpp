@@ -22,17 +22,20 @@ struct Event
 	EventType type;
 };
 
-struct EventListener
-{
-	virtual void onEvent(const Event &event) = 0;
-};
-
 struct InputKeyEvent : public Event
 {
 	InputKeyEvent(sf::Keyboard::Key key, bool pressed);
 
 	sf::Keyboard::Key key;
 	bool pressed;
+};
+
+struct EventListener
+{
+	virtual void onEvent(Event *event)
+	{ }
+	virtual void onInputKey(InputKeyEvent *event)
+	{ }
 };
 
 #endif

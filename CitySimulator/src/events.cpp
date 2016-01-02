@@ -8,25 +8,30 @@ void EventService::onDisable()
 {
 }
 
-void EventService::registerListener(EventListener *listener, EventType eventType)
+void EventService::registerListener(EventListener *listener, EventCallback callback, EventType eventType)
 {
 	Logger::logDebuggier(format("Registering listener for event %1%", std::to_string(eventType)));
-	listeners[eventType].push_front(listener);
+	listeners[eventType].push_front({listener, callback});
 }
-void EventService::unregisterListener(EventListener *listener, EventType eventType)
+void EventService::unregisterListener(EventListener *listener, EventCallback callback, EventType eventType)
 {
-	listeners[eventType].remove(listener);
+	listeners[eventType].remove({listener, callback});
 	Logger::logDebuggier(format("Unregistering listener for event %1%", std::to_string(eventType)));
 }
 
 void EventService::processQueue()
 {
 	// todo only process a subset according to a time limit/fixed maximum count
-	for (const Event &e : pendingEvents)
+	for (Event &e : pendingEvents)
 	{
 		auto eventListeners = listeners[e.type];
-		for (EventListener *listener : eventListeners)
-			listener->onEvent(e);
+		for (auto &pair : eventListeners)
+		{
+			EventListener *listener = pair.first;
+			EventCallback callback = pair.second;
+			(listener->*callback)(&e);
+
+		}
 	}
 
 	pendingEvents.clear();
