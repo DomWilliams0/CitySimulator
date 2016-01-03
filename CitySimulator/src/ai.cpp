@@ -39,6 +39,13 @@ void InputBrain::tick(float delta)
 //		phys->steeringLinear.y = 0.f;
 }
 
+void InputBrain::onEvent(const Event &event)
+{
+	bool start = event.type == EVENT_HUMAN_START_MOVING;
+	Logger::logDebug(format("Input brain should %1% moving%2%", start ? "start" : "stop",
+	                        start ? " in direction " + std::to_string(event.startMove.direction) : ""));
+}
+
 void AIBrain::tick(float delta)
 {
 	// do things

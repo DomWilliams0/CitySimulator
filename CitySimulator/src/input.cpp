@@ -10,6 +10,7 @@ void InputService::onEnable()
 	bindKey(KEY_DOWN, sf::Keyboard::S);
 	bindKey(KEY_RIGHT, sf::Keyboard::D);
 	bindKey(KEY_YIELD_CONTROL, sf::Keyboard::Tab);
+	bindKey(KEY_EXIT, sf::Keyboard::Escape);
 	// todo load from config
 
 	// check all keys have been registered
@@ -44,7 +45,70 @@ void InputService::bindKey(InputKey binding, sf::Keyboard::Key key)
 
 void InputService::onEvent(const Event &event)
 {
-	Logger::logDebug(format("%1% raw key %2%", event.rawInputKey.pressed? "Pressed" : "Released", std::to_string(event.rawInputKey.key)));
+	InputKey binding(getBinding(event.rawInputKey.key));
+	if (binding == KEY_COUNT)
+		return;
+
+	EntityID controlledEntity = 0; // todo get from EntityService
+
+	// quit
+	if (binding == KEY_EXIT)
+	{
+		Logger::logDebug("Exit key pressed, quitting");
+		Locator::locate<RenderService>()->getWindow()->close();
+		return;
+	}
+
+	// an entity is being controlled
+	if (controlledEntity != -1)
+	{
+		EventService *es = Locator::locate<EventService>();
+
+		Event e;
+		e.entityID = controlledEntity;
+
+
+		if (binding == KEY_YIELD_CONTROL)
+		{
+			e.type = EVENT_HUMAN_YIELD_CONTROL;
+		}
+
+		else
+		{
+			bool startMoving = event.rawInputKey.pressed;
+			e.type = startMoving ? EVENT_HUMAN_START_MOVING : EVENT_HUMAN_STOP_MOVING;
+
+			// movement direction
+			if (startMoving)
+			{
+				DirectionType direction;
+
+				switch (binding)
+				{
+					case KEY_UP:
+						direction = Direction::NORTH;
+						break;
+					case KEY_LEFT:
+						direction = Direction::WEST;
+						break;
+					case KEY_DOWN:
+						direction = Direction::SOUTH;
+						break;
+					case KEY_RIGHT:
+						direction = Direction::EAST;
+						break;
+					default:
+						error("An invalid movement key slipped through InputService's onEvent: %1%",
+						      std::to_string(binding));
+						return;
+				}
+
+				e.startMove.direction = direction;
+			}
+		}
+
+		es->callEvent(e);
+	}
 }
 
 sf::Keyboard::Key InputService::getKey(InputKey binding)

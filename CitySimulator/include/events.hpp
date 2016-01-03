@@ -2,11 +2,16 @@
 #define CITYSIM_EVENTS_HPP
 
 #include <SFML/Window.hpp>
+#include "utils.hpp"
 
 enum EventType
 {
 	EVENT_RAW_INPUT_KEY,
 	EVENT_RAW_INPUT_CLICK,
+
+	EVENT_HUMAN_START_MOVING,
+	EVENT_HUMAN_STOP_MOVING,
+	EVENT_HUMAN_YIELD_CONTROL,
 
 	EVENT_HUMAN_SPAWN,
 	EVENT_HUMAN_DEATH,
@@ -24,11 +29,18 @@ struct Event
 		bool pressed;
 	};
 
+	struct HumanStartMoveEvent
+	{
+		DirectionType direction;
+	};
+
 	EventType type;
+	EntityID entityID;
 
 	union
 	{
 		RawInputKeyEvent rawInputKey;
+		HumanStartMoveEvent startMove;
 	};
 };
 

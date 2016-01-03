@@ -40,14 +40,19 @@ protected:
 	PhysicsComponent *phys;
 };
 
-class InputBrain : public EntityBrain
+class InputBrain : public EntityBrain, EventListener
 {
 public:
 	explicit InputBrain(EntityID e)
 			: EntityBrain(e)
 	{
+		EventService *es = Locator::locate<EventService>();
+		es->registerListener(this, EVENT_HUMAN_START_MOVING);
+		es->registerListener(this, EVENT_HUMAN_STOP_MOVING);
 	}
 
+private:
+	virtual void onEvent(const Event &event) override;
 	void tick(float delta) override;
 };
 

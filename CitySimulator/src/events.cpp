@@ -34,6 +34,7 @@ void EventService::processQueue()
 
 void EventService::callEvent(const Event &event)
 {
+	// todo double buffer event queue
 	pendingEvents.push_front(event);
 }
 

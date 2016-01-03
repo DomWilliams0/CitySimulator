@@ -49,7 +49,6 @@ public:
 
 	static std::string serviceToString(ServiceType type);
 
-	// helper
 	template<class T>
 	static T *locate(bool errorOnFail = true)
 	{
@@ -257,6 +256,7 @@ enum InputKey
 	KEY_DOWN,
 	KEY_RIGHT,
 	KEY_YIELD_CONTROL,
+	KEY_EXIT,
 
 	KEY_COUNT
 };
