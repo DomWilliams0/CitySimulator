@@ -67,7 +67,7 @@ void InputService::onEvent(const Event &event)
 	Event e;
 
 	// assign entity id
-	e.entityID = hasEntity ? *playerEntity : -1;
+	e.entityID = hasEntity ? *playerEntity : INVALID_ENTITY;
 
 	// yield entity control
 	if (binding == KEY_YIELD_CONTROL)

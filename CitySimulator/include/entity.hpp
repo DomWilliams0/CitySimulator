@@ -1,6 +1,8 @@
 #ifndef CITYSIM_ENTITY_HPP
 #define CITYSIM_ENTITY_HPP
 
+#define INVALID_ENTITY (-1)
+
 typedef unsigned int EntityID;
 
 #include <boost/smart_ptr/shared_ptr.hpp>
