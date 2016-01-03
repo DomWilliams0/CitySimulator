@@ -179,6 +179,7 @@ void EntityService::addPhysicsComponent(EntityID e, World *world, const sf::Vect
 	);
 
 	b2FixtureDef fixDef;
+	fixDef.friction = 0.5f;
 	fixDef.density = 985.f;
 	fixDef.shape = &aabb;
 
