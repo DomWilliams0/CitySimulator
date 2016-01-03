@@ -152,6 +152,10 @@ ConfigService::ConfigService(const std::string &directory,
 		: config(Utils::joinPaths(directory, appConfigPath), Utils::joinPaths(directory, userConfigPath)),
 		  rootDirectory(directory)
 {
+	if (appConfigPath.empty())
+		config.setAppConfigPath("");
+	if (userConfigPath.empty())
+		config.setUserConfigPath("");
 }
 
 void ConfigService::onEnable()

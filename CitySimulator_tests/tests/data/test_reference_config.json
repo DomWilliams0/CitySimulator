@@ -7,12 +7,24 @@
             "cheetah": "woof"
         }
     },
+
     "override-me": {
         "pegasus": 5.5
     },
     "eggs": {
-        "numbahs": [1, 2, 3, -60],
-        "strangs": ["rudolph", "was", "a", "bad", "boy"],
+        "numbahs": [
+            1,
+            2,
+            3,
+            -60
+        ],
+        "strangs": [
+            "rudolph",
+            "was",
+            "a",
+            "bad",
+            "boy"
+        ],
         "swimmers": [
             {
                 "name": "Boris",
@@ -23,5 +35,30 @@
                 "swimming": "painful to watch"
             }
         ]
+    },
+
+
+    "debug": {
+        "window-title": "Tests",
+        "human-skin": "Test Man",
+        "zoom": 1,
+        "reload-config": true,
+        "movement": {
+            "stop-decay": 8,
+            "force": 80,
+            "max-speed": 40
+        }
+    },
+    "resources": {
+        "root": "data",
+        "world": {
+            "root": "",
+            "tileset": "tileset.png"
+        },
+        "entities": {
+            "root": "",
+            "config": "test_entities.json",
+            "sprites": ""
+        }
     }
 }

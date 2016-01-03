@@ -2,30 +2,5 @@
     "override-me": {
         "pegasus": 100.0
     },
-    "dog": "cornichon",
-
-    "debug": {
-        "window-title": "Chity Shimulator",
-        "human-skin": "Test Man",
-        "zoom": 1,
-        "reload-config": true,
-        "movement": {
-            "stop-decay": 8,
-            "force": 80,
-            "max-speed": 40
-        }
-    },
-
-    "resources": {
-        "root": "data",
-        "world": {
-            "root": "",
-            "tileset": "tileset.png"
-        },
-        "entities": {
-            "root": "",
-            "config": "test_entities.json",
-            "sprites": ""
-        }
-    }
+    "dog": "cornichon"
 }
