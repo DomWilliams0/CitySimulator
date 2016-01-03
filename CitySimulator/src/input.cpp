@@ -65,7 +65,7 @@ void InputService::onEvent(const Event &event)
 		EventService *es = Locator::locate<EventService>();
 
 		Event e;
-		e.entityID = playerEntity;
+		e.entityID = *playerEntity;
 
 
 		if (binding == KEY_YIELD_CONTROL)

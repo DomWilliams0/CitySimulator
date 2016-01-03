@@ -279,24 +279,23 @@ public:
 
 	inline void clearPlayerEntity()
 	{
-		// todo but EntityID is unsigned
-		playerEntity = -1;
+		playerEntity.reset();
 	}
 
 	inline bool hasPlayerEntity()
 	{
-		return playerEntity != -1;
+		return playerEntity.is_initialized();
 	}
 
 	inline EntityID getPlayerEntity()
 	{
-		return playerEntity;
+		return *playerEntity;
 	}
 
 
 private:
 	boost::bimap<InputKey, sf::Keyboard::Key> bindings;
-	EntityID playerEntity;
+	boost::optional<EntityID> playerEntity;
 };
 
 enum LogLevel
