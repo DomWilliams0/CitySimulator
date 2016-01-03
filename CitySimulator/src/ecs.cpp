@@ -81,7 +81,7 @@ void tempDrawVector(PhysicsComponent *physics, const sf::Vector2f vector, sf::Co
 {
 	sf::RectangleShape r;
 	r.rotate(atan2(vector.y, vector.x) * Math::radToDeg);
-	r.move(Utils::toPixel(physics->getPosition()));
+	r.move(physics->getPosition());
 	r.setSize(sf::Vector2f(Math::length(vector) * Constants::tileSizef / 2, 1.0f));
 	r.setFillColor(colour);
 	window.draw(r);
@@ -95,7 +95,7 @@ void RenderSystem::renderEntity(EntityService *es, EntityID e, sf::RenderWindow 
 	sf::RenderStates states;
 	sf::Transform transform;
 
-	auto offsetPosition = physics->getPosition();
+	sf::Vector2f offsetPosition = physics->getTilePosition();
 	const float offset = 0.5f * Constants::entityScalef;
 	offsetPosition.x -= offset;
 	offsetPosition.y -= offset;
@@ -112,47 +112,6 @@ void RenderSystem::renderEntity(EntityService *es, EntityID e, sf::RenderWindow 
 }
 
 // components
-
-sf::Vector2i PhysicsComponent::getTilePosition() const
-{
-	sf::Vector2i tile;
-	auto position(getPosition());
-	tile.x = static_cast<int>(position.x);
-	tile.y = static_cast<int>(position.y) + 1;
-	return Utils::toTile(tile);
-}
-
-sf::Vector2f PhysicsComponent::getPosition() const
-{
-	auto pos(body->GetPosition());
-	return sf::Vector2f(pos.x, pos.y);
-}
-
-sf::Vector2f PhysicsComponent::getVelocity() const
-{
-	auto vel(body->GetLinearVelocity());
-	return sf::Vector2f(vel.x, vel.y);
-}
-
-sf::Vector2f PhysicsComponent::getLastVelocity() const
-{
-	return fromB2Vec<float>(lastVelocity);
-}
-
-void PhysicsComponent::setVelocity(const sf::Vector2f &velocity)
-{
-	body->SetLinearVelocity(toB2Vec(velocity));
-}
-
-bool PhysicsComponent::isStopped()
-{
-	return Math::lengthSquared(getVelocity()) < 1;
-}
-
-bool PhysicsComponent::isSteering()
-{
-	return steering.x != 0.f || steering.y != 0.f;
-}
 
 void RenderComponent::reset()
 {
