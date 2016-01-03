@@ -48,19 +48,21 @@ std::string Locator::serviceToString(ServiceType type)
 {
 	switch (type)
 	{
-		case SERVICE_INPUT:
-			return "Input";
-		case SERVICE_RENDER:
-			return "Render";
+		case SERVICE_ANIMATION:
+			return "Animation";
 		case SERVICE_CONFIG:
 			return "Config";
 		case SERVICE_ENTITY:
 			return "Entity";
-		case SERVICE_ANIMATION:
-			return "Animation";
+		case SERVICE_EVENT:
+			return "Event";
+		case SERVICE_INPUT:
+			return "Input";
 		case SERVICE_LOGGING:
 			return "Logging";
+		case SERVICE_RENDER:
+			return "Render";
 		default:
-			return "Unknown";
+			return format("Unknown (%1%)", std::to_string(type));
 	}
 }
