@@ -25,22 +25,19 @@ void InputBrain::tick(float delta)
 	bool east = moving[DIRECTION_EAST];
 	bool west = moving[DIRECTION_WEST];
 
-	// todo: WIP!
-	sf::Vector2f impulse;
+	float x, y;
 
 	if (east != west)
-		impulse.x = east ? acceleration : -acceleration;
+		x = east ? acceleration : -acceleration;
 	else
-		impulse.x = 0.f;
+		x = 0.f;
 
 	if (south != north)
-		impulse.y = south ? acceleration : -acceleration;
+		y = south ? acceleration : -acceleration;
 	else
-		impulse.y = 0.f;
+		y = 0.f;
 
-	impulse -= phys->getVelocity();
-	impulse *= phys->body->GetMass();
-	phys->body->ApplyForce(toB2Vec(impulse), phys->body->GetWorldCenter(), true);
+	phys->steering.Set(x, y);
 }
 
 

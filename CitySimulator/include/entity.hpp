@@ -68,20 +68,19 @@ struct PhysicsComponent : BaseComponent
 	void reset() override;
 
 	sf::Vector2i getTilePosition() const;
-
 	sf::Vector2f getPosition() const;
-
 	sf::Vector2f getVelocity() const;
-
 	sf::Vector2f getLastVelocity() const;
-
 	void setVelocity(const sf::Vector2f &velocity);
 
 	bool isStopped();
+	bool isSteering();
 
 	b2Body *body;
 	b2World *bWorld;
 	b2Vec2 lastVelocity;
+
+	b2Vec2 steering;
 };
 
 class EntityService;

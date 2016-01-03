@@ -27,12 +27,13 @@ void RenderSystem::tickEntity(EntityService *es, EntityID e, float dt)
 	auto *physics = es->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
 
 	// set playing
-	bool stopped = physics->isStopped();
-	render->anim.setPlaying(!stopped, stopped);
+	bool stopAnimation = !physics->isSteering() && physics->isStopped();
+
+	render->anim.setPlaying(!stopAnimation, stopAnimation);
 
 	// change animation direction
 	// todo get this from orientation instead of movement
-	sf::Vector2f directionVector = stopped ? physics->getLastVelocity() : physics->getVelocity();
+	sf::Vector2f directionVector = physics->isStopped() ? physics->getLastVelocity() : physics->getVelocity();
 	double angleDeg = atan2(directionVector.y, directionVector.x) * Math::radToDeg;
 	DirectionType direction = Direction::fromAngle(angleDeg);
 	render->anim.turn(direction, false);
@@ -49,6 +50,10 @@ void InputSystem::tickEntity(EntityService *es, EntityID e, float dt)
 void PhysicsSystem::tickEntity(EntityService *es, EntityID e, float dt)
 {
 	auto *physics = es->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
+
+	// move
+	physics->body->SetLinearVelocity(
+			physics->body->GetLinearVelocity() + physics->steering);
 
 	// maximum speed
 	float maxSpeed = Config::getFloat("debug.movement.max-speed");
@@ -142,6 +147,11 @@ void PhysicsComponent::setVelocity(const sf::Vector2f &velocity)
 bool PhysicsComponent::isStopped()
 {
 	return Math::lengthSquared(getVelocity()) < 1;
+}
+
+bool PhysicsComponent::isSteering()
+{
+	return steering.x != 0.f || steering.y != 0.f;
 }
 
 void RenderComponent::reset()
