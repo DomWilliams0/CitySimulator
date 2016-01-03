@@ -9,8 +9,8 @@ EntityBrain::EntityBrain(EntityID e) : entity(e)
 InputBrain::InputBrain(EntityID e) : EntityBrain(e), moving(DIRECTION_COUNT, false)
 {
 	EventService *es = Locator::locate<EventService>();
-	es->registerListener(this, EVENT_HUMAN_START_MOVING);
-	es->registerListener(this, EVENT_HUMAN_STOP_MOVING);
+	es->registerListener(this, EVENT_INPUT_START_MOVING);
+	es->registerListener(this, EVENT_INPUT_STOP_MOVING);
 
 	moving.shrink_to_fit();
 }
@@ -44,7 +44,10 @@ void InputBrain::tick(float delta)
 
 void InputBrain::onEvent(const Event &event)
 {
-	bool start = event.type == EVENT_HUMAN_START_MOVING;
+	if (event.entityID != entity)
+		return;
+
+	bool start = event.type == EVENT_INPUT_START_MOVING;
 
 	float dx = 0.f;
 	float dy = 0.f;

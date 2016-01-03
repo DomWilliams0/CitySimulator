@@ -5,6 +5,7 @@ project(CitySimulator)
 set(SOURCE_FILES
         src/ai.cpp
         src/animation.cpp
+        src/camera.cpp
         src/config.cpp
         src/constants.cpp
         src/ecs.cpp

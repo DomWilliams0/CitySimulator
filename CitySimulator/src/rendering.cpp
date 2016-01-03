@@ -426,22 +426,6 @@ sf::RenderWindow *RenderService::getWindow()
 
 void RenderService::render(const World &world)
 {
-	InputService *is = Locator::locate<InputService>();
-	EntityService *es = Locator::locate<EntityService>();
-	
-	// centre on player
-	if (is->hasPlayerEntity())
-	{
-		EntityID player = is->getPlayerEntity();
-		if (es->hasComponent(player, COMPONENT_PHYSICS))
-		{
-			PhysicsComponent *phys = es->getComponent<PhysicsComponent>(player, COMPONENT_PHYSICS);
-
-			view.setCenter(phys->getPosition());
-			window->setView(view);
-		}
-	}
-
 	window->draw(world);
-	es->renderSystems(*window);
+	Locator::locate<EntityService>()->renderSystems(*window);
 }

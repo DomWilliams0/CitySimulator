@@ -11,11 +11,12 @@ void BaseService::onDisable()
 Locator::Locator() : services(SERVICE_UNKNOWN)
 {
 	types[typeid(AnimationService)] = SERVICE_ANIMATION;
+	types[typeid(CameraService)] = SERVICE_CAMERA;
 	types[typeid(ConfigService)] = SERVICE_CONFIG;
 	types[typeid(EntityService)] = SERVICE_ENTITY;
 	types[typeid(EventService)] = SERVICE_EVENT;
 	types[typeid(InputService)] = SERVICE_INPUT;
-	types[(typeid(LoggingService))] = SERVICE_LOGGING;
+	types[typeid(LoggingService)] = SERVICE_LOGGING;
 	types[typeid(RenderService)] = SERVICE_RENDER;
 }
 
@@ -50,6 +51,8 @@ std::string Locator::serviceToString(ServiceType type)
 	{
 		case SERVICE_ANIMATION:
 			return "Animation";
+		case SERVICE_CAMERA:
+			return "Camera";
 		case SERVICE_CONFIG:
 			return "Config";
 		case SERVICE_ENTITY:

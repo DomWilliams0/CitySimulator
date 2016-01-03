@@ -17,12 +17,8 @@ GameState::GameState() : State(GAME)
 	world.loadFromFile(Config::getString("debug.world-name"),
 	                   Config::getResource("world.tileset"));
 
-	// camera view
-	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
-	view.setCenter(world.getPixelSize().x / 2.f, world.getPixelSize().y / 2.f);
-
-	view.zoom(Config::getFloat("debug.zoom"));
-	Locator::locate<RenderService>()->getWindow()->setView(view);
+	// load camera
+	Locator::provide(SERVICE_CAMERA, new CameraService(world));
 
 	EntityID e = entityService->createEntity();
 	sf::Vector2i tilePos = {Config::getInt("debug.start-pos.x"), Config::getInt("debug.start-pos.y")};
@@ -37,6 +33,7 @@ void GameState::tick(float delta)
 {
 	world.tick(delta);
 
+	Locator::locate<CameraService>()->tick(delta);
 	Locator::locate<EntityService>()->tickSystems(delta);
 }
 

@@ -14,6 +14,7 @@
 enum ServiceType
 {
 	SERVICE_ANIMATION,
+	SERVICE_CAMERA,
 	SERVICE_CONFIG,
 	SERVICE_ENTITY,
 	SERVICE_EVENT,
@@ -32,6 +33,7 @@ public:
 };
 
 class AnimationService;
+class CameraService;
 class ConfigService;
 class EntityService;
 class EventService;
@@ -40,6 +42,7 @@ class LoggingService;
 class RenderService;
 
 class World;
+class PhysicsComponent;
 
 class Locator
 {
@@ -107,6 +110,34 @@ private:
 	sf::Vector2i stringToVector(const std::string &s);
 
 	void positionImages(sf::Vector2i &imageSize, std::map<sf::Image *, sf::IntRect> &imagePositions);
+};
+
+class CameraService : public BaseService, public EventListener
+{
+public:
+	CameraService(World &world);
+
+	virtual void onEnable() override;
+	virtual void onDisable() override;
+
+	void tick(float delta);
+
+	void switchWorld(World &world);
+	void setTrackedEntity(EntityID entity);
+	void clearPlayerEntity();
+
+	virtual void onEvent(const Event &event) override;
+
+	inline World* getWorld()
+	{
+		return world;
+	}
+private:
+	World *world;
+	PhysicsComponent *trackedEntity;
+	sf::View view;
+
+	void updateWindowView() const;
 };
 
 class ConfigService : public BaseService
@@ -275,11 +306,13 @@ public:
 	inline void setPlayerEntity(EntityID entity)
 	{
 		playerEntity = entity;
+		Locator::locate<CameraService>()->setTrackedEntity(entity);
 	}
 
 	inline void clearPlayerEntity()
 	{
 		playerEntity.reset();
+		Locator::locate<CameraService>()->clearPlayerEntity();
 	}
 
 	inline bool hasPlayerEntity()
@@ -287,9 +320,10 @@ public:
 		return playerEntity.is_initialized();
 	}
 
+	// throws an exception if hasPlayerEntity returns false
 	inline EntityID getPlayerEntity()
 	{
-		return *playerEntity;
+		return playerEntity.get();
 	}
 
 

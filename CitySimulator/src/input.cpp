@@ -48,6 +48,8 @@ void InputService::bindKey(InputKey binding, sf::Keyboard::Key key)
 void InputService::onEvent(const Event &event)
 {
 	InputKey binding(getBinding(event.rawInputKey.key));
+
+	// unrecognized key
 	if (binding == KEY_COUNT)
 		return;
 
@@ -59,56 +61,58 @@ void InputService::onEvent(const Event &event)
 		return;
 	}
 
-	// an entity is being controlled
-	if (hasPlayerEntity())
+	EventService *es = Locator::locate<EventService>();
+	bool hasEntity = hasPlayerEntity();
+
+	Event e;
+
+	// assign entity id
+	e.entityID = hasEntity ? *playerEntity : -1;
+
+	// yield entity control
+	if (binding == KEY_YIELD_CONTROL)
 	{
-		EventService *es = Locator::locate<EventService>();
-
-		Event e;
-		e.entityID = *playerEntity;
-
-
-		if (binding == KEY_YIELD_CONTROL)
+		if (hasEntity)
 		{
-			e.type = EVENT_HUMAN_YIELD_CONTROL;
+			e.type = EVENT_INPUT_YIELD_CONTROL;
 			clearPlayerEntity();
 		}
-
-		else
-		{
-			bool startMoving = event.rawInputKey.pressed;
-			e.type = startMoving ? EVENT_HUMAN_START_MOVING : EVENT_HUMAN_STOP_MOVING;
-
-				DirectionType direction;
-
-				switch (binding)
-				{
-					case KEY_UP:
-						direction = DIRECTION_NORTH;
-						break;
-					case KEY_LEFT:
-						direction = DIRECTION_WEST;
-						break;
-					case KEY_DOWN:
-						direction = DIRECTION_SOUTH;
-						break;
-					case KEY_RIGHT:
-						direction = DIRECTION_EAST;
-						break;
-					default:
-						error("An invalid movement key slipped through InputService's onEvent: %1%",
-						      std::to_string(binding));
-						return;
-				}
-
-			if (startMoving)
-				e.startMove.direction = direction;
-			else
-				e.stopMove.direction = direction;
-		}
-
-		es->callEvent(e);
 	}
+
+	else
+	{
+		bool startMoving = event.rawInputKey.pressed;
+		e.type = startMoving ? EVENT_INPUT_START_MOVING : EVENT_INPUT_STOP_MOVING;
+
+			DirectionType direction;
+
+			switch (binding)
+			{
+				case KEY_UP:
+					direction = DIRECTION_NORTH;
+					break;
+				case KEY_LEFT:
+					direction = DIRECTION_WEST;
+					break;
+				case KEY_DOWN:
+					direction = DIRECTION_SOUTH;
+					break;
+				case KEY_RIGHT:
+					direction = DIRECTION_EAST;
+					break;
+				default:
+					error("An invalid movement key slipped through InputService's onEvent: %1%",
+					      std::to_string(binding));
+					return;
+			}
+
+		if (startMoving)
+			e.startMove.direction = direction;
+		else
+			e.stopMove.direction = direction;
+	}
+
+	es->callEvent(e);
 }
 
 sf::Keyboard::Key InputService::getKey(InputKey binding)
