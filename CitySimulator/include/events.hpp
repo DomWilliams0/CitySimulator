@@ -34,6 +34,11 @@ struct Event
 		DirectionType direction;
 	};
 
+	struct HumanStopMoveEvent
+	{
+		DirectionType direction;
+	};
+
 	EventType type;
 	EntityID entityID;
 
@@ -41,6 +46,7 @@ struct Event
 	{
 		RawInputKeyEvent rawInputKey;
 		HumanStartMoveEvent startMove;
+		HumanStopMoveEvent stopMove;
 	};
 };
 

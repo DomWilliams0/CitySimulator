@@ -42,8 +42,41 @@ void InputBrain::tick(float delta)
 void InputBrain::onEvent(const Event &event)
 {
 	bool start = event.type == EVENT_HUMAN_START_MOVING;
-	Logger::logDebug(format("Input brain should %1% moving%2%", start ? "start" : "stop",
-	                        start ? " in direction " + std::to_string(event.startMove.direction) : ""));
+
+	float dx = 0.f;
+	float dy = 0.f;
+
+	DirectionType direction = start ? event.startMove.direction : event.stopMove.direction;
+	switch (direction)
+	{
+		case DIRECTION_NORTH:
+			dy = -1;
+			break;
+		case DIRECTION_SOUTH:
+			dy = 1;
+			break;
+		case DIRECTION_WEST:
+			dx = -1;
+			break;
+		case DIRECTION_EAST:
+			dx = 1;
+			break;
+		default:
+			error("Invalid direction in human %1% moving event: %2%", start ? "start" : "stop",
+			      std::to_string(direction));
+	}
+
+	// todo movement should be toggled by start and stop move events
+
+	float acceleration = Config::getFloat("debug.movement.force");
+	if (!start)
+		acceleration *= -1;
+
+	sf::Vector2f impulse(dx * acceleration, dy * acceleration);
+
+	impulse -= phys->getVelocity();
+	impulse *= phys->body->GetMass();
+	phys->body->ApplyForce(toB2Vec(impulse), phys->body->GetWorldCenter(), true);
 }
 
 void AIBrain::tick(float delta)

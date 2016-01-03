@@ -78,9 +78,6 @@ void InputService::onEvent(const Event &event)
 			bool startMoving = event.rawInputKey.pressed;
 			e.type = startMoving ? EVENT_HUMAN_START_MOVING : EVENT_HUMAN_STOP_MOVING;
 
-			// movement direction
-			if (startMoving)
-			{
 				DirectionType direction;
 
 				switch (binding)
@@ -103,8 +100,10 @@ void InputService::onEvent(const Event &event)
 						return;
 				}
 
+			if (startMoving)
 				e.startMove.direction = direction;
-			}
+			else
+				e.stopMove.direction = direction;
 		}
 
 		es->callEvent(e);
