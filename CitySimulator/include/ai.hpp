@@ -8,12 +8,7 @@
 class EntityBrain
 {
 public:
-	explicit EntityBrain(EntityID e)
-	{
-		entity = e;
-		phys = Locator::locate<EntityService>()->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
-		movementForce = Config::getFloat("debug.movement.force");
-	}
+	explicit EntityBrain(EntityID e);
 
 	virtual ~EntityBrain()
 	{
@@ -23,11 +18,7 @@ public:
 
 protected:
 	EntityID entity;
-
-	float movementForce;
-
-//	void turnTowards(DirectionType direction);
-//	void setMoving(bool moving);
+	PhysicsComponent *phys;
 
 	virtual void onEnable()
 	{
@@ -37,30 +28,24 @@ protected:
 	{
 	}
 
-	PhysicsComponent *phys;
 };
 
 class InputBrain : public EntityBrain, EventListener
 {
 public:
-	explicit InputBrain(EntityID e)
-			: EntityBrain(e)
-	{
-		EventService *es = Locator::locate<EventService>();
-		es->registerListener(this, EVENT_HUMAN_START_MOVING);
-		es->registerListener(this, EVENT_HUMAN_STOP_MOVING);
-	}
+	InputBrain(EntityID e);
 
 private:
 	virtual void onEvent(const Event &event) override;
 	void tick(float delta) override;
+
+	std::vector<bool> moving;
 };
 
 class AIBrain : public EntityBrain
 {
 public:
-	explicit AIBrain(EntityID e)
-			: EntityBrain(e)
+	AIBrain(EntityID e) : EntityBrain(e)
 	{
 	}
 
