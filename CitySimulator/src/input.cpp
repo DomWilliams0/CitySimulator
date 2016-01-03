@@ -60,7 +60,7 @@ void InputService::onEvent(const Event &event)
 	}
 
 	// an entity is being controlled
-	if (playerEntity != -1)
+	if (hasPlayerEntity())
 	{
 		EventService *es = Locator::locate<EventService>();
 
@@ -71,7 +71,7 @@ void InputService::onEvent(const Event &event)
 		if (binding == KEY_YIELD_CONTROL)
 		{
 			e.type = EVENT_HUMAN_YIELD_CONTROL;
-			playerEntity = -1;
+			clearPlayerEntity();
 		}
 
 		else

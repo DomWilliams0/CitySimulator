@@ -412,12 +412,36 @@ RenderService::RenderService(sf::RenderWindow *renderWindow) : window(renderWind
 {
 }
 
+void RenderService::onEnable()
+{
+	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
+	view.zoom(Config::getFloat("debug.zoom"));
+	window->setView(view);
+}
+
 sf::RenderWindow *RenderService::getWindow()
 {
 	return window;
 }
 
-void RenderService::renderEntities()
+void RenderService::render(const World &world)
 {
-	Locator::locate<EntityService>()->renderSystems(*window);
+	InputService *is = Locator::locate<InputService>();
+	EntityService *es = Locator::locate<EntityService>();
+	
+	// centre on player
+	if (is->hasPlayerEntity())
+	{
+		EntityID player = is->getPlayerEntity();
+		if (es->hasComponent(player, COMPONENT_PHYSICS))
+		{
+			PhysicsComponent *phys = es->getComponent<PhysicsComponent>(player, COMPONENT_PHYSICS);
+
+			view.setCenter(phys->getPosition());
+			window->setView(view);
+		}
+	}
+
+	window->draw(world);
+	es->renderSystems(*window);
 }

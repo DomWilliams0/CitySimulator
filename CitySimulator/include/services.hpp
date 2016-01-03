@@ -272,10 +272,25 @@ public:
 
 	virtual void onEvent(const Event &event) override;
 
-	// -1 for none
 	inline void setPlayerEntity(EntityID entity)
 	{
 		playerEntity = entity;
+	}
+
+	inline void clearPlayerEntity()
+	{
+		// todo but EntityID is unsigned
+		playerEntity = -1;
+	}
+
+	inline bool hasPlayerEntity()
+	{
+		return playerEntity != -1;
+	}
+
+	inline EntityID getPlayerEntity()
+	{
+		return playerEntity;
 	}
 
 
@@ -374,12 +389,14 @@ class RenderService : public BaseService
 public:
 	RenderService(sf::RenderWindow *renderWindow);
 
-	sf::RenderWindow *getWindow();
+	virtual void onEnable() override;
+	void render(const World &world);
 
-	void renderEntities();
+	sf::RenderWindow *getWindow();
 
 private:
 	sf::RenderWindow *window;
+	sf::View view;
 };
 
 // helpers

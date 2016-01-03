@@ -42,9 +42,7 @@ void GameState::tick(float delta)
 
 void GameState::render(sf::RenderWindow &window)
 {
-	window.draw(world);
-
-	Locator::locate<RenderService>()->renderEntities();
+	Locator::locate<RenderService>()->render(world);
 }
 
 b2World *GameState::getBox2DWorld()
