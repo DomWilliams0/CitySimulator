@@ -22,19 +22,23 @@ void EventService::unregisterListener(EventListener *listener, EventType eventTy
 void EventService::processQueue()
 {
 	// todo only process a subset according to a time limit/fixed maximum count
-	for (Event &e : pendingEvents)
+
+	size_t size = std::distance(pendingEvents.cbegin(), pendingEvents.cend());
+
+	while (size--)
 	{
+		Event e = pendingEvents.front();
+		pendingEvents.pop_front();
+
 		auto eventListeners = listeners[e.type];
 		for (EventListener *listener : eventListeners)
 			listener->onEvent(e);
-	}
 
-	pendingEvents.clear();
+	}
 }
 
 void EventService::callEvent(const Event &event)
 {
-	// todo double buffer event queue
 	pendingEvents.push_front(event);
 }
 
