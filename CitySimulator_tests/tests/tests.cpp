@@ -10,6 +10,7 @@ public:
 	{
 		Locator::provide(SERVICE_LOGGING, new LoggingService(std::cout, LOG_DEBUGGIEST));
 		Locator::provide(SERVICE_CONFIG, new ConfigService(DATA_ROOT, "test_reference_config.json", "test_config.json"));
+		Locator::provide(SERVICE_EVENT, new EventService);
 	}
 
 	virtual void TearDown() override
