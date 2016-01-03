@@ -33,34 +33,24 @@ namespace Constants
 
 DirectionType Direction::random()
 {
-	return Utils::random(0, Direction::DIRECTION_COUNT);
+	return static_cast<DirectionType>(Utils::random(0, static_cast<int>(DIRECTION_COUNT)));
 }
 
 DirectionType Direction::fromAngle(double degrees)
 {
 	const static double multiple = 360.0f / DIRECTION_COUNT;
 
-	int angle = static_cast<DirectionType>(multiple * round(degrees / multiple));
+	int angle = static_cast<int>(multiple * round(degrees / multiple));
 
 	switch (angle)
 	{
 		case 0:
-			return EAST;
+			return DIRECTION_EAST;
 		case 90:
-			return SOUTH;
+			return DIRECTION_SOUTH;
 		case -90:
-			return NORTH;
+			return DIRECTION_NORTH;
 		default:
-			return WEST;
+			return DIRECTION_WEST;
 	}
-}
-
-namespace Direction
-{
-	const int NORTH = 0;
-	const int EAST = 1;
-	const int SOUTH = 2;
-	const int WEST = 3;
-
-	const int DIRECTION_COUNT = 4;
 }

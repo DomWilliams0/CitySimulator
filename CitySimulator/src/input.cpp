@@ -86,16 +86,16 @@ void InputService::onEvent(const Event &event)
 				switch (binding)
 				{
 					case KEY_UP:
-						direction = Direction::NORTH;
+						direction = DIRECTION_NORTH;
 						break;
 					case KEY_LEFT:
-						direction = Direction::WEST;
+						direction = DIRECTION_WEST;
 						break;
 					case KEY_DOWN:
-						direction = Direction::SOUTH;
+						direction = DIRECTION_SOUTH;
 						break;
 					case KEY_RIGHT:
-						direction = Direction::EAST;
+						direction = DIRECTION_EAST;
 						break;
 					default:
 						error("An invalid movement key slipped through InputService's onEvent: %1%",

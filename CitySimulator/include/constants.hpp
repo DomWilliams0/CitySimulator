@@ -31,17 +31,18 @@ namespace Constants
 	extern std::string userConfigFileName;
 }
 
-typedef int DirectionType;
+enum DirectionType
+{
+	DIRECTION_NORTH,
+	DIRECTION_EAST,
+	DIRECTION_SOUTH,
+	DIRECTION_WEST,
+
+	DIRECTION_COUNT
+};
 
 namespace Direction
 {
-	extern const int NORTH;
-	extern const int EAST;
-	extern const int SOUTH;
-	extern const int WEST;
-
-	extern const int DIRECTION_COUNT;
-
 	DirectionType random();
 
 	DirectionType fromAngle(double degrees);

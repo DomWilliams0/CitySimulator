@@ -34,10 +34,10 @@ public:
 		reset();
 	}
 
-	Animator(Animation *anim, float step, DirectionType initialDirection = Direction::SOUTH,
+	Animator(Animation *anim, float step, DirectionType initialDirection = DIRECTION_SOUTH,
 	         bool initiallyPlaying = false);
 
-	void init(Animation *anim, float step, DirectionType initialDirection = Direction::SOUTH,
+	void init(Animation *anim, float step, DirectionType initialDirection = DIRECTION_SOUTH,
 	          bool initiallyPlaying = false);
 
 	void tick(float delta);

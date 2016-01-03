@@ -265,7 +265,7 @@ void Animator::init(Animation *anim, float step, DirectionType initialDirection,
 
 	if (anim != nullptr)
 	{
-		direction = Direction::DIRECTION_COUNT;
+		direction = DIRECTION_COUNT;
 		turn(initialDirection);
 	}
 }
@@ -293,13 +293,13 @@ void Animator::turn(DirectionType direction, bool reset)
 	this->direction = direction;
 
 	// convert direction to sequence
-	if (direction == Direction::NORTH)
+	if (direction == DIRECTION_NORTH)
 		currentSequence = 3;
-	else if (direction == Direction::EAST)
+	else if (direction == DIRECTION_EAST)
 		currentSequence = 2;
-	else if (direction == Direction::WEST)
+	else if (direction == DIRECTION_WEST)
 		currentSequence = 1;
-	else if (direction == Direction::SOUTH)
+	else if (direction == DIRECTION_SOUTH)
 		currentSequence = 0;
 
 	if (reset)
