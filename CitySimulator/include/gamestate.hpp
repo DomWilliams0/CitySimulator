@@ -22,12 +22,8 @@ public:
 private:
 	World world;
 	sf::View view;
-	PhysicsComponent *entityTracking;
 
 	sf::Vector2f viewOffset;
-	bool playerControl;
-
-	void tempControlCamera(float delta);
 };
 
 #endif

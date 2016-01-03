@@ -1,6 +1,6 @@
 #include "gamestate.hpp"
 
-GameState::GameState() : State(GAME), playerControl(true)
+GameState::GameState() : State(GAME)
 {
 	// load art service for queueing
 	auto animationService = new AnimationService;
@@ -30,49 +30,14 @@ GameState::GameState() : State(GAME), playerControl(true)
 	entityService->addRenderComponent(e, ENTITY_HUMAN, "Business Man", 0.2f, DIRECTION_EAST, false);
 	entityService->addPlayerInputComponent(e);
 
-	entityTracking = (PhysicsComponent *) entityService->getComponentOfType(e, COMPONENT_PHYSICS);
-}
-
-void GameState::tempControlCamera(float delta)
-{
-	const static float viewSpeed = 400;
-
-	float dx(0), dy(0);
-
-/*	if (Locator::locate<InputService>()->isPressed(KEY_UP))
-		dy = -delta;
-	else if (Locator::locate<InputService>()->isPressed(KEY_DOWN))
-		dy = delta;
-	if (Locator::locate<InputService>()->isPressed(KEY_LEFT))
-		dx = -delta;
-	else if (Locator::locate<InputService>()->isPressed(KEY_RIGHT))
-		dx = delta;
-
-	if (dx || dy)
-	{
-		view.move(dx * viewSpeed, dy * viewSpeed);
-		Locator::locate<RenderService>()->getWindow()->setView(view);
-	}*/
+	Locator::locate<InputService>()->setPlayerEntity(e);
 }
 
 void GameState::tick(float delta)
 {
 	world.tick(delta);
 
-//	if (Locator::locate<InputService>()->isFirstPressed(InputKey::KEY_YIELD_CONTROL))
-//		playerControl = !playerControl;
-
-	// todo make sure this hack DOESN'T end up in production
-	if (playerControl)
-	{
-		Locator::locate<EntityService>()->tickSystems(delta);
-		if (entityTracking)
-			view.setCenter(Utils::toPixel(entityTracking->getPosition()));
-		Locator::locate<RenderService>()->getWindow()->setView(view);
-	}
-	else
-		tempControlCamera(delta);
-
+	Locator::locate<EntityService>()->tickSystems(delta);
 }
 
 void GameState::render(sf::RenderWindow &window)

@@ -267,15 +267,21 @@ public:
 	virtual void onEnable() override;
 
 	void bindKey(InputKey binding, sf::Keyboard::Key key);
-
 	sf::Keyboard::Key getKey(InputKey binding);
-
 	InputKey getBinding(sf::Keyboard::Key key);
 
-
 	virtual void onEvent(const Event &event) override;
+
+	// -1 for none
+	inline void setPlayerEntity(EntityID entity)
+	{
+		playerEntity = entity;
+	}
+
+
 private:
 	boost::bimap<InputKey, sf::Keyboard::Key> bindings;
+	EntityID playerEntity;
 };
 
 enum LogLevel

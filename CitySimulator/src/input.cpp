@@ -25,6 +25,8 @@ void InputService::onEnable()
 	// listen to input events
 	auto events = Locator::locate<EventService>();
 	events->registerListener(this, EVENT_RAW_INPUT_KEY);
+
+	playerEntity = -1;
 }
 
 void InputService::bindKey(InputKey binding, sf::Keyboard::Key key)
@@ -49,8 +51,6 @@ void InputService::onEvent(const Event &event)
 	if (binding == KEY_COUNT)
 		return;
 
-	EntityID controlledEntity = 0; // todo get from EntityService
-
 	// quit
 	if (binding == KEY_EXIT)
 	{
@@ -60,17 +60,18 @@ void InputService::onEvent(const Event &event)
 	}
 
 	// an entity is being controlled
-	if (controlledEntity != -1)
+	if (playerEntity != -1)
 	{
 		EventService *es = Locator::locate<EventService>();
 
 		Event e;
-		e.entityID = controlledEntity;
+		e.entityID = playerEntity;
 
 
 		if (binding == KEY_YIELD_CONTROL)
 		{
 			e.type = EVENT_HUMAN_YIELD_CONTROL;
+			playerEntity = -1;
 		}
 
 		else
