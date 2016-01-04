@@ -15,7 +15,7 @@ public:
 		setUserConfigPath(userConfigPath);
 	}
 
-	void load();
+	bool load();
 	void loadOnTop();
 	void recurseAndOverwrite(boost::property_tree::ptree &tree, std::string prefix);
 

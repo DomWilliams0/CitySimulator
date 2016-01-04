@@ -1,18 +1,31 @@
 #include <regex>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/exception/diagnostic_information.hpp>
 #include "constants.hpp"
 #include "config.hpp"
 #include "services.hpp"
 
-void ConfigurationFile::load()
+bool ConfigurationFile::load()
 {
 	// doesn't exist
 	if (appConfigPath.empty() || !exists(appConfigPath))
 		throw Utils::filenotfound_exception(format("Config file not found: '%1%'", appConfigPath.string()));
 
 	lastModification = boost::filesystem::last_write_time(appConfigPath);
-	read_json(appConfigPath.string(), propertyTree);
+
+	try
+	{
+		read_json(appConfigPath.string(), propertyTree);
+		return true;
+
+	} catch (boost::exception &e)
+	{
+		Logger::logWarning(format("Could not load app config '%1%': %2%", appConfigPath.string(),
+		                          boost::current_exception_diagnostic_information()));
+		return false;
+	}
+
 }
 
 void ConfigurationFile::loadOnTop()
@@ -22,17 +35,17 @@ void ConfigurationFile::loadOnTop()
 		Logger::logDebug(format("User config not found (%1%)", userConfigPath.string()));
 		return;
 	}
+	Logger::logDebug(format("Found user config at %1%", getUserConfigPath()));
 
 	// load user config
 	ConfigurationFile loaded(userConfigPath.string());
-	loaded.load();
-
-	Logger::logDebug(format("Found user config at %1%", getUserConfigPath()));
-
-	// put all values
-	Logger::pushIndent();
-	recurseAndOverwrite(loaded.propertyTree, "");
-	Logger::popIndent();
+	if (loaded.load())
+	{
+		// put all values
+		Logger::pushIndent();
+		recurseAndOverwrite(loaded.propertyTree, "");
+		Logger::popIndent();
+	}
 
 	// update path to overwriting
 	userConfigPath = loaded.appConfigPath;
