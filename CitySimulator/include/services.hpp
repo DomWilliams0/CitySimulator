@@ -288,7 +288,10 @@ enum InputKey
 	KEY_LEFT,
 	KEY_DOWN,
 	KEY_RIGHT,
+
 	KEY_YIELD_CONTROL,
+	KEY_SPRINT,
+
 	KEY_EXIT,
 
 	KEY_COUNT
@@ -297,7 +300,8 @@ enum InputKey
 class SimpleMovementController : public EventListener
 {
 public:
-	SimpleMovementController(EntityID entity) : entity(entity), moving(DIRECTION_COUNT, false)
+	SimpleMovementController(EntityID entity) : entity(entity), moving(DIRECTION_COUNT, false),
+	                                            running(false), wasRunning(false)
 	{
 		moving.shrink_to_fit();
 	}
@@ -310,12 +314,17 @@ public:
 	void registerListeners();
 	void unregisterListeners();
 
+	void doSprintSwitcharoo(PhysicsComponent *physics, float sprintSpeed);
+
 	b2Vec2 tick(float speed, float delta);
 	virtual void onEvent(const Event &event) override;
 
 private:
 	std::vector<bool> moving;
 	EntityID entity;
+
+	bool running, wasRunning;
+	float maxSpeedBackup;
 
 };
 

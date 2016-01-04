@@ -10,6 +10,7 @@ enum EventType
 	EVENT_RAW_INPUT_KEY,
 	EVENT_RAW_INPUT_CLICK,
 
+	EVENT_INPUT_SPRINT,
 	EVENT_INPUT_START_MOVING,
 	EVENT_INPUT_STOP_MOVING,
 	EVENT_INPUT_YIELD_CONTROL,
@@ -40,6 +41,11 @@ struct Event
 		DirectionType direction;
 	};
 
+	struct InputSprintEvent
+	{
+		bool start;
+	};
+
 	EventType type;
 	EntityID entityID;
 
@@ -48,6 +54,7 @@ struct Event
 		RawInputKeyEvent rawInputKey;
 		InputStartMoveEvent startMove;
 		InputStopMoveEvent stopMove;
+		InputSprintEvent sprintToggle;
 	};
 };
 

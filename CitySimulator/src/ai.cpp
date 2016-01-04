@@ -20,6 +20,8 @@ void InputBrain::tick(float delta)
 {
 	float acceleration = Config::getFloat("debug.movement.force");
 	phys->steering = controller.tick(acceleration, delta);
+
+	controller.doSprintSwitcharoo(phys, Config::getFloat("debug.movement.max-speed.run"));
 }
 
 void AIBrain::tick(float delta)

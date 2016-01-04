@@ -10,6 +10,7 @@ void InputService::onEnable()
 	bindKey(KEY_DOWN, sf::Keyboard::S);
 	bindKey(KEY_RIGHT, sf::Keyboard::D);
 	bindKey(KEY_YIELD_CONTROL, sf::Keyboard::Tab);
+	bindKey(KEY_SPRINT, sf::Keyboard::Space);
 	bindKey(KEY_EXIT, sf::Keyboard::Escape);
 	// todo load from config
 
@@ -76,41 +77,50 @@ void InputService::onEvent(const Event &event)
 		{
 			e.type = EVENT_INPUT_YIELD_CONTROL;
 			clearPlayerEntity();
+			es->callEvent(e);
 		}
+		return;
 	}
 
-	else
+	// sprint
+	if (binding == KEY_SPRINT)
 	{
-		bool startMoving = event.rawInputKey.pressed;
-		e.type = startMoving ? EVENT_INPUT_START_MOVING : EVENT_INPUT_STOP_MOVING;
-
-			DirectionType direction;
-
-			switch (binding)
-			{
-				case KEY_UP:
-					direction = DIRECTION_NORTH;
-					break;
-				case KEY_LEFT:
-					direction = DIRECTION_WEST;
-					break;
-				case KEY_DOWN:
-					direction = DIRECTION_SOUTH;
-					break;
-				case KEY_RIGHT:
-					direction = DIRECTION_EAST;
-					break;
-				default:
-					error("An invalid movement key slipped through InputService's onEvent: %1%",
-					      std::to_string(binding));
-					return;
-			}
-
-		if (startMoving)
-			e.startMove.direction = direction;
-		else
-			e.stopMove.direction = direction;
+		e.type = EVENT_INPUT_SPRINT;
+		e.sprintToggle.start = event.rawInputKey.pressed;
+		es->callEvent(e);
+		return;
 	}
+
+	// input
+	bool startMoving = event.rawInputKey.pressed;
+	e.type = startMoving ? EVENT_INPUT_START_MOVING : EVENT_INPUT_STOP_MOVING;
+
+	DirectionType direction;
+
+	switch (binding)
+	{
+		case KEY_UP:
+			direction = DIRECTION_NORTH;
+			break;
+		case KEY_LEFT:
+			direction = DIRECTION_WEST;
+			break;
+		case KEY_DOWN:
+			direction = DIRECTION_SOUTH;
+			break;
+		case KEY_RIGHT:
+			direction = DIRECTION_EAST;
+			break;
+		default:
+			error("An invalid movement key slipped through InputService's onEvent: %1%",
+			      std::to_string(binding));
+			return;
+	}
+
+	if (startMoving)
+		e.startMove.direction = direction;
+	else
+		e.stopMove.direction = direction;
 
 	es->callEvent(e);
 }
@@ -133,12 +143,33 @@ void SimpleMovementController::registerListeners()
 {
 	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_START_MOVING);
 	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_STOP_MOVING);
+	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_SPRINT);
 }
 
 void SimpleMovementController::unregisterListeners()
 {
 	Locator::locate<EventService>()->unregisterListener(this, EVENT_INPUT_START_MOVING);
 	Locator::locate<EventService>()->unregisterListener(this, EVENT_INPUT_STOP_MOVING);
+	Locator::locate<EventService>()->unregisterListener(this, EVENT_INPUT_SPRINT);
+}
+
+void SimpleMovementController::doSprintSwitcharoo(PhysicsComponent *physics, float sprintSpeed)
+{
+	if (wasRunning == running)
+		return;
+
+	if (running)
+	{
+		maxSpeedBackup = physics->maxSpeed;
+		physics->maxSpeed = sprintSpeed;
+	}
+	else
+	{
+		physics->maxSpeed = maxSpeedBackup;
+		maxSpeedBackup = 0;
+	}
+
+	wasRunning = running;
 }
 
 b2Vec2 SimpleMovementController::tick(float speed, float delta)
@@ -168,12 +199,14 @@ void SimpleMovementController::onEvent(const Event &event)
 	if (event.entityID != entity)
 		return;
 
+	// sprinting
+	if (event.type == EVENT_INPUT_SPRINT)
+	{
+		running = event.sprintToggle.start;
+		return;
+	}
+
 	bool start = event.type == EVENT_INPUT_START_MOVING;
-
-	float dx = 0.f;
-	float dy = 0.f;
-
 	DirectionType direction = start ? event.startMove.direction : event.stopMove.direction;
-
 	moving[direction] = start;
 }
