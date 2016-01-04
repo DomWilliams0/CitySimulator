@@ -128,6 +128,19 @@ InputKey InputService::getBinding(sf::Keyboard::Key key)
 	return result == bindings.right.end() ? InputKey::KEY_COUNT : result->second;
 }
 
+
+void SimpleMovementController::registerListeners()
+{
+	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_START_MOVING);
+	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_STOP_MOVING);
+}
+
+void SimpleMovementController::unregisterListeners()
+{
+	Locator::locate<EventService>()->unregisterListener(this, EVENT_INPUT_START_MOVING);
+	Locator::locate<EventService>()->unregisterListener(this, EVENT_INPUT_STOP_MOVING);
+}
+
 b2Vec2 SimpleMovementController::tick(float speed, float delta)
 {
 	bool north = moving[DIRECTION_NORTH];

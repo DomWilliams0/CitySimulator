@@ -8,16 +8,12 @@ EntityBrain::EntityBrain(EntityID e) : entity(e)
 
 InputBrain::InputBrain(EntityID e) : EntityBrain(e), controller(e)
 {
-	EventService *es = Locator::locate<EventService>();
-	es->registerListener(&controller, EVENT_INPUT_START_MOVING);
-	es->registerListener(&controller, EVENT_INPUT_STOP_MOVING);
+	controller.registerListeners();
 }
 
 InputBrain::~InputBrain()
 {
-	EventService *es = Locator::locate<EventService>();
-	es->unregisterListener(&controller, EVENT_INPUT_START_MOVING);
-	es->unregisterListener(&controller, EVENT_INPUT_STOP_MOVING);
+	controller.unregisterListeners();
 }
 
 void InputBrain::tick(float delta)

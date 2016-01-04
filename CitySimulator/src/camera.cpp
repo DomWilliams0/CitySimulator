@@ -55,8 +55,7 @@ void CameraService::setTrackedEntity(EntityID entity)
 		trackedEntity = es->getComponent<PhysicsComponent>(entity, COMPONENT_PHYSICS);
 		Logger::logDebug(format("Started tracking entity %1%", std::to_string(entity)));
 
-		Locator::locate<EventService>()->unregisterListener(controller, EVENT_INPUT_START_MOVING);
-		Locator::locate<EventService>()->unregisterListener(controller, EVENT_INPUT_STOP_MOVING);
+		controller->unregisterListeners();
 	}
 	else
 		Logger::logWarning(
@@ -66,6 +65,5 @@ void CameraService::setTrackedEntity(EntityID entity)
 void CameraService::clearPlayerEntity()
 {
 	trackedEntity = nullptr;
-	Locator::locate<EventService>()->registerListener(controller, EVENT_INPUT_START_MOVING);
-	Locator::locate<EventService>()->registerListener(controller, EVENT_INPUT_STOP_MOVING);
+	controller->registerListeners();
 }

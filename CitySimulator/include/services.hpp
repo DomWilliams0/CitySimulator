@@ -302,6 +302,14 @@ public:
 		moving.shrink_to_fit();
 	}
 
+	~SimpleMovementController()
+	{
+		unregisterListeners();
+	}
+
+	void registerListeners();
+	void unregisterListeners();
+
 	b2Vec2 tick(float speed, float delta);
 	virtual void onEvent(const Event &event) override;
 
