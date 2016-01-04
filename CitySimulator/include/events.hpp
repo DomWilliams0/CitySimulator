@@ -2,6 +2,7 @@
 #define CITYSIM_EVENTS_HPP
 
 #include <SFML/Window.hpp>
+#include "services.hpp"
 #include "utils.hpp"
 
 enum EventType

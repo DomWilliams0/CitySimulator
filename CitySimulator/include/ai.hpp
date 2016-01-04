@@ -30,16 +30,17 @@ protected:
 
 };
 
-class InputBrain : public EntityBrain, EventListener
+class InputBrain : public EntityBrain
 {
 public:
 	InputBrain(EntityID e);
+	~InputBrain();
 
 private:
-	virtual void onEvent(const Event &event) override;
 	void tick(float delta) override;
 
-	std::vector<bool> moving;
+	InputService::SimpleMovementController controller;
+
 };
 
 class AIBrain : public EntityBrain

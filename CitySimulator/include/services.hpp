@@ -295,6 +295,23 @@ enum InputKey
 class InputService : public BaseService, public EventListener
 {
 public:
+	class SimpleMovementController : public EventListener
+	{
+	public:
+		SimpleMovementController(EntityID entity) : entity(entity), moving(DIRECTION_COUNT, false)
+		{
+			moving.shrink_to_fit();
+		}
+
+		b2Vec2 tick(float speed, float delta);
+		virtual void onEvent(const Event &event) override;
+
+	private:
+		std::vector<bool> moving;
+		EntityID entity;
+
+	};
+
 	virtual void onEnable() override;
 
 	void bindKey(InputKey binding, sf::Keyboard::Key key);

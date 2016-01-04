@@ -127,3 +127,40 @@ InputKey InputService::getBinding(sf::Keyboard::Key key)
 	auto result = bindings.right.find(key);
 	return result == bindings.right.end() ? InputKey::KEY_COUNT : result->second;
 }
+
+b2Vec2 InputService::SimpleMovementController::tick(float speed, float delta)
+{
+	bool north = moving[DIRECTION_NORTH];
+	bool south = moving[DIRECTION_SOUTH];
+	bool east = moving[DIRECTION_EAST];
+	bool west = moving[DIRECTION_WEST];
+
+	float x, y;
+
+	if (east != west)
+		x = east ? speed : -speed;
+	else
+		x = 0.f;
+
+	if (south != north)
+		y = south ? speed : -speed;
+	else
+		y = 0.f;
+
+	return {x, y};
+
+}
+void InputService::SimpleMovementController::onEvent(const Event &event)
+{
+	if (event.entityID != entity)
+		return;
+
+	bool start = event.type == EVENT_INPUT_START_MOVING;
+
+	float dx = 0.f;
+	float dy = 0.f;
+
+	DirectionType direction = start ? event.startMove.direction : event.stopMove.direction;
+
+	moving[direction] = start;
+}
