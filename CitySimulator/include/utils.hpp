@@ -1,11 +1,8 @@
 #ifndef CITYSIM_UTILS_HPP
 #define CITYSIM_UTILS_HPP
 
-#include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
 #include <random>
-#include <boost/format.hpp>
-#include "constants.hpp"
-#include "SFMLDebugDraw.h"
 
 
 std::string format(const std::string &s, const std::string &arg1);
@@ -22,6 +19,11 @@ void error(const std::string &msg, const std::string &arg1, const std::string &a
 
 void error(const std::string &msg, const std::string &arg1, const std::string &arg2, const std::string &arg3);
 
+namespace Constants
+{
+	extern const int tileSize;
+	extern const float tileSizef;
+}
 
 namespace Utils
 {

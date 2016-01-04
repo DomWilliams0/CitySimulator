@@ -1,3 +1,4 @@
+#include <iostream>
 #include "services.hpp"
 
 void BaseService::onEnable()
@@ -68,4 +69,7 @@ std::string Locator::serviceToString(ServiceType type)
 		default:
 			return format("Unknown (%1%)", std::to_string(type));
 	}
+}
+NullLoggingService::NullLoggingService() : LoggingService(std::cerr, LOG_INFO)
+{
 }

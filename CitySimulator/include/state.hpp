@@ -1,7 +1,10 @@
 #ifndef CITYSIM_STATE_HPP
 #define CITYSIM_STATE_HPP
 
-#include <SFML/Graphics.hpp>
+namespace sf
+{
+	class RenderWindow;
+}
 
 enum StateType
 {

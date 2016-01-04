@@ -7,13 +7,13 @@ typedef unsigned int EntityID;
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <vector>
+#include <Box2D/Common/b2Math.h>
+#include <Box2D/Dynamics/b2Body.h>
 #include "animation.hpp"
 #include "config.hpp"
 #include "constants.hpp"
 
 class b2World;
-
-class b2Body;
 
 template<class T>
 sf::Vector2<T> fromB2Vec(const b2Vec2 &v)

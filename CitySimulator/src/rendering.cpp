@@ -1,5 +1,7 @@
 #include <unordered_set>
+#include "maploader.hpp"
 #include "world.hpp"
+#include "services.hpp"
 
 Tileset::Tileset() : converted(false)
 {

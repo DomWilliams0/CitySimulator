@@ -2,8 +2,9 @@
 #define CITYSIM_AI_HPP
 
 #include "entity.hpp"
-#include "constants.hpp"
 #include "services.hpp"
+
+struct PhysicsComponent;
 
 class EntityBrain
 {

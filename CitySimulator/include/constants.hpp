@@ -1,9 +1,8 @@
 #ifndef CITYSIM_CONSTANTS_HPP
 #define CITYSIM_CONSTANTS_HPP
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <unordered_map>
-#include <boost/format.hpp>
 
 typedef std::unordered_map<std::string, std::string> ConfigMap;
 typedef std::map<std::string, std::string> ConfigKeyValue;

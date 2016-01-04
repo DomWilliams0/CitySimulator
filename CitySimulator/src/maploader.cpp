@@ -1,5 +1,6 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/lexical_cast.hpp>
 #include "maploader.hpp"
 #include "utils.hpp"
 #include "services.hpp"
@@ -61,6 +62,20 @@ int TMX::stripFlip(const int &gid, std::bitset<3> &flips)
 	flips.set(2, (gid & DIAGONAL) != 0);
 
 	return gid & ~(HORIZONTAL | VERTICAL | DIAGONAL);
+}
+
+TMX::Tile::Tile(const std::string &id)
+{
+	gid = boost::lexical_cast<rot>(id);
+	if (gid != 0)
+		gid -= 1;
+
+	std::bitset<3> flips;
+	gid = stripFlip(gid, flips);
+
+	flipped = flips.any();
+
+	processRotation(flips);
 }
 
 TMX::TileMap *TMX::TileMap::load(const std::string &filePath)

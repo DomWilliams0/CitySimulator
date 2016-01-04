@@ -1,6 +1,5 @@
-#include <config.hpp>
-#include "maploader.hpp"
 #include "world.hpp"
+#include "services.hpp"
 
 bool isCollidable(BlockType blockType)
 {
@@ -279,7 +278,7 @@ World::World() : terrain(this), collisionMap(this)
 
 void World::loadFromFile(const std::string &filename, const std::string &tileset)
 {
-	Logger::logDebug(str(boost::format("Began loading world %1%") % filename));
+	Logger::logDebug(format("Began loading world %1%", filename));
 	Logger::pushIndent();
 
 	std::string path(Utils::joinPaths(Config::getResource("world.root"), filename));
@@ -297,7 +296,7 @@ void World::loadFromFile(const std::string &filename, const std::string &tileset
 	collisionMap.load();
 
 	Logger::popIndent();
-	Logger::logInfo(str(boost::format("Loaded world %1%") % filename));
+	Logger::logInfo(format("Loaded world %1%", filename));
 	delete tmx;
 }
 

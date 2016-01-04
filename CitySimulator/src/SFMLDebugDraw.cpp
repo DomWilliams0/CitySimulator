@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <SFML/Graphics.hpp>
 #include "SFMLDebugDraw.h"
 
 SFMLDebugDraw::SFMLDebugDraw(sf::RenderWindow &window) : m_window(&window)

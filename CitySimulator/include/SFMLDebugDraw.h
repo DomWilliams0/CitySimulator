@@ -19,8 +19,12 @@
 
 #include <Box2D/Box2D.h>
 #include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
 #include "constants.hpp"
+
+namespace sf
+{
+	class RenderWindow;
+}
 
 namespace sfdd
 {

@@ -5,8 +5,8 @@
 #include <stack>
 #include "utils.hpp"
 #include "state.hpp"
-#include "constants.hpp"
-#include <Box2D/Dynamics/b2World.h>
+
+class b2World;
 
 class FPSCounter
 {

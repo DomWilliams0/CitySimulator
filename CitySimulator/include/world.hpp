@@ -5,10 +5,9 @@
 #include <Box2D/Box2D.h>
 #include <unordered_map>
 #include <set>
-#include "maploader.hpp"
+#include <boost/optional.hpp>
 #include "SFMLDebugDraw.h"
-#include "game.hpp"
-#include "services.hpp"
+#include "maploader.hpp"
 
 class World;
 

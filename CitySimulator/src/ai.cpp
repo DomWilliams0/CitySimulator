@@ -1,6 +1,5 @@
 #include "ai.hpp"
 
-
 EntityBrain::EntityBrain(EntityID e) : entity(e)
 {
 	phys = Locator::locate<EntityService>()->getComponent<PhysicsComponent>(entity, COMPONENT_PHYSICS);

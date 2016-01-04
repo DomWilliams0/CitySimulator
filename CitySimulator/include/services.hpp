@@ -4,11 +4,13 @@
 #include <boost/bimap.hpp>
 #include <typeindex>
 #include <typeinfo>
-#include <iostream>
 #include <forward_list>
 #include "entity.hpp"
 #include "events.hpp"
+#include <unordered_map>
 #include "utils.hpp"
+#include "constants.hpp"
+#include "animation.hpp"
 #include "config.hpp"
 
 enum ServiceType
@@ -443,9 +445,7 @@ class NullLoggingService : public LoggingService
 {
 
 public:
-	NullLoggingService() : LoggingService(std::cerr, LOG_INFO)
-	{
-	}
+	NullLoggingService();
 
 private:
 	virtual void log(const std::string &msg, LogLevel level) override

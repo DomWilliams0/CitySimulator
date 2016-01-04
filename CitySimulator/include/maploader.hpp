@@ -5,7 +5,6 @@
 #include <SFML/System/Vector2.hpp>
 #include <bitset>
 #include <vector>
-#include <boost/lexical_cast.hpp>
 
 namespace TMX
 {
@@ -64,38 +63,23 @@ namespace TMX
 		{
 		}
 
-		explicit Tile(const std::string &id)
-		{
-			gid = boost::lexical_cast<rot>(id);
-			if (gid != 0)
-				gid -= 1;
-
-			std::bitset<3> flips;
-			gid = stripFlip(gid, flips);
-
-			flipped = flips.any();
-
-			processRotation(flips);
-		}
+		explicit Tile(const std::string &id);
 
 		virtual inline bool isTile()
 		{
 			return true;
 		}
 
-
 		inline bool isFlipped()
 		{
 			return flipped;
 		}
-
 
 		/// <returns>Either -90, 0 or 90</returns>
 		inline int getRotationAngle()
 		{
 			return rotationAngle;
 		}
-
 
 		/// <returns>Block ID | horizontal or vertical flip flags</returns>
 		inline int getFlipGID()

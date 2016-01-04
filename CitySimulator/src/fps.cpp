@@ -1,3 +1,4 @@
+#include "constants.hpp"
 #include "game.hpp"
 
 void FPSCounter::init(float waitTime)
