@@ -56,7 +56,7 @@ void PhysicsSystem::tickEntity(EntityService *es, EntityID e, float dt)
 			physics->body->GetLinearVelocity() + physics->steering);
 
 	// maximum speed
-	float maxSpeed = Config::getFloat("debug.movement.max-speed");
+	float maxSpeed = Config::getFloat("debug.movement.max-speed.walk");
 	if (Math::lengthSquared(physics->getVelocity()) > maxSpeed * maxSpeed)
 	{
 		physics->setVelocity(Math::truncate(physics->getVelocity(), maxSpeed));
