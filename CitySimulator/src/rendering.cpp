@@ -416,7 +416,9 @@ void RenderService::onEnable()
 {
 	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
 	view.zoom(Config::getFloat("debug.zoom"));
-	window->setView(view);
+
+	if(window != nullptr)
+		window->setView(view);
 }
 
 sf::RenderWindow *RenderService::getWindow()
