@@ -42,16 +42,30 @@ void EntityService::loadEntities(ConfigurationFile &config, EntityType entityTyp
 	for (auto &entity : entityMapList)
 	{
 		auto nameIt(entity.find("name"));
-
-		// no name
 		if (nameIt == entity.end())
 		{
 			Logger::logWarning(format("No name found for entity of type %1%, skipping", std::to_string(entityType)));
 			continue;
 		}
 
-		std::string name(nameIt->second);
-		allTags.insert({name, entity});
+		// prototype
+		auto prototypeIt(entity.find("prototype"));
+		if (prototypeIt != entity.end())
+		{
+			auto prototypeEntity = allTags.find(prototypeIt->second);
+			if (prototypeEntity == allTags.end())
+			{
+				Logger::logWarning(format("Entity prototype '%1%' not found, skipping entity %2%",
+				                          prototypeIt->second, nameIt->second));
+				continue;
+			}
+
+			// inherit all
+			entity.insert(prototypeEntity->second.begin(), prototypeEntity->second.end());
+		}
+
+
+		allTags.insert({nameIt->second, entity});
 	}
 
 	loadedTags[entityType] = allTags;

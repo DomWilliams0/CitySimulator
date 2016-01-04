@@ -9,52 +9,38 @@
     },
     {
       "name": "Cool Trainer",
-      "sprite": "H_cool_trainer.png",
-      "anim-count": 4,
-      "anim-length": 4,
-      "anim-dimensions-all": "32x32"
+      "prototype": "Business Man",
+      "sprite": "H_cool_trainer.png"
     },
     {
       "name": "Girl Scout",
-      "sprite": "H_girl_scout.png",
-      "anim-count": 4,
-      "anim-length": 4,
-      "anim-dimensions-all": "32x32"
+      "prototype": "Business Man",
+      "sprite": "H_girl_scout.png"
     },
     {
       "name": "Goth",
-      "sprite": "H_goth.png",
-      "anim-count": 4,
-      "anim-length": 4,
-      "anim-dimensions-all": "32x32"
+      "prototype": "Business Man",
+      "sprite": "H_goth.png"
     },
     {
       "name": "Middle Aged Man",
-      "sprite": "H_middle_aged_man.png",
-      "anim-count": 4,
-      "anim-length": 4,
-      "anim-dimensions-all": "32x32"
+      "prototype": "Business Man",
+      "sprite": "H_middle_aged_man.png"
     },
     {
       "name": "Ninja",
-      "sprite": "H_ninja.png",
-      "anim-count": 4,
-      "anim-length": 4,
-      "anim-dimensions-all": "32x32"
+      "prototype": "Business Man",
+      "sprite": "H_ninja.png"
     },
     {
       "name": "Old Man",
-      "sprite": "H_poor_old_man.png",
-      "anim-count": 4,
-      "anim-length": 4,
-      "anim-dimensions-all": "32x32"
+      "prototype": "Business Man",
+      "sprite": "H_poor_old_man.png"
     },
     {
       "name": "Sweet Lady",
-      "sprite": "H_sweet_lady.png",
-      "anim-count": 4,
-      "anim-length": 4,
-      "anim-dimensions-all": "32x32"
+      "prototype": "Business Man",
+      "sprite": "H_sweet_lady.png"
     }
   ],
 
