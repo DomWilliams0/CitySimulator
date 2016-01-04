@@ -18,7 +18,8 @@
         "movement": {
             "stop-decay": 8,
             "force": 80,
-            "max-speed": 40
+            "max-speed": 40,
+            "camera-speed": 10
         },
         "start-pos": {
             "x": 0,

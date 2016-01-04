@@ -39,7 +39,7 @@ public:
 private:
 	void tick(float delta) override;
 
-	InputService::SimpleMovementController controller;
+	SimpleMovementController controller;
 
 };
 

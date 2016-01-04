@@ -2,6 +2,12 @@
 
 CameraService::CameraService(World &world) : world(&world)
 {
+	controller = new SimpleMovementController(INVALID_ENTITY);
+}
+
+CameraService::~CameraService()
+{
+	delete controller;
 }
 
 void CameraService::onEnable()
@@ -27,6 +33,12 @@ void CameraService::tick(float delta)
 		view.setCenter(trackedEntity->getPosition());
 		updateWindowView();
 	}
+	else
+	{
+		b2Vec2 movement(controller->tick(Config::getFloat("debug.movement.camera-speed"), delta));
+		view.move(movement.x, movement.y);
+		updateWindowView();
+	}
 }
 
 void CameraService::switchWorld(World &world)
@@ -43,7 +55,8 @@ void CameraService::setTrackedEntity(EntityID entity)
 		trackedEntity = es->getComponent<PhysicsComponent>(entity, COMPONENT_PHYSICS);
 		Logger::logDebug(format("Started tracking entity %1%", std::to_string(entity)));
 
-		Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_START_MOVING);
+		Locator::locate<EventService>()->unregisterListener(controller, EVENT_INPUT_START_MOVING);
+		Locator::locate<EventService>()->unregisterListener(controller, EVENT_INPUT_STOP_MOVING);
 	}
 	else
 		Logger::logWarning(
@@ -53,10 +66,6 @@ void CameraService::setTrackedEntity(EntityID entity)
 void CameraService::clearPlayerEntity()
 {
 	trackedEntity = nullptr;
-	Locator::locate<EventService>()->unregisterListener(this, EVENT_INPUT_START_MOVING);
-}
-
-void CameraService::onEvent(const Event &event)
-{
-
+	Locator::locate<EventService>()->registerListener(controller, EVENT_INPUT_START_MOVING);
+	Locator::locate<EventService>()->registerListener(controller, EVENT_INPUT_STOP_MOVING);
 }

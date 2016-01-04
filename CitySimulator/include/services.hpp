@@ -43,6 +43,7 @@ class RenderService;
 
 class World;
 class PhysicsComponent;
+class SimpleMovementController;
 
 class Locator
 {
@@ -112,10 +113,11 @@ private:
 	void positionImages(sf::Vector2i &imageSize, std::map<sf::Image *, sf::IntRect> &imagePositions);
 };
 
-class CameraService : public BaseService, public EventListener
+class CameraService : public BaseService
 {
 public:
 	CameraService(World &world);
+	~CameraService();
 
 	virtual void onEnable() override;
 	virtual void onDisable() override;
@@ -126,8 +128,6 @@ public:
 	void setTrackedEntity(EntityID entity);
 	void clearPlayerEntity();
 
-	virtual void onEvent(const Event &event) override;
-
 	inline World* getWorld()
 	{
 		return world;
@@ -136,6 +136,8 @@ private:
 	World *world;
 	PhysicsComponent *trackedEntity;
 	sf::View view;
+
+	SimpleMovementController *controller;
 
 	void updateWindowView() const;
 };
@@ -292,26 +294,26 @@ enum InputKey
 	KEY_COUNT
 };
 
+class SimpleMovementController : public EventListener
+{
+public:
+	SimpleMovementController(EntityID entity) : entity(entity), moving(DIRECTION_COUNT, false)
+	{
+		moving.shrink_to_fit();
+	}
+
+	b2Vec2 tick(float speed, float delta);
+	virtual void onEvent(const Event &event) override;
+
+private:
+	std::vector<bool> moving;
+	EntityID entity;
+
+};
+
 class InputService : public BaseService, public EventListener
 {
 public:
-	class SimpleMovementController : public EventListener
-	{
-	public:
-		SimpleMovementController(EntityID entity) : entity(entity), moving(DIRECTION_COUNT, false)
-		{
-			moving.shrink_to_fit();
-		}
-
-		b2Vec2 tick(float speed, float delta);
-		virtual void onEvent(const Event &event) override;
-
-	private:
-		std::vector<bool> moving;
-		EntityID entity;
-
-	};
-
 	virtual void onEnable() override;
 
 	void bindKey(InputKey binding, sf::Keyboard::Key key);
