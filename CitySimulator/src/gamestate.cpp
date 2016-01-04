@@ -23,7 +23,7 @@ GameState::GameState() : State(GAME)
 	EntityID e = entityService->createEntity();
 	sf::Vector2i tilePos = {Config::getInt("debug.start-pos.x"), Config::getInt("debug.start-pos.y")};
 	entityService->addPhysicsComponent(e, &world, tilePos);
-	entityService->addRenderComponent(e, ENTITY_HUMAN, "Business Man", 0.2f, DIRECTION_EAST, false);
+	entityService->addRenderComponent(e, ENTITY_HUMAN, Config::getString("debug.human-skin"), 0.2f, DIRECTION_EAST, false);
 	entityService->addPlayerInputComponent(e);
 
 	Locator::locate<InputService>()->setPlayerEntity(e);
