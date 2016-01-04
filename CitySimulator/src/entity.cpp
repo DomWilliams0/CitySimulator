@@ -168,9 +168,13 @@ BaseComponent *EntityService::getComponentOfType(EntityID e, ComponentType type)
 	}
 }
 
-void EntityService::addPhysicsComponent(EntityID e, World *world, const sf::Vector2i &startTilePos)
+void EntityService::addPhysicsComponent(EntityID e, World *world, const sf::Vector2i &startTilePos, float maxSpeed, float damping)
 {
 	PhysicsComponent *phys = dynamic_cast<PhysicsComponent *>(addComponent(e, COMPONENT_PHYSICS));
+
+	phys->maxSpeed = maxSpeed;
+	phys->damping = damping;
+
 	b2World *bWorld = world->getBox2DWorld();
 
 	phys->bWorld = bWorld;

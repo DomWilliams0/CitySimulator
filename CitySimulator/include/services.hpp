@@ -228,7 +228,7 @@ public:
 		return dynamic_cast<T *>(getComponentOfType(e, type));
 	}
 
-	void addPhysicsComponent(EntityID e, World *world, const sf::Vector2i &startTilePos);
+	void addPhysicsComponent(EntityID e, World *world, const sf::Vector2i &startTilePos, float maxSpeed, float damping);
 
 	void addRenderComponent(EntityID e, EntityType entityType, const std::string &animation,
 	                        float step, DirectionType initialDirection, bool playing);

@@ -56,7 +56,7 @@ void PhysicsSystem::tickEntity(EntityService *es, EntityID e, float dt)
 			physics->body->GetLinearVelocity() + physics->steering);
 
 	// maximum speed
-	float maxSpeed = Config::getFloat("debug.movement.max-speed.walk");
+	float maxSpeed = physics->maxSpeed;
 	if (Math::lengthSquared(physics->getVelocity()) > maxSpeed * maxSpeed)
 	{
 		physics->setVelocity(Math::truncate(physics->getVelocity(), maxSpeed));
@@ -65,7 +65,7 @@ void PhysicsSystem::tickEntity(EntityService *es, EntityID e, float dt)
 		physics->body->SetLinearDamping(0.f);
 	}
 	else
-		physics->body->SetLinearDamping(Config::getFloat("debug.movement.stop-decay"));
+		physics->body->SetLinearDamping(physics->damping);
 
 	// stop
 	if (physics->isStopped())

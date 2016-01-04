@@ -106,6 +106,9 @@ struct PhysicsComponent : BaseComponent
 		return steering.x != 0.f || steering.y != 0.f;
 	}
 
+	float maxSpeed;
+	float damping;
+
 	b2Body *body;
 	b2World *bWorld;
 	b2Vec2 lastVelocity;
