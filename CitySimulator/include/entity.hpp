@@ -2,6 +2,7 @@
 #define CITYSIM_ENTITY_HPP
 
 #define INVALID_ENTITY (-1)
+#define CAMERA_ENTITY (-2)
 
 typedef unsigned int EntityID;
 

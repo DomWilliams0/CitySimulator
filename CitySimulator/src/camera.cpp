@@ -2,7 +2,7 @@
 
 CameraService::CameraService(World &world) : world(&world)
 {
-	controller = new SimpleMovementController(INVALID_ENTITY);
+	controller = new SimpleMovementController(CAMERA_ENTITY);
 }
 
 CameraService::~CameraService()
