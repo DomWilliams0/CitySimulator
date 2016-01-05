@@ -1,6 +1,6 @@
 #include "services.hpp"
 
-CameraService::CameraService(World &world) : world(&world)
+CameraService::CameraService(World &world) : world(&world), trackedEntity(nullptr)
 {
 	float speed = Config::getFloat("debug.movement.camera-speed");
 	controller = new SimpleMovementController(CAMERA_ENTITY, speed, speed, speed);
@@ -13,8 +13,11 @@ CameraService::~CameraService()
 
 void CameraService::onEnable()
 {
-	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
+	sf::Vector2f size = static_cast<sf::Vector2f>(Constants::windowSize);
+
+	view.setSize(size);
 	view.zoom(Config::getFloat("debug.zoom"));
+	view.reset(sf::FloatRect(-size.x / 4, -size.y / 4, size.x, size.y));
 	updateWindowView();
 }
 
