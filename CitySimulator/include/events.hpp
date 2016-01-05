@@ -32,6 +32,14 @@ struct Event
 		bool pressed;
 	};
 
+	struct RawInputClickEvent
+	{
+		sf::Mouse::Button button;
+		int x;
+		int y;
+		bool pressed;
+	};
+
 	struct InputStartMoveEvent
 	{
 		DirectionType direction;
@@ -53,6 +61,7 @@ struct Event
 	union
 	{
 		RawInputKeyEvent rawInputKey;
+		RawInputClickEvent rawInputClick;
 		InputStartMoveEvent startMove;
 		InputStopMoveEvent stopMove;
 		InputSprintEvent sprintToggle;

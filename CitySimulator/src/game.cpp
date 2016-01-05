@@ -46,7 +46,7 @@ void BaseGame::beginGame()
 	while (window->isOpen())
 	{
 		window = Locator::locate<RenderService>()->getWindow();
-		auto event = Locator::locate<EventService>();
+		EventService *es = Locator::locate<EventService>();
 
 		// process OS events
 		while (window->pollEvent(e))
@@ -55,11 +55,22 @@ void BaseGame::beginGame()
 				window->close();
 
 			else if (e.type == sf::Event::KeyPressed || e.type == sf::Event::KeyReleased)
-				event->callRawInputKeyEvent(e.key.code, e.type == sf::Event::KeyPressed);
+				es->callRawInputKeyEvent(e.key.code, e.type == sf::Event::KeyPressed);
+
+			else if (e.type == sf::Event::MouseButtonPressed || e.type == sf::Event::MouseButtonReleased)
+			{
+				Event event;
+				event.type = EVENT_RAW_INPUT_CLICK;
+				event.rawInputClick.button = e.mouseButton.button;
+				event.rawInputClick.x = e.mouseButton.x;
+				event.rawInputClick.y = e.mouseButton.y;
+				event.rawInputClick.pressed = e.type == sf::Event::MouseButtonPressed;
+				es->callEvent(event);
+			}
 		}
 
 		// process game events
-		event->processQueue();
+		es->processQueue();
 
 		// tick
 		float delta(clock.restart().asSeconds());
