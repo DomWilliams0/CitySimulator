@@ -1,12 +1,31 @@
 #include "services.hpp"
 #include "gamestate.hpp"
 
+EntityID createTestHuman(World &world, int x, int y, const std::string &skin, DirectionType direction, bool player)
+{
+	EntityService *es = Locator::locate<EntityService>();
+
+	EntityID e = es->createEntity();
+	es->addPhysicsComponent(e, &world, {x, y},
+	                        Config::getFloat("debug.movement.max-speed.walk"),
+	                        Config::getFloat("debug.movement.stop-decay"));
+
+	es->addRenderComponent(e, ENTITY_HUMAN, skin, 0.2f, direction, false);
+
+	if (player)
+		es->addPlayerInputComponent(e);
+	else
+		es->addAIInputComponent(e);
+
+	return e;
+}
+
 GameState::GameState() : State(GAME)
 {
 	// load art service for queueing
 	auto animationService = new AnimationService;
 	Locator::provide(SERVICE_ANIMATION, animationService);
-	
+
 	// load entities
 	auto entityService = new EntityService;
 	Locator::provide(SERVICE_ENTITY, entityService);
@@ -21,16 +40,22 @@ GameState::GameState() : State(GAME)
 	// load camera
 	Locator::provide(SERVICE_CAMERA, new CameraService(world));
 
-	EntityID e = entityService->createEntity();
-	sf::Vector2i tilePos = {Config::getInt("debug.start-pos.x"), Config::getInt("debug.start-pos.y")};
-	entityService->addPhysicsComponent(e, &world, tilePos,
-	                                   Config::getFloat("debug.movement.max-speed.walk"),
-	                                   Config::getFloat("debug.movement.stop-decay"));
+	// create some humans
+	const int count = 20;
 
-	entityService->addRenderComponent(e, ENTITY_HUMAN, Config::getString("debug.human-skin"), 0.2f, DIRECTION_EAST, false);
-	entityService->addAIInputComponent(e);
+	for (int i = 0; i < count; ++i)
+	{
+		int x = Utils::random(0, world.getTileSize().x);
+		int y = Utils::random(0, world.getTileSize().y);
 
-	Locator::locate<InputService>()->setPlayerEntity(e);
+		EntityID e = createTestHuman(world, x, y, animationService->getRandomAnimationName(ENTITY_HUMAN),
+		                             Direction::random(),
+		                             false);
+
+	}
+
+//	Locator::locate<InputService>()->setPlayerEntity(e);
+
 }
 
 void GameState::tick(float delta)
