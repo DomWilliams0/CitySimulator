@@ -109,8 +109,16 @@ EntityID EntityService::createEntity()
 	return MAX_ENTITIES;
 }
 
+void validateEntity(const EntityID &id)
+{
+	if (id == INVALID_ENTITY)
+		error("Null entity");
+}
+
 void EntityService::killEntity(EntityID e)
 {
+	validateEntity(e);
+
 	if (isAlive(e))
 		entityCount--;
 
@@ -119,6 +127,7 @@ void EntityService::killEntity(EntityID e)
 
 bool EntityService::isAlive(EntityID e) const
 {
+	validateEntity(e);
 	return entities[e] != COMPONENT_NONE;
 }
 
@@ -135,6 +144,7 @@ void EntityService::renderSystems(sf::RenderWindow &window)
 
 BaseComponent *EntityService::addComponent(EntityID e, ComponentType type)
 {
+	validateEntity(e);
 	entities[e] |= type;
 
 	auto comp = getComponentOfType(e, type);
@@ -144,16 +154,19 @@ BaseComponent *EntityService::addComponent(EntityID e, ComponentType type)
 
 void EntityService::removeComponent(EntityID e, ComponentType type)
 {
+	validateEntity(e);
 	entities[e] &= ~type;
 }
 
 bool EntityService::hasComponent(EntityID e, ComponentType type) const
 {
+	validateEntity(e);
 	return (entities[e] & type) != COMPONENT_NONE;
 }
 
 BaseComponent *EntityService::getComponentOfType(EntityID e, ComponentType type)
 {
+	validateEntity(e);
 	switch (type)
 	{
 		case COMPONENT_PHYSICS:
