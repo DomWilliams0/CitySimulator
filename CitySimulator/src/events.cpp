@@ -41,12 +41,3 @@ void EventService::callEvent(const Event &event)
 {
 	pendingEvents.push_front(event);
 }
-
-void EventService::callRawInputKeyEvent(sf::Keyboard::Key key, bool pressed)
-{
-	Event e;
-	e.type = EVENT_RAW_INPUT_KEY;
-	e.rawInputKey.key = key;
-	e.rawInputKey.pressed = pressed;
-	callEvent(e);
-}

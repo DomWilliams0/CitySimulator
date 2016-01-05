@@ -55,7 +55,13 @@ void BaseGame::beginGame()
 				window->close();
 
 			else if (e.type == sf::Event::KeyPressed || e.type == sf::Event::KeyReleased)
-				es->callRawInputKeyEvent(e.key.code, e.type == sf::Event::KeyPressed);
+			{
+				Event event;
+				event.type = EVENT_RAW_INPUT_KEY;
+				event.rawInputKey.key = e.key.code;
+				event.rawInputKey.pressed = e.type == sf::Event::KeyPressed;
+				es->callEvent(event);
+			}
 
 			else if (e.type == sf::Event::MouseButtonPressed || e.type == sf::Event::MouseButtonReleased)
 			{

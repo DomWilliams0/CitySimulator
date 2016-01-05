@@ -277,7 +277,6 @@ public:
 	void processQueue();
 
 	void callEvent(const Event &event);
-	void callRawInputKeyEvent(sf::Keyboard::Key key, bool pressed);
 
 private:
 	std::forward_list<Event> pendingEvents;

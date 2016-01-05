@@ -31,20 +31,29 @@ struct ErrorOnEventListener : public EventListener
 	}
 };
 
+void callRawInputKeyEvent(sf::Keyboard::Key key, bool pressed)
+{
+	Event e;
+	e.type = EVENT_RAW_INPUT_KEY;
+	e.rawInputKey.key = key;
+	e.rawInputKey.pressed = pressed;
+	Locator::locate<EventService>()->callEvent(e);
+}
+
 TEST_F(EventsTest, RegisterAndUnregister)
 {
 	ErrorOnEventListener l;
 	auto key(sf::Keyboard::K);
 
-	es->callRawInputKeyEvent(key, true);
+	callRawInputKeyEvent(key, true);
 	EXPECT_NO_THROW(es->processQueue());
 
 	es->registerListener(&l, EVENT_RAW_INPUT_KEY);
-	es->callRawInputKeyEvent(key, true);
+	callRawInputKeyEvent(key, true);
 	EXPECT_ANY_THROW(es->processQueue());
 
 	es->unregisterListener(&l, EVENT_RAW_INPUT_KEY);
-	es->callRawInputKeyEvent(key, true);
+	callRawInputKeyEvent(key, true);
 	EXPECT_NO_THROW(es->processQueue());
 }
 
@@ -56,7 +65,7 @@ TEST_F(EventsTest, SpecificEvents)
 	Event badEvent;
 	badEvent.type = EVENT_UNKNOWN;
 
-	es->callRawInputKeyEvent(sf::Keyboard::K, true);
+	callRawInputKeyEvent(sf::Keyboard::K, true);
 	es->callEvent(badEvent);
 	EXPECT_NO_THROW(es->processQueue());
 
