@@ -43,7 +43,7 @@ void CameraService::tick(float delta)
 	{
 		float speed; // todo currently unused
 		b2Vec2 movement(controller->tick(delta, speed));
-		view.move(movement.x, movement.y);
+		view.move(movement.x * delta, movement.y * delta);
 		updateWindowView();
 	}
 }

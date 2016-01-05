@@ -22,7 +22,7 @@
                 "walk": 3,
                 "run": 5
             },
-            "camera-speed": 10
+            "camera-speed": 600
         },
         "start-pos": {
             "x": 4,
