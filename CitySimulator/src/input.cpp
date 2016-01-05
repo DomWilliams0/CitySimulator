@@ -26,8 +26,6 @@ void InputService::onEnable()
 	// listen to input events
 	auto events = Locator::locate<EventService>();
 	events->registerListener(this, EVENT_RAW_INPUT_KEY);
-
-	playerEntity = -1;
 }
 
 void InputService::bindKey(InputKey binding, sf::Keyboard::Key key)

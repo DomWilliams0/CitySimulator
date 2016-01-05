@@ -19,6 +19,8 @@ void CameraService::onEnable()
 	view.zoom(Config::getFloat("debug.zoom"));
 	view.reset(sf::FloatRect(-size.x / 4, -size.y / 4, size.x, size.y));
 	updateWindowView();
+
+	clearPlayerEntity();
 }
 
 void CameraService::updateWindowView() const

@@ -41,20 +41,24 @@ GameState::GameState() : State(GAME)
 	Locator::provide(SERVICE_CAMERA, new CameraService(world));
 
 	// create some humans
-	const int count = 20;
+	const int count = 5;
+	int player = INVALID_ENTITY;
+	player = Utils::random(0, count);
 
 	for (int i = 0; i < count; ++i)
 	{
 		int x = Utils::random(0, world.getTileSize().x);
 		int y = Utils::random(0, world.getTileSize().y);
+		bool isPlayer = i == player;
 
 		EntityID e = createTestHuman(world, x, y, animationService->getRandomAnimationName(ENTITY_HUMAN),
 		                             Direction::random(),
-		                             false);
+		                             isPlayer);
 
+		if (isPlayer)
+			Locator::locate<InputService>()->setPlayerEntity(e);
 	}
 
-//	Locator::locate<InputService>()->setPlayerEntity(e);
 
 }
 
