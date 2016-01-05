@@ -111,7 +111,7 @@ EntityID EntityService::createEntity()
 
 void validateEntity(const EntityID &id)
 {
-	if (id == INVALID_ENTITY)
+	if (id < 0 || id >= MAX_ENTITIES)
 		error("Null entity");
 }
 
