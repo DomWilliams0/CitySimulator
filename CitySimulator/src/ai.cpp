@@ -27,5 +27,20 @@ void EntityBrain::tick(float delta)
 
 void EntityBrain::setMoving(bool moving, DirectionType direction)
 {
-	// todo
+	Event e;
+	e.entityID = entity;
+	e.type = moving ? EVENT_INPUT_START_MOVING : EVENT_INPUT_STOP_MOVING;
+	e.startMove.direction = e.stopMove.direction = direction;
+	controller.onEvent(e);
+}
+void StupidAIBrain::tick(float delta)
+{
+	if (ticker.tick(delta))
+	{
+		setMoving(false, direction);
+		direction = static_cast<DirectionType>((static_cast<int>(direction) + 1) % DIRECTION_COUNT);
+		setMoving(true, direction);
+	}
+
+	EntityBrain::tick(delta);
 }

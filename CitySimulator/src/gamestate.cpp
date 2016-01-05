@@ -28,7 +28,7 @@ GameState::GameState() : State(GAME)
 	                                   Config::getFloat("debug.movement.stop-decay"));
 
 	entityService->addRenderComponent(e, ENTITY_HUMAN, Config::getString("debug.human-skin"), 0.2f, DIRECTION_EAST, false);
-	entityService->addPlayerInputComponent(e);
+	entityService->addAIInputComponent(e);
 
 	Locator::locate<InputService>()->setPlayerEntity(e);
 }

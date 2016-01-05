@@ -49,14 +49,19 @@ public:
 	}
 };
 
-class AIBrain : public EntityBrain
+class StupidAIBrain : public EntityBrain
 {
 public:
-	AIBrain(EntityID e) : EntityBrain(e)
+	StupidAIBrain(EntityID e) : EntityBrain(e), direction(DIRECTION_SOUTH)
 	{
+		ticker.init(0.05f, 0.25f);
 	}
 
-//	void tick(float delta) override;
+	void tick(float delta) override;
+
+private:
+	Utils::TimeTicker ticker;
+	DirectionType direction;
 };
 
 #endif

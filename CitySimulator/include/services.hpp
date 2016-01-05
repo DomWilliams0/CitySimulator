@@ -322,7 +322,6 @@ public:
 	b2Vec2 tick(float delta, float &newMaxSpeed);
 	void tick(PhysicsComponent *phys, float delta);
 
-protected:
 	virtual void onEvent(const Event &event) override;
 
 private:

@@ -232,7 +232,7 @@ void EntityService::addBrain(EntityID e, bool aiBrain)
 	InputComponent *comp = dynamic_cast<InputComponent *>(addComponent(e, COMPONENT_INPUT));
 
 	if (aiBrain)
-		comp->brain.reset(new AIBrain(e));
+		comp->brain.reset(new StupidAIBrain(e));
 	else
 		comp->brain.reset(new InputBrain(e));
 }
