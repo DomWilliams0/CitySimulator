@@ -14,6 +14,7 @@
         "human-skin": "Business Man",
         "zoom": 1,
         "reload-config": true,
+        "fps-tick-rate": 0.2,
         "log-level": "info",
         "movement": {
             "stop-decay": 8,

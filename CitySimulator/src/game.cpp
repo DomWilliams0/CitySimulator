@@ -36,7 +36,7 @@ void BaseGame::beginGame()
 
 	start();
 
-	fps.init(0.25);
+	fps.init(Config::getFloat("debug.fps-tick-rate"));
 
 	sf::Clock clock;
 	sf::Event e;
