@@ -153,26 +153,7 @@ void SimpleMovementController::unregisterListeners()
 	Locator::locate<EventService>()->unregisterListener(this, EVENT_INPUT_SPRINT);
 }
 
-void SimpleMovementController::doSprintSwitcharoo(PhysicsComponent *physics, float sprintSpeed)
-{
-	if (wasRunning == running)
-		return;
-
-	if (running)
-	{
-		maxSpeedBackup = physics->maxSpeed;
-		physics->maxSpeed = sprintSpeed;
-	}
-	else
-	{
-		physics->maxSpeed = maxSpeedBackup;
-		maxSpeedBackup = 0;
-	}
-
-	wasRunning = running;
-}
-
-b2Vec2 SimpleMovementController::tick(float speed, float delta)
+b2Vec2 SimpleMovementController::tick(float delta, float &newMaxSpeed)
 {
 	bool north = moving[DIRECTION_NORTH];
 	bool south = moving[DIRECTION_SOUTH];
@@ -182,20 +163,33 @@ b2Vec2 SimpleMovementController::tick(float speed, float delta)
 	float x, y;
 
 	if (east != west)
-		x = east ? speed : -speed;
+		x = east ? movementForce : -movementForce;
 	else
 		x = 0.f;
 
 	if (south != north)
-		y = south ? speed : -speed;
+		y = south ? movementForce : -movementForce;
 	else
 		y = 0.f;
 
+	newMaxSpeed = running ? maxSprintSpeed : maxSpeed;
 	return {x, y};
-
 }
+
+
+void SimpleMovementController::tick(PhysicsComponent *phys, float delta)
+{
+	float maxSpeed;
+	b2Vec2 steering(tick(delta, maxSpeed));
+	phys->steering.Set(steering.x, steering.y);
+	phys->maxSpeed = maxSpeed;
+
+	wasRunning = running;
+}
+
 void SimpleMovementController::onEvent(const Event &event)
 {
+	// todo remove check and unregister listener instead
 	if (event.entityID != entity)
 		return;
 

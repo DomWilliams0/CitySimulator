@@ -2,7 +2,8 @@
 
 CameraService::CameraService(World &world) : world(&world)
 {
-	controller = new SimpleMovementController(CAMERA_ENTITY);
+	float speed = Config::getFloat("debug.movement.camera-speed");
+	controller = new SimpleMovementController(CAMERA_ENTITY, speed, speed, speed);
 }
 
 CameraService::~CameraService()
@@ -35,7 +36,8 @@ void CameraService::tick(float delta)
 	}
 	else
 	{
-		b2Vec2 movement(controller->tick(Config::getFloat("debug.movement.camera-speed"), delta));
+		float speed; // todo currently unused
+		b2Vec2 movement(controller->tick(delta, speed));
 		view.move(movement.x, movement.y);
 		updateWindowView();
 	}

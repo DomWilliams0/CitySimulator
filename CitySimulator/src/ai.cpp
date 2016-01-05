@@ -1,29 +1,31 @@
 #include "ai.hpp"
 
-EntityBrain::EntityBrain(EntityID e) : entity(e)
+EntityBrain::EntityBrain(EntityID e) :
+		entity(e),
+		controller(e, Config::getFloat("debug.movement.force"),
+		           Config::getFloat("debug.movement.max-speed.walk"),
+		           Config::getFloat("debug.movement.max-speed.run"))
+
 {
-	phys = Locator::locate<EntityService>()->getComponent<PhysicsComponent>(entity, COMPONENT_PHYSICS);
+	EntityService *es = Locator::locate<EntityService>();
+	if (!es->hasComponent(entity, COMPONENT_PHYSICS))
+		error("Could not create brain for entity %1% as it doesn't have a physics component", std::to_string(entity));
+
+	phys = es->getComponent<PhysicsComponent>(entity, COMPONENT_PHYSICS);
 }
 
-InputBrain::InputBrain(EntityID e) : EntityBrain(e), controller(e)
+
+EntityBrain::~EntityBrain()
 {
-	controller.registerListeners();
 }
 
-InputBrain::~InputBrain()
+
+void EntityBrain::tick(float delta)
 {
-	controller.unregisterListeners();
+	controller.tick(phys, delta);
 }
 
-void InputBrain::tick(float delta)
+void EntityBrain::setMoving(bool moving, DirectionType direction)
 {
-	float acceleration = Config::getFloat("debug.movement.force");
-	phys->steering = controller.tick(acceleration, delta);
-
-	controller.doSprintSwitcharoo(phys, Config::getFloat("debug.movement.max-speed.run"));
-}
-
-void AIBrain::tick(float delta)
-{
-	// do things
+	// todo
 }

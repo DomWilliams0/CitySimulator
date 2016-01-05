@@ -9,17 +9,17 @@ struct PhysicsComponent;
 class EntityBrain
 {
 public:
-	explicit EntityBrain(EntityID e);
+	EntityBrain(EntityID e);
 
-	virtual ~EntityBrain()
-	{
-	}
+	virtual ~EntityBrain();
 
-	virtual void tick(float delta) = 0;
+	virtual void tick(float delta);
 
 protected:
 	EntityID entity;
+	SimpleMovementController controller;
 	PhysicsComponent *phys;
+
 
 	virtual void onEnable()
 	{
@@ -29,19 +29,24 @@ protected:
 	{
 	}
 
+//	void turnTowards(DirectionType direction);
+//	void setMoving(bool moving);
+	void setMoving(bool moving, DirectionType direction);
+
 };
 
 class InputBrain : public EntityBrain
 {
 public:
-	InputBrain(EntityID e);
-	~InputBrain();
+	InputBrain(EntityID e) : EntityBrain(e)
+	{
+		controller.registerListeners();
+	}
 
-private:
-	void tick(float delta) override;
-
-	SimpleMovementController controller;
-
+	virtual ~InputBrain()
+	{
+		controller.unregisterListeners();
+	}
 };
 
 class AIBrain : public EntityBrain
@@ -51,7 +56,7 @@ public:
 	{
 	}
 
-	void tick(float delta) override;
+//	void tick(float delta) override;
 };
 
 #endif

@@ -302,8 +302,11 @@ enum InputKey
 class SimpleMovementController : public EventListener
 {
 public:
-	SimpleMovementController(EntityID entity) : entity(entity), moving(DIRECTION_COUNT, false),
-	                                            running(false), wasRunning(false)
+	SimpleMovementController(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
+			: entity(entity), moving(DIRECTION_COUNT, false),
+			  running(false), wasRunning(false),
+			  movementForce(movementForce), maxSpeed(maxWalkSpeed), maxSprintSpeed(maxSprintSpeed)
+
 	{
 		moving.shrink_to_fit();
 	}
@@ -316,17 +319,18 @@ public:
 	void registerListeners();
 	void unregisterListeners();
 
-	void doSprintSwitcharoo(PhysicsComponent *physics, float sprintSpeed);
+	b2Vec2 tick(float delta, float &newMaxSpeed);
+	void tick(PhysicsComponent *phys, float delta);
 
-	b2Vec2 tick(float speed, float delta);
+protected:
 	virtual void onEvent(const Event &event) override;
 
 private:
-	std::vector<bool> moving;
 	EntityID entity;
 
+	std::vector<bool> moving;
 	bool running, wasRunning;
-	float maxSpeedBackup;
+	float movementForce, maxSprintSpeed, maxSpeed;
 
 };
 
