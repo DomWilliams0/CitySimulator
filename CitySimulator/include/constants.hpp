@@ -50,6 +50,8 @@ namespace Direction
 enum EntityType
 {
 	ENTITY_HUMAN,
-	ENTITY_VEHICLE
+	ENTITY_VEHICLE,
+
+	ENTITY_UNKNOWN
 };
 #endif
