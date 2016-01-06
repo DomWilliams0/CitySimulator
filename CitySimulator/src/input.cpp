@@ -79,7 +79,7 @@ void InputService::setPlayerEntity(EntityID entity)
 	head->brain = inputBrain;
 
 	playerEntity = entity;
-//	Locator::locate<CameraService>()->setTrackedEntity(entity);
+	Locator::locate<CameraService>()->setTrackedEntity(entity);
 }
 
 void InputService::clearPlayerEntity()
