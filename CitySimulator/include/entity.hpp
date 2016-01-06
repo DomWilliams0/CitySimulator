@@ -30,9 +30,14 @@ b2Vec2 toB2Vec(const sf::Vector2<T> &v)
 
 struct EntityIdentifier
 {
-	EntityID id = INVALID_ENTITY;
-	EntityType type = ENTITY_UNKNOWN;
+	EntityID id;
+	EntityType type;
 
+
+	EntityIdentifier() : type(ENTITY_UNKNOWN), id(INVALID_ENTITY)
+	{
+
+	}
 	EntityIdentifier(EntityID id, EntityType type) : type(type), id(id)
 	{
 	}

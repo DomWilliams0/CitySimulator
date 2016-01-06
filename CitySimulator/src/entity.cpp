@@ -111,9 +111,11 @@ EntityID EntityService::createEntity()
 
 EntityIdentifier *EntityService::createEntity(EntityType type)
 {
-	// todo allocate on stack, like components
-	// todo currently is a memory leak
-	return new EntityIdentifier(createEntity(), type);
+	EntityID e = createEntity();
+	EntityIdentifier *id = &identifiers[e];
+	id->id = e;
+	id->type = type;
+	return id;
 }
 
 void validateEntity(const EntityID &id)

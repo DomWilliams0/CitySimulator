@@ -266,6 +266,8 @@ public:
 
 private:
 	EntityID entities[MAX_ENTITIES];
+	EntityIdentifier identifiers[MAX_ENTITIES];
+
 	EntityID entityCount;
 
 	// loading
@@ -284,8 +286,6 @@ private:
 
 	// helpers
 	BaseComponent *addComponent(EntityID e, ComponentType type);
-
-	void addBrain(EntityID e, bool aiBrain);
 };
 
 typedef void(EventListener::*EventCallback)(Event &);
