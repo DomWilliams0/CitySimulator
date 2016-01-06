@@ -374,6 +374,9 @@ public:
 private:
 	boost::bimap<InputKey, sf::Keyboard::Key> bindings;
 	boost::optional<EntityID> playerEntity;
+
+	void handleMouseEvent(const Event &event);
+	void handleKeyEvent(const Event &event);
 };
 
 enum LogLevel
@@ -468,6 +471,7 @@ public:
 	void render(const World &world);
 
 	sf::RenderWindow *getWindow();
+	sf::Vector2f mapScreenToWorld(const sf::Vector2i &screenPos);
 
 	inline void setView(sf::View &view)
 	{

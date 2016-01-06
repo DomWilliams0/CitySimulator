@@ -429,3 +429,8 @@ void RenderService::render(const World &world)
 	window->draw(world);
 	Locator::locate<EntityService>()->renderSystems(*window);
 }
+
+sf::Vector2f RenderService::mapScreenToWorld(const sf::Vector2i &screenPos)
+{
+	return window->mapPixelToCoords(screenPos, *view);
+}

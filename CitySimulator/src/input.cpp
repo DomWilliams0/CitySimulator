@@ -26,6 +26,7 @@ void InputService::onEnable()
 	// listen to input events
 	auto events = Locator::locate<EventService>();
 	events->registerListener(this, EVENT_RAW_INPUT_KEY);
+	events->registerListener(this, EVENT_RAW_INPUT_CLICK);
 }
 
 void InputService::bindKey(InputKey binding, sf::Keyboard::Key key)
@@ -45,6 +46,27 @@ void InputService::bindKey(InputKey binding, sf::Keyboard::Key key)
 }
 
 void InputService::onEvent(const Event &event)
+{
+	if (event.type == EVENT_RAW_INPUT_CLICK)
+		handleMouseEvent(event);
+	else
+		handleKeyEvent(event);
+}
+
+void InputService::handleMouseEvent(const Event &event)
+{
+	// only left clicks for now
+	if (event.rawInputClick.button != sf::Mouse::Left)
+		return;
+
+	sf::Vector2i windowPos(event.rawInputClick.x, event.rawInputClick.y);
+
+	// translate to world tile coordinates
+	sf::Vector2f pos(Utils::toTile(Locator::locate<RenderService>()->mapScreenToWorld(windowPos)));
+	Debug::printVector(pos, "Click at ");
+}
+
+void InputService::handleKeyEvent(const Event &event)
 {
 	InputKey binding(getBinding(event.rawInputKey.key));
 
