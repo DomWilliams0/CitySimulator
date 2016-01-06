@@ -42,10 +42,11 @@ struct EntityIdentifier
 
 enum ComponentType
 {
-	COMPONENT_NONE = 0,
 	COMPONENT_PHYSICS = 1 << 0,
 	COMPONENT_RENDER = 1 << 1,
-	COMPONENT_INPUT = 1 << 2
+	COMPONENT_INPUT = 1 << 2,
+
+	COMPONENT_UNKNOWN = 0
 };
 
 // components

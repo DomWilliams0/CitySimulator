@@ -265,7 +265,7 @@ void Animator::init(Animation *anim, float step, DirectionType initialDirection,
 
 	if (anim != nullptr)
 	{
-		direction = DIRECTION_COUNT;
+		direction = DIRECTION_UNKNOWN;
 		turn(initialDirection);
 	}
 }

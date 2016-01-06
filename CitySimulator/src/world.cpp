@@ -4,7 +4,7 @@
 bool isCollidable(BlockType blockType)
 {
 	static const std::set<BlockType> collidables(
-			{WATER, TREE, BUILDING_WALL, BUILDING_EDGE, BUILDING_ROOF, BUILDING_ROOF_CORNER});
+			{BLOCK_WATER, BLOCK_TREE, BLOCK_BUILDING_WALL, BLOCK_BUILDING_EDGE, BLOCK_BUILDING_ROOF, BLOCK_BUILDING_ROOF_CORNER});
 	return collidables.find(blockType) != collidables.end();
 }
 
@@ -22,7 +22,7 @@ LayerType layerTypeFromString(const std::string &s)
 		return LAYER_COLLISIONS;
 
 	Logger::logWarning("Unknown LayerType: " + s);
-	return LAYER_COUNT;
+	return LAYER_UNKNOWN;
 }
 
 bool isTileLayer(LayerType &layerType)

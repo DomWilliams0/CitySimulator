@@ -8,12 +8,12 @@ namespace sf
 
 enum StateType
 {
-	NONE,
-	MENU,
-	OPTIONS,
-	GAME,
-	PAUSE,
-	GAMEOVER
+	STATE_MENU,
+	STATE_OPTIONS,
+	STATE_GAME,
+	STATE_PAUSE,
+
+	STATE_UNKNOWN
 };
 
 class State

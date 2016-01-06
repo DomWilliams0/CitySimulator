@@ -12,7 +12,8 @@ namespace TMX
 	{
 		PROPERTY_TYPE,
 		PROPERTY_VISIBLE,
-		PROPERTY_INVALID
+
+		PROPERTY_UNKNOWN
 	};
 
 	PropertyType propertyTypeFromString(const std::string &s);

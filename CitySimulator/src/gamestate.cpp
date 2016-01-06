@@ -21,7 +21,7 @@ EntityIdentifier & createTestHuman(World &world, int x, int y, const std::string
 	return *entity;
 }
 
-GameState::GameState() : State(GAME)
+GameState::GameState() : State(STATE_GAME)
 {
 	// load art service for queueing
 	auto animationService = new AnimationService;

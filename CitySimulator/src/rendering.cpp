@@ -79,7 +79,7 @@ sf::Vector2u Tileset::getSize() const
 void Tileset::convertToTexture(const std::vector<int> &flippedGIDs)
 {
 	// resize image
-	int totalBlockTypes = LAST + flippedGIDs.size();
+	int totalBlockTypes = BLOCK_UNKNOWN + flippedGIDs.size();
 	int rowsRequired = totalBlockTypes / size.x;
 
 	if (totalBlockTypes % size.x != 0)
@@ -95,7 +95,7 @@ void Tileset::convertToTexture(const std::vector<int> &flippedGIDs)
 	generatePoints();
 
 	// render flipped blocktypes
-	int currentBlockType(LAST);
+	int currentBlockType(BLOCK_UNKNOWN);
 	for (int flippedGID : flippedGIDs)
 	{
 		std::bitset<3> flips;
@@ -285,7 +285,7 @@ int WorldTerrain::discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<
 
 		// unknown layer type
 		LayerType layerType = layerTypeFromString(layer->name);
-		if (layerType == LAYER_COUNT)
+		if (layerType == LAYER_UNKNOWN)
 		{
 			Logger::logError("Invalid layer name: " + layer->name);
 			layerIt = layers.erase(layerIt);
@@ -325,7 +325,7 @@ void WorldTerrain::discoverFlippedTiles(const std::vector<TMX::Layer *> &layers,
 			if (tile == nullptr || !tile->isFlipped())
 				continue;
 
-			if (tile->gid == BLANK)
+			if (tile->gid == BLOCK_BLANK)
 				continue;
 
 			int flipGID = tile->getFlipGID();
@@ -359,7 +359,7 @@ void WorldTerrain::addTiles(const std::vector<TMX::Layer *> &layers, const std::
 					continue;
 
 				BlockType blockType = static_cast<BlockType>(tile->gid);
-				if (blockType == BLANK)
+				if (blockType == BLOCK_BLANK)
 					continue;
 
 				// objects are not stuck to the grid

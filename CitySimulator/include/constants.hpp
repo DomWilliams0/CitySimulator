@@ -37,7 +37,7 @@ enum DirectionType
 	DIRECTION_SOUTH,
 	DIRECTION_WEST,
 
-	DIRECTION_COUNT
+	DIRECTION_UNKNOWN
 };
 
 namespace Direction

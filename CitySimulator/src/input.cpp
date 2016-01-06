@@ -16,10 +16,10 @@ void InputService::onEnable()
 	// todo load from config
 
 	// check all keys have been registered
-	if (bindings.left.size() != KEY_COUNT)
+	if (bindings.left.size() != KEY_UNKNOWN)
 	{
 		Logger::logError(format("Expected %1% key bindings, received %2% instead",
-		                        std::to_string(KEY_COUNT), std::to_string(bindings.left.size())));
+		                        std::to_string(KEY_UNKNOWN), std::to_string(bindings.left.size())));
 
 		error("Invalid number of key bindings");
 	}
@@ -102,7 +102,7 @@ void InputService::handleKeyEvent(const Event &event)
 	InputKey binding(getBinding(event.rawInputKey.key));
 
 	// unrecognized key
-	if (binding == KEY_COUNT)
+	if (binding == KEY_UNKNOWN)
 		return;
 
 	// quit
@@ -186,7 +186,7 @@ InputKey InputService::getBinding(sf::Keyboard::Key key)
 {
 
 	auto result = bindings.right.find(key);
-	return result == bindings.right.end() ? InputKey::KEY_COUNT : result->second;
+	return result == bindings.right.end() ? InputKey::KEY_UNKNOWN : result->second;
 }
 
 

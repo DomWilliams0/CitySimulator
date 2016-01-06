@@ -33,12 +33,12 @@ namespace Constants
 
 DirectionType Direction::random()
 {
-	return static_cast<DirectionType>(Utils::random(0, static_cast<int>(DIRECTION_COUNT)));
+	return static_cast<DirectionType>(Utils::random(0, static_cast<int>(DIRECTION_UNKNOWN)));
 }
 
 DirectionType Direction::fromAngle(double degrees)
 {
-	const static double multiple = 360.0f / DIRECTION_COUNT;
+	const static double multiple = 360.0f / DIRECTION_UNKNOWN;
 
 	int angle = static_cast<int>(multiple * round(degrees / multiple));
 

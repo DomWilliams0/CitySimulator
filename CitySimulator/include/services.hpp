@@ -23,6 +23,7 @@ enum ServiceType
 	SERVICE_INPUT,
 	SERVICE_LOGGING,
 	SERVICE_RENDER,
+
 	SERVICE_UNKNOWN
 };
 
@@ -305,14 +306,14 @@ enum InputKey
 
 	KEY_EXIT,
 
-	KEY_COUNT
+	KEY_UNKNOWN
 };
 
 class SimpleMovementController : public EventListener
 {
 public:
 	SimpleMovementController(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
-			: entity(entity), moving(DIRECTION_COUNT, false),
+			: entity(entity), moving(DIRECTION_UNKNOWN, false),
 			  running(false), wasRunning(false),
 			  movementForce(movementForce), maxSpeed(maxWalkSpeed), maxSprintSpeed(maxSprintSpeed)
 

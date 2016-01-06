@@ -14,7 +14,7 @@ void EntityService::onEnable()
 
 	// init entities
 	for (size_t i = 0; i < MAX_ENTITIES; ++i)
-		entities[i] = COMPONENT_NONE;
+		entities[i] = COMPONENT_UNKNOWN;
 
 	// init systems in correct order
 	systems.push_back(new InputSystem);
@@ -129,13 +129,13 @@ void EntityService::killEntity(EntityID e)
 	if (isAlive(e))
 		entityCount--;
 
-	entities[e] = COMPONENT_NONE;
+	entities[e] = COMPONENT_UNKNOWN;
 }
 
 bool EntityService::isAlive(EntityID e) const
 {
 	validateEntity(e);
-	return entities[e] != COMPONENT_NONE;
+	return entities[e] != COMPONENT_UNKNOWN;
 }
 
 boost::optional<EntityIdentifier*> EntityService::getEntityIDFromBody(const b2Body &body)
@@ -180,7 +180,7 @@ void EntityService::removeComponent(EntityID e, ComponentType type)
 bool EntityService::hasComponent(EntityID e, ComponentType type) const
 {
 	validateEntity(e);
-	return (entities[e] & type) != COMPONENT_NONE;
+	return (entities[e] & type) != COMPONENT_UNKNOWN;
 }
 
 BaseComponent *EntityService::getComponentOfType(EntityID e, ComponentType type)

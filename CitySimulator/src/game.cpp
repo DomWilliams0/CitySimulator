@@ -135,7 +135,7 @@ Game::Game(sf::RenderWindow &window) : BaseGame(window), current(nullptr)
 
 void Game::start()
 {
-	switchState(StateType::GAME);
+	switchState(StateType::STATE_GAME);
 	box2DWorld = dynamic_cast<GameState *>(current)->getBox2DWorld();
 }
 
@@ -164,7 +164,7 @@ void Game::render(sf::RenderWindow &window)
 void Game::switchState(StateType newStateType)
 {
 	// destruct current
-	if (newStateType == StateType::NONE)
+	if (newStateType == StateType::STATE_UNKNOWN)
 	{
 		delete current;
 		states.pop();
@@ -177,7 +177,7 @@ void Game::switchState(StateType newStateType)
 		State *newState(createFromStateType(newStateType));
 		if (!newState) return;
 
-		bool shouldDestruct = (current && current->type != GAME && newStateType != PAUSE);
+		bool shouldDestruct = (current && current->type != STATE_GAME && newStateType != STATE_PAUSE);
 
 		if (shouldDestruct)
 		{
@@ -197,7 +197,7 @@ State *Game::createFromStateType(StateType type)
 {
 	switch (type)
 	{
-		case GAME:
+		case STATE_GAME:
 			return new GameState;
 		default:
 			throw std::runtime_error("Not implemented");

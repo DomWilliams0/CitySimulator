@@ -13,7 +13,7 @@ TMX::PropertyType propertyTypeFromString(const std::string &s)
 		return TMX::PROPERTY_VISIBLE;
 
 	Logger::logWarning("Unknown PropertyType: " + s);
-	return TMX::PROPERTY_INVALID;
+	return TMX::PROPERTY_UNKNOWN;
 }
 
 void addProperties(TMX::TileMap *tile_map, boost::property_tree::ptree &tree)
@@ -37,7 +37,7 @@ void addProperties(TMX::TileMap *tile_map, boost::property_tree::ptree &tree)
 			Logger::logDebuggier(format("Found world property '%1%' => '%2%'", name, value));
 
 			TMX::PropertyType type = propertyTypeFromString(name);
-			if (type != TMX::PROPERTY_INVALID)
+			if (type != TMX::PROPERTY_UNKNOWN)
 				tile_map->addProperty(type, value);
 		}
 	}
