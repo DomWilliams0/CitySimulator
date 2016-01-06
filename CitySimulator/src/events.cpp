@@ -23,7 +23,7 @@ void EventService::unregisterListener(EventListener *listener, EventType eventTy
 
 void EventService::unregisterListener(EventListener *listener)
 {
-	struct ListenerEqualityPredicate
+	struct
 	{
 		EventListener *value;
 
