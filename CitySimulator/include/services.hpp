@@ -134,14 +134,18 @@ public:
 	{
 		return world;
 	}
+
+	inline sf::View getView() const
+	{
+		return view;
+	}
+
 private:
 	World *world;
 	PhysicsComponent *trackedEntity;
 	sf::View view;
 
 	SimpleMovementController *controller;
-
-	void updateWindowView() const;
 };
 
 class ConfigService : public BaseService
@@ -465,9 +469,14 @@ public:
 
 	sf::RenderWindow *getWindow();
 
+	inline void setView(sf::View &view)
+	{
+		this->view = &view;
+	}
+
 private:
 	sf::RenderWindow *window;
-	sf::View view;
+	sf::View *view;
 };
 
 // helpers

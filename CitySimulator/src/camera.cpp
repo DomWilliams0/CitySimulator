@@ -18,14 +18,9 @@ void CameraService::onEnable()
 	view.setSize(size);
 	view.zoom(Config::getFloat("debug.zoom"));
 	view.reset(sf::FloatRect(-size.x / 4, -size.y / 4, size.x, size.y));
-	updateWindowView();
+	Locator::locate<RenderService>()->setView(view);
 
 	clearPlayerEntity();
-}
-
-void CameraService::updateWindowView() const
-{
-	Locator::locate<RenderService>()->getWindow()->setView(view);
 }
 
 void CameraService::onDisable()
@@ -37,14 +32,12 @@ void CameraService::tick(float delta)
 	if (trackedEntity != nullptr)
 	{
 		view.setCenter(trackedEntity->getPosition());
-		updateWindowView();
 	}
 	else
 	{
 		float speed; // todo currently unused
 		b2Vec2 movement(controller->tick(delta, speed));
 		view.move(movement.x * delta, movement.y * delta);
-		updateWindowView();
 	}
 }
 

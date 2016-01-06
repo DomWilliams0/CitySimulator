@@ -416,11 +416,6 @@ RenderService::RenderService(sf::RenderWindow *renderWindow) : window(renderWind
 
 void RenderService::onEnable()
 {
-	view.setSize(static_cast<sf::Vector2f>(Constants::windowSize));
-	view.zoom(Config::getFloat("debug.zoom"));
-
-	if(window != nullptr)
-		window->setView(view);
 }
 
 sf::RenderWindow *RenderService::getWindow()
@@ -430,6 +425,7 @@ sf::RenderWindow *RenderService::getWindow()
 
 void RenderService::render(const World &world)
 {
+	window->setView(*view);
 	window->draw(world);
 	Locator::locate<EntityService>()->renderSystems(*window);
 }
