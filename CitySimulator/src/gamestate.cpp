@@ -40,7 +40,7 @@ GameState::GameState() : State(STATE_GAME)
 	Locator::provide(SERVICE_CAMERA, new CameraService(world));
 
 	// create some humans
-	const int count = 5;
+	int count = Config::getInt("debug.humans.count");
 
 	for (int i = 0; i < count; ++i)
 	{
