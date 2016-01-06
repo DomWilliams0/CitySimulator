@@ -54,7 +54,7 @@ public:
 class StupidAIBrain : public EntityBrain
 {
 public:
-	StupidAIBrain(EntityID e) : EntityBrain(e), direction(DIRECTION_SOUTH)
+	StupidAIBrain(EntityID e) : EntityBrain(e), direction(DIRECTION_SOUTH), random(Utils::random(0.f, 1.f) < 0.5f)
 	{
 		ticker.init(0.05f, 0.25f);
 	}
@@ -64,6 +64,8 @@ public:
 private:
 	Utils::TimeTicker ticker;
 	DirectionType direction;
+
+	bool random;
 };
 
 #endif

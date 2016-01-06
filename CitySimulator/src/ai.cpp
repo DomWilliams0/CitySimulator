@@ -48,7 +48,10 @@ void StupidAIBrain::tick(float delta)
 	if (ticker.tick(delta))
 	{
 		setMoving(false, direction);
-		direction = static_cast<DirectionType>((static_cast<int>(direction) + 1) % DIRECTION_UNKNOWN);
+		if (random)
+			direction = Direction::random();
+		else
+			direction = static_cast<DirectionType>((static_cast<int>(direction) + 1) % DIRECTION_UNKNOWN);
 		setMoving(true, direction);
 	}
 

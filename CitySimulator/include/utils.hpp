@@ -77,7 +77,7 @@ namespace Utils
 	T random(T min, T max)
 	{
 		static std::random_device rd;
-		static std::mt19937 gen(rd());
+		static std::mt19937 gen(50);
 		static std::uniform_real_distribution<> dis(0, 1);
 
 		return static_cast<T>(dis(gen) * (max - min) + min);
