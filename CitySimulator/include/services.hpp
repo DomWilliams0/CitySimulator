@@ -348,6 +348,7 @@ class InputService : public BaseService, public EventListener
 {
 public:
 	virtual void onEnable() override;
+	virtual void onDisable() override;
 
 	void bindKey(InputKey binding, sf::Keyboard::Key key);
 	sf::Keyboard::Key getKey(InputKey binding);

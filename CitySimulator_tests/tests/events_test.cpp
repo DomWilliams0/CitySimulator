@@ -72,4 +72,6 @@ TEST_F(EventsTest, SpecificEvents)
 	es->registerListener(&ikl, EVENT_UNKNOWN);
 	es->callEvent(badEvent);
 	EXPECT_ANY_THROW(es->processQueue());
+
+	es->unregisterListener(&ikl);
 }

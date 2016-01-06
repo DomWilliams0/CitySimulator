@@ -30,6 +30,12 @@ void InputService::onEnable()
 	events->registerListener(this, EVENT_RAW_INPUT_CLICK);
 }
 
+void InputService::onDisable()
+{
+	Locator::locate<EventService>()->unregisterListener(this);
+}
+
+
 void InputService::bindKey(InputKey binding, sf::Keyboard::Key key)
 {
 	std::string verb("Set");
