@@ -1,23 +1,24 @@
 #include "services.hpp"
 #include "gamestate.hpp"
 
-EntityID createTestHuman(World &world, int x, int y, const std::string &skin, DirectionType direction, bool player)
+EntityIdentifier & createTestHuman(World &world, int x, int y, const std::string &skin, DirectionType direction,
+                                   bool player)
 {
 	EntityService *es = Locator::locate<EntityService>();
 
-	EntityID e = es->createEntity();
-	es->addPhysicsComponent(e, &world, {x, y},
-	                        Config::getFloat("debug.movement.max-speed.walk"),
+	EntityIdentifier *entity = es->createEntity(ENTITY_HUMAN);
+
+	es->addPhysicsComponent(*entity, &world, {x, y}, Config::getFloat("debug.movement.max-speed.walk"),
 	                        Config::getFloat("debug.movement.stop-decay"));
 
-	es->addRenderComponent(e, ENTITY_HUMAN, skin, 0.2f, direction, false);
+	es->addRenderComponent(*entity, skin, 0.2f, direction, false);
 
 	if (player)
-		es->addPlayerInputComponent(e);
+		es->addPlayerInputComponent(entity->id);
 	else
-		es->addAIInputComponent(e);
+		es->addAIInputComponent(entity->id);
 
-	return e;
+	return *entity;
 }
 
 GameState::GameState() : State(GAME)
@@ -51,12 +52,12 @@ GameState::GameState() : State(GAME)
 		int y = Utils::random(0, world.getTileSize().y);
 		bool isPlayer = i == player;
 
-		EntityID e = createTestHuman(world, x, y, animationService->getRandomAnimationName(ENTITY_HUMAN),
+		auto e = createTestHuman(world, x, y, animationService->getRandomAnimationName(ENTITY_HUMAN),
 		                             Direction::random(),
 		                             isPlayer);
 
 		if (isPlayer)
-			Locator::locate<InputService>()->setPlayerEntity(e);
+			Locator::locate<InputService>()->setPlayerEntity(e.id);
 	}
 
 

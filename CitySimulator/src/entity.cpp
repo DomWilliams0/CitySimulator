@@ -109,6 +109,13 @@ EntityID EntityService::createEntity()
 	return MAX_ENTITIES;
 }
 
+EntityIdentifier *EntityService::createEntity(EntityType type)
+{
+	// todo allocate on stack, like components
+	// todo currently is a memory leak
+	return new EntityIdentifier(createEntity(), type);
+}
+
 void validateEntity(const EntityID &id)
 {
 	if (id < 0 || id >= MAX_ENTITIES)
@@ -131,10 +138,16 @@ bool EntityService::isAlive(EntityID e) const
 	return entities[e] != COMPONENT_NONE;
 }
 
-EntityID EntityService::getEntityIDFromBody(const b2Body &body)
+boost::optional<EntityIdentifier*> EntityService::getEntityIDFromBody(const b2Body &body)
 {
 	// todo segfaults when user data is null ie. when body is not an entity
-	return static_cast<PhysicsComponent *>(body.GetUserData())->entityID;
+
+	auto data = static_cast<EntityIdentifier*>(body.GetUserData());
+	boost::optional<EntityIdentifier*> ret;
+	if (data != nullptr)
+		ret = data;
+
+	return ret;
 }
 
 void EntityService::tickSystems(float delta)
@@ -186,13 +199,15 @@ BaseComponent *EntityService::getComponentOfType(EntityID e, ComponentType type)
 	}
 }
 
-void EntityService::addPhysicsComponent(EntityID e, World *world, const sf::Vector2i &startTilePos, float maxSpeed, float damping)
+void EntityService::addPhysicsComponent(EntityIdentifier &entity, World *world,
+                                        const sf::Vector2i &startTilePos,
+                                        float maxSpeed,
+                                        float damping)
 {
-	PhysicsComponent *phys = dynamic_cast<PhysicsComponent *>(addComponent(e, COMPONENT_PHYSICS));
+	PhysicsComponent *phys = dynamic_cast<PhysicsComponent *>(addComponent(entity.id, COMPONENT_PHYSICS));
 
 	phys->maxSpeed = maxSpeed;
 	phys->damping = damping;
-	phys->entityID = e;
 
 	b2World *bWorld = world->getBox2DWorld();
 
@@ -203,7 +218,8 @@ void EntityService::addPhysicsComponent(EntityID e, World *world, const sf::Vect
 	def.position.Set(static_cast<float>(startTilePos.x), static_cast<float>(startTilePos.y));
 	phys->body = bWorld->CreateBody(&def);
 	phys->body->SetFixedRotation(true);
-	phys->body->SetUserData(phys);
+
+	phys->body->SetUserData(&entity);
 
 	// basic full body aabb
 	b2PolygonShape aabb;
@@ -225,13 +241,13 @@ void EntityService::addPhysicsComponent(EntityID e, World *world, const sf::Vect
 }
 
 
-void EntityService::addRenderComponent(EntityID e, EntityType entityType, const std::string &animation, float step,
+void EntityService::addRenderComponent(const EntityIdentifier &entity, const std::string &animation, float step,
                                        DirectionType initialDirection, bool playing)
 {
-	RenderComponent *comp = dynamic_cast<RenderComponent *>(addComponent(e, COMPONENT_RENDER));
+	RenderComponent *comp = dynamic_cast<RenderComponent *>(addComponent(entity.id, COMPONENT_RENDER));
 
 	AnimationService *as = Locator::locate<AnimationService>();
-	Animation *anim = as->getAnimation(entityType, animation);
+	Animation *anim = as->getAnimation(entity.type, animation);
 	comp->anim.init(anim, step, initialDirection, playing);
 }
 

@@ -65,7 +65,7 @@ struct ClickCallback : public b2QueryCallback
 	}
 };
 
-boost::optional<EntityID> InputService::getClickedEntity(const sf::Vector2i &screenPos, float radius)
+boost::optional<EntityIdentifier *> InputService::getClickedEntity(const sf::Vector2i &screenPos, float radius)
 {
 	// translate to world tile coordinates
 	sf::Vector2f pos(Utils::toTile(Locator::locate<RenderService>()->mapScreenToWorld(screenPos)));
@@ -78,7 +78,7 @@ boost::optional<EntityID> InputService::getClickedEntity(const sf::Vector2i &scr
 	Locator::locate<CameraService>()->getWorld()->getBox2DWorld()->QueryAABB(&callback, aabb);
 
 	if (callback.clickedBody == nullptr)
-		return boost::optional<EntityID>();
+		return boost::optional<EntityIdentifier *>();
 
 	return Locator::locate<EntityService>()->getEntityIDFromBody(*callback.clickedBody);
 }
@@ -91,9 +91,9 @@ void InputService::handleMouseEvent(const Event &event)
 
 	sf::Vector2i windowPos(event.rawInputClick.x, event.rawInputClick.y);
 
-	boost::optional<EntityID> clicked(getClickedEntity(windowPos, 0));
+	auto clicked(getClickedEntity(windowPos, 0));
 	if (clicked.is_initialized())
-		Logger::logDebug(format("Clicked on entity %1%", std::to_string(*clicked)));
+		Logger::logDebug(format("Clicked on entity %1%", std::to_string(clicked.get()->id)));
 
 }
 

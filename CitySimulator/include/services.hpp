@@ -205,6 +205,7 @@ public:
 	unsigned int getEntityCount() const;
 
 	EntityID createEntity();
+	EntityIdentifier *createEntity(EntityType type);
 
 	void killEntity(EntityID e);
 
@@ -218,7 +219,7 @@ public:
 		return entities[e];
 	}
 
-	EntityID getEntityIDFromBody(const b2Body &body);
+	boost::optional<EntityIdentifier *> getEntityIDFromBody(const b2Body &body);
 
 	// systems
 	void tickSystems(float delta);
@@ -238,10 +239,11 @@ public:
 		return dynamic_cast<T *>(getComponentOfType(e, type));
 	}
 
-	void addPhysicsComponent(EntityID e, World *world, const sf::Vector2i &startTilePos, float maxSpeed, float damping);
+	void addPhysicsComponent(EntityIdentifier &entity, World *world, const sf::Vector2i &startTilePos,
+	                         float maxSpeed, float damping);
 
-	void addRenderComponent(EntityID e, EntityType entityType, const std::string &animation,
-	                        float step, DirectionType initialDirection, bool playing);
+	void addRenderComponent(const EntityIdentifier &entity, const std::string &animation, float step,
+	                        DirectionType initialDirection, bool playing);
 
 	void addPlayerInputComponent(EntityID e);
 
@@ -382,7 +384,7 @@ private:
 	void handleMouseEvent(const Event &event);
 	void handleKeyEvent(const Event &event);
 
-	boost::optional<EntityID> getClickedEntity(const sf::Vector2i &screenPos, float radius = 0.25f);
+	boost::optional<EntityIdentifier *> getClickedEntity(const sf::Vector2i &screenPos, float radius = 0.25f);
 };
 
 enum LogLevel

@@ -28,6 +28,16 @@ b2Vec2 toB2Vec(const sf::Vector2<T> &v)
 	return {static_cast<float>(v.x), static_cast<float>(v.y)};
 }
 
+struct EntityIdentifier
+{
+	EntityID id = INVALID_ENTITY;
+	EntityType type; // todo add default value
+
+	EntityIdentifier(EntityID id, EntityType type) : type(type), id(id)
+	{
+	}
+};
+
 // component-entity-systems
 
 enum ComponentType
@@ -106,8 +116,6 @@ struct PhysicsComponent : BaseComponent
 	{
 		return steering.x != 0.f || steering.y != 0.f;
 	}
-
-	EntityID entityID; // box2d user data
 
 	float maxSpeed;
 	float damping;
