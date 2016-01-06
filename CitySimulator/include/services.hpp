@@ -216,6 +216,8 @@ public:
 		return entities[e];
 	}
 
+	EntityID getEntityIDFromBody(const b2Body &body);
+
 	// systems
 	void tickSystems(float delta);
 

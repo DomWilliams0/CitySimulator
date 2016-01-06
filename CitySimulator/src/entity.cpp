@@ -131,6 +131,11 @@ bool EntityService::isAlive(EntityID e) const
 	return entities[e] != COMPONENT_NONE;
 }
 
+EntityID EntityService::getEntityIDFromBody(const b2Body &body)
+{
+	return static_cast<PhysicsComponent *>(body.GetUserData())->entityID;
+}
+
 void EntityService::tickSystems(float delta)
 {
 	for (System *system : systems)
@@ -186,6 +191,7 @@ void EntityService::addPhysicsComponent(EntityID e, World *world, const sf::Vect
 
 	phys->maxSpeed = maxSpeed;
 	phys->damping = damping;
+	phys->entityID = e;
 
 	b2World *bWorld = world->getBox2DWorld();
 
@@ -196,6 +202,7 @@ void EntityService::addPhysicsComponent(EntityID e, World *world, const sf::Vect
 	def.position.Set(static_cast<float>(startTilePos.x), static_cast<float>(startTilePos.y));
 	phys->body = bWorld->CreateBody(&def);
 	phys->body->SetFixedRotation(true);
+	phys->body->SetUserData(phys);
 
 	// basic full body aabb
 	b2PolygonShape aabb;

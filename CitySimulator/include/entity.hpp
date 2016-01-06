@@ -107,6 +107,8 @@ struct PhysicsComponent : BaseComponent
 		return steering.x != 0.f || steering.y != 0.f;
 	}
 
+	EntityID entityID; // box2d user data
+
 	float maxSpeed;
 	float damping;
 
