@@ -73,3 +73,16 @@ void CameraService::updateViewSize(unsigned int width, unsigned int height)
 	view.setSize(width, height);
 	view.zoom(Config::getFloat("debug.zoom"));
 }
+
+void CameraService::zoomTo(float delta, const sf::Vector2i &pixel, sf::RenderWindow &window)
+{
+	window.setView(view);
+
+	const sf::Vector2f beforeCoord{window.mapPixelToCoords(pixel)};
+	view.zoom(delta);
+	window.setView(view);
+
+	const sf::Vector2f afterCoord{window.mapPixelToCoords(pixel)};
+	const sf::Vector2f offsetCoords{beforeCoord - afterCoord};
+	view.move(offsetCoords);
+}

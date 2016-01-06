@@ -67,6 +67,18 @@ void BaseGame::beginGame()
 			else if (e.type == sf::Event::Resized)
 				Locator::locate<CameraService>()->updateViewSize(e.size.width, e.size.height);
 
+			else if (e.type == sf::Event::MouseWheelScrolled)
+			{
+				CameraService *camera = Locator::locate<CameraService>();
+				sf::Vector2i mousePos = {e.mouseWheelScroll.x, e.mouseWheelScroll.y};
+
+				const sf::Keyboard::Key &sprintKey = Locator::locate<InputService>()->getKey(KEY_SPRINT);
+				const float increment = sf::Keyboard::isKeyPressed(sprintKey) ? 1.3f : 1.1f;
+				float zoom = e.mouseWheelScroll.delta > 0 ? 1.f / increment : increment;
+
+				camera->zoomTo(zoom, mousePos, *window);
+			}
+
 			else if (e.type == sf::Event::KeyPressed || e.type == sf::Event::KeyReleased)
 			{
 				Event event;

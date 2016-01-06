@@ -154,6 +154,8 @@ public:
 		return world;
 	}
 
+	// merci: https://github.com/SFML/SFML/wiki/Source:-Zoom-View-At-(specified-pixel)
+	void zoomTo(float delta, const sf::Vector2i &pixel, sf::RenderWindow &window);
 private:
 	World *world;
 	PhysicsComponent *trackedEntity;
