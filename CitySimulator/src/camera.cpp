@@ -16,8 +16,8 @@ void CameraService::onEnable()
 	sf::Vector2f size = static_cast<sf::Vector2f>(Constants::windowSize);
 
 	view.setSize(size);
-	view.zoom(Config::getFloat("debug.zoom"));
 	view.reset(sf::FloatRect(-size.x / 4, -size.y / 4, size.x, size.y));
+	view.zoom(Config::getFloat("debug.zoom"));
 	Locator::locate<RenderService>()->setView(view);
 
 	clearPlayerEntity();
@@ -66,4 +66,10 @@ void CameraService::clearPlayerEntity()
 {
 	trackedEntity = nullptr;
 	controller->registerListeners();
+}
+
+void CameraService::updateViewSize(unsigned int width, unsigned int height)
+{
+	view.setSize(width, height);
+	view.zoom(Config::getFloat("debug.zoom"));
 }

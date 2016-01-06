@@ -147,10 +147,7 @@ public:
 	void setTrackedEntity(EntityID entity);
 	void clearPlayerEntity();
 
-	inline void updateViewSize(unsigned int width, unsigned int height)
-	{
-		view.setSize(width, height);
-	}
+	void updateViewSize(unsigned int width, unsigned int height);
 
 	inline World* getWorld()
 	{
