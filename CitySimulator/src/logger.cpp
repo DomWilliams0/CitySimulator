@@ -32,7 +32,7 @@ void LoggingService::log(const std::string &msg, LogLevel level)
 
 	auto l = levels.find(level);
 	if (l == levels.end())
-		error("Invalid log level %1%", std::to_string(level));
+		error("Invalid log level %1%", _str(level));
 
 	stream << l->second << ": " << prefix << msg << std::endl;
 }

@@ -59,7 +59,7 @@ std::string Locator::serviceToString(ServiceType type)
 		case SERVICE_RENDER:
 			return "Render";
 		default:
-			return format("Unknown (%1%)", std::to_string(type));
+			return format("Unknown (%1%)", _str(type));
 	}
 }
 NullLoggingService::NullLoggingService() : LoggingService(std::cerr, LOG_INFO)

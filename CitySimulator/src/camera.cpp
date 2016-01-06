@@ -53,13 +53,13 @@ void CameraService::setTrackedEntity(EntityID entity)
 	if (es->hasComponent(entity, COMPONENT_PHYSICS))
 	{
 		trackedEntity = es->getComponent<PhysicsComponent>(entity, COMPONENT_PHYSICS);
-		Logger::logDebug(format("Started tracking entity %1%", std::to_string(entity)));
+		Logger::logDebug(format("Started tracking entity %1%", _str(entity)));
 
 		controller->unregisterListeners();
 	}
 	else
 		Logger::logWarning(
-				format("Could not track entity %1% as it doesn't have a physics component", std::to_string(entity)));
+				format("Could not track entity %1% as it doesn't have a physics component", _str(entity)));
 }
 
 void CameraService::clearPlayerEntity()

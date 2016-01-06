@@ -22,7 +22,7 @@ void EntityBrain::setEntity(EntityID e, bool stop)
 
 	EntityService *es = Locator::locate<EntityService>();
 	if (!es->hasComponent(entity, COMPONENT_PHYSICS))
-		error("Could not create brain for entity %1% as it doesn't have a physics component", std::to_string(entity));
+		error("Could not create brain for entity %1% as it doesn't have a physics component", _str(entity));
 
 	phys = es->getComponent<PhysicsComponent>(entity, COMPONENT_PHYSICS);
 

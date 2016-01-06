@@ -10,13 +10,13 @@ void EventService::onDisable()
 
 void EventService::registerListener(EventListener *listener, EventType eventType)
 {
-	Logger::logDebuggiest(format("Registering listener for event %1%", std::to_string(eventType)));
+	Logger::logDebuggiest(format("Registering listener for event %1%", _str(eventType)));
 	listeners[eventType].push_front(listener);
 }
 void EventService::unregisterListener(EventListener *listener, EventType eventType)
 {
 	listeners[eventType].remove(listener);
-	Logger::logDebuggiest(format("Unregistering listener for event %1%", std::to_string(eventType)));
+	Logger::logDebuggiest(format("Unregistering listener for event %1%", _str(eventType)));
 }
 
 

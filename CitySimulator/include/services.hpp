@@ -229,7 +229,7 @@ public:
 	inline EntityID getComponentMask(EntityID e) const
 	{
 		if (e < 0 || e >= MAX_ENTITIES)
-			error("EntityID %1% out of range in getComponentMask", std::to_string(e));
+			error("EntityID %1% out of range in getComponentMask", _str(e));
 
 		return entities[e];
 	}

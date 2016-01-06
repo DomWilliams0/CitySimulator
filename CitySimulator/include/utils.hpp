@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include <random>
 
+#define _str std::to_string
+
 
 std::string format(const std::string &s, const std::string &arg1);
 

@@ -27,7 +27,7 @@ std::string AnimationService::getRandomAnimationName(EntityType entityType)
 	auto anims = animations.find(entityType);
 	if (anims == animations.end())
 	{
-		error("No animations found for entity type %1%", std::to_string(entityType));
+		error("No animations found for entity type %1%", _str(entityType));
 		return "";
 	}
 
@@ -129,7 +129,7 @@ void AnimationService::positionImages(sf::Vector2i &imageSize, std::map<sf::Imag
 		auto positionedRect = node.insert(rect);
 
 		if (!positionedRect)
-			error("Could not pack spritesheet of size %1%, %2%", std::to_string(size.x), std::to_string(size.y));
+			error("Could not pack spritesheet of size %1%, %2%", _str(size.x), _str(size.y));
 
 		imagePositions.insert({pair.first, *positionedRect});
 	}

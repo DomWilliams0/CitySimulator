@@ -20,7 +20,7 @@ void InputService::onEnable()
 	if (bindings.left.size() != KEY_UNKNOWN)
 	{
 		Logger::logError(format("Expected %1% key bindings, received %2% instead",
-		                        std::to_string(KEY_UNKNOWN), std::to_string(bindings.left.size())));
+		                        _str(KEY_UNKNOWN), _str(bindings.left.size())));
 
 		error("Invalid number of key bindings");
 	}
@@ -50,7 +50,7 @@ void InputService::bindKey(InputKey binding, sf::Keyboard::Key key)
 	}
 
 	bindings.left.insert({binding, key});
-	Logger::logDebuggier(format("%1% binding for key %2%: %3%", verb, std::to_string(key), std::to_string(binding)));
+	Logger::logDebuggier(format("%1% binding for key %2%: %3%", verb, _str(key), _str(binding)));
 }
 
 void InputService::onEvent(const Event &event)
@@ -65,7 +65,7 @@ void InputService::setPlayerEntity(EntityID entity)
 {
 	auto es = Locator::locate<EntityService>();
 	if (!es->hasComponent(entity, COMPONENT_INPUT))
-		error("Cannot set player entity to %1% as it doesn't have an input component", std::to_string(entity));
+		error("Cannot set player entity to %1% as it doesn't have an input component", _str(entity));
 
 	// switch out brain
 	auto head = es->getComponent<InputComponent>(entity, COMPONENT_INPUT);
@@ -209,7 +209,7 @@ void InputService::handleKeyEvent(const Event &event)
 			break;
 		default:
 			error("An invalid movement key slipped through InputService's onEvent: %1%",
-			      std::to_string(binding));
+			      _str(binding));
 			return;
 	}
 
