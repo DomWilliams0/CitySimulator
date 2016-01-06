@@ -22,18 +22,19 @@ TEST_F(EntityTests, EntityLifeCycle)
 	EntityService *es = Locator::locate<EntityService>();
 
 	EXPECT_EQ(es->getEntityCount(), 0);
-	EntityID e = es->createEntity();
+	EntityIdentifier *entity = es->createEntity(ENTITY_HUMAN);
+	EntityID e = entity->id;
 	EXPECT_FALSE(es->isAlive(e)); // no components = dead
 
-	EXPECT_FALSE(es->hasComponent(e, COMPONENT_INPUT));
-	es->addAIInputComponent(e);
-	EXPECT_TRUE(es->hasComponent(e, COMPONENT_INPUT));
+	EXPECT_FALSE(es->hasComponent(e, COMPONENT_RENDER));
+	es->addRenderComponent(*entity, "Test Man", 0.2f, DIRECTION_EAST, false);
+	EXPECT_TRUE(es->hasComponent(e, COMPONENT_RENDER));
 	EXPECT_TRUE(es->isAlive(e));
 	EXPECT_EQ(es->getEntityCount(), 1);
 
-	InputComponent *input = es->getComponent<InputComponent>(e, COMPONENT_INPUT);
-	BaseComponent *other = es->getComponentOfType(e, COMPONENT_INPUT);
-	EXPECT_EQ(input, other);
+	RenderComponent *render = es->getComponent<RenderComponent>(e, COMPONENT_RENDER);
+	BaseComponent *other = es->getComponentOfType(e, COMPONENT_RENDER);
+	EXPECT_EQ(render, other);
 
 	es->killEntity(e);
 	EXPECT_FALSE(es->isAlive(e));

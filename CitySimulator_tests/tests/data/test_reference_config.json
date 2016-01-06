@@ -46,7 +46,10 @@
         "movement": {
             "stop-decay": 8,
             "force": 80,
-            "max-speed": 40
+            "max-speed": {
+                "walk": 3,
+                "run": 5
+            }
         }
     },
     "resources": {
