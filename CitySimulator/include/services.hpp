@@ -147,14 +147,14 @@ public:
 	void setTrackedEntity(EntityID entity);
 	void clearPlayerEntity();
 
+	inline void updateViewSize(unsigned int width, unsigned int height)
+	{
+		view.setSize(width, height);
+	}
+
 	inline World* getWorld()
 	{
 		return world;
-	}
-
-	inline sf::View getView() const
-	{
-		return view;
 	}
 
 private:

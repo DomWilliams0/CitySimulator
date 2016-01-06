@@ -39,7 +39,7 @@ void BaseGame::beginGame()
 				                    static_cast<int>(desktop.height / 2) - static_cast<int>(windowSize.y / 2)
 		                    });
 	}
-	
+
 	// initially fill screen
 	window->clear(backgroundColour);
 	window->display();
@@ -63,6 +63,9 @@ void BaseGame::beginGame()
 		{
 			if (e.type == sf::Event::Closed)
 				window->close();
+
+			else if (e.type == sf::Event::Resized)
+				Locator::locate<CameraService>()->updateViewSize(e.size.width, e.size.height);
 
 			else if (e.type == sf::Event::KeyPressed || e.type == sf::Event::KeyReleased)
 			{
@@ -100,7 +103,8 @@ void BaseGame::beginGame()
 		if (showFPS)
 		{
 			// restore to default for gui display
-			window->setView(window->getDefaultView());
+			auto windowSize = window->getSize();
+			window->setView(sf::View(sf::FloatRect(0, 0, windowSize.x, windowSize.y)));
 			fps.tick(delta, *window);
 		}
 
