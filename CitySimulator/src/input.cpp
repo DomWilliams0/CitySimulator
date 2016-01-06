@@ -79,7 +79,7 @@ void InputService::setPlayerEntity(EntityID entity)
 	head->brain = inputBrain;
 
 	playerEntity = entity;
-	Locator::locate<CameraService>()->setTrackedEntity(entity);
+//	Locator::locate<CameraService>()->setTrackedEntity(entity);
 }
 
 void InputService::clearPlayerEntity()
@@ -130,11 +130,15 @@ void InputService::handleMouseEvent(const Event &event)
 	if (event.rawInputClick.button != sf::Mouse::Left || !event.rawInputClick.pressed)
 		return;
 
+	// only control if not currently controlling
+	if (hasPlayerEntity())
+		return;
+
 	sf::Vector2i windowPos(event.rawInputClick.x, event.rawInputClick.y);
 
 	auto clicked(getClickedEntity(windowPos, 0));
 	if (clicked.is_initialized())
-		Logger::logDebug(format("Clicked on entity %1%", std::to_string(clicked.get()->id)));
+		setPlayerEntity(clicked.get()->id);
 
 }
 

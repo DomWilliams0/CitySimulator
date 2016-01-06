@@ -1,17 +1,10 @@
 #include "ai.hpp"
 
 EntityBrain::EntityBrain(EntityID e) :
-		entity(e),
-		controller(e, Config::getFloat("debug.movement.force"),
-		           Config::getFloat("debug.movement.max-speed.walk"),
-		           Config::getFloat("debug.movement.max-speed.run"))
+		entity(e), controller(e, 0.f, 0.f, 0.f) // dummy values
 
 {
-	EntityService *es = Locator::locate<EntityService>();
-	if (!es->hasComponent(entity, COMPONENT_PHYSICS))
-		error("Could not create brain for entity %1% as it doesn't have a physics component", std::to_string(entity));
-
-	phys = es->getComponent<PhysicsComponent>(entity, COMPONENT_PHYSICS);
+	setEntity(e);
 }
 
 
@@ -19,13 +12,22 @@ EntityBrain::~EntityBrain()
 {
 }
 
-void EntityBrain::setEntity(EntityID e)
+void EntityBrain::setEntity(EntityID e, bool stop)
 {
 	entity = e;
 
 	controller.reset(e, Config::getFloat("debug.movement.force"),
 	                 Config::getFloat("debug.movement.max-speed.walk"),
 	                 Config::getFloat("debug.movement.max-speed.run"));
+
+	EntityService *es = Locator::locate<EntityService>();
+	if (!es->hasComponent(entity, COMPONENT_PHYSICS))
+		error("Could not create brain for entity %1% as it doesn't have a physics component", std::to_string(entity));
+
+	phys = es->getComponent<PhysicsComponent>(entity, COMPONENT_PHYSICS);
+
+	if (stop)
+		phys->setVelocity(sf::Vector2f());
 }
 
 void EntityBrain::tick(float delta)
