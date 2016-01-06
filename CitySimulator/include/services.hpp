@@ -328,9 +328,7 @@ class SimpleMovementController : public EventListener
 {
 public:
 	SimpleMovementController(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
-			: moving(DIRECTION_UNKNOWN - 1)
 	{
-		moving.shrink_to_fit();
 		reset(entity, movementForce, maxWalkSpeed, maxSprintSpeed);
 	}
 

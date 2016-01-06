@@ -242,7 +242,7 @@ void SimpleMovementController::reset(EntityID entity, float movementForce, float
 	this->maxSprintSpeed = maxSprintSpeed;
 	running = wasRunning = false;
 
-	moving.clear();
+	moving.resize(DIRECTION_UNKNOWN, false);
 	std::fill(moving.begin(), moving.end(), false);
 }
 
