@@ -29,6 +29,16 @@ BaseGame::BaseGame(sf::RenderWindow &window)
 void BaseGame::beginGame()
 {
 	sf::RenderWindow *window = Locator::locate<RenderService>()->getWindow();
+
+	if (Config::getBool("display.centre"))
+	{
+		auto desktop = sf::VideoMode::getDesktopMode();
+		auto windowSize = window->getSize();
+		window->setPosition({
+				                    static_cast<int>(desktop.width / 2) - static_cast<int>(windowSize.x / 2),
+				                    static_cast<int>(desktop.height / 2) - static_cast<int>(windowSize.y / 2)
+		                    });
+	}
 	
 	// initially fill screen
 	window->clear(backgroundColour);
