@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.3)
 project(CitySimulator)
 
 # flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O0")
 
 # debug
 if(CMAKE_BUILD_TYPE STREQUAL "")
