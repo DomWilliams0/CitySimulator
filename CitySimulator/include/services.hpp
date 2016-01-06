@@ -7,7 +7,6 @@
 #include <forward_list>
 #include "entity.hpp"
 #include "events.hpp"
-#include <unordered_map>
 #include "utils.hpp"
 #include "constants.hpp"
 #include "animation.hpp"
@@ -61,12 +60,27 @@ public:
 	template<class T>
 	static T *locate(bool errorOnFail = true)
 	{
-		auto possibleType = getInstance().types.find(typeid(T));
+		ServiceType type = SERVICE_UNKNOWN;
 
-		if (possibleType == getInstance().types.end())
+		if (typeid(T) == typeid(AnimationService))
+			type = SERVICE_ANIMATION;
+		else if (typeid(T) == typeid(CameraService))
+			type = SERVICE_CAMERA;
+		else if (typeid(T) == typeid(ConfigService))
+			type = SERVICE_CONFIG;
+		else if (typeid(T) == typeid(EntityService))
+			type = SERVICE_ENTITY;
+		else if (typeid(T) == typeid(EventService))
+			type = SERVICE_EVENT;
+		else if (typeid(T) == typeid(InputService))
+			type = SERVICE_INPUT;
+		else if (typeid(T) == typeid(LoggingService))
+			type = SERVICE_LOGGING;
+		else if (typeid(T) == typeid(RenderService))
+			type = SERVICE_RENDER;
+		else
 			error("Invalid service type given. Has its type been registered?");
 
-		ServiceType type = possibleType->second;
 		T *ret = dynamic_cast<T *>(getInstance().services[type]);
 		if (errorOnFail && ret == nullptr)
 			error("Could not locate service '%1%'", serviceToString(type));
@@ -85,8 +99,6 @@ private:
 	}
 
 	std::vector<BaseService *> services;
-	std::unordered_map<std::type_index, ServiceType> types;
-
 };
 
 // services
