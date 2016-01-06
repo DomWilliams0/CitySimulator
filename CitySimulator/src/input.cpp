@@ -1,6 +1,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include "services.hpp"
 #include "world.hpp"
+#include "ai.hpp"
 
 void InputService::onEnable()
 {
@@ -59,6 +60,40 @@ void InputService::onEvent(const Event &event)
 	else
 		handleKeyEvent(event);
 }
+
+void InputService::setPlayerEntity(EntityID entity)
+{
+	auto es = Locator::locate<EntityService>();
+	if (!es->hasComponent(entity, COMPONENT_INPUT))
+		error("Cannot set player entity to %1% as it doesn't have an input component", std::to_string(entity));
+
+	// switch out brain
+	auto head = es->getComponent<InputComponent>(entity, COMPONENT_INPUT);
+	playersOldBrain = head->brain;
+
+	if (!inputBrain)
+		inputBrain.reset(new InputBrain(entity)); // lazy init
+	else
+		inputBrain->setEntity(entity);
+
+	head->brain = inputBrain;
+
+	playerEntity = entity;
+	Locator::locate<CameraService>()->setTrackedEntity(entity);
+}
+
+void InputService::clearPlayerEntity()
+{
+	// replace brain
+	auto es = Locator::locate<EntityService>();
+	auto head = es->getComponent<InputComponent>(*playerEntity, COMPONENT_INPUT);
+	head->brain = playersOldBrain;
+	playersOldBrain.reset();
+
+	playerEntity.reset();
+	Locator::locate<CameraService>()->clearPlayerEntity();
+}
+
 
 struct ClickCallback : public b2QueryCallback
 {
@@ -193,6 +228,18 @@ InputKey InputService::getBinding(sf::Keyboard::Key key)
 
 	auto result = bindings.right.find(key);
 	return result == bindings.right.end() ? InputKey::KEY_UNKNOWN : result->second;
+}
+
+void SimpleMovementController::reset(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
+{
+	this->entity = entity;
+	this->movementForce = movementForce;
+	this->maxSpeed = maxWalkSpeed;
+	this->maxSprintSpeed = maxSprintSpeed;
+	running = wasRunning = false;
+
+	moving.clear();
+	std::fill(moving.begin(), moving.end(), false);
 }
 
 

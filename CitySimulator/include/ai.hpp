@@ -10,8 +10,9 @@ class EntityBrain
 {
 public:
 	EntityBrain(EntityID e);
-
 	virtual ~EntityBrain();
+
+	void setEntity(EntityID e);
 
 	virtual void tick(float delta);
 
@@ -40,7 +41,8 @@ class InputBrain : public EntityBrain
 public:
 	InputBrain(EntityID e) : EntityBrain(e)
 	{
-		controller.registerListeners();
+		if (e != INVALID_ENTITY)
+			controller.registerListeners();
 	}
 
 	virtual ~InputBrain()

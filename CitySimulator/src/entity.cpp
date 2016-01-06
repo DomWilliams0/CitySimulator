@@ -251,23 +251,15 @@ void EntityService::addRenderComponent(const EntityIdentifier &entity, const std
 	comp->anim.init(anim, step, initialDirection, playing);
 }
 
-void EntityService::addBrain(EntityID e, bool aiBrain)
-{
-	InputComponent *comp = dynamic_cast<InputComponent *>(addComponent(e, COMPONENT_INPUT));
-
-	if (aiBrain)
-		comp->brain.reset(new StupidAIBrain(e));
-	else
-		comp->brain.reset(new InputBrain(e));
-}
-
 void EntityService::addPlayerInputComponent(EntityID e)
 {
-	addBrain(e, false);
+	addComponent(e, COMPONENT_INPUT);
+	Locator::locate<InputService>()->setPlayerEntity(e);
 }
 
 void EntityService::addAIInputComponent(EntityID e)
 {
-	addBrain(e, true);
+	InputComponent *comp = dynamic_cast<InputComponent *>(addComponent(e, COMPONENT_INPUT));
+	comp->brain.reset(new StupidAIBrain(e)); // todo allocate on stack
 }
 

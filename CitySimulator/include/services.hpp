@@ -47,6 +47,8 @@ class World;
 class PhysicsComponent;
 class SimpleMovementController;
 
+class InputBrain;
+
 class b2Body;
 
 class Locator
@@ -326,12 +328,10 @@ class SimpleMovementController : public EventListener
 {
 public:
 	SimpleMovementController(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
-			: entity(entity), moving(DIRECTION_UNKNOWN, false),
-			  running(false), wasRunning(false),
-			  movementForce(movementForce), maxSpeed(maxWalkSpeed), maxSprintSpeed(maxSprintSpeed)
-
+			: moving(DIRECTION_UNKNOWN - 1)
 	{
 		moving.shrink_to_fit();
+		reset(entity, movementForce, maxWalkSpeed, maxSprintSpeed);
 	}
 
 	~SimpleMovementController()
@@ -347,6 +347,7 @@ public:
 
 	virtual void onEvent(const Event &event) override;
 
+	void reset(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed);
 private:
 	EntityID entity;
 
@@ -368,17 +369,9 @@ public:
 
 	virtual void onEvent(const Event &event) override;
 
-	inline void setPlayerEntity(EntityID entity)
-	{
-		playerEntity = entity;
-		Locator::locate<CameraService>()->setTrackedEntity(entity);
-	}
+	void setPlayerEntity(EntityID entity);
 
-	inline void clearPlayerEntity()
-	{
-		playerEntity.reset();
-		Locator::locate<CameraService>()->clearPlayerEntity();
-	}
+	void clearPlayerEntity();
 
 	inline bool hasPlayerEntity()
 	{
@@ -394,7 +387,10 @@ public:
 
 private:
 	boost::bimap<InputKey, sf::Keyboard::Key> bindings;
+
 	boost::optional<EntityID> playerEntity;
+	boost::shared_ptr<EntityBrain> playersOldBrain;
+	boost::shared_ptr<InputBrain> inputBrain;
 
 	void handleMouseEvent(const Event &event);
 	void handleKeyEvent(const Event &event);

@@ -19,6 +19,14 @@ EntityBrain::~EntityBrain()
 {
 }
 
+void EntityBrain::setEntity(EntityID e)
+{
+	entity = e;
+
+	controller.reset(e, Config::getFloat("debug.movement.force"),
+	                 Config::getFloat("debug.movement.max-speed.walk"),
+	                 Config::getFloat("debug.movement.max-speed.run"));
+}
 
 void EntityBrain::tick(float delta)
 {
