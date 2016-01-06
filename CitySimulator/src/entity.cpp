@@ -133,6 +133,7 @@ bool EntityService::isAlive(EntityID e) const
 
 EntityID EntityService::getEntityIDFromBody(const b2Body &body)
 {
+	// todo segfaults when user data is null ie. when body is not an entity
 	return static_cast<PhysicsComponent *>(body.GetUserData())->entityID;
 }
 

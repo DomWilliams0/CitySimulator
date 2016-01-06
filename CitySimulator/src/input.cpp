@@ -1,5 +1,6 @@
 #include <SFML/Window/Keyboard.hpp>
 #include "services.hpp"
+#include "world.hpp"
 
 void InputService::onEnable()
 {
@@ -53,17 +54,47 @@ void InputService::onEvent(const Event &event)
 		handleKeyEvent(event);
 }
 
+struct ClickCallback : public b2QueryCallback
+{
+	b2Body* clickedBody = nullptr;
+
+	virtual bool ReportFixture(b2Fixture *fixture) override
+	{
+		clickedBody = fixture->GetBody();
+		return false; // stop after single
+	}
+};
+
+boost::optional<EntityID> InputService::getClickedEntity(const sf::Vector2i &screenPos, float radius)
+{
+	// translate to world tile coordinates
+	sf::Vector2f pos(Utils::toTile(Locator::locate<RenderService>()->mapScreenToWorld(screenPos)));
+
+	// find body
+	b2AABB aabb;
+	ClickCallback callback;
+	aabb.lowerBound.Set(pos.x - radius, pos.y - radius);
+	aabb.upperBound.Set(pos.x + radius, pos.y + radius);
+	Locator::locate<CameraService>()->getWorld()->getBox2DWorld()->QueryAABB(&callback, aabb);
+
+	if (callback.clickedBody == nullptr)
+		return boost::optional<EntityID>();
+
+	return Locator::locate<EntityService>()->getEntityIDFromBody(*callback.clickedBody);
+}
+
 void InputService::handleMouseEvent(const Event &event)
 {
 	// only left clicks for now
-	if (event.rawInputClick.button != sf::Mouse::Left)
+	if (event.rawInputClick.button != sf::Mouse::Left || !event.rawInputClick.pressed)
 		return;
 
 	sf::Vector2i windowPos(event.rawInputClick.x, event.rawInputClick.y);
 
-	// translate to world tile coordinates
-	sf::Vector2f pos(Utils::toTile(Locator::locate<RenderService>()->mapScreenToWorld(windowPos)));
-	Debug::printVector(pos, "Click at ");
+	boost::optional<EntityID> clicked(getClickedEntity(windowPos, 0));
+	if (clicked.is_initialized())
+		Logger::logDebug(format("Clicked on entity %1%", std::to_string(*clicked)));
+
 }
 
 void InputService::handleKeyEvent(const Event &event)

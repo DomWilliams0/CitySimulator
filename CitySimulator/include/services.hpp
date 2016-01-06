@@ -47,6 +47,8 @@ class World;
 class PhysicsComponent;
 class SimpleMovementController;
 
+class b2Body;
+
 class Locator
 {
 public:
@@ -379,6 +381,8 @@ private:
 
 	void handleMouseEvent(const Event &event);
 	void handleKeyEvent(const Event &event);
+
+	boost::optional<EntityID> getClickedEntity(const sf::Vector2i &screenPos, float radius = 0.25f);
 };
 
 enum LogLevel
