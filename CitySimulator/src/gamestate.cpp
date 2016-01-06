@@ -26,6 +26,9 @@ GameState::GameState() : State(STATE_GAME)
 	auto entityService = new EntityService;
 	Locator::provide(SERVICE_ENTITY, entityService);
 
+	// load gui in a really shady way
+	animationService->loadGUI();
+
 	// load art
 	animationService->processQueuedSprites();
 

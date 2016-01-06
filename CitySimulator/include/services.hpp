@@ -111,9 +111,9 @@ public:
 	virtual void onEnable() override;
 
 	void loadSprite(ConfigKeyValue &entityTags, EntityType entityType);
+	void loadGUI();
 
 	Animation *getAnimation(EntityType entityType, const std::string &name);
-
 	std::string getRandomAnimationName(EntityType entityType);
 
 	void processQueuedSprites();

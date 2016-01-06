@@ -35,12 +35,15 @@
         "entities": {
             "root": "entities",
             "config": "entities.json",
-            "sprites": "sprites",
-            "controller-arrow": "/misc/controller_arrow.png"
+            "sprites": "sprites"
         },
         "world": {
             "root": "world",
             "tileset": "tileset.png"
+        },
+        "gui": {
+            "root": "gui",
+            "controller-arrow": "controller_arrow.png"
         },
         "misc": {
             "root": "misc",

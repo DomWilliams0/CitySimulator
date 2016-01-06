@@ -50,6 +50,25 @@ void AnimationService::loadSprite(ConfigKeyValue &entityTags, EntityType entityT
 	Logger::logDebuggier(format("Loaded sprite %1%", entityTags["name"]));
 }
 
+void AnimationService::loadGUI()
+{
+	// todo load all animations from a gui.json
+	sf::Image *image = new sf::Image;
+	if (!image->loadFromFile(Config::getResource("gui.controller-arrow")))
+		error("Could not load controller arrow image! Serves you right for being so hacky");
+
+	// lord forgive me
+	ConfigKeyValue tags;
+	tags["name"] = "Controller Arrow";
+	tags["anim-count"] = "1";
+	tags["anim-length"] = "1";
+	tags["anim-dimensions-all"] = "16x8";
+
+	preProcessImageData->insert({image, {tags, ENTITY_UNKNOWN}});
+	Logger::logDebuggier("Loaded controller arrow");
+}
+
+
 void AnimationService::checkProcessed(bool shouldBe)
 {
 	if (shouldBe != processed)
