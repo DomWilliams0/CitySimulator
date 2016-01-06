@@ -1,8 +1,7 @@
 #include "services.hpp"
 #include "gamestate.hpp"
 
-EntityIdentifier & createTestHuman(World &world, int x, int y, const std::string &skin, DirectionType direction,
-                                   bool player)
+EntityIdentifier & createTestHuman(World &world, int x, int y, const std::string &skin, DirectionType direction)
 {
 	EntityService *es = Locator::locate<EntityService>();
 
@@ -12,11 +11,7 @@ EntityIdentifier & createTestHuman(World &world, int x, int y, const std::string
 	                        Config::getFloat("debug.movement.stop-decay"));
 
 	es->addRenderComponent(*entity, skin, 0.2f, direction, false);
-
-	if (player)
-		es->addPlayerInputComponent(entity->id);
-	else
-		es->addAIInputComponent(entity->id);
+	es->addAIInputComponent(entity->id);
 
 	return *entity;
 }
@@ -43,24 +38,14 @@ GameState::GameState() : State(STATE_GAME)
 
 	// create some humans
 	const int count = 5;
-	int player = INVALID_ENTITY;
-	player = Utils::random(0, count);
 
 	for (int i = 0; i < count; ++i)
 	{
 		int x = Utils::random(0, world.getTileSize().x);
 		int y = Utils::random(0, world.getTileSize().y);
-		bool isPlayer = i == player;
 
-		auto e = createTestHuman(world, x, y, animationService->getRandomAnimationName(ENTITY_HUMAN),
-		                             Direction::random(),
-		                             isPlayer);
-
-		if (isPlayer)
-			Locator::locate<InputService>()->setPlayerEntity(e.id);
+		createTestHuman(world, x, y, animationService->getRandomAnimationName(ENTITY_HUMAN), Direction::random());
 	}
-
-
 }
 
 void GameState::tick(float delta)
