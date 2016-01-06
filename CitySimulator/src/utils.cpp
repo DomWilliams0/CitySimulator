@@ -118,6 +118,8 @@ void Utils::TimeTicker::init(float min, float max)
 		minDuration = min;
 		maxDuration = max;
 	}
+
+	reset();
 }
 
 bool Utils::TimeTicker::tick(float delta)
