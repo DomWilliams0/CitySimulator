@@ -17,7 +17,8 @@ void CameraService::onEnable()
 
 	view.setSize(size);
 	view.reset(sf::FloatRect(-size.x / 4, -size.y / 4, size.x, size.y));
-	view.zoom(Config::getFloat("debug.zoom"));
+	zoom = Config::getFloat("debug.zoom");
+	view.zoom(zoom);
 	Locator::locate<RenderService>()->setView(view);
 
 	clearPlayerEntity();
@@ -71,11 +72,12 @@ void CameraService::clearPlayerEntity()
 void CameraService::updateViewSize(unsigned int width, unsigned int height)
 {
 	view.setSize(width, height);
-	view.zoom(Config::getFloat("debug.zoom"));
+	view.zoom(zoom);
 }
 
 void CameraService::zoomTo(float delta, const sf::Vector2i &pixel, sf::RenderWindow &window)
 {
+	zoom *= delta;
 	window.setView(view);
 
 	const sf::Vector2f beforeCoord{window.mapPixelToCoords(pixel)};

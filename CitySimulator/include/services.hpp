@@ -160,6 +160,7 @@ private:
 	World *world;
 	PhysicsComponent *trackedEntity;
 	sf::View view;
+	float zoom;
 
 	SimpleMovementController *controller;
 };
