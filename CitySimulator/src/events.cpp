@@ -19,6 +19,29 @@ void EventService::unregisterListener(EventListener *listener, EventType eventTy
 	Logger::logDebuggier(format("Unregistering listener for event %1%", std::to_string(eventType)));
 }
 
+
+
+void EventService::unregisterListener(EventListener *listener)
+{
+	struct ListenerEqualityPredicate
+	{
+		EventListener *value;
+
+		bool operator() (const EventListener *e)
+		{
+			return e == value;
+		}
+	} pred;
+
+	pred.value = listener;
+
+	for (auto &pair : listeners)
+		pair.second.remove_if(pred);
+
+	Logger::logDebuggier("Unregistered listener from all events");
+}
+
+
 void EventService::processQueue()
 {
 	// todo only process a subset according to a time limit/fixed maximum count

@@ -199,9 +199,7 @@ void SimpleMovementController::registerListeners()
 
 void SimpleMovementController::unregisterListeners()
 {
-	Locator::locate<EventService>()->unregisterListener(this, EVENT_INPUT_START_MOVING);
-	Locator::locate<EventService>()->unregisterListener(this, EVENT_INPUT_STOP_MOVING);
-	Locator::locate<EventService>()->unregisterListener(this, EVENT_INPUT_SPRINT);
+	Locator::locate<EventService>()->unregisterListener(this);
 }
 
 b2Vec2 SimpleMovementController::tick(float delta, float &newMaxSpeed)

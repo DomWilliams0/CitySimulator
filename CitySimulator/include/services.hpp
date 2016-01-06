@@ -284,6 +284,7 @@ public:
 
 	void registerListener(EventListener *listener, EventType eventType);
 	void unregisterListener(EventListener *listener, EventType eventType);
+	void unregisterListener(EventListener *listener);
 
 	void processQueue();
 
