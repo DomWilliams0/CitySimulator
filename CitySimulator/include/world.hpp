@@ -55,7 +55,8 @@ enum LayerType
 
 LayerType layerTypeFromString(const std::string &s);
 
-bool isTileLayer(LayerType &layerType);
+bool isTileLayer(const LayerType &layerType);
+bool isOverLayer(const LayerType &layerType);
 
 class Tileset
 {
@@ -130,11 +131,6 @@ struct WorldLayer
 	WorldLayer(const LayerType &type, int depth) : type(type), depth(depth)
 	{
 	}
-
-	bool isOverTerrain() const
-	{
-		return type == LAYER_OVERTERRAIN;
-	}
 };
 
 class WorldTerrain : public BaseWorld
@@ -155,27 +151,29 @@ public:
 
 private:
 	Tileset tileset;
-	sf::VertexArray vertices;
+	sf::VertexArray tileVertices;
+	sf::VertexArray overLayerVertices;
 
 	std::vector<BlockType> blockTypes;
 	std::vector<WorldObject> objects;
 	std::vector<WorldLayer> layers;
 
-	int discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<LayerType> &layerTypes);
+	int tileLayerCount;
+	int overLayerCount;
 
+	void discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<LayerType> &layerTypes);
 	void discoverFlippedTiles(const std::vector<TMX::Layer *> &layers, std::vector<int> &flippedGIDs);
-
 	void addTiles(const std::vector<TMX::Layer *> &layers, const std::vector<LayerType> &types);
-
 	int getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
-
+	int getVertexIndex(const sf::Vector2i &pos, LayerType layerType);
 	void rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos);
 
 	void positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
+	sf::VertexArray &getVertices(const LayerType &layerType);
 
 protected:
 
-	void resize(const int &layerCount);
+	void resizeVertices();
 
 	void registerLayer(LayerType layerType, int depth);
 

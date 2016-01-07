@@ -25,9 +25,14 @@ LayerType layerTypeFromString(const std::string &s)
 	return LAYER_UNKNOWN;
 }
 
-bool isTileLayer(LayerType &layerType)
+bool isTileLayer(const LayerType &layerType)
 {
 	return layerType == LAYER_UNDERTERRAIN || layerType == LAYER_TERRAIN || layerType == LAYER_OVERTERRAIN;
+}
+
+bool isOverLayer(const LayerType &layerType)
+{
+	return layerType == LAYER_OVERTERRAIN;
 }
 
 bool compareRectsHorizontally(const sf::FloatRect &a, const sf::FloatRect &b)
