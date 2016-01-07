@@ -239,7 +239,7 @@ public:
 	// systems
 	void tickSystems(float delta);
 
-	void renderSystems(sf::RenderWindow &window);
+	void renderSystems();
 
 	// component management
 	void removeComponent(EntityID e, ComponentType type);

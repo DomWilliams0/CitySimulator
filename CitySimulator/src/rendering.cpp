@@ -172,7 +172,8 @@ int Tileset::getIndex(int x, int y) const
 
 WorldTerrain::WorldTerrain(World *container) : BaseWorld(container)
 {
-	vertices.setPrimitiveType(sf::Quads);
+	tileVertices.setPrimitiveType(sf::Quads);
+	overLayerVertices.setPrimitiveType(sf::Quads);
 }
 
 WorldTerrain::~WorldTerrain()
@@ -181,16 +182,30 @@ WorldTerrain::~WorldTerrain()
 
 int WorldTerrain::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
 {
-	auto depth = layerDepths[layerType];
-	if (depth != 0)
-		depth -= 1;
-
 	int index = (pos.x + pos.y * container->tileSize.x);
+	index += layers.at(layerType).depth * container->tileSize.x * container->tileSize.y;
+	index *= 4;
+
+	return index;
+}
+
+
+int WorldTerrain::getVertexIndex(const sf::Vector2i &pos, LayerType layerType)
+{
+	int index = (pos.x + pos.y * container->tileSize.x);
+	int depth = layers.at(layerType).depth;
+	if (isOverLayer(layerType))
+	{
+		int diff = tileLayerCount - overLayerCount;
+		depth -= diff;
+	}
+
 	index += depth * container->tileSize.x * container->tileSize.y;
 	index *= 4;
 
 	return index;
 }
+
 
 void WorldTerrain::rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos)
 {
@@ -223,29 +238,42 @@ void WorldTerrain::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, i
 	quad[3].position = sf::Vector2f(pos.x, pos.y + delta);
 }
 
-void WorldTerrain::resize(const int &layerCount)
+
+sf::VertexArray &WorldTerrain::getVertices(const LayerType &layerType)
 {
-	auto tilesetResolution = container->getTileSize();
-	const int size = tilesetResolution.x * tilesetResolution.y * layerCount * 4;
-	vertices.resize(size);
-	blockTypes.resize(size);
+	return isOverLayer(layerType) ? overLayerVertices : tileVertices;
+}
+
+void WorldTerrain::resizeVertices()
+{
+	sf::Vector2i tilesetResolution(container->getTileSize());
+	const int sizeMultiplier = tilesetResolution.x * tilesetResolution.y * 4;
+
+	blockTypes.resize(tileLayerCount * sizeMultiplier);
+
+	tileVertices.resize((tileLayerCount - overLayerCount) * sizeMultiplier);
+	overLayerVertices.resize(overLayerCount * sizeMultiplier);
 }
 
 void WorldTerrain::registerLayer(LayerType layerType, int depth)
 {
-	layerDepths.insert(std::make_pair(layerType, depth));
+	layers.emplace_back(layerType, depth);
+	Logger::logDebuggier(format("Found %3%layer type %1% at depth %2%", _str(layerType), _str(depth),
+	                            isOverLayer(layerType) ? "overterrain " : ""));
 }
 
 void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer, int rotationAngle,
                                 int flipGID)
 {
-	int index = getBlockIndex(pos, layer);
-	sf::Vertex *quad = &vertices[index];
+	int vertexIndex = getVertexIndex(pos, layer);
+	sf::VertexArray &vertices = getVertices(layer);
+	auto size = vertices.getVertexCount();
+	sf::Vertex *quad = &vertices[vertexIndex];
 
 	positionVertices(quad, static_cast<sf::Vector2f>(pos), 1);
 	tileset.textureQuad(quad, blockType, rotationAngle, flipGID);
 
-	blockTypes[index] = blockType;
+	blockTypes[getBlockIndex(pos, layer)] = blockType;
 }
 
 void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, float rotationAngle, int flipGID)
@@ -262,23 +290,29 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, float
 	if (rotationAngle != 0)
 		rotateObject(&quad[0], rotationAngle, adjustedPos);
 
+	sf::VertexArray &vertices = getVertices(LAYER_OBJECTS);
 	for (int i = 0; i < 4; ++i)
 		vertices.append(quad[i]);
 
 	objects.emplace_back(blockType, rotationAngle, Utils::toTile(pos));
 }
 
-std::vector<WorldObject> &WorldTerrain::getObjects()
+const std::vector<WorldObject> & WorldTerrain::getObjects()
 {
 	return objects;
 }
 
+const std::vector<WorldLayer> &WorldTerrain::getLayers()
+{
+	return layers;
+}
 
-int WorldTerrain::discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<LayerType> &layerTypes)
+void WorldTerrain::discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<LayerType> &layerTypes)
 {
 	auto layerIt = layers.begin();
-	int depth(1);
-	int tileLayerCount(0);
+	int depth(0);
+	tileLayerCount = 0;
+	overLayerCount = 0;
 	while (layerIt != layers.end())
 	{
 		auto layer = *layerIt;
@@ -301,6 +335,8 @@ int WorldTerrain::discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<
 
 		if (isTileLayer(layerType))
 			++tileLayerCount;
+		if (isOverLayer(layerType))
+			++overLayerCount;
 
 		// add layer
 		registerLayer(layerType, depth);
@@ -309,8 +345,6 @@ int WorldTerrain::discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<
 		++depth;
 		++layerIt;
 	}
-
-	return tileLayerCount;
 }
 
 void WorldTerrain::discoverFlippedTiles(const std::vector<TMX::Layer *> &layers, std::vector<int> &flippedGIDs)
@@ -382,23 +416,23 @@ void WorldTerrain::addTiles(const std::vector<TMX::Layer *> &layers, const std::
 	}
 }
 
-void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states) const
+void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const
 {
 	states.texture = tileset.getTexture();
-	target.draw(vertices, states);
+	target.draw(overLayers ? overLayerVertices : tileVertices, states);
 }
 
 void WorldTerrain::load(const TMX::TileMap *tileMap, const std::string &tilesetPath)
 {
 	// find layer count and depths
-	auto layers = tileMap->layers;
+	std::vector<TMX::Layer *> layers = tileMap->layers;
 	std::vector<LayerType> types;
-	int tileLayerCount = discoverLayers(layers, types);
+	discoverLayers(layers, types);
 
-	Logger::logDebug(format("Discovered %1% tile layer(s)", _str(tileLayerCount)));
+	Logger::logDebug(format("Discovered %1% tile layer(s), of which %2% is/are overlayer(s)", _str(tileLayerCount), _str(overLayerCount)));
 
 	// resize vertex array to accommodate for layer count
-	resize(tileLayerCount);
+	resizeVertices();
 
 	// update tileset with flipped textures
 	std::vector<int> flippedGIDs;
@@ -427,7 +461,6 @@ void RenderService::render(const World &world)
 {
 	window->setView(*view);
 	window->draw(world);
-	Locator::locate<EntityService>()->renderSystems(*window);
 }
 
 sf::Vector2f RenderService::mapScreenToWorld(const sf::Vector2i &screenPos)
