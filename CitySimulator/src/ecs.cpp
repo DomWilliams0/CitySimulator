@@ -109,7 +109,8 @@ void RenderSystem::renderEntity(EntityService *es, EntityID e, sf::RenderWindow 
 	render->anim.draw(window, states);
 
 	// debug
-	tempDrawVector(physics, physics->getVelocity(), sf::Color::Green, window);
+	if (Config::getBool("debug.render-physics", false))
+		tempDrawVector(physics, physics->getVelocity(), sf::Color::Green, window);
 }
 
 // components

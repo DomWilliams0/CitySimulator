@@ -224,7 +224,7 @@ void CollisionMap::load()
 
 	// debug drawing
 	sf::RenderWindow *window = Locator::locate<RenderService>()->getWindow();
-	if (window != nullptr)
+	if (Config::getBool("debug.render-physics", false) && window != nullptr)
 	{
 		b2Renderer.emplace(*window);
 		world.SetDebugDraw(&*b2Renderer);
