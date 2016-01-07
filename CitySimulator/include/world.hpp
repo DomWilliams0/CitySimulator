@@ -177,7 +177,7 @@ protected:
 
 	void registerLayer(LayerType layerType, int depth);
 
-	void render(sf::RenderTarget &target, sf::RenderStates &states) const;
+	void render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const;
 
 	void load(const TMX::TileMap *tileMap, const std::string &tilesetPath);
 

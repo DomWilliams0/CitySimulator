@@ -158,9 +158,9 @@ void EntityService::tickSystems(float delta)
 		system->tick(this, delta);
 }
 
-void EntityService::renderSystems(sf::RenderWindow &window)
+void EntityService::renderSystems()
 {
-	renderSystem->render(this, window);
+	renderSystem->render(this, *Locator::locate<RenderService>()->getWindow());
 }
 
 BaseComponent *EntityService::addComponent(EntityID e, ComponentType type)

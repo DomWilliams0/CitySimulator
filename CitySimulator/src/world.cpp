@@ -363,5 +363,12 @@ void World::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	states.transform *= transform;
 
 	// terrain
-	terrain.render(target, states);
+	terrain.render(target, states, false);
+
+	// entities
+	Locator::locate<EntityService>()->renderSystems();
+
+	// overterrain
+	terrain.render(target, states, true);
+
 }

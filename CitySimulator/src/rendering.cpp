@@ -416,11 +416,10 @@ void WorldTerrain::addTiles(const std::vector<TMX::Layer *> &layers, const std::
 	}
 }
 
-void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states) const
+void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const
 {
 	states.texture = tileset.getTexture();
-	target.draw(tileVertices, states);
-	target.draw(overLayerVertices, states);
+	target.draw(overLayers ? overLayerVertices : tileVertices, states);
 }
 
 void WorldTerrain::load(const TMX::TileMap *tileMap, const std::string &tilesetPath)
@@ -462,7 +461,6 @@ void RenderService::render(const World &world)
 {
 	window->setView(*view);
 	window->draw(world);
-	Locator::locate<EntityService>()->renderSystems(*window);
 }
 
 sf::Vector2f RenderService::mapScreenToWorld(const sf::Vector2i &screenPos)
