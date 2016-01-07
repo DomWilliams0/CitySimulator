@@ -181,12 +181,8 @@ WorldTerrain::~WorldTerrain()
 
 int WorldTerrain::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
 {
-	auto depth = layerDepths[layerType];
-	if (depth != 0)
-		depth -= 1;
-
 	int index = (pos.x + pos.y * container->tileSize.x);
-	index += depth * container->tileSize.x * container->tileSize.y;
+	index += layers.at(layerType).depth * container->tileSize.x * container->tileSize.y;
 	index *= 4;
 
 	return index;
@@ -233,7 +229,10 @@ void WorldTerrain::resize(const int &layerCount)
 
 void WorldTerrain::registerLayer(LayerType layerType, int depth)
 {
-	layerDepths.insert(std::make_pair(layerType, depth));
+	bool overTerrain = layerType == LAYER_OVERTERRAIN;
+	layers.emplace_back(layerType, depth);
+	Logger::logDebuggier(format("Found %3%layer type %1% at depth %2%", _str(layerType), _str(depth),
+	                            overTerrain ? "overterrain " : ""));
 }
 
 void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer, int rotationAngle,
@@ -268,11 +267,15 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, float
 	objects.emplace_back(blockType, rotationAngle, Utils::toTile(pos));
 }
 
-std::vector<WorldObject> &WorldTerrain::getObjects()
+const std::vector<WorldObject> & WorldTerrain::getObjects()
 {
 	return objects;
 }
 
+const std::vector<WorldLayer> &WorldTerrain::getLayers()
+{
+	return layers;
+}
 
 int WorldTerrain::discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<LayerType> &layerTypes)
 {
@@ -303,7 +306,7 @@ int WorldTerrain::discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<
 			++tileLayerCount;
 
 		// add layer
-		registerLayer(layerType, depth);
+		registerLayer(layerType, depth - 1);
 		layerTypes.push_back(layerType);
 
 		++depth;

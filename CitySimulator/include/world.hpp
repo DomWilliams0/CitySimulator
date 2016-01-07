@@ -122,6 +122,21 @@ struct WorldObject
 	}
 };
 
+struct WorldLayer
+{
+	LayerType type;
+	int depth;
+
+	WorldLayer(const LayerType &type, int depth) : type(type), depth(depth)
+	{
+	}
+
+	bool isOverTerrain() const
+	{
+		return type == LAYER_OVERTERRAIN;
+	}
+};
+
 class WorldTerrain : public BaseWorld
 {
 public:
@@ -135,7 +150,8 @@ public:
 
 	void addObject(const sf::Vector2f &pos, BlockType blockType, float rotationAngle, int flipGID);
 
-	std::vector<WorldObject> &getObjects();
+	const std::vector<WorldObject> & getObjects();
+	const std::vector<WorldLayer> & getLayers();
 
 private:
 	Tileset tileset;
@@ -143,6 +159,7 @@ private:
 
 	std::vector<BlockType> blockTypes;
 	std::vector<WorldObject> objects;
+	std::vector<WorldLayer> layers;
 
 	int discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<LayerType> &layerTypes);
 
@@ -157,7 +174,6 @@ private:
 	void positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
 
 protected:
-	std::map<LayerType, int> layerDepths;
 
 	void resize(const int &layerCount);
 
