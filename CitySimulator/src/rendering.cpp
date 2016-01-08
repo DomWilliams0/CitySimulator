@@ -459,6 +459,8 @@ sf::RenderWindow *RenderService::getWindow()
 
 void RenderService::render(const World &world)
 {
+	limitView(world);
+
 	window->setView(*view);
 	window->draw(world);
 }
@@ -467,3 +469,67 @@ sf::Vector2f RenderService::mapScreenToWorld(const sf::Vector2i &screenPos)
 {
 	return window->mapPixelToCoords(screenPos, *view);
 }
+
+void RenderService::limitView(const World &world)
+{
+	const sf::Vector2i &worldSize = world.getPixelSize();
+	bool update = false;
+
+	sf::Vector2f centre = view->getCenter();
+	sf::Vector2f size = view->getSize();
+
+	// horizontal
+	if (size.x > worldSize.x)
+	{
+		update = true;
+		centre.x = worldSize.x / 2;
+	}
+	else
+	{
+
+		float leftBound = centre.x - size.x / 2.f;
+		if (leftBound < 0)
+		{
+			update = true;
+			centre.x -= leftBound;
+		}
+		else
+		{
+			float rightBound = centre.x + size.x / 2.f;
+			if (rightBound > worldSize.x)
+			{
+				update = true;
+				centre.x -= (rightBound - worldSize.x);
+			}
+		}
+	}
+
+	// vertical
+	if (size.y > worldSize.y)
+	{
+		update = true;
+		centre.y = worldSize.y / 2;
+	}
+	else
+	{
+		float topBound = centre.y - size.y / 2.f;
+		if (topBound < 0)
+		{
+			update = true;
+			centre.y -= topBound;
+		}
+		else
+		{
+			float bottomBound = centre.y + size.y / 2.f;
+			if (bottomBound > worldSize.y)
+			{
+				update = true;
+				centre.y -= (bottomBound - worldSize.y);
+			}
+		}
+	}
+
+	if (update)
+		view->setCenter(centre);
+}
+

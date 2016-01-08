@@ -498,6 +498,8 @@ public:
 private:
 	sf::RenderWindow *window;
 	sf::View *view;
+
+	void limitView(const World &world);
 };
 
 // helpers
