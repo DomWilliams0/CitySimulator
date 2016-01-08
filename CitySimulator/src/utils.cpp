@@ -103,7 +103,7 @@ int Utils::roundToMultiple(double x, int multiple)
 	return static_cast<int>(multiple * round(x / multiple));
 }
 
-void Utils::TimeTicker::init(float min, float max)
+void Utils::TimeTicker::setMinAndMax(float min, float max)
 {
 	current = 0;
 

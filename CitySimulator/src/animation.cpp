@@ -273,7 +273,7 @@ Animator::Animator(Animation *anim, float step, DirectionType initialDirection, 
 void Animator::init(Animation *anim, float step, DirectionType initialDirection, bool initiallyPlaying)
 {
 	animation = anim;
-	ticker.init(step);
+	ticker.setMinAndMax(step);
 	currentSequence = 0;
 	currentFrame = 0;
 	playing = initiallyPlaying;

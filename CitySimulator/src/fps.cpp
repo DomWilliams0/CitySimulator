@@ -3,7 +3,7 @@
 
 void FPSCounter::init(float waitTime)
 {
-	ticker.init(waitTime);
+	ticker.setMinAndMax(waitTime);
 
 	fpsText.setFont(Constants::mainFont);
 	fpsText.setCharacterSize(16);

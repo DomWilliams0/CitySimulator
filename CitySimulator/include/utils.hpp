@@ -32,7 +32,24 @@ namespace Utils
 	class TimeTicker
 	{
 	public:
-		void init(float min, float max = -1);
+		TimeTicker()
+		{
+			setMinAndMax(1.f);
+		}
+
+		TimeTicker(float min)
+		{
+			setMinAndMax(min);
+		}
+
+		TimeTicker(float min, float max)
+		{
+			setMinAndMax(min, max);
+		}
+
+		// if max is not -1, the time value is generated randomly between
+		// min and max on each reset
+		void setMinAndMax(float min, float max = -1);
 
 		bool tick(float delta);
 
