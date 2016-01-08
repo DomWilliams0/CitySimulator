@@ -142,8 +142,6 @@ bool EntityService::isAlive(EntityID e) const
 
 boost::optional<EntityIdentifier*> EntityService::getEntityIDFromBody(const b2Body &body)
 {
-	// todo segfaults when user data is null ie. when body is not an entity
-
 	auto data = static_cast<EntityIdentifier*>(body.GetUserData());
 	boost::optional<EntityIdentifier*> ret;
 	if (data != nullptr)
