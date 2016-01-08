@@ -5,6 +5,7 @@
 #include <typeindex>
 #include <typeinfo>
 #include <forward_list>
+#include "bodydata.hpp"
 #include "entity.hpp"
 #include "events.hpp"
 #include "utils.hpp"

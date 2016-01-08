@@ -142,10 +142,10 @@ bool EntityService::isAlive(EntityID e) const
 
 boost::optional<EntityIdentifier*> EntityService::getEntityIDFromBody(const b2Body &body)
 {
-	auto data = static_cast<EntityIdentifier*>(body.GetUserData());
+	auto data = static_cast<BodyData*>(body.GetUserData());
 	boost::optional<EntityIdentifier*> ret;
-	if (data != nullptr)
-		ret = data;
+	if (data != nullptr && data->type == BODYDATA_ENTITY)
+		ret = static_cast<EntityIdentifier*>(data->data);
 
 	return ret;
 }
@@ -219,7 +219,10 @@ void EntityService::addPhysicsComponent(EntityIdentifier &entity, World *world,
 	phys->body = bWorld->CreateBody(&def);
 	phys->body->SetFixedRotation(true);
 
-	phys->body->SetUserData(&entity);
+	BodyData *bodyData = new BodyData; // todo make sure to delete bodydata when deleting body
+	bodyData->type = BODYDATA_ENTITY;
+	bodyData->data = &entity;
+	phys->body->SetUserData(bodyData);
 
 	// basic full body aabb
 	b2PolygonShape aabb;

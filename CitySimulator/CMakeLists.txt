@@ -24,6 +24,7 @@ set(SOURCE_FILES
         src/world.cpp
         include/ai.hpp
         include/animation.hpp
+        include/bodydata.hpp
         include/config.hpp
         include/constants.hpp
         include/entity.hpp
