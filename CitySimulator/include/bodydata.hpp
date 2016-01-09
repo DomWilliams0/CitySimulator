@@ -2,6 +2,7 @@
 #define CITYSIM_BODYDATA_HPP
 
 #include "entity.hpp"
+#include "world.hpp"
 
 enum BodyDataType
 {
@@ -33,6 +34,8 @@ struct BlockInteraction
 {
 	// todo
 };
+
+BodyData * createBodyDataForBlock(const BlockType &block);
 
 
 #endif

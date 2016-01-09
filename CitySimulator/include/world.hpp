@@ -40,7 +40,7 @@ enum BlockType
 };
 
 bool isCollidable(BlockType blockType);
-
+bool isInteractable(BlockType blockType);
 
 enum LayerType
 {
@@ -214,8 +214,10 @@ private:
 	{
 		sf::FloatRect rect;
 		float rotation;
+		BlockType blockType;
 
-		CollisionRect(const sf::FloatRect &r, float rot) : rect(r), rotation(rot)
+		CollisionRect(const sf::FloatRect &r, float rot, BlockType blockType = BLOCK_UNKNOWN)
+				: rect(r), rotation(rot), blockType(blockType)
 		{
 		}
 	};

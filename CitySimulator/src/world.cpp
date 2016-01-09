@@ -8,6 +8,13 @@ bool isCollidable(BlockType blockType)
 	return collidables.find(blockType) != collidables.end();
 }
 
+bool isInteractable(BlockType blockType)
+{
+	static const std::set<BlockType> interactables(
+			{BLOCK_SLIDING_DOOR});
+	return interactables.find(blockType) != interactables.end();
+}
+
 LayerType layerTypeFromString(const std::string &s)
 {
 	if (s == "underterrain")
@@ -68,11 +75,14 @@ void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 		for (auto x = 0; x < worldTileSize.x; ++x)
 		{
 			BlockType bt = container->getBlockAt({x, y}, LAYER_TERRAIN); // the only collidable tile layer
-			if (!isCollidable(bt))
+			bool collide = isCollidable(bt);
+			bool interact = isInteractable(bt);
+
+			if (!collide && !interact)
 				continue;
 
 			sf::Vector2f pos(Utils::toPixel(sf::Vector2f(x, y)));
-			rects.emplace_back(sf::FloatRect(pos, size), 0.f);
+			rects.emplace_back(sf::FloatRect(pos, size), 0.f, bt);
 		}
 	}
 
@@ -84,7 +94,7 @@ void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 		pos.y -= 1 / Constants::scale;
 		pos = Math::multiply(pos, Constants::tileScale);
 
-		rects.emplace_back(sf::FloatRect(pos, size), obj.rotation);
+		rects.emplace_back(sf::FloatRect(pos, size), obj.rotation, obj.type);
 	}
 }
 
@@ -95,7 +105,7 @@ void CollisionMap::mergeAdjacentTiles(std::vector<CollisionRect> &rects, std::ve
 	auto it = rects.begin();
 	while (it != rects.end())
 	{
-		if (it->rotation == 0.f)
+		if (!isInteractable(it->blockType) && it->rotation == 0.f)
 		{
 			rectangles.push_back(it->rect);
 			it = rects.erase(it);
@@ -253,17 +263,24 @@ void CollisionMap::load()
 	fixDef.shape = &box;
 	fixDef.friction = 0.1f;
 
-	// rotated
 	for (auto &collisionRect : rects)
 	{
 		sf::FloatRect aabb = Utils::scaleToBox2D(collisionRect.rect);
 		sf::Vector2f size(aabb.width, aabb.height);
 
+		// rotated
 		if (collisionRect.rotation != 0.f)
 		{
 			sf::Transform transform;
 			transform.rotate(collisionRect.rotation, aabb.left, aabb.top + aabb.height);
 			aabb = transform.transformRect(aabb);
+		}
+
+		// interactable
+		if (isInteractable(collisionRect.blockType))
+		{
+			BodyData *bodyData = createBodyDataForBlock(collisionRect.blockType);
+			fixDef.userData = bodyData;
 		}
 
 		box.SetAsBox(
