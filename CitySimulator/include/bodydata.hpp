@@ -10,12 +10,6 @@ enum BodyDataType
 	BODYDATA_BLOCK
 };
 
-struct BodyData
-{
-	BodyDataType type;
-	void *data;
-};
-
 struct EntityIdentifier
 {
 	EntityID id;
@@ -32,7 +26,26 @@ struct EntityIdentifier
 
 struct BlockInteraction
 {
+	BlockInteraction()
+	{
+	}
+
 	// todo
+};
+
+struct BodyData
+{
+	BodyDataType type;
+
+	union
+	{
+		EntityIdentifier entityID;
+		BlockInteraction blockInteraction;
+	};
+
+	BodyData()
+	{
+	}
 };
 
 BodyData * createBodyDataForBlock(const BlockType &block);

@@ -145,7 +145,7 @@ boost::optional<EntityIdentifier*> EntityService::getEntityIDFromBody(const b2Bo
 	auto data = static_cast<BodyData*>(body.GetUserData());
 	boost::optional<EntityIdentifier*> ret;
 	if (data != nullptr && data->type == BODYDATA_ENTITY)
-		ret = static_cast<EntityIdentifier*>(data->data);
+		ret = &data->entityID;
 
 	return ret;
 }
@@ -221,7 +221,7 @@ void EntityService::addPhysicsComponent(EntityIdentifier &entity, World *world,
 
 	BodyData *bodyData = new BodyData; // todo make sure to delete bodydata when deleting body
 	bodyData->type = BODYDATA_ENTITY;
-	bodyData->data = &entity;
+	bodyData->entityID = entity;
 	phys->body->SetUserData(bodyData);
 
 	// basic full body aabb
