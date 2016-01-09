@@ -23,6 +23,7 @@ enum ServiceType
 	SERVICE_INPUT,
 	SERVICE_LOGGING,
 	SERVICE_RENDER,
+	SERVICE_WORLD,
 
 	SERVICE_UNKNOWN
 };
@@ -43,6 +44,7 @@ class EventService;
 class InputService;
 class LoggingService;
 class RenderService;
+class WorldService;
 
 class World;
 class PhysicsComponent;
@@ -81,6 +83,8 @@ public:
 			type = SERVICE_LOGGING;
 		else if (typeid(T) == typeid(RenderService))
 			type = SERVICE_RENDER;
+		else if (typeid(T) == typeid(WorldService))
+			type = SERVICE_WORLD;
 		else
 			error("Invalid service type given. Has its type been registered?");
 
@@ -149,11 +153,6 @@ public:
 	void clearPlayerEntity();
 
 	void updateViewSize(unsigned int width, unsigned int height);
-
-	inline World* getWorld()
-	{
-		return world;
-	}
 
 	// merci: https://github.com/SFML/SFML/wiki/Source:-Zoom-View-At-(specified-pixel)
 	void zoomTo(float delta, const sf::Vector2i &pixel, sf::RenderWindow &window);
@@ -501,6 +500,25 @@ private:
 	sf::View *view;
 
 	void limitView(const World &world);
+};
+
+class WorldService : public BaseService
+{
+public:
+	WorldService(const std::string &worldPath, const std::string &tilesetPath);
+	virtual void onEnable() override;
+	virtual void onDisable() override;
+
+	inline World &getWorld()
+	{
+		return world;
+	}
+
+private:
+	World world;
+	// todo list of buildings
+
+	std::string worldPath, tilesetPath;
 };
 
 // helpers

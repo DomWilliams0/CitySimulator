@@ -58,6 +58,8 @@ std::string Locator::serviceToString(ServiceType type)
 			return "Logging";
 		case SERVICE_RENDER:
 			return "Render";
+		case SERVICE_WORLD:
+			return "World";
 		default:
 			return format("Unknown (%1%)", _str(type));
 	}

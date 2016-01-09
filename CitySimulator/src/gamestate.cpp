@@ -33,27 +33,30 @@ GameState::GameState() : State(STATE_GAME)
 	animationService->processQueuedSprites();
 
 	// load world
-	world.loadFromFile(Config::getString("debug.world-name"),
-	                   Config::getResource("world.tileset"));
+	WorldService *worldService = new WorldService(Config::getString("debug.world-name"),
+		Config::getResource("world.tileset"));
+	Locator::provide(SERVICE_WORLD, worldService);
+
+	world = &worldService->getWorld();
 
 	// load camera
-	Locator::provide(SERVICE_CAMERA, new CameraService(world));
+	Locator::provide(SERVICE_CAMERA, new CameraService(*world));
 
 	// create some humans
 	int count = Config::getInt("debug.humans.count");
 
 	for (int i = 0; i < count; ++i)
 	{
-		int x = Utils::random(0, world.getTileSize().x);
-		int y = Utils::random(0, world.getTileSize().y);
+		int x = Utils::random(0, world->getTileSize().x);
+		int y = Utils::random(0, world->getTileSize().y);
 
-		createTestHuman(world, x, y, animationService->getRandomAnimationName(ENTITY_HUMAN), Direction::random());
+		createTestHuman(*world, x, y, animationService->getRandomAnimationName(ENTITY_HUMAN), Direction::random());
 	}
 }
 
 void GameState::tick(float delta)
 {
-	world.tick(delta);
+	world->tick(delta);
 
 	Locator::locate<CameraService>()->tick(delta);
 	Locator::locate<EntityService>()->tickSystems(delta);
@@ -61,10 +64,10 @@ void GameState::tick(float delta)
 
 void GameState::render(sf::RenderWindow &window)
 {
-	Locator::locate<RenderService>()->render(world);
+	Locator::locate<RenderService>()->render(*world);
 }
 
 b2World *GameState::getBox2DWorld()
 {
-	return world.getBox2DWorld();
+	return world->getBox2DWorld();
 }

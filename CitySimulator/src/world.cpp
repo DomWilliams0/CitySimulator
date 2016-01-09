@@ -293,6 +293,22 @@ void CollisionMap::load()
 	}
 }
 
+
+WorldService::WorldService(const std::string &worldPath, const std::string &tilesetPath)
+: worldPath(worldPath), tilesetPath(tilesetPath)
+{
+
+}
+void WorldService::onEnable()
+{
+	world.loadFromFile(worldPath, tilesetPath);
+}
+
+void WorldService::onDisable()
+{
+}
+
+
 World::World() : terrain(this), collisionMap(this)
 {
 	transform.scale(Constants::tileSizef, Constants::tileSizef);

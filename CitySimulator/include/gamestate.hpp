@@ -20,10 +20,7 @@ public:
 	b2World *getBox2DWorld();
 
 private:
-	World world;
-	sf::View view;
-
-	sf::Vector2f viewOffset;
+	World *world;
 };
 
 #endif
