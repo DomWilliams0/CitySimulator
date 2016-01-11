@@ -348,7 +348,7 @@ void WorldService::discoverBuildings()
 							format("Found building at (%1%, %2%) with height %3% and width " + _str(bounds.width),
 							_str(bounds.left), _str(bounds.top), _str(bounds.height)));
 
-					buildings.emplace_back(bounds);
+					buildings.emplace_back(bounds, world);
 					
 					reset();
 				}
