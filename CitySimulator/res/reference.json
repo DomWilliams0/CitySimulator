@@ -5,7 +5,10 @@
             "width": 800,
             "height": 600
         },
-        "centre": true,
+        "position": {
+            "x": 960,
+            "y": 540
+        },
         "fps-limit": 60,
         "vsync": true
     },
