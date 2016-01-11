@@ -6,6 +6,7 @@ set(SOURCE_FILES
         src/ai.cpp
         src/animation.cpp
         src/bodydata.cpp
+        src/building.cpp
         src/camera.cpp
         src/config.cpp
         src/constants.cpp
@@ -26,6 +27,7 @@ set(SOURCE_FILES
         include/ai.hpp
         include/animation.hpp
         include/bodydata.hpp
+        include/building.hpp
         include/config.hpp
         include/constants.hpp
         include/entity.hpp

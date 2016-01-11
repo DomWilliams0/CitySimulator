@@ -302,10 +302,85 @@ WorldService::WorldService(const std::string &worldPath, const std::string &tile
 void WorldService::onEnable()
 {
 	world.loadFromFile(worldPath, tilesetPath);
+
+	discoverBuildings();
 }
 
 void WorldService::onDisable()
 {
+}
+
+void WorldService::discoverBuildings()
+{
+	Logger::pushIndent();
+
+	sf::Vector2i edgeStart;
+	auto hasStarted = [&edgeStart]()
+	{ return !(edgeStart.x == -1 && edgeStart.y == -1); };
+	auto reset = [&edgeStart]()
+	{ edgeStart.x = edgeStart.y = -1; };
+
+	reset();
+
+	// find building bases
+	for (int y = 0; y < world.getTileSize().y; ++y)
+	{
+		for (int x = 0; x < world.getTileSize().x; ++x)
+		{
+			BlockType block = world.getBlockAt({x, y});
+
+			// building start/end
+			if (block == BLOCK_BUILDING_EDGE)
+			{
+				// start
+				if (!hasStarted())
+				{
+					edgeStart.x = x;
+					edgeStart.y = y;
+					Logger::logDebuggiest(format("Found building start at (%1%, %2%)", _str(x), _str(y)));
+				}
+
+				else
+				{
+					Logger::logDebuggiest(format("Found building end at (%1%, %2%)", _str(x), _str(y)));
+					sf::IntRect bounds = discoverBuildingHeight(edgeStart, {x, y});
+					Logger::logDebuggier(
+							format("Found building at (%1%, %2%) with height %3% and width " + _str(bounds.width),
+							_str(bounds.left), _str(bounds.top), _str(bounds.height)));
+
+					buildings.emplace_back(bounds);
+					
+					reset();
+				}
+			}
+		}
+
+		if (hasStarted())
+		{
+			Logger::logDebuggier("Building end not found at end of row");
+			reset();
+		}
+	}
+
+	Logger::popIndent();
+
+}
+
+sf::IntRect WorldService::discoverBuildingHeight(const sf::Vector2i &start, const sf::Vector2i &end)
+{
+	// find roof
+	int roof(start.y);
+	while (roof >= 0 && world.getBlockAt({start.x, roof}, LAYER_OVERTERRAIN) != BLOCK_BUILDING_ROOF_CORNER)
+		--roof;
+	--roof;
+
+	sf::IntRect bounds;
+	bounds.left = start.x;
+	bounds.top = roof;
+	bounds.width = end.x - start.x;
+	bounds.height = start.y - roof;
+
+	return bounds;
 }
 
 

@@ -12,6 +12,7 @@
 #include "constants.hpp"
 #include "animation.hpp"
 #include "config.hpp"
+#include "building.hpp"
 
 enum ServiceType
 {
@@ -516,9 +517,12 @@ public:
 
 private:
 	World world;
-	// todo list of buildings
+	std::vector<Building> buildings;
 
 	std::string worldPath, tilesetPath;
+
+	void discoverBuildings();
+	sf::IntRect discoverBuildingHeight(const sf::Vector2i &start, const sf::Vector2i &end);
 };
 
 // helpers
