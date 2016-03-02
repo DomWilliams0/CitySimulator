@@ -1,8 +1,5 @@
-#include <Box2D/Dynamics/b2World.h>
+#include "entity.hpp"
 #include "services.hpp"
-#include "ai.hpp"
-
-// systems
 
 void System::tick(EntityService *es, float dt)
 {
@@ -111,26 +108,4 @@ void RenderSystem::renderEntity(EntityService *es, EntityID e, sf::RenderWindow 
 	// debug
 	if (Config::getBool("debug.render-physics", false))
 		tempDrawVector(physics, physics->getVelocity(), sf::Color::Green, window);
-}
-
-// components
-
-void RenderComponent::reset()
-{
-	anim.reset();
-}
-
-
-void InputComponent::reset()
-{
-	brain.reset();
-}
-
-void PhysicsComponent::reset()
-{
-	if (body != nullptr)
-	{
-		bWorld->DestroyBody(body);
-		body = nullptr;
-	}
 }
