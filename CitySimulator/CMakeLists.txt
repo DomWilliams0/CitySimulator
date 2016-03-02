@@ -2,46 +2,7 @@ cmake_minimum_required(VERSION 3.3)
 project(CitySimulator)
 
 # source files
-set(SOURCE_FILES
-        src/ai.cpp
-        src/animation.cpp
-        src/bodydata.cpp
-        src/building.cpp
-        src/camera.cpp
-        src/config.cpp
-        src/constants.cpp
-        src/ecs.cpp
-        src/entity.cpp
-        src/events.cpp
-        src/fps.cpp
-        src/game.cpp
-        src/gamestate.cpp
-        src/input.cpp
-        src/logger.cpp
-        src/maploader.cpp
-        src/rendering.cpp
-        src/services.cpp
-        src/SFMLDebugDraw.cpp
-        src/utils.cpp
-        src/world.cpp
-        include/ai.hpp
-        include/animation.hpp
-        include/bodydata.hpp
-        include/building.hpp
-        include/config.hpp
-        include/constants.hpp
-        include/entity.hpp
-        include/events.hpp
-        include/game.hpp
-        include/gamestate.hpp
-        include/maploader.hpp
-        include/PackingTreeNode.h
-        include/services.hpp
-        include/SFMLDebugDraw.h
-        include/state.hpp
-        include/utils.hpp
-        include/world.hpp
-        )
+file(GLOB_RECURSE SOURCE_FILES src/*/*.cpp)
 
 # create as static library
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES} ${HEADER_FILES})
