@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.3)
 project(CitySimulator)
 
 # source files
-file(GLOB_RECURSE SOURCE_FILES src/*/*.cpp)
+file(GLOB_RECURSE SOURCE_FILES src/*/*.cpp include/*/*.hpp)
 
 # create as static library
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES} ${HEADER_FILES})

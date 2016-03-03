@@ -28,6 +28,8 @@ b2Vec2 toB2Vec(const sf::Vector2<T> &v)
 	return {static_cast<float>(v.x), static_cast<float>(v.y)};
 }
 
+// component-entity-systems
+
 struct EntityIdentifier
 {
 	EntityID id;
@@ -41,8 +43,6 @@ struct EntityIdentifier
 	{
 	}
 };
-
-// component-entity-systems
 
 enum ComponentType
 {
