@@ -3,6 +3,7 @@
 
 #include "services.hpp"
 #include "constants.hpp"
+#include "animation.hpp"
 
 class AnimationService : public BaseService {
 public:

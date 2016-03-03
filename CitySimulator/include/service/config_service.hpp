@@ -2,6 +2,7 @@
 #define CITYSIM_CONFIG_SERVICE_HPP
 
 #include "services.hpp"
+#include <boost/filesystem.hpp>
 
 class ConfigService : public BaseService {
 public:

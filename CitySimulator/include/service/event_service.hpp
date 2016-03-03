@@ -1,7 +1,9 @@
 #ifndef CITYSIM_EVENT_SERVICE_HPP
 #define CITYSIM_EVENT_SERVICE_HPP
 
+#include <bits/forward_list.h>
 #include "services.hpp"
+#include "events.hpp"
 
 typedef void(EventListener::*EventCallback)(Event &);
 

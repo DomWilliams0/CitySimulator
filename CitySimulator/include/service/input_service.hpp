@@ -4,6 +4,7 @@
 #include <boost/bimap.hpp>
 #include "services.hpp"
 #include "ai.hpp"
+#include "events.hpp"
 
 enum InputKey {
 	KEY_UP,

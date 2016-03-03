@@ -3,6 +3,7 @@
 
 #include "services.hpp"
 #include "world.hpp"
+#include "building.hpp"
 
 class WorldService : public BaseService {
 public:

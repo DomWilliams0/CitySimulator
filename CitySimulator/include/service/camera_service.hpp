@@ -1,8 +1,13 @@
 #ifndef CITYSIM_CAMERA_SERVICE_HPP
 #define CITYSIM_CAMERA_SERVICE_HPP
 
+#include "ecs.hpp"
 #include "services.hpp"
 #include "world.hpp"
+
+class SimpleMovementController;
+class PhysicsComponent;
+
 
 class CameraService : public BaseService {
 public:

@@ -82,6 +82,4 @@ private:
 	// helpers
 	BaseComponent *addComponent(EntityID e, ComponentType type);
 };
-
-typedef void(EventListener::*EventCallback)(Event &);
 #endif
