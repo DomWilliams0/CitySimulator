@@ -1,7 +1,7 @@
 #ifndef CITYSIM_TEST_UTILS_HPP
 #define CITYSIM_TEST_UTILS_HPP
 #include "gtest/gtest.h"
-#include "services.hpp"
+#include "service/locator.hpp"
 
 #define EXPECT_ERROR_MESSAGE(block, errorMessage) \
                     try\

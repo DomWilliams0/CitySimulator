@@ -1,5 +1,5 @@
 #include "test_helpers.hpp"
-#include "services.hpp"
+#include "service/locator.hpp"
 
 struct ConfigTest : ::testing::Test
 {

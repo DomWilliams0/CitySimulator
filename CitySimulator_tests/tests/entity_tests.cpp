@@ -1,5 +1,5 @@
 #include "test_helpers.hpp"
-#include "services.hpp"
+#include "service/locator.hpp"
 
 struct EntityTests : public ::testing::Test
 {

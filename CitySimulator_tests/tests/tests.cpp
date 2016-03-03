@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "services.hpp"
+#include "service/locator.hpp"
 #include "test_helpers.hpp"
 
 class TestingEnvironment : public ::testing::Environment
