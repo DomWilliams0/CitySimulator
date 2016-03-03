@@ -1,6 +1,5 @@
-#ifndef CITYSIMULATOR_TEST_UTILS_H
-#define CITYSIMULATOR_TEST_UTILS_H
-
+#ifndef CITYSIM_TEST_UTILS_HPP
+#define CITYSIM_TEST_UTILS_HPP
 #include "gtest/gtest.h"
 #include "services.hpp"
 
