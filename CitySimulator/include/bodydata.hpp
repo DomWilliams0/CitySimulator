@@ -10,19 +10,6 @@ enum BodyDataType
 	BODYDATA_BLOCK
 };
 
-struct EntityIdentifier
-{
-	EntityID id;
-	EntityType type;
-
-	EntityIdentifier() : type(ENTITY_UNKNOWN), id(INVALID_ENTITY)
-	{
-	}
-
-	EntityIdentifier(EntityID id, EntityType type) : type(type), id(id)
-	{
-	}
-};
 
 struct BlockInteraction
 {
