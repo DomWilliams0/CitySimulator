@@ -1,7 +1,7 @@
 #ifndef CITYSIM_ENTITY_SERVICE_HPP
 #define CITYSIM_ENTITY_SERVICE_HPP
 
-#include "services.hpp"
+#include "base_service.hpp"
 #include "ecs.hpp"
 
 const unsigned int MAX_ENTITIES = 1024;

@@ -106,3 +106,6 @@ void LoggingService::setLogLevel(const std::string &s)
 		logWarning(format("Could not set log level to unknown level '%1%'", s));
 }
 
+NullLoggingService::NullLoggingService() : LoggingService(std::cerr, LOG_INFO)
+{
+}

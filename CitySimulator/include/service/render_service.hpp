@@ -2,7 +2,7 @@
 #define CITYSIM_RENDER_SERVICE_HPP
 
 #include <SFML/Graphics.hpp>
-#include "services.hpp"
+#include "base_service.hpp"
 
 class RenderService : public BaseService {
 public:

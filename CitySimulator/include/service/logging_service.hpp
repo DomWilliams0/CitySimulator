@@ -1,7 +1,8 @@
 #ifndef CITYSIM_LOGGING_SERVICE_HPP
 #define CITYSIM_LOGGING_SERVICE_HPP
 
-#include "services.hpp"
+#include "locator.hpp"
+#include "base_service.hpp"
 #include "constants.hpp"
 
 enum LogLevel {

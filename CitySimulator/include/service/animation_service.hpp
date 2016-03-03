@@ -1,7 +1,7 @@
 #ifndef CITYSIM_ANIMATION_SERVICE_HPP
 #define CITYSIM_ANIMATION_SERVICE_HPP
 
-#include "services.hpp"
+#include "base_service.hpp"
 #include "constants.hpp"
 #include "animation.hpp"
 

@@ -2,7 +2,7 @@
 #define CITYSIM_CAMERA_SERVICE_HPP
 
 #include "ecs.hpp"
-#include "services.hpp"
+#include "base_service.hpp"
 #include "world.hpp"
 
 class SimpleMovementController;

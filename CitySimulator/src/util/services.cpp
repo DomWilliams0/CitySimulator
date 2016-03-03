@@ -1,15 +1,6 @@
 #include <iostream>
 #include "utils.hpp"
-#include "services.hpp"
-#include "service/logging_service.hpp"
-
-void BaseService::onEnable()
-{
-}
-
-void BaseService::onDisable()
-{
-}
+#include "service/locator.hpp"
 
 Locator::Locator() : services(SERVICE_UNKNOWN)
 {
@@ -65,7 +56,4 @@ std::string Locator::serviceToString(ServiceType type)
 		default:
 			return format("Unknown (%1%)", _str(type));
 	}
-}
-NullLoggingService::NullLoggingService() : LoggingService(std::cerr, LOG_INFO)
-{
 }

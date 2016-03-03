@@ -1,7 +1,7 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include "game.hpp"
-#include "services.hpp"
+#include "base_service.hpp"
 
 const std::string RESOURCE_DIR("res"); // todo probably shouldn't be hardcoded
 

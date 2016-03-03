@@ -2,7 +2,7 @@
 #define CITYSIM_EVENT_SERVICE_HPP
 
 #include <bits/forward_list.h>
-#include "services.hpp"
+#include "base_service.hpp"
 #include "events.hpp"
 
 typedef void(EventListener::*EventCallback)(Event &);
