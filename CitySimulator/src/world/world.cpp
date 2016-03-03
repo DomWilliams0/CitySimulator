@@ -1,12 +1,12 @@
 #include "world.hpp"
 #include "bodydata.hpp"
-#include "utils.hpp"
 #include "service/locator.hpp"
 
 bool isCollidable(BlockType blockType)
 {
 	static const std::set<BlockType> collidables(
-			{BLOCK_WATER, BLOCK_TREE, BLOCK_BUILDING_WALL, BLOCK_BUILDING_EDGE, BLOCK_BUILDING_ROOF, BLOCK_BUILDING_ROOF_CORNER});
+			{BLOCK_WATER, BLOCK_TREE, BLOCK_BUILDING_WALL, BLOCK_BUILDING_EDGE, BLOCK_BUILDING_ROOF,
+			 BLOCK_BUILDING_ROOF_CORNER});
 	return collidables.find(blockType) != collidables.end();
 }
 
@@ -137,7 +137,7 @@ void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfF
 		nextRowFunc = [](const sf::FloatRect *lastRect, const sf::FloatRect *rect)
 		{
 			return powf(rect->left - lastRect->left, 2.f) + powf(rect->top - lastRect->top, 2.f) >
-			       Constants::tileSizef * Constants::tileSizef;
+				   Constants::tileSizef * Constants::tileSizef;
 		};
 	}
 	else
@@ -146,10 +146,10 @@ void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfF
 		{
 			// adjacent and same dimensions
 			return !(lastRect->left <= rect->left + rect->width &&
-			         rect->left <= lastRect->left + lastRect->width &&
-			         lastRect->top <= rect->top + rect->height &&
-			         rect->top <= lastRect->top + lastRect->height &&
-			         lastRect->width == rect->width && lastRect->height == rect->height);
+					 rect->left <= lastRect->left + lastRect->width &&
+					 lastRect->top <= rect->top + rect->height &&
+					 rect->top <= lastRect->top + lastRect->height &&
+					 lastRect->width == rect->width && lastRect->height == rect->height);
 		};
 	}
 
@@ -297,10 +297,11 @@ void CollisionMap::load()
 
 
 WorldService::WorldService(const std::string &worldPath, const std::string &tilesetPath)
-: worldPath(worldPath), tilesetPath(tilesetPath)
+		: worldPath(worldPath), tilesetPath(tilesetPath)
 {
 
 }
+
 void WorldService::onEnable()
 {
 	world.loadFromFile(worldPath, tilesetPath);
@@ -348,10 +349,10 @@ void WorldService::discoverBuildings()
 					sf::IntRect bounds = discoverBuildingHeight(edgeStart, {x, y});
 					Logger::logDebuggier(
 							format("Found building at (%1%, %2%) with height %3% and width " + _str(bounds.width),
-							_str(bounds.left), _str(bounds.top), _str(bounds.height)));
+								   _str(bounds.left), _str(bounds.top), _str(bounds.height)));
 
 					buildings.emplace_back(bounds, world);
-					
+
 					reset();
 				}
 			}

@@ -12,7 +12,7 @@ namespace Constants
 
 	const float scale(tileSizef / tilesetResolution);
 	const float tileScale(tileSizef * scale);
-	
+
 	const float entityScalef(1.f);
 	const sf::Vector2f entityScale(entityScalef, entityScalef);
 

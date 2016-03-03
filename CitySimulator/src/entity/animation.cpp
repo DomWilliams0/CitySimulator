@@ -99,11 +99,11 @@ void AnimationService::positionImages(sf::Vector2i &imageSize, std::map<sf::Imag
 {
 // calculate initial size of bin
 	sf::Vector2u totalSize = std::accumulate(preProcessImageData->begin(), preProcessImageData->end(), sf::Vector2u(),
-	                                         [](sf::Vector2u &acc,
-	                                            const std::pair<sf::Image *, std::pair<ConfigKeyValue, EntityType>> &pair)
-	                                         {
-		                                         return acc + pair.first->getSize();
-	                                         });
+											 [](sf::Vector2u &acc,
+												const std::pair<sf::Image *, std::pair<ConfigKeyValue, EntityType>> &pair)
+											 {
+												 return acc + pair.first->getSize();
+											 });
 
 	sf::IntRect binRect(0, 0, totalSize.x, totalSize.y);
 	PackingTreeNode node(binRect);
@@ -114,14 +114,14 @@ void AnimationService::positionImages(sf::Vector2i &imageSize, std::map<sf::Imag
 		asVector.push_back(*it);
 
 	std::sort(asVector.begin(), asVector.end(),
-	          [](const std::pair<sf::Image *, std::pair<ConfigKeyValue, EntityType>> &left,
-	             const std::pair<sf::Image *, std::pair<ConfigKeyValue, EntityType>> &right)
-	          {
-		          sf::Vector2i leftSize(left.first->getSize());
-		          sf::Vector2i rightSize(right.first->getSize());
+			  [](const std::pair<sf::Image *, std::pair<ConfigKeyValue, EntityType>> &left,
+				 const std::pair<sf::Image *, std::pair<ConfigKeyValue, EntityType>> &right)
+			  {
+				  sf::Vector2i leftSize(left.first->getSize());
+				  sf::Vector2i rightSize(right.first->getSize());
 
-		          return (leftSize.x * leftSize.y) < (rightSize.x * rightSize.y);
-	          });
+				  return (leftSize.x * leftSize.y) < (rightSize.x * rightSize.y);
+			  });
 
 	// insert one at a time
 	for (auto &pair : asVector)

@@ -40,6 +40,7 @@ enum BlockType
 };
 
 bool isCollidable(BlockType blockType);
+
 bool isInteractable(BlockType blockType);
 
 enum LayerType
@@ -56,6 +57,7 @@ enum LayerType
 LayerType layerTypeFromString(const std::string &s);
 
 bool isTileLayer(const LayerType &layerType);
+
 bool isOverLayer(const LayerType &layerType);
 
 class Tileset
@@ -142,12 +144,13 @@ public:
 	~WorldTerrain();
 
 	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = LAYER_TERRAIN,
-	                  int rotationAngle = 0, int flipGID = 0);
+					  int rotationAngle = 0, int flipGID = 0);
 
 	void addObject(const sf::Vector2f &pos, BlockType blockType, float rotationAngle, int flipGID);
 
-	const std::vector<WorldObject> & getObjects();
-	const std::vector<WorldLayer> & getLayers();
+	const std::vector<WorldObject> &getObjects();
+
+	const std::vector<WorldLayer> &getLayers();
 
 private:
 	Tileset tileset;
@@ -162,13 +165,19 @@ private:
 	int overLayerCount;
 
 	void discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<LayerType> &layerTypes);
+
 	void discoverFlippedTiles(const std::vector<TMX::Layer *> &layers, std::vector<int> &flippedGIDs);
+
 	void addTiles(const std::vector<TMX::Layer *> &layers, const std::vector<LayerType> &types);
+
 	int getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
+
 	int getVertexIndex(const sf::Vector2i &pos, LayerType layerType);
+
 	void rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos);
 
 	void positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
+
 	sf::VertexArray &getVertices(const LayerType &layerType);
 
 protected:
@@ -190,7 +199,7 @@ class CollisionMap : public BaseWorld
 {
 public:
 	explicit CollisionMap(World *container) : BaseWorld(container), world(b2Vec2(0.f, 0.f)),
-	                                          worldBody(nullptr)
+											  worldBody(nullptr)
 	{
 		world.SetAllowSleeping(true);
 	}

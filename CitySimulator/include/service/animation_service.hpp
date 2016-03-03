@@ -5,7 +5,8 @@
 #include "constants.hpp"
 #include "animation.hpp"
 
-class AnimationService : public BaseService {
+class AnimationService : public BaseService
+{
 public:
 	virtual void onEnable() override;
 
@@ -32,4 +33,5 @@ private:
 
 	void positionImages(sf::Vector2i &imageSize, std::map<sf::Image *, sf::IntRect> &imagePositions);
 };
+
 #endif

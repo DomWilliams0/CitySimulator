@@ -7,7 +7,8 @@
 
 typedef void(EventListener::*EventCallback)(Event &);
 
-class EventService : public BaseService {
+class EventService : public BaseService
+{
 public:
 	virtual void onEnable() override;
 
@@ -27,4 +28,5 @@ private:
 	std::forward_list<Event> pendingEvents;
 	std::unordered_map<EventType, std::forward_list<EventListener *>, std::hash<int>> listeners;
 };
+
 #endif

@@ -34,9 +34,9 @@ void BaseGame::beginGame()
 	// position
 	auto windowSize = window->getSize();
 	window->setPosition({
-			                    Config::getInt("display.position.x") - static_cast<int>(windowSize.x / 2),
-			                    Config::getInt("display.position.y") - static_cast<int>(windowSize.y / 2)
-	                    });
+								Config::getInt("display.position.x") - static_cast<int>(windowSize.x / 2),
+								Config::getInt("display.position.y") - static_cast<int>(windowSize.y / 2)
+						});
 
 	// initially fill screen
 	window->clear(backgroundColour);

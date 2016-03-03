@@ -18,8 +18,8 @@ void EntityBrain::setEntity(EntityID e, bool stop)
 	entity = e;
 
 	controller.reset(e, Config::getFloat("debug.movement.force"),
-	                 Config::getFloat("debug.movement.max-speed.walk"),
-	                 Config::getFloat("debug.movement.max-speed.run"));
+					 Config::getFloat("debug.movement.max-speed.walk"),
+					 Config::getFloat("debug.movement.max-speed.run"));
 
 	EntityService *es = Locator::locate<EntityService>();
 	if (!es->hasComponent(entity, COMPONENT_PHYSICS))
@@ -44,6 +44,7 @@ void EntityBrain::setMoving(bool moving, DirectionType direction)
 	e.startMove.direction = e.stopMove.direction = direction;
 	controller.onEvent(e);
 }
+
 void StupidAIBrain::tick(float delta)
 {
 	if (ticker.tick(delta))

@@ -5,7 +5,8 @@
 #include "world.hpp"
 #include "building.hpp"
 
-class WorldService : public BaseService {
+class WorldService : public BaseService
+{
 public:
 	WorldService(const std::string &worldPath, const std::string &tilesetPath);
 
@@ -13,7 +14,8 @@ public:
 
 	virtual void onDisable() override;
 
-	inline World &getWorld() {
+	inline World &getWorld()
+	{
 		return world;
 	}
 
@@ -27,4 +29,5 @@ private:
 
 	sf::IntRect discoverBuildingHeight(const sf::Vector2i &start, const sf::Vector2i &end);
 };
+
 #endif

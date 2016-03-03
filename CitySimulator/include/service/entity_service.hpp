@@ -8,7 +8,8 @@
 const unsigned int MAX_ENTITIES = 1024;
 typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;
 
-class EntityService : public BaseService {
+class EntityService : public BaseService
+{
 public:
 	virtual void onEnable() override;
 
@@ -24,7 +25,8 @@ public:
 
 	bool isAlive(EntityID e) const;
 
-	inline EntityID getComponentMask(EntityID e) const {
+	inline EntityID getComponentMask(EntityID e) const
+	{
 		if (e < 0 || e >= MAX_ENTITIES)
 			error("EntityID %1% out of range in getComponentMask", _str(e));
 
@@ -46,7 +48,8 @@ public:
 	BaseComponent *getComponentOfType(EntityID e, ComponentType type);
 
 	template<class T>
-	T *getComponent(EntityID e, ComponentType type) {
+	T *getComponent(EntityID e, ComponentType type)
+	{
 		return dynamic_cast<T *>(getComponentOfType(e, type));
 	}
 
@@ -83,4 +86,5 @@ private:
 	// helpers
 	BaseComponent *addComponent(EntityID e, ComponentType type);
 };
+
 #endif

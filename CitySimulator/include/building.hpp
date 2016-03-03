@@ -12,6 +12,7 @@ public:
 	Building(const sf::IntRect &tileBounds, World &world);
 
 	bool isWindowLit(const sf::Vector2i &tile);
+
 	void setWindowLight(const sf::Vector2i &tile, bool lit);
 
 private:

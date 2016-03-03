@@ -11,6 +11,7 @@ class EntityBrain
 {
 public:
 	EntityBrain(EntityID e);
+
 	virtual ~EntityBrain();
 
 	void setEntity(EntityID e, bool stop = true);
@@ -56,7 +57,7 @@ class StupidAIBrain : public EntityBrain
 {
 public:
 	StupidAIBrain(EntityID e) : EntityBrain(e), direction(DIRECTION_SOUTH),
-	                            random(Utils::random(0.f, 1.f) < 0.5f), ticker(0.05f, 0.25f)
+								random(Utils::random(0.f, 1.f) < 0.5f), ticker(0.05f, 0.25f)
 	{
 	}
 

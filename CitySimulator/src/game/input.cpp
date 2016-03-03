@@ -20,7 +20,7 @@ void InputService::onEnable()
 	if (bindings.left.size() != KEY_UNKNOWN)
 	{
 		Logger::logError(format("Expected %1% key bindings, received %2% instead",
-		                        _str(KEY_UNKNOWN), _str(bindings.left.size())));
+								_str(KEY_UNKNOWN), _str(bindings.left.size())));
 
 		error("Invalid number of key bindings");
 	}
@@ -97,7 +97,7 @@ void InputService::clearPlayerEntity()
 
 struct ClickCallback : public b2QueryCallback
 {
-	b2Body* clickedBody = nullptr;
+	b2Body *clickedBody = nullptr;
 
 	virtual bool ReportFixture(b2Fixture *fixture) override
 	{
@@ -209,7 +209,7 @@ void InputService::handleKeyEvent(const Event &event)
 			break;
 		default:
 			error("An invalid movement key slipped through InputService's onEvent: %1%",
-			      _str(binding));
+				  _str(binding));
 			return;
 	}
 

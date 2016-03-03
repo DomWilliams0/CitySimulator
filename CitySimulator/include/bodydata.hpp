@@ -35,7 +35,7 @@ struct BodyData
 	}
 };
 
-BodyData * createBodyDataForBlock(const BlockType &block);
+BodyData *createBodyDataForBlock(const BlockType &block);
 
 
 #endif

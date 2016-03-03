@@ -4,7 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include "base_service.hpp"
 
-class RenderService : public BaseService {
+class RenderService : public BaseService
+{
 public:
 	RenderService(sf::RenderWindow *renderWindow);
 
@@ -16,7 +17,8 @@ public:
 
 	sf::Vector2f mapScreenToWorld(const sf::Vector2i &screenPos);
 
-	inline void setView(sf::View &view) {
+	inline void setView(sf::View &view)
+	{
 		this->view = &view;
 	}
 
@@ -26,4 +28,5 @@ private:
 
 	void limitView(const World &world);
 };
+
 #endif

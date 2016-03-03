@@ -1,7 +1,5 @@
 #include "ai.hpp"
 #include "world.hpp"
-#include "config.hpp"
-#include "ecs.hpp"
 #include "bodydata.hpp"
 #include "service/locator.hpp"
 
@@ -59,7 +57,7 @@ void EntityService::loadEntities(ConfigurationFile &config, EntityType entityTyp
 			if (prototypeEntity == allTags.end())
 			{
 				Logger::logWarning(format("Entity prototype '%1%' not found, skipping entity %2%",
-				                          prototypeIt->second, nameIt->second));
+										  prototypeIt->second, nameIt->second));
 				continue;
 			}
 
@@ -144,10 +142,10 @@ bool EntityService::isAlive(EntityID e) const
 	return entities[e] != COMPONENT_UNKNOWN;
 }
 
-boost::optional<EntityIdentifier*> EntityService::getEntityIDFromBody(const b2Body &body)
+boost::optional<EntityIdentifier *> EntityService::getEntityIDFromBody(const b2Body &body)
 {
-	auto data = static_cast<BodyData*>(body.GetUserData());
-	boost::optional<EntityIdentifier*> ret;
+	auto data = static_cast<BodyData *>(body.GetUserData());
+	boost::optional<EntityIdentifier *> ret;
 	if (data != nullptr && data->type == BODYDATA_ENTITY)
 		ret = &data->entityID;
 
@@ -204,9 +202,9 @@ BaseComponent *EntityService::getComponentOfType(EntityID e, ComponentType type)
 }
 
 void EntityService::addPhysicsComponent(EntityIdentifier &entity, World *world,
-                                        const sf::Vector2i &startTilePos,
-                                        float maxSpeed,
-                                        float damping)
+										const sf::Vector2i &startTilePos,
+										float maxSpeed,
+										float damping)
 {
 	PhysicsComponent *phys = dynamic_cast<PhysicsComponent *>(addComponent(entity.id, COMPONENT_PHYSICS));
 
@@ -249,7 +247,7 @@ void EntityService::addPhysicsComponent(EntityIdentifier &entity, World *world,
 
 
 void EntityService::addRenderComponent(const EntityIdentifier &entity, const std::string &animation, float step,
-                                       DirectionType initialDirection, bool playing)
+									   DirectionType initialDirection, bool playing)
 {
 	RenderComponent *comp = dynamic_cast<RenderComponent *>(addComponent(entity.id, COMPONENT_RENDER));
 

@@ -1,14 +1,14 @@
 #include "state/gamestate.hpp"
 #include "service/locator.hpp"
 
-EntityIdentifier & createTestHuman(World &world, int x, int y, const std::string &skin, DirectionType direction)
+EntityIdentifier &createTestHuman(World &world, int x, int y, const std::string &skin, DirectionType direction)
 {
 	EntityService *es = Locator::locate<EntityService>();
 
 	EntityIdentifier *entity = es->createEntity(ENTITY_HUMAN);
 
 	es->addPhysicsComponent(*entity, &world, {x, y}, Config::getFloat("debug.movement.max-speed.walk"),
-	                        Config::getFloat("debug.movement.stop-decay"));
+							Config::getFloat("debug.movement.stop-decay"));
 
 	es->addRenderComponent(*entity, skin, 0.2f, direction, false);
 	es->addAIInputComponent(entity->id);
@@ -34,7 +34,7 @@ GameState::GameState() : State(STATE_GAME)
 
 	// load world
 	WorldService *worldService = new WorldService(Config::getString("debug.world-name"),
-		Config::getResource("world.tileset"));
+												  Config::getResource("world.tileset"));
 	Locator::provide(SERVICE_WORLD, worldService);
 
 	world = &worldService->getWorld();

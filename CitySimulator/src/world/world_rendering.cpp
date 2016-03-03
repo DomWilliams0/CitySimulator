@@ -137,9 +137,9 @@ sf::IntRect Tileset::getTileRect(unsigned blockType)
 	int tileX = blockType % size.x;
 	int tileY = blockType / size.x;
 	return sf::IntRect(tileX * Constants::tilesetResolution,
-	                   tileY * Constants::tilesetResolution,
-	                   Constants::tilesetResolution,
-	                   Constants::tilesetResolution);
+					   tileY * Constants::tilesetResolution,
+					   Constants::tilesetResolution,
+					   Constants::tilesetResolution);
 }
 
 void Tileset::createTileImage(sf::Image *image, unsigned blockType)
@@ -154,7 +154,7 @@ void Tileset::createTileImage(sf::Image *image, unsigned blockType)
 void Tileset::addPoint(int x, int y)
 {
 	points[getIndex(x, y)] = sf::Vector2f(x * Constants::tilesetResolution,
-	                                      y * Constants::tilesetResolution);
+										  y * Constants::tilesetResolution);
 }
 
 void Tileset::generatePoints()
@@ -260,11 +260,11 @@ void WorldTerrain::registerLayer(LayerType layerType, int depth)
 {
 	layers.emplace_back(layerType, depth);
 	Logger::logDebuggier(format("Found %3%layer type %1% at depth %2%", _str(layerType), _str(depth),
-	                            isOverLayer(layerType) ? "overterrain " : ""));
+								isOverLayer(layerType) ? "overterrain " : ""));
 }
 
 void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer, int rotationAngle,
-                                int flipGID)
+								int flipGID)
 {
 	int vertexIndex = getVertexIndex(pos, layer);
 	sf::VertexArray &vertices = getVertices(layer);
@@ -283,7 +283,7 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, float
 
 	std::vector<sf::Vertex> quad(4);
 	sf::Vector2f adjustedPos = sf::Vector2f(pos.x / Constants::tilesetResolution,
-	                                        (pos.y - Constants::tilesetResolution) / Constants::tilesetResolution);
+											(pos.y - Constants::tilesetResolution) / Constants::tilesetResolution);
 
 	positionVertices(&quad[0], adjustedPos, 1);
 	tileset.textureQuad(&quad[0], blockType, 0, flipGID);
@@ -298,7 +298,7 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, float
 	objects.emplace_back(blockType, rotationAngle, Utils::toTile(pos));
 }
 
-const std::vector<WorldObject> & WorldTerrain::getObjects()
+const std::vector<WorldObject> &WorldTerrain::getObjects()
 {
 	return objects;
 }
@@ -430,7 +430,8 @@ void WorldTerrain::load(const TMX::TileMap *tileMap, const std::string &tilesetP
 	std::vector<LayerType> types;
 	discoverLayers(layers, types);
 
-	Logger::logDebug(format("Discovered %1% tile layer(s), of which %2% is/are overlayer(s)", _str(tileLayerCount), _str(overLayerCount)));
+	Logger::logDebug(format("Discovered %1% tile layer(s), of which %2% is/are overlayer(s)", _str(tileLayerCount),
+							_str(overLayerCount)));
 
 	// resize vertex array to accommodate for layer count
 	resizeVertices();

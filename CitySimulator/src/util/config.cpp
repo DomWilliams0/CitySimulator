@@ -22,7 +22,7 @@ bool ConfigurationFile::load()
 	} catch (boost::exception &e)
 	{
 		Logger::logWarning(format("Could not load app config '%1%': %2%", appConfigPath.string(),
-		                          boost::current_exception_diagnostic_information()));
+								  boost::current_exception_diagnostic_information()));
 		return false;
 	}
 
@@ -94,6 +94,7 @@ float ConfigurationFile::getFloat(const std::string &path)
 {
 	return get<float>(path);
 }
+
 float ConfigurationFile::getFloat(const std::string &path, float defaultValue)
 {
 	return get(path, defaultValue);
@@ -103,6 +104,7 @@ bool ConfigurationFile::getBool(const std::string &path)
 {
 	return get<bool>(path);
 }
+
 bool ConfigurationFile::getBool(const std::string &path, bool defaultValue)
 {
 	return get(path, defaultValue);
@@ -112,6 +114,7 @@ std::string ConfigurationFile::getString(const std::string &path, const std::str
 {
 	return get(path, defaultValue);
 }
+
 std::string ConfigurationFile::getString(const std::string &path)
 {
 	return get<std::string>(path);
@@ -146,6 +149,7 @@ void ConfigurationFile::setAppConfigPath(const std::string &path)
 {
 	appConfigPath = path;
 }
+
 void ConfigurationFile::setUserConfigPath(const std::string &path)
 {
 	userConfigPath = path;
@@ -162,7 +166,7 @@ std::string ConfigurationFile::getUserConfigPath() const
 }
 
 ConfigService::ConfigService(const std::string &directory,
-                             const std::string &appConfigPath, const std::string &userConfigPath)
+							 const std::string &appConfigPath, const std::string &userConfigPath)
 		: config(Utils::joinPaths(directory, appConfigPath), Utils::joinPaths(directory, userConfigPath)),
 		  rootDirectory(directory)
 {
@@ -212,6 +216,7 @@ float ConfigService::getFloat(const std::string &path)
 {
 	return config.getFloat(path);
 }
+
 float ConfigService::getFloat(const std::string &path, float defaultValue)
 {
 	return config.getFloat(path, defaultValue);
@@ -221,6 +226,7 @@ bool ConfigService::getBool(const std::string &path)
 {
 	return config.getBool(path);
 }
+
 bool ConfigService::getBool(const std::string &path, bool defaultValue)
 {
 	return config.getBool(path, defaultValue);
@@ -230,6 +236,7 @@ std::string ConfigService::getString(const std::string &path)
 {
 	return config.getString(path);
 }
+
 std::string ConfigService::getString(const std::string &path, const std::string &defaultValue)
 {
 	return config.getString(path, defaultValue);
@@ -260,34 +267,42 @@ int Config::getInt(const std::string &path)
 {
 	return Locator::locate<ConfigService>()->getInt(path);
 }
+
 int Config::getInt(const std::string &path, int defaultValue)
 {
 	return Locator::locate<ConfigService>()->getInt(path, defaultValue);
 }
+
 float Config::getFloat(const std::string &path)
 {
 	return Locator::locate<ConfigService>()->getFloat(path);
 }
+
 float Config::getFloat(const std::string &path, float defaultValue)
 {
 	return Locator::locate<ConfigService>()->getFloat(path, defaultValue);
 }
+
 bool Config::getBool(const std::string &path)
 {
 	return Locator::locate<ConfigService>()->getBool(path);
 }
+
 bool Config::getBool(const std::string &path, bool defaultValue)
 {
 	return Locator::locate<ConfigService>()->getBool(path, defaultValue);
 }
+
 std::string Config::getString(const std::string &path)
 {
 	return Locator::locate<ConfigService>()->getString(path);
 }
+
 std::string Config::getString(const std::string &path, const std::string &defaultValue)
 {
 	return Locator::locate<ConfigService>()->getString(path, defaultValue);
 }
+
 std::string Config::getResource(const std::string &path)
 {
 	return Locator::locate<ConfigService>()->getResource(path);

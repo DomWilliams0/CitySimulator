@@ -16,16 +16,25 @@ public:
 	}
 
 	bool load();
+
 	void loadOnTop();
+
 	void recurseAndOverwrite(boost::property_tree::ptree &tree, std::string prefix);
 
 	int getInt(const std::string &path);
+
 	int getInt(const std::string &path, int defaultValue);
+
 	float getFloat(const std::string &path);
+
 	float getFloat(const std::string &path, float defaultValue);
+
 	bool getBool(const std::string &path);
+
 	bool getBool(const std::string &path, bool defaultValue);
+
 	std::string getString(const std::string &path);
+
 	std::string getString(const std::string &path, const std::string &defaultValue);
 
 	template<class T>
@@ -49,9 +58,11 @@ public:
 	}
 
 	void setReloadFromFile(bool reload);
+
 	void reload();
 
 	void setAppConfigPath(const std::string &path);
+
 	void setUserConfigPath(const std::string &path);
 
 	std::string getAppConfigPath() const;

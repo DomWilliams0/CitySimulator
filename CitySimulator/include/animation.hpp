@@ -35,10 +35,10 @@ public:
 	}
 
 	Animator(Animation *anim, float step, DirectionType initialDirection = DIRECTION_SOUTH,
-	         bool initiallyPlaying = false);
+			 bool initiallyPlaying = false);
 
 	void init(Animation *anim, float step, DirectionType initialDirection = DIRECTION_SOUTH,
-	          bool initiallyPlaying = false);
+			  bool initiallyPlaying = false);
 
 	void tick(float delta);
 

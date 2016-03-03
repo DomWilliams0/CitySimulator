@@ -6,10 +6,12 @@
 #include "world.hpp"
 
 class SimpleMovementController;
+
 class PhysicsComponent;
 
 
-class CameraService : public BaseService {
+class CameraService : public BaseService
+{
 public:
 	CameraService(World &world);
 
@@ -40,4 +42,5 @@ private:
 
 	SimpleMovementController *controller;
 };
+
 #endif
