@@ -3,7 +3,7 @@
 
 #include <SFML/Window.hpp>
 #include "utils.hpp"
-#include "entity.hpp"
+#include "ecs.hpp"
 #include "constants.hpp"
 
 enum EventType

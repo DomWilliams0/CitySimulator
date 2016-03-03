@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <stack>
 #include "utils.hpp"
-#include "state.hpp"
+#include "state/state.hpp"
 
 class b2World;
 

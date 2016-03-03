@@ -1,8 +1,8 @@
 #ifndef CITYSIM_AI_HPP
 #define CITYSIM_AI_HPP
 
-#include "entity.hpp"
-#include "services.hpp"
+#include "ecs.hpp"
+#include "service/input_service.hpp"
 
 struct PhysicsComponent;
 
