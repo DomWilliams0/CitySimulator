@@ -1,7 +1,8 @@
 #include <SFML/Window/Keyboard.hpp>
-#include "services.hpp"
 #include "world.hpp"
 #include "ai.hpp"
+#include "service/input_service.hpp"
+#include "service/logging_service.hpp"
 
 void InputService::onEnable()
 {

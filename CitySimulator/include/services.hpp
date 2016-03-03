@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <typeinfo>
+#include <typeindex>
+#include "utils.hpp"
 
 enum ServiceType
 {
@@ -39,7 +41,9 @@ class RenderService;
 class WorldService;
 
 class World;
+
 class PhysicsComponent;
+
 class SimpleMovementController;
 
 class InputBrain;

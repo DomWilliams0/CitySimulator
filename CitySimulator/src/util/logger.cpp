@@ -1,6 +1,7 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
-#include "services.hpp"
+#include "utils.hpp"
+#include "service/logging_service.hpp"
 
 const std::string PREFIX_STRING("    ");
 

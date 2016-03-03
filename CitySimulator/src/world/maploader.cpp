@@ -3,7 +3,7 @@
 #include <boost/lexical_cast.hpp>
 #include "maploader.hpp"
 #include "utils.hpp"
-#include "services.hpp"
+#include "service/logging_service.hpp"
 
 TMX::PropertyType propertyTypeFromString(const std::string &s)
 {

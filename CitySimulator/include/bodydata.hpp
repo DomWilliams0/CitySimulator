@@ -2,6 +2,7 @@
 #define CITYSIM_BODYDATA_HPP
 
 #include "world.hpp"
+#include "ecs.hpp"
 
 enum BodyDataType
 {

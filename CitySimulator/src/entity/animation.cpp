@@ -1,7 +1,10 @@
 #include <SFML/Graphics.hpp>
 #include <regex>
 #include "PackingTreeNode.h"
-#include "services.hpp"
+#include "animation.hpp"
+#include "service/animation_service.hpp"
+#include "service/config_service.hpp"
+#include "service/logging_service.hpp"
 
 void AnimationService::onEnable()
 {

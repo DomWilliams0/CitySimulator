@@ -1,5 +1,11 @@
-#include "services.hpp"
-#include "gamestate.hpp"
+#include "state/gamestate.hpp"
+#include "service/animation_service.hpp"
+#include "service/camera_service.hpp"
+#include "service/config_service.hpp"
+#include "service/entity_service.hpp"
+#include "service/input_service.hpp"
+#include "service/render_service.hpp"
+#include "service/world_service.hpp"
 
 EntityIdentifier & createTestHuman(World &world, int x, int y, const std::string &skin, DirectionType direction)
 {

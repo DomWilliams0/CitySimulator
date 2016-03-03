@@ -1,5 +1,7 @@
 #include "events.hpp"
 #include "services.hpp"
+#include "service/event_service.hpp"
+#include "service/logging_service.hpp"
 
 void EventService::onEnable()
 {

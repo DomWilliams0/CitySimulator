@@ -1,7 +1,13 @@
 #include <SFML/Window.hpp>
 #include "game.hpp"
-#include "gamestate.hpp"
-#include "services.hpp"
+#include "state/gamestate.hpp"
+#include "events.hpp"
+#include "service/camera_service.hpp"
+#include "service/config_service.hpp"
+#include "service/event_service.hpp"
+#include "service/input_service.hpp"
+#include "service/logging_service.hpp"
+#include "service/render_service.hpp"
 
 BaseGame::BaseGame(sf::RenderWindow &window)
 {

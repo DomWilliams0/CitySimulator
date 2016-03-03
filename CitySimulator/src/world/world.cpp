@@ -1,5 +1,11 @@
 #include "world.hpp"
-#include "services.hpp"
+#include "bodydata.hpp"
+#include "utils.hpp"
+#include "service/config_service.hpp"
+#include "service/logging_service.hpp"
+#include "service/render_service.hpp"
+#include "service/world_service.hpp"
+#include "service/entity_service.hpp"
 
 bool isCollidable(BlockType blockType)
 {

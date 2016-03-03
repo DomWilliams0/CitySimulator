@@ -2,7 +2,7 @@
 #define CITYSIM_ENTITY_SERVICE_HPP
 
 #include "services.hpp"
-#include "entity.hpp"
+#include "ecs.hpp"
 
 const unsigned int MAX_ENTITIES = 1024;
 typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;

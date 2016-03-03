@@ -2,6 +2,7 @@
 #define CITYSIM_BUILDING_HPP
 
 #include <SFML/Graphics/Rect.hpp>
+#include <map>
 
 class World;
 

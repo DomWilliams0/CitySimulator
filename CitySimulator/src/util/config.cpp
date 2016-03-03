@@ -3,7 +3,8 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/exception/diagnostic_information.hpp>
 #include "config.hpp"
-#include "services.hpp"
+#include "utils.hpp"
+#include "service/logging_service.hpp"
 
 bool ConfigurationFile::load()
 {
@@ -38,6 +39,7 @@ void ConfigurationFile::loadOnTop()
 
 	// load user config
 	ConfigurationFile loaded(userConfigPath.string());
+
 	if (loaded.load())
 	{
 		// put all values

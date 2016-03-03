@@ -1,5 +1,7 @@
 #include "ecs.hpp"
-#include "services.hpp"
+#include "ai.hpp"
+#include "service/entity_service.hpp"
+#include "service/config_service.hpp"
 
 void System::tick(EntityService *es, float dt)
 {
