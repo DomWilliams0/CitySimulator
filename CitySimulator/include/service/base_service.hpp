@@ -23,9 +23,15 @@ enum ServiceType
 class BaseService
 {
 public:
-	virtual void onEnable();
+	virtual void onEnable()
+	{
+	}
 
-	virtual void onDisable();
+
+	virtual void onDisable()
+	{
+	}
+
 };
 
 #endif
