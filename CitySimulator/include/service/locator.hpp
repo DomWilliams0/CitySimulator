@@ -1,3 +1,6 @@
+#ifndef CITYSIM_LOCATOR_HPP
+#define CITYSIM_LOCATOR_HPP
+
 #include <typeinfo>
 #include "animation_service.hpp"
 #include "camera_service.hpp"
@@ -65,4 +68,4 @@ private:
 	std::vector<BaseService *> services;
 };
 
-
+#endif
