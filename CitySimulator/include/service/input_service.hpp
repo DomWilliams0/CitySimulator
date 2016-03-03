@@ -5,6 +5,8 @@
 #include <boost/bimap.hpp>
 #include "base_service.hpp"
 
+class InputBrain;
+
 class InputService : public BaseService, public EventListener
 {
 public:

@@ -3,12 +3,7 @@
 #include "config.hpp"
 #include "ecs.hpp"
 #include "bodydata.hpp"
-#include "service/animation_service.hpp"
-#include "service/config_service.hpp"
-#include "service/logging_service.hpp"
-#include "service/entity_service.hpp"
-#include "service/render_service.hpp"
-#include "service/input_service.hpp"
+#include "service/locator.hpp"
 
 void EntityService::onEnable()
 {

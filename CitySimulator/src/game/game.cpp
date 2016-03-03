@@ -1,8 +1,7 @@
 #include <SFML/Window.hpp>
 #include "game.hpp"
 #include "state/gamestate.hpp"
-#include "service/config_service.hpp"
-#include "service/render_service.hpp"
+#include "service/locator.hpp"
 
 Game::Game(sf::RenderWindow &window) : BaseGame(window), current(nullptr)
 {

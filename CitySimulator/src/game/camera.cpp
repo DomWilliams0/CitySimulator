@@ -1,11 +1,7 @@
 #include "ecs.hpp"
 #include "ai.hpp"
 #include "world.hpp"
-#include "service/camera_service.hpp"
-#include "service/entity_service.hpp"
-#include "service/render_service.hpp"
-#include "service/logging_service.hpp"
-#include "service/config_service.hpp"
+#include "service/locator.hpp"
 
 CameraService::CameraService(World &world) : world(&world), trackedEntity(nullptr)
 {

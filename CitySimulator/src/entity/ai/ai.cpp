@@ -1,7 +1,5 @@
 #include "ai.hpp"
-#include "events.hpp"
-#include "service/config_service.hpp"
-#include "service/entity_service.hpp"
+#include "service/locator.hpp"
 
 EntityBrain::EntityBrain(EntityID e) :
 		entity(e), controller(e, 0.f, 0.f, 0.f) // dummy values

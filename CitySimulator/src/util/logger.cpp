@@ -1,7 +1,7 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 #include "utils.hpp"
-#include "service/logging_service.hpp"
+#include "service/locator.hpp"
 
 const std::string PREFIX_STRING("    ");
 
@@ -108,4 +108,44 @@ void LoggingService::setLogLevel(const std::string &s)
 
 NullLoggingService::NullLoggingService() : LoggingService(std::cerr, LOG_INFO)
 {
+}
+
+void Logger::logDebuggiest(const std::string &msg)
+{
+	Locator::locate<LoggingService>()->logDebuggiest(msg);
+}
+
+void Logger::logDebuggier(const std::string &msg)
+{
+	Locator::locate<LoggingService>()->logDebuggier(msg);
+}
+
+void Logger::logDebug(const std::string &msg)
+{
+	Locator::locate<LoggingService>()->logDebug(msg);
+}
+
+void Logger::logInfo(const std::string &msg)
+{
+	Locator::locate<LoggingService>()->logInfo(msg);
+}
+
+void Logger::logWarning(const std::string &msg)
+{
+	Locator::locate<LoggingService>()->logWarning(msg);
+}
+
+void Logger::logError(const std::string &msg)
+{
+	Locator::locate<LoggingService>()->logError(msg);
+}
+
+void Logger::pushIndent()
+{
+	Locator::locate<LoggingService>()->pushIndent();
+}
+
+void Logger::popIndent()
+{
+	Locator::locate<LoggingService>()->popIndent();
 }

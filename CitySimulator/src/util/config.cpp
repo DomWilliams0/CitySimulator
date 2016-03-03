@@ -4,7 +4,7 @@
 #include <boost/exception/diagnostic_information.hpp>
 #include "config.hpp"
 #include "utils.hpp"
-#include "service/logging_service.hpp"
+#include "service/locator.hpp"
 
 bool ConfigurationFile::load()
 {

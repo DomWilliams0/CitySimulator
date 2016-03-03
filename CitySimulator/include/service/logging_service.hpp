@@ -1,11 +1,11 @@
 #ifndef CITYSIM_LOGGING_SERVICE_HPP
 #define CITYSIM_LOGGING_SERVICE_HPP
 
-#include "locator.hpp"
 #include "base_service.hpp"
 #include "constants.hpp"
 
-enum LogLevel {
+enum LogLevel
+{
 	LOG_DEBUGGIEST,
 	LOG_DEBUGGIER,
 	LOG_DEBUG,
@@ -16,34 +16,42 @@ enum LogLevel {
 	LOG_UNKNOWN
 };
 
-class LoggingService : public BaseService {
+class LoggingService : public BaseService
+{
 public:
-	LoggingService(std::ostream &stream, const LogLevel &level) : stream(stream), level(level) {
+	LoggingService(std::ostream &stream, const LogLevel &level) : stream(stream), level(level)
+	{
 	}
 
 	virtual void onEnable() override;
 
-	inline void logDebuggier(const std::string &msg) {
+	inline void logDebuggier(const std::string &msg)
+	{
 		log(msg, LOG_DEBUGGIER);
 	}
 
-	inline void logDebuggiest(const std::string &msg) {
+	inline void logDebuggiest(const std::string &msg)
+	{
 		log(msg, LOG_DEBUGGIEST);
 	}
 
-	inline void logDebug(const std::string &msg) {
+	inline void logDebug(const std::string &msg)
+	{
 		log(msg, LOG_DEBUG);
 	}
 
-	inline void logInfo(const std::string &msg) {
+	inline void logInfo(const std::string &msg)
+	{
 		log(msg, LOG_INFO);
 	}
 
-	inline void logWarning(const std::string &msg) {
+	inline void logWarning(const std::string &msg)
+	{
 		log(msg, LOG_WARNING);
 	}
 
-	inline void logError(const std::string &msg) {
+	inline void logError(const std::string &msg)
+	{
 		log(msg, LOG_ERROR);
 	}
 
@@ -68,46 +76,33 @@ private:
 
 };
 
-class NullLoggingService : public LoggingService {
+class NullLoggingService : public LoggingService
+{
 
 public:
 	NullLoggingService();
 
 private:
-	virtual void log(const std::string &msg, LogLevel level) override {
+	virtual void log(const std::string &msg, LogLevel level) override
+	{
 	}
 };
-namespace Logger {
-	inline void logDebuggiest(const std::string &msg) {
-		Locator::locate<LoggingService>()->logDebuggiest(msg);
-	}
+namespace Logger
+{
+	void logDebuggiest(const std::string &msg);
 
-	inline void logDebuggier(const std::string &msg) {
-		Locator::locate<LoggingService>()->logDebuggier(msg);
-	}
+	void logDebuggier(const std::string &msg);
 
-	inline void logDebug(const std::string &msg) {
-		Locator::locate<LoggingService>()->logDebug(msg);
-	}
+	void logDebug(const std::string &msg);
 
-	inline void logInfo(const std::string &msg) {
-		Locator::locate<LoggingService>()->logInfo(msg);
-	}
+	void logInfo(const std::string &msg);
 
-	inline void logWarning(const std::string &msg) {
-		Locator::locate<LoggingService>()->logWarning(msg);
-	}
+	void logWarning(const std::string &msg);
 
-	inline void logError(const std::string &msg) {
-		Locator::locate<LoggingService>()->logError(msg);
-	}
+	void logError(const std::string &msg);
 
-	inline void pushIndent() {
-		Locator::locate<LoggingService>()->pushIndent();
-	}
+	void pushIndent();
 
-	inline void popIndent() {
-		Locator::locate<LoggingService>()->popIndent();
-	}
+	void popIndent();
 }
 #endif

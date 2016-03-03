@@ -1,11 +1,12 @@
 #ifndef CITYSIM_CONFIG_SERVICE_HPP
 #define CITYSIM_CONFIG_SERVICE_HPP
 
-#include "locator.hpp"
-#include "base_service.hpp"
 #include <boost/filesystem.hpp>
+#include "base_service.hpp"
+#include "config.hpp"
 
-class ConfigService : public BaseService {
+class ConfigService : public BaseService
+{
 public:
 	ConfigService(const std::string &directory,
 				  const std::string &appConfigPath, const std::string &userConfigPath = "");
@@ -31,16 +32,19 @@ public:
 	std::string getResource(const std::string &path);
 
 	template<class T>
-	void getList(const std::string &path, std::vector<int> &l) {
+	void getList(const std::string &path, std::vector<int> &l)
+	{
 		config.getList<T>(path, l);
 	}
 
 	template<class T=std::string>
-	void getMapList(const std::string &path, std::vector<std::map<std::string, T>> &ml) {
+	void getMapList(const std::string &path, std::vector<std::map<std::string, T>> &ml)
+	{
 		config.getMapList<T>(path, ml);
 	}
 
-	void setRootDirectory(const std::string &directory) {
+	void setRootDirectory(const std::string &directory)
+	{
 		rootDirectory = directory;
 	}
 
@@ -50,7 +54,8 @@ private:
 
 	void ensureConfigExists();
 };
-namespace Config {
+namespace Config
+{
 	int getInt(const std::string &path);
 
 	int getInt(const std::string &path, int defaultValue);
@@ -69,14 +74,15 @@ namespace Config {
 
 	std::string getResource(const std::string &path);
 
-	template<class T>
-	void getList(const std::string &path, std::vector<int> &l) {
-		Locator::locate<ConfigService>()->getList<T>(path, l);
-	}
-
-	template<class T=std::string>
-	void getMapList(const std::string &path, std::vector<std::map<std::string, T>> &ml) {
-		Locator::locate<ConfigService>()->getMapList<T>(path, ml);
-	}
+//	template<class T>
+//	void getList(const std::string &path, std::vector<int> &l) {
+// 		// todo do not use Locator in services
+//		Locator::locate<ConfigService>()->getList<T>(path, l);
+//	}
+//
+//	template<class T=std::string>
+//	void getMapList(const std::string &path, std::vector<std::map<std::string, T>> &ml) {
+//		Locator::locate<ConfigService>()->getMapList<T>(path, ml);
+//	}
 }
 #endif

@@ -1,7 +1,7 @@
 #ifndef CITYSIM_EVENT_SERVICE_HPP
 #define CITYSIM_EVENT_SERVICE_HPP
 
-#include <bits/forward_list.h>
+#include <forward_list>
 #include "base_service.hpp"
 #include "events.hpp"
 
