@@ -1,5 +1,5 @@
-#ifndef CITYSIM_ANIMATION_HPP
-#define CITYSIM_ANIMATION_HPP
+#ifndef CITYSIMULATOR_ANIMATION_HPP
+#define CITYSIMULATOR_ANIMATION_HPP
 
 #include <SFML/Graphics.hpp>
 #include <unordered_map>

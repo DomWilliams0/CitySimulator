@@ -1,5 +1,5 @@
-#ifndef CITYSIM_GAME_HPP
-#define CITYSIM_GAME_HPP
+#ifndef CITYSIMULATOR_GAME_HPP
+#define CITYSIMULATOR_GAME_HPP
 
 #include <SFML/Graphics.hpp>
 #include <stack>

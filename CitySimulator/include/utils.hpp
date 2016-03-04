@@ -1,5 +1,5 @@
-#ifndef CITYSIM_UTILS_HPP
-#define CITYSIM_UTILS_HPP
+#ifndef CITYSIMULATOR_UTILS_HPP
+#define CITYSIMULATOR_UTILS_HPP
 
 #include <SFML/Graphics.hpp>
 #include <random>

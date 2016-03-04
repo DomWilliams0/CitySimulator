@@ -1,5 +1,5 @@
-#ifndef CITYSIM_RENDER_SERVICE_HPP
-#define CITYSIM_RENDER_SERVICE_HPP
+#ifndef CITYSIMULATOR_RENDER_SERVICE_HPP
+#define CITYSIMULATOR_RENDER_SERVICE_HPP
 
 #include <SFML/Graphics.hpp>
 #include "base_service.hpp"

@@ -1,5 +1,5 @@
-#ifndef CITYSIM_EVENTS_HPP
-#define CITYSIM_EVENTS_HPP
+#ifndef CITYSIMULATOR_EVENTS_HPP
+#define CITYSIMULATOR_EVENTS_HPP
 
 #include <SFML/Window.hpp>
 #include "utils.hpp"

@@ -1,5 +1,5 @@
-#ifndef CITYSIM_CONFIG_HPP
-#define CITYSIM_CONFIG_HPP
+#ifndef CITYSIMULATOR_CONFIG_HPP
+#define CITYSIMULATOR_CONFIG_HPP
 
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>

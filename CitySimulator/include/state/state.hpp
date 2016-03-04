@@ -1,5 +1,5 @@
-#ifndef CITYSIM_STATE_HPP
-#define CITYSIM_STATE_HPP
+#ifndef CITYSIMULATOR_STATE_HPP
+#define CITYSIMULATOR_STATE_HPP
 
 namespace sf
 {

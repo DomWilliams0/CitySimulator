@@ -1,5 +1,5 @@
-#ifndef CITYSIM_CAMERA_SERVICE_HPP
-#define CITYSIM_CAMERA_SERVICE_HPP
+#ifndef CITYSIMULATOR_CAMERA_SERVICE_HPP
+#define CITYSIMULATOR_CAMERA_SERVICE_HPP
 
 #include "ecs.hpp"
 #include "base_service.hpp"

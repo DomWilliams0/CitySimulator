@@ -1,5 +1,5 @@
-#ifndef CITYSIM_BODYDATA_HPP
-#define CITYSIM_BODYDATA_HPP
+#ifndef CITYSIMULATOR_BODYDATA_HPP
+#define CITYSIMULATOR_BODYDATA_HPP
 
 #include "world.hpp"
 #include "ecs.hpp"

@@ -1,5 +1,5 @@
-#ifndef CITYSIM_LOGGING_SERVICE_HPP
-#define CITYSIM_LOGGING_SERVICE_HPP
+#ifndef CITYSIMULATOR_LOGGING_SERVICE_HPP
+#define CITYSIMULATOR_LOGGING_SERVICE_HPP
 
 #include "base_service.hpp"
 #include "constants.hpp"

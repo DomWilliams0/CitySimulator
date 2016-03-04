@@ -1,5 +1,5 @@
-#ifndef CITYSIM_BUILDING_HPP
-#define CITYSIM_BUILDING_HPP
+#ifndef CITYSIMULATOR_BUILDING_HPP
+#define CITYSIMULATOR_BUILDING_HPP
 
 #include <SFML/Graphics/Rect.hpp>
 #include <map>

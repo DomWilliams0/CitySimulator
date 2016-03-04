@@ -1,5 +1,5 @@
-#ifndef CITYSIM_CONSTANTS_HPP
-#define CITYSIM_CONSTANTS_HPP
+#ifndef CITYSIMULATOR_CONSTANTS_HPP
+#define CITYSIMULATOR_CONSTANTS_HPP
 
 #include <SFML/Graphics/Font.hpp>
 #include <unordered_map>

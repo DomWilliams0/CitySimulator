@@ -1,5 +1,5 @@
-#ifndef CITYSIM_CONFIG_SERVICE_HPP
-#define CITYSIM_CONFIG_SERVICE_HPP
+#ifndef CITYSIMULATOR_CONFIG_SERVICE_HPP
+#define CITYSIMULATOR_CONFIG_SERVICE_HPP
 
 #include <boost/filesystem.hpp>
 #include "base_service.hpp"

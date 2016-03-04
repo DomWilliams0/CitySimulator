@@ -1,5 +1,5 @@
-#ifndef CITYSIM_GAMESTATE_HPP
-#define CITYSIM_GAMESTATE_HPP
+#ifndef CITYSIMULATOR_GAMESTATE_HPP
+#define CITYSIMULATOR_GAMESTATE_HPP
 
 #include "state.hpp"
 #include "world.hpp"

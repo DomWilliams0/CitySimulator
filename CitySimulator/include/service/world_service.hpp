@@ -1,5 +1,5 @@
-#ifndef CITYSIM_WORLD_SERVICE_HPP
-#define CITYSIM_WORLD_SERVICE_HPP
+#ifndef CITYSIMULATOR_WORLD_SERVICE_HPP
+#define CITYSIMULATOR_WORLD_SERVICE_HPP
 
 #include "base_service.hpp"
 #include "world.hpp"

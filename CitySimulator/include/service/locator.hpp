@@ -1,5 +1,5 @@
-#ifndef CITYSIM_LOCATOR_HPP
-#define CITYSIM_LOCATOR_HPP
+#ifndef CITYSIMULATOR_LOCATOR_HPP
+#define CITYSIMULATOR_LOCATOR_HPP
 
 #include "base_service.hpp"
 

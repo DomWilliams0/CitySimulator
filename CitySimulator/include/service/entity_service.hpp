@@ -1,5 +1,5 @@
-#ifndef CITYSIM_ENTITY_SERVICE_HPP
-#define CITYSIM_ENTITY_SERVICE_HPP
+#ifndef CITYSIMULATOR_ENTITY_SERVICE_HPP
+#define CITYSIMULATOR_ENTITY_SERVICE_HPP
 
 #include "base_service.hpp"
 #include "ecs.hpp"

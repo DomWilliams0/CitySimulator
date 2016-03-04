@@ -1,5 +1,5 @@
-#ifndef CITYSIM_WORLD_HPP
-#define CITYSIM_WORLD_HPP
+#ifndef CITYSIMULATOR_WORLD_HPP
+#define CITYSIMULATOR_WORLD_HPP
 
 #include <SFML/Graphics.hpp>
 #include <Box2D/Box2D.h>

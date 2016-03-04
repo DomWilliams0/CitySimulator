@@ -1,5 +1,5 @@
-#ifndef CITYSIM_AI_HPP
-#define CITYSIM_AI_HPP
+#ifndef CITYSIMULATOR_AI_HPP
+#define CITYSIMULATOR_AI_HPP
 
 #include "input.hpp"
 #include "ecs.hpp"

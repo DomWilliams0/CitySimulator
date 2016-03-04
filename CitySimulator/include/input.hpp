@@ -1,5 +1,5 @@
-#ifndef CITYSIM_INPUT_HPP
-#define CITYSIM_INPUT_HPP
+#ifndef CITYSIMULATOR_INPUT_HPP
+#define CITYSIMULATOR_INPUT_HPP
 
 #include "events.hpp"
 

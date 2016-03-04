@@ -1,5 +1,5 @@
-#ifndef CITYSIM_INPUT_SERVICE_HPP
-#define CITYSIM_INPUT_SERVICE_HPP
+#ifndef CITYSIMULATOR_INPUT_SERVICE_HPP
+#define CITYSIMULATOR_INPUT_SERVICE_HPP
 
 #include "ai.hpp"
 #include <boost/bimap.hpp>

@@ -1,5 +1,5 @@
-#ifndef CITYSIM_EVENT_SERVICE_HPP
-#define CITYSIM_EVENT_SERVICE_HPP
+#ifndef CITYSIMULATOR_EVENT_SERVICE_HPP
+#define CITYSIMULATOR_EVENT_SERVICE_HPP
 
 #include <forward_list>
 #include "base_service.hpp"

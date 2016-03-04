@@ -1,5 +1,5 @@
-#ifndef CITYSIM_MAPLOADER_HPP
-#define CITYSIM_MAPLOADER_HPP
+#ifndef CITYSIMULATOR_MAPLOADER_HPP
+#define CITYSIMULATOR_MAPLOADER_HPP
 
 #include <map>
 #include <SFML/System/Vector2.hpp>

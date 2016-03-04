@@ -1,5 +1,5 @@
-#ifndef CITYSIM_SERVICES_HPP
-#define CITYSIM_SERVICES_HPP
+#ifndef CITYSIMULATOR_SERVICES_HPP
+#define CITYSIMULATOR_SERVICES_HPP
 
 #include <string>
 #include <vector>
