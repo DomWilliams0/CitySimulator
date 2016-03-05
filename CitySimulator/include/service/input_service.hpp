@@ -6,6 +6,7 @@
 #include "base_service.hpp"
 
 class InputBrain;
+class EntityBrain;
 
 class InputService : public BaseService, public EventListener
 {

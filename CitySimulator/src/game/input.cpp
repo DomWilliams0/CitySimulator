@@ -69,7 +69,7 @@ void InputService::setPlayerEntity(EntityID entity)
 
 	// switch out brain
 	auto head = es->getComponent<InputComponent>(entity, COMPONENT_INPUT);
-	playersOldBrain = head->brain;
+	playersOldBrain = boost::dynamic_pointer_cast<EntityBrain>(head->brain);
 
 	if (!inputBrain)
 		inputBrain.reset(new InputBrain(entity)); // lazy init
@@ -243,9 +243,14 @@ void SimpleMovementController::reset(EntityID entity, float movementForce, float
 	running = wasRunning = false;
 
 	moving.resize(DIRECTION_UNKNOWN, false);
-	std::fill(moving.begin(), moving.end(), false);
+	halt();
 }
 
+
+void SimpleMovementController::halt()
+{
+	std::fill(moving.begin(), moving.end(), false);
+}
 
 void SimpleMovementController::registerListeners()
 {

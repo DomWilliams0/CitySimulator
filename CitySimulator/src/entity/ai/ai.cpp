@@ -1,22 +1,20 @@
 #include "ai.hpp"
 #include "service/locator.hpp"
 
-EntityBrain::EntityBrain(EntityID e) :
-		entity(e), controller(e, 0.f, 0.f, 0.f) // dummy values
-
+Brain::Brain(EntityID e) : entity(e), controller(e, 0.f, 0.f, 0.f) // dummy values
 {
 	setEntity(e);
 }
 
-
-EntityBrain::~EntityBrain()
+Brain::~Brain()
 {
 }
 
-void EntityBrain::setEntity(EntityID e, bool stop)
+void Brain::setEntity(EntityID e, bool stop)
 {
 	entity = e;
 
+	// todo pass in as parameters
 	controller.reset(e, Config::getFloat("debug.movement.force"),
 					 Config::getFloat("debug.movement.max-speed.walk"),
 					 Config::getFloat("debug.movement.max-speed.run"));
@@ -28,34 +26,20 @@ void EntityBrain::setEntity(EntityID e, bool stop)
 	phys = es->getComponent<PhysicsComponent>(entity, COMPONENT_PHYSICS);
 
 	if (stop)
-		phys->setVelocity(sf::Vector2f());
+		controller.halt();
 }
 
-void EntityBrain::tick(float delta)
+void Brain::tick(float delta)
 {
 	controller.tick(phys, delta);
 }
 
-void EntityBrain::setMoving(bool moving, DirectionType direction)
+
+EntityBrain::EntityBrain(EntityID e) : Brain(e)
 {
-	Event e;
-	e.entityID = entity;
-	e.type = moving ? EVENT_INPUT_START_MOVING : EVENT_INPUT_STOP_MOVING;
-	e.startMove.direction = e.stopMove.direction = direction;
-	controller.onEvent(e);
 }
 
-void StupidAIBrain::tick(float delta)
+void EntityBrain::tick(float delta)
 {
-	if (ticker.tick(delta))
-	{
-		setMoving(false, direction);
-		if (random)
-			direction = Direction::random();
-		else
-			direction = static_cast<DirectionType>((static_cast<int>(direction) + 1) % DIRECTION_UNKNOWN);
-		setMoving(true, direction);
-	}
-
-	EntityBrain::tick(delta);
+	// todo tick behaviours, which tick steerings
 }

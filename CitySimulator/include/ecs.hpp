@@ -72,13 +72,13 @@ struct RenderComponent : BaseComponent
 	Animator anim;
 };
 
-class EntityBrain;
+class Brain;
 
 struct InputComponent : BaseComponent
 {
 	void reset() override;
 
-	boost::shared_ptr<EntityBrain> brain;
+	boost::shared_ptr<Brain> brain;
 };
 
 struct PhysicsComponent : BaseComponent

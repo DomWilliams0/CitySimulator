@@ -44,6 +44,8 @@ public:
 
 	void reset(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed);
 
+	void halt();
+
 private:
 	EntityID entity;
 

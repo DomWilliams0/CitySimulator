@@ -265,6 +265,6 @@ void EntityService::addPlayerInputComponent(EntityID e)
 void EntityService::addAIInputComponent(EntityID e)
 {
 	InputComponent *comp = dynamic_cast<InputComponent *>(addComponent(e, COMPONENT_INPUT));
-	comp->brain.reset(new StupidAIBrain(e)); // todo allocate on stack
+	comp->brain.reset(new EntityBrain(e)); // todo allocate on stack
 }
 
