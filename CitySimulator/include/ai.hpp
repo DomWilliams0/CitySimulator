@@ -24,12 +24,17 @@ public:
 	 */
 	void setEntity(EntityID e, bool stop = true);
 
-	virtual void tick(float delta);
+	void tick(float delta);
+
 
 protected:
 	EntityID entity;
 	PhysicsComponent *phys;
 	MovementController controller;
+
+	virtual void tickBrain(float delta)
+	{
+	}
 
 	virtual void onEnable()
 	{
@@ -48,7 +53,7 @@ class EntityBrain : public Brain
 public:
 	EntityBrain(EntityID e);
 
-	void tick(float delta) override;
+	void tickBrain(float delta) override;
 };
 
 /**

@@ -20,7 +20,7 @@
         "reload-config": true,
         "fps-tick-rate": 0.2,
         "log-level": "info",
-        "render-physics": false,
+        "render-physics": true,
         "movement": {
             "stop-decay": 8,
             "force": 1,

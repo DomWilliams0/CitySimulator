@@ -31,6 +31,7 @@ void Brain::setEntity(EntityID e, bool stop)
 
 void Brain::tick(float delta)
 {
+	tickBrain(delta);
 	controller.tick(phys, delta);
 }
 
@@ -39,7 +40,7 @@ EntityBrain::EntityBrain(EntityID e) : Brain(e)
 {
 }
 
-void EntityBrain::tick(float delta)
+void EntityBrain::tickBrain(float delta)
 {
 	// todo tick behaviours, which tick steerings
 }
