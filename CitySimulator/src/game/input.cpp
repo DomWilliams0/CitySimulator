@@ -188,37 +188,42 @@ void InputService::handleKeyEvent(const Event &event)
 	}
 
 	// movement
-	e.type = EVENT_INPUT_MOVE;
-	e.move.halt = false;
-
-	DirectionType direction;
-
-	switch (binding)
+	if (event.rawInputKey.pressed)
 	{
-		case KEY_UP:
-			direction = DIRECTION_NORTH;
-			break;
-		case KEY_LEFT:
-			direction = DIRECTION_WEST;
-			break;
-		case KEY_DOWN:
-			direction = DIRECTION_SOUTH;
-			break;
-		case KEY_RIGHT:
-			direction = DIRECTION_EAST;
-			break;
-		default:
-			error("An invalid movement key slipped through InputService's onEvent: %1%",
-				  _str(binding));
-			return;
+
+		e.type = EVENT_INPUT_MOVE;
+		e.move.halt = false;
+
+		DirectionType direction;
+
+		switch (binding)
+		{
+			case KEY_UP:
+				direction = DIRECTION_NORTH;
+				break;
+			case KEY_LEFT:
+				direction = DIRECTION_WEST;
+				break;
+			case KEY_DOWN:
+				direction = DIRECTION_SOUTH;
+				break;
+			case KEY_RIGHT:
+				direction = DIRECTION_EAST;
+				break;
+			default:
+				error("An invalid movement key slipped through InputService's onEvent: %1%",
+					  _str(binding));
+				return;
+		}
+
+		float x, y;
+		Direction::toVector(direction, x, y);
+		e.move.x = x;
+		e.move.y = y;
+
+		es->callEvent(e);
+		return;
 	}
-
-	float x, y;
-	Direction::toVector(direction, x, y);
-	e.move.x = x;
-	e.move.y = y;
-
-	es->callEvent(e);
 }
 
 sf::Keyboard::Key InputService::getKey(InputKey binding)
@@ -260,7 +265,8 @@ b2Vec2 MovementController::tick(float delta, float &newMaxSpeed)
 {
 	newMaxSpeed = running ? maxSprintSpeed : maxSpeed;
 	b2Vec2 ret = steering;
-	ret *= newMaxSpeed;
+	ret *= movementForce;
+	steering.SetZero();
 	return ret;
 }
 
@@ -287,7 +293,16 @@ void MovementController::onEvent(const Event &event)
 		return;
 	}
 
-	steering += b2Vec2(event.move.x, event.move.y);
+//	steering += b2Vec2(event.move.x, event.move.y);
+	move({event.move.x, event.move.y});
+}
+
+
+void MovementController::move(const sf::Vector2f &vector)
+{
+	b2Vec2 vec = toB2Vec(vector);
+//	vec.Normalize();
+	steering += vec;
 }
 
 

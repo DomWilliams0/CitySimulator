@@ -42,6 +42,11 @@ public:
 
 	virtual void onEvent(const Event &event) override;
 
+	/**
+	 * Adds the given vector to the accumulated forces, which will be applied to the entity's steering force
+	 */
+	void move(const sf::Vector2f& vector);
+
 	void reset(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed);
 
 	void halt();
