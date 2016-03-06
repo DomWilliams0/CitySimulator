@@ -29,7 +29,7 @@ public:
 protected:
 	EntityID entity;
 	PhysicsComponent *phys;
-	SimpleMovementController controller;
+	MovementController controller;
 
 	virtual void onEnable()
 	{

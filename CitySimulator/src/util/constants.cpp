@@ -54,3 +54,37 @@ DirectionType Direction::fromAngle(double degrees)
 			return DIRECTION_WEST;
 	}
 }
+
+void Direction::toVector(DirectionType direction, sf::Vector2f &out)
+{
+	float x, y;
+	toVector(direction, x, y);
+	out.x = x;
+	out.y = y;
+}
+
+void ::Direction::toVector(DirectionType direction, float &xOut, float &yOut)
+{
+switch (direction)
+	{
+		case DIRECTION_NORTH:
+			xOut = 0;
+			yOut = -1;
+			break;
+		case DIRECTION_EAST:
+			xOut = 1;
+			yOut = 0;
+			break;
+		case DIRECTION_SOUTH:
+			xOut = 0;
+			yOut = 1;
+			break;
+		case DIRECTION_WEST:
+			xOut = -1;
+			yOut = 0;
+			break;
+		default:
+			error("An unknown direction cannot be converted to a vector");
+
+	}
+}

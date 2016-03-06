@@ -6,7 +6,7 @@
 CameraService::CameraService(World &world) : world(&world), trackedEntity(nullptr)
 {
 	float speed = Config::getFloat("debug.movement.camera-speed");
-	controller = new SimpleMovementController(CAMERA_ENTITY, speed, speed, speed);
+	controller = new MovementController(CAMERA_ENTITY, speed, speed, speed);
 }
 
 CameraService::~CameraService()

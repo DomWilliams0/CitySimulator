@@ -19,15 +19,15 @@ enum InputKey
 	KEY_UNKNOWN
 };
 
-class SimpleMovementController : public EventListener
+class MovementController : public EventListener
 {
 public:
-	SimpleMovementController(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
+	MovementController(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
 	{
 		reset(entity, movementForce, maxWalkSpeed, maxSprintSpeed);
 	}
 
-	~SimpleMovementController()
+	~MovementController()
 	{
 		unregisterListeners();
 	}
@@ -49,8 +49,8 @@ public:
 private:
 	EntityID entity;
 
-	std::vector<bool> moving;
-	bool running, wasRunning;
+	b2Vec2 steering;
+	bool running;
 	float movementForce, maxSprintSpeed, maxSpeed;
 
 };

@@ -45,6 +45,9 @@ namespace Direction
 	DirectionType random();
 
 	DirectionType fromAngle(double degrees);
+
+	void toVector(DirectionType direction, sf::Vector2f &out);
+	void toVector(DirectionType direction, float &xOut, float &yOut);
 }
 
 enum EntityType

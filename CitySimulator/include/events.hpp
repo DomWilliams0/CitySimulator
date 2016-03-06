@@ -12,8 +12,7 @@ enum EventType
 	EVENT_RAW_INPUT_CLICK,
 
 	EVENT_INPUT_SPRINT,
-	EVENT_INPUT_START_MOVING,
-	EVENT_INPUT_STOP_MOVING,
+	EVENT_INPUT_MOVE,
 	EVENT_INPUT_YIELD_CONTROL,
 
 	EVENT_HUMAN_SPAWN,
@@ -40,14 +39,11 @@ struct Event
 		bool pressed;
 	};
 
-	struct InputStartMoveEvent
+	struct InputMoveEvent
 	{
-		DirectionType direction;
-	};
-
-	struct InputStopMoveEvent
-	{
-		DirectionType direction;
+		bool halt;
+		float x;
+		float y;
 	};
 
 	struct InputSprintEvent
@@ -62,8 +58,7 @@ struct Event
 	{
 		RawInputKeyEvent rawInputKey;
 		RawInputClickEvent rawInputClick;
-		InputStartMoveEvent startMove;
-		InputStopMoveEvent stopMove;
+		InputMoveEvent move;
 		InputSprintEvent sprintToggle;
 	};
 };

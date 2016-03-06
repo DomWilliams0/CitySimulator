@@ -187,9 +187,9 @@ void InputService::handleKeyEvent(const Event &event)
 		return;
 	}
 
-	// input
-	bool startMoving = event.rawInputKey.pressed;
-	e.type = startMoving ? EVENT_INPUT_START_MOVING : EVENT_INPUT_STOP_MOVING;
+	// movement
+	e.type = EVENT_INPUT_MOVE;
+	e.move.halt = false;
 
 	DirectionType direction;
 
@@ -213,10 +213,10 @@ void InputService::handleKeyEvent(const Event &event)
 			return;
 	}
 
-	if (startMoving)
-		e.startMove.direction = direction;
-	else
-		e.stopMove.direction = direction;
+	float x, y;
+	Direction::toVector(direction, x, y);
+	e.move.x = x;
+	e.move.y = y;
 
 	es->callEvent(e);
 }
@@ -234,71 +234,47 @@ InputKey InputService::getBinding(sf::Keyboard::Key key)
 	return result == bindings.right.end() ? InputKey::KEY_UNKNOWN : result->second;
 }
 
-void SimpleMovementController::reset(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
+void MovementController::reset(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
 {
 	this->entity = entity;
 	this->movementForce = movementForce;
 	this->maxSpeed = maxWalkSpeed;
 	this->maxSprintSpeed = maxSprintSpeed;
-	running = wasRunning = false;
-
-	moving.resize(DIRECTION_UNKNOWN, false);
-	halt();
+	this->steering.SetZero();
+	running = false;
 }
 
 
-void SimpleMovementController::halt()
+void MovementController::registerListeners()
 {
-	std::fill(moving.begin(), moving.end(), false);
-}
-
-void SimpleMovementController::registerListeners()
-{
-	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_START_MOVING);
-	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_STOP_MOVING);
+	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_MOVE);
 	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_SPRINT);
 }
 
-void SimpleMovementController::unregisterListeners()
+void MovementController::unregisterListeners()
 {
 	Locator::locate<EventService>()->unregisterListener(this);
 }
 
-b2Vec2 SimpleMovementController::tick(float delta, float &newMaxSpeed)
+b2Vec2 MovementController::tick(float delta, float &newMaxSpeed)
 {
-	bool north = moving[DIRECTION_NORTH];
-	bool south = moving[DIRECTION_SOUTH];
-	bool east = moving[DIRECTION_EAST];
-	bool west = moving[DIRECTION_WEST];
-
-	float x, y;
-
-	if (east != west)
-		x = east ? movementForce : -movementForce;
-	else
-		x = 0.f;
-
-	if (south != north)
-		y = south ? movementForce : -movementForce;
-	else
-		y = 0.f;
-
 	newMaxSpeed = running ? maxSprintSpeed : maxSpeed;
-	return {x, y};
+	b2Vec2 ret = steering;
+	ret *= newMaxSpeed;
+	return ret;
 }
 
 
-void SimpleMovementController::tick(PhysicsComponent *phys, float delta)
+void MovementController::tick(PhysicsComponent *phys, float delta)
 {
 	float maxSpeed;
 	b2Vec2 steering(tick(delta, maxSpeed));
 	phys->steering.Set(steering.x, steering.y);
 	phys->maxSpeed = maxSpeed;
 
-	wasRunning = running;
 }
 
-void SimpleMovementController::onEvent(const Event &event)
+void MovementController::onEvent(const Event &event)
 {
 	// todo remove check and unregister listener instead
 	if (event.entityID != entity)
@@ -311,7 +287,11 @@ void SimpleMovementController::onEvent(const Event &event)
 		return;
 	}
 
-	bool start = event.type == EVENT_INPUT_START_MOVING;
-	DirectionType direction = start ? event.startMove.direction : event.stopMove.direction;
-	moving[direction] = start;
+	steering += b2Vec2(event.move.x, event.move.y);
+}
+
+
+void MovementController::halt()
+{
+	steering.SetZero();
 }
