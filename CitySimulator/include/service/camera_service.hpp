@@ -4,8 +4,7 @@
 #include "ecs.hpp"
 #include "base_service.hpp"
 #include "world.hpp"
-
-class PlayerMovementController;
+#include "input.hpp"
 
 class PhysicsComponent;
 
@@ -14,8 +13,6 @@ class CameraService : public BaseService
 {
 public:
 	CameraService(World &world);
-
-	~CameraService();
 
 	virtual void onEnable() override;
 
@@ -40,7 +37,7 @@ private:
 	sf::View view;
 	float zoom;
 
-	PlayerMovementController *controller;
+	PlayerMovementController controller;
 };
 
 #endif

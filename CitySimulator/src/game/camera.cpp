@@ -6,12 +6,7 @@
 CameraService::CameraService(World &world) : world(&world), trackedEntity(nullptr)
 {
 	float speed = Config::getFloat("debug.movement.camera-speed");
-	controller = new PlayerMovementController(CAMERA_ENTITY, speed, speed, speed);
-}
-
-CameraService::~CameraService()
-{
-	delete controller;
+	controller.reset(CAMERA_ENTITY, speed, speed, speed);
 }
 
 void CameraService::onEnable()
@@ -40,7 +35,7 @@ void CameraService::tick(float delta)
 	else
 	{
 		float speed; // todo currently unused
-		b2Vec2 movement(controller->tick(delta, speed));
+		b2Vec2 movement(controller.tick(delta, speed));
 		view.move(movement.x * delta, movement.y * delta);
 	}
 }
@@ -59,7 +54,7 @@ void CameraService::setTrackedEntity(EntityID entity)
 		trackedEntity = es->getComponent<PhysicsComponent>(entity, COMPONENT_PHYSICS);
 		Logger::logDebug(format("Started tracking entity %1%", _str(entity)));
 
-		controller->unregisterListeners();
+		controller.unregisterListeners();
 	}
 	else
 		Logger::logWarning(
@@ -69,7 +64,7 @@ void CameraService::setTrackedEntity(EntityID entity)
 void CameraService::clearPlayerEntity()
 {
 	trackedEntity = nullptr;
-	controller->registerListeners();
+	controller.registerListeners();
 }
 
 void CameraService::updateViewSize(unsigned int width, unsigned int height)
