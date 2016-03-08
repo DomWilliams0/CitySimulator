@@ -5,7 +5,7 @@
 #include "base_service.hpp"
 #include "world.hpp"
 
-class MovementController;
+class PlayerMovementController;
 
 class PhysicsComponent;
 
@@ -40,7 +40,7 @@ private:
 	sf::View view;
 	float zoom;
 
-	MovementController *controller;
+	PlayerMovementController *controller;
 };
 
 #endif

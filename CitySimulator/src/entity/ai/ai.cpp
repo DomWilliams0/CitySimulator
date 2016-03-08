@@ -1,23 +1,13 @@
 #include "ai.hpp"
 #include "service/locator.hpp"
 
-Brain::Brain(EntityID e) : entity(e), controller(e, 0.f, 0.f, 0.f) // dummy values
-{
-	setEntity(e);
-}
-
-Brain::~Brain()
-{
-}
-
 void Brain::setEntity(EntityID e, bool stop)
 {
 	entity = e;
 
-	// todo pass in as parameters
-	controller.reset(e, Config::getFloat("debug.movement.force"),
-					 Config::getFloat("debug.movement.max-speed.walk"),
-					 Config::getFloat("debug.movement.max-speed.run"));
+	initController(Config::getFloat("debug.movement.force"),
+				   Config::getFloat("debug.movement.max-speed.walk"),
+				   Config::getFloat("debug.movement.max-speed.run"));
 
 	EntityService *es = Locator::locate<EntityService>();
 	if (!es->hasComponent(entity, COMPONENT_PHYSICS))
@@ -26,21 +16,43 @@ void Brain::setEntity(EntityID e, bool stop)
 	phys = es->getComponent<PhysicsComponent>(entity, COMPONENT_PHYSICS);
 
 	if (stop)
-		controller.halt();
+		controller->halt();
 }
 
 void Brain::tick(float delta)
 {
 	tickBrain(delta);
-	controller.tick(phys, delta);
+	controller->tick(phys, delta);
 }
 
 
-EntityBrain::EntityBrain(EntityID e) : Brain(e)
+EntityBrain::EntityBrain(EntityID e)
 {
+	setEntity(e);
 }
 
 void EntityBrain::tickBrain(float delta)
 {
 	// todo tick behaviours, which tick steerings
+}
+
+InputBrain::InputBrain(EntityID e)
+{
+	setEntity(e);
+	boost::dynamic_pointer_cast<PlayerMovementController>(controller)->registerListeners();
+}
+
+InputBrain::~InputBrain()
+{
+	boost::dynamic_pointer_cast<PlayerMovementController>(controller)->unregisterListeners();
+}
+
+void EntityBrain::initController(float movementForce, float maxWalkSpeed, float maxSprintSpeed)
+{
+	controller.reset(dynamic_cast<MovementController*>(new DynamicMovementController(entity, movementForce, maxWalkSpeed, maxSprintSpeed)));
+}
+
+void InputBrain::initController(float movementForce, float maxWalkSpeed, float maxSprintSpeed)
+{
+	controller.reset(dynamic_cast<MovementController*>(new PlayerMovementController(entity, movementForce, maxWalkSpeed, maxSprintSpeed)));
 }

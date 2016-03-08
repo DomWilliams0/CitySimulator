@@ -13,9 +13,9 @@ struct PhysicsComponent;
 class Brain
 {
 public:
-	Brain(EntityID e);
-
-	virtual ~Brain();
+	virtual ~Brain()
+	{
+	}
 
 	/**
 	 * Changes the entity that this brain is controlling
@@ -30,7 +30,9 @@ public:
 protected:
 	EntityID entity;
 	PhysicsComponent *phys;
-	MovementController controller;
+	boost::shared_ptr<MovementController> controller;
+
+	virtual void initController(float movementForce, float maxWalkSpeed, float maxSprintSpeed) = 0;
 
 	virtual void tickBrain(float delta)
 	{
@@ -53,6 +55,9 @@ class EntityBrain : public Brain
 public:
 	EntityBrain(EntityID e);
 
+protected:
+	virtual void initController(float movementForce, float maxWalkSpeed, float maxSprintSpeed);
+
 	void tickBrain(float delta) override;
 };
 
@@ -62,16 +67,12 @@ public:
 class InputBrain : public Brain
 {
 public:
-	InputBrain(EntityID e) : Brain(e)
-	{
-		setEntity(e);
-		controller.registerListeners();
-	}
+	InputBrain(EntityID e);
 
-	virtual ~InputBrain()
-	{
-		controller.unregisterListeners();
-	}
+	virtual ~InputBrain();
+
+protected:
+	virtual void initController(float movementForce, float maxWalkSpeed, float maxSprintSpeed);
 };
 
 #endif

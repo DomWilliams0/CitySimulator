@@ -187,43 +187,37 @@ void InputService::handleKeyEvent(const Event &event)
 		return;
 	}
 
-	// movement
-	if (event.rawInputKey.pressed)
+	// input
+	bool startMoving = event.rawInputKey.pressed;
+	e.type = startMoving ? EVENT_INPUT_START_MOVING : EVENT_INPUT_STOP_MOVING;
+
+	DirectionType direction;
+
+	switch (binding)
 	{
-
-		e.type = EVENT_INPUT_MOVE;
-		e.move.halt = false;
-
-		DirectionType direction;
-
-		switch (binding)
-		{
-			case KEY_UP:
-				direction = DIRECTION_NORTH;
-				break;
-			case KEY_LEFT:
-				direction = DIRECTION_WEST;
-				break;
-			case KEY_DOWN:
-				direction = DIRECTION_SOUTH;
-				break;
-			case KEY_RIGHT:
-				direction = DIRECTION_EAST;
-				break;
-			default:
-				error("An invalid movement key slipped through InputService's onEvent: %1%",
-					  _str(binding));
-				return;
-		}
-
-		float x, y;
-		Direction::toVector(direction, x, y);
-		e.move.x = x;
-		e.move.y = y;
-
-		es->callEvent(e);
-		return;
+		case KEY_UP:
+			direction = DIRECTION_NORTH;
+			break;
+		case KEY_LEFT:
+			direction = DIRECTION_WEST;
+			break;
+		case KEY_DOWN:
+			direction = DIRECTION_SOUTH;
+			break;
+		case KEY_RIGHT:
+			direction = DIRECTION_EAST;
+			break;
+		default:
+			error("An invalid movement key slipped through InputService's onEvent: %1%", _str(binding));
+			return;
 	}
+
+	if (startMoving)
+		e.startMove.direction = direction;
+	else
+		e.stopMove.direction = direction;
+
+	es->callEvent(e);
 }
 
 sf::Keyboard::Key InputService::getKey(InputKey binding)
@@ -234,36 +228,32 @@ sf::Keyboard::Key InputService::getKey(InputKey binding)
 
 InputKey InputService::getBinding(sf::Keyboard::Key key)
 {
-
 	auto result = bindings.right.find(key);
 	return result == bindings.right.end() ? InputKey::KEY_UNKNOWN : result->second;
 }
+
 
 void MovementController::reset(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
 {
 	this->entity = entity;
 	this->movementForce = movementForce;
-	this->maxSpeed = maxWalkSpeed;
+	this->maxWalkSpeed = maxWalkSpeed;
 	this->maxSprintSpeed = maxSprintSpeed;
-	this->steering.SetZero();
 	running = false;
 }
 
 
-void MovementController::registerListeners()
+void MovementController::tick(PhysicsComponent *phys, float delta)
 {
-	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_MOVE);
-	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_SPRINT);
+	float maxSpeed;
+	b2Vec2 steering(tick(delta, maxWalkSpeed));
+	phys->steering.Set(steering.x, steering.y);
+	phys->maxSpeed = maxWalkSpeed;
 }
 
-void MovementController::unregisterListeners()
+b2Vec2 DynamicMovementController::tick(float delta, float &newMaxSpeed)
 {
-	Locator::locate<EventService>()->unregisterListener(this);
-}
-
-b2Vec2 MovementController::tick(float delta, float &newMaxSpeed)
-{
-	newMaxSpeed = running ? maxSprintSpeed : maxSpeed;
+	newMaxSpeed = running ? maxSprintSpeed : maxWalkSpeed;
 	b2Vec2 ret = steering;
 	ret *= movementForce;
 	steering.SetZero();
@@ -271,16 +261,40 @@ b2Vec2 MovementController::tick(float delta, float &newMaxSpeed)
 }
 
 
-void MovementController::tick(PhysicsComponent *phys, float delta)
+void DynamicMovementController::move(const sf::Vector2f &vector)
 {
-	float maxSpeed;
-	b2Vec2 steering(tick(delta, maxSpeed));
-	phys->steering.Set(steering.x, steering.y);
-	phys->maxSpeed = maxSpeed;
+	b2Vec2 vec = toB2Vec(vector);
+//	vec.Normalize();
+	steering += vec;
+}
+
+
+void DynamicMovementController::halt()
+{
+	steering.SetZero();
+}
+
+
+void PlayerMovementController::init()
+{
+	registerListeners();
+	moving.resize(DIRECTION_UNKNOWN, false);
 
 }
 
-void MovementController::onEvent(const Event &event)
+void PlayerMovementController::registerListeners()
+{
+	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_SPRINT);
+	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_START_MOVING);
+	Locator::locate<EventService>()->registerListener(this, EVENT_INPUT_STOP_MOVING);
+}
+
+void PlayerMovementController::unregisterListeners()
+{
+	Locator::locate<EventService>()->unregisterListener(this);
+}
+
+void PlayerMovementController::onEvent(const Event &event)
 {
 	// todo remove check and unregister listener instead
 	if (event.entityID != entity)
@@ -293,20 +307,47 @@ void MovementController::onEvent(const Event &event)
 		return;
 	}
 
-//	steering += b2Vec2(event.move.x, event.move.y);
-	move({event.move.x, event.move.y});
+
+	bool start = event.type == EVENT_INPUT_START_MOVING;
+	DirectionType direction = start ? event.startMove.direction : event.stopMove.direction;
+	moving[direction] = start;
 }
 
-
-void MovementController::move(const sf::Vector2f &vector)
+void PlayerMovementController::halt()
 {
-	b2Vec2 vec = toB2Vec(vector);
-//	vec.Normalize();
-	steering += vec;
+	std::fill(moving.begin(), moving.end(), false);
 }
 
-
-void MovementController::halt()
+b2Vec2 PlayerMovementController::tick(float delta, float &newMaxSpeed)
 {
-	steering.SetZero();
+	bool north = moving[DIRECTION_NORTH];
+	bool south = moving[DIRECTION_SOUTH];
+	bool east = moving[DIRECTION_EAST];
+	bool west = moving[DIRECTION_WEST];
+
+	float x, y;
+
+	if (east != west)
+		x = east ? movementForce : -movementForce;
+	else
+		x = 0.f;
+
+	if (south != north)
+		y = south ? movementForce : -movementForce;
+	else
+		y = 0.f;
+
+	newMaxSpeed = running ? maxSprintSpeed : maxWalkSpeed;
+	return {x, y};
+}
+
+PlayerMovementController::~PlayerMovementController()
+{
+	unregisterListeners();
+}
+
+void PlayerMovementController::reset(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
+{
+	MovementController::reset(entity, movementForce, maxWalkSpeed, maxSprintSpeed);
+	halt();
 }

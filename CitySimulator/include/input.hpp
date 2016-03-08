@@ -19,46 +19,91 @@ enum InputKey
 	KEY_UNKNOWN
 };
 
-class MovementController : public EventListener
+class MovementController
 {
 public:
+	MovementController()
+	{
+	}
+
 	MovementController(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
 	{
 		reset(entity, movementForce, maxWalkSpeed, maxSprintSpeed);
 	}
 
-	~MovementController()
+	virtual void reset(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed);
+
+	virtual b2Vec2 tick(float delta, float &newMaxSpeed) = 0;
+
+	void tick(PhysicsComponent *phys, float delta);
+
+	virtual void halt() = 0;
+
+protected:
+	EntityID entity;
+	bool running;
+	float movementForce, maxWalkSpeed, maxSprintSpeed;
+
+};
+
+
+class DynamicMovementController : public MovementController
+{
+public:
+
+	DynamicMovementController() : MovementController()
+	{ }
+
+	DynamicMovementController(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
+			: MovementController(entity, movementForce, maxWalkSpeed, maxSprintSpeed)
+	{ }
+
+	virtual b2Vec2 tick(float delta, float &newMaxSpeed) override;
+
+	/**
+	 * Adds the given vector to the accumulated forces, which will be applied to the entity's steering force
+	 */
+	void move(const sf::Vector2f &vector);
+
+	void halt() override;
+
+private:
+	b2Vec2 steering;
+};
+
+class PlayerMovementController : public MovementController, EventListener
+{
+public:
+
+	PlayerMovementController()
 	{
-		unregisterListeners();
+		init();
 	}
+
+	PlayerMovementController(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
+			: MovementController(entity, movementForce, maxWalkSpeed, maxSprintSpeed)
+	{
+		init();
+	}
+
+
+	virtual ~PlayerMovementController();
 
 	void registerListeners();
 
 	void unregisterListeners();
 
-	b2Vec2 tick(float delta, float &newMaxSpeed);
-
-	void tick(PhysicsComponent *phys, float delta);
+	virtual b2Vec2 tick(float delta, float &newMaxSpeed) override;
 
 	virtual void onEvent(const Event &event) override;
 
-	/**
-	 * Adds the given vector to the accumulated forces, which will be applied to the entity's steering force
-	 */
-	void move(const sf::Vector2f& vector);
+	virtual void halt();
 
-	void reset(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed);
-
-	void halt();
+	virtual void reset(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed) override;
 
 private:
-	EntityID entity;
-
-	b2Vec2 steering;
-	bool running;
-	float movementForce, maxSprintSpeed, maxSpeed;
-
+	void init();
+	std::vector<bool> moving;
 };
-
 
 #endif
