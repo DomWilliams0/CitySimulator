@@ -4,7 +4,7 @@
 #define INVALID_ENTITY (-1)
 #define CAMERA_ENTITY (-2)
 
-typedef unsigned int EntityID;
+typedef int EntityID;
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <vector>
