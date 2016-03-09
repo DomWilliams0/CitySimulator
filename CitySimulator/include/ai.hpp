@@ -13,7 +13,7 @@ struct PhysicsComponent;
 class BaseSteering
 {
 public:
-	BaseSteering(PhysicsComponent &entity) : entity(entity)
+	BaseSteering()
 	{
 	}
 
@@ -23,12 +23,12 @@ public:
 
 	virtual void tick(b2Vec2 &steeringOut, float delta) = 0;
 
-	PhysicsComponent &getEntity() const;
+	PhysicsComponent *getEntity() const;
 
-	void setEntity(PhysicsComponent &entity);
+	void setEntity(PhysicsComponent *entity);
 
 protected:
-	PhysicsComponent &entity;
+	PhysicsComponent *entity;
 };
 
 /**
@@ -36,13 +36,11 @@ protected:
  */
 class BaseTargetedSteering : public BaseSteering
 {
-
 public:
-	BaseTargetedSteering(PhysicsComponent &entity, const sf::Vector2f &target) :
-			BaseSteering(entity), target(target)
-	{ }
+	BaseTargetedSteering() : BaseSteering()
+	{
+	}
 
-private:
 	virtual ~BaseTargetedSteering()
 	{
 	}
@@ -62,10 +60,10 @@ protected:
  */
 class SeekSteering : public BaseTargetedSteering
 {
-
 public:
-	SeekSteering(PhysicsComponent &entity, const sf::Vector2f &target) : BaseTargetedSteering(entity, target)
-	{ }
+	SeekSteering() : BaseTargetedSteering()
+	{
+	}
 
 	virtual void tick(b2Vec2 &steeringOut, float delta);
 };
@@ -75,10 +73,10 @@ public:
  */
 class ArriveSteering : public BaseTargetedSteering
 {
-
 public:
-	ArriveSteering(PhysicsComponent &entity, const sf::Vector2f &target) : BaseTargetedSteering(entity, target)
-	{ }
+	ArriveSteering() : BaseTargetedSteering()
+	{
+	}
 
 	virtual void tick(b2Vec2 &steeringOut, float delta);
 };

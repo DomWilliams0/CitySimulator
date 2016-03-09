@@ -1,11 +1,11 @@
 #include "ai.hpp"
 
-PhysicsComponent &BaseSteering::getEntity() const
+PhysicsComponent * BaseSteering::getEntity() const
 {
 	return entity;
 }
 
-void BaseSteering::setEntity(PhysicsComponent &entity)
+void BaseSteering::setEntity(PhysicsComponent *entity)
 {
 	this->entity = entity;
 }
