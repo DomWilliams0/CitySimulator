@@ -51,6 +51,8 @@ public:
 
 	void setTarget(const sf::Vector2f &target);
 
+	double getDistanceSqrd(const sf::Vector2f &entityPos) const;
+
 protected:
 	sf::Vector2f target;
 };
@@ -71,14 +73,30 @@ public:
 /**
  * A steering behaviour to seek to and stop at the target
  */
-class ArriveSteering : public BaseTargetedSteering
+class ArriveSteering : public SeekSteering
 {
 public:
-	ArriveSteering() : BaseTargetedSteering()
+	ArriveSteering() : SeekSteering()
 	{
+		arrivalThreshold = 0.25f;
+		deaccelerationDistance = 1.f;
 	}
 
 	virtual void tick(b2Vec2 &steeringOut, float delta);
+
+	void setArrivalThreshold(float arrivalThreshold)
+	{
+		this->arrivalThreshold = arrivalThreshold * arrivalThreshold;
+	}
+
+	void setDeaccelerationDistance(float deaccelerationDistance)
+	{
+		this->deaccelerationDistance = deaccelerationDistance * deaccelerationDistance;
+	}
+
+private:
+	float arrivalThreshold;
+	float deaccelerationDistance;
 };
 
 /**

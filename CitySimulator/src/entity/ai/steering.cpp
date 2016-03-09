@@ -1,6 +1,6 @@
-#include "ai.hpp"
+#include <ai.hpp>
 
-PhysicsComponent * BaseSteering::getEntity() const
+PhysicsComponent *BaseSteering::getEntity() const
 {
 	return entity;
 }
@@ -20,6 +20,13 @@ void BaseTargetedSteering::setTarget(const sf::Vector2f &target)
 	this->target = target;
 }
 
+double BaseTargetedSteering::getDistanceSqrd(const sf::Vector2f &entityPos) const
+{
+	float dx = target.x - entityPos.x;
+	float dy = target.y - entityPos.y;
+	return dx * dx + dy * dy;
+}
+
 void SeekSteering::tick(b2Vec2 &steeringOut, float delta)
 {
 	const sf::Vector2f &pos = entity->getTilePosition();
@@ -29,5 +36,22 @@ void SeekSteering::tick(b2Vec2 &steeringOut, float delta)
 
 void ArriveSteering::tick(b2Vec2 &steeringOut, float delta)
 {
-	// todo
+	double distance = getDistanceSqrd(entity->getTilePosition());
+
+	// arrived
+	if (distance <= arrivalThreshold)
+	{
+		steeringOut.SetZero();
+		return;
+	}
+
+	// seek
+	SeekSteering::tick(steeringOut, delta);
+
+	// slow down
+	if (distance <= deaccelerationDistance)
+	{
+		double scale = distance / deaccelerationDistance;
+		steeringOut *= scale;
+	}
 }
