@@ -104,9 +104,11 @@ public:
 protected:
 	EntityID entity;
 	PhysicsComponent *phys;
-	boost::shared_ptr<MovementController> controller;
+	//	boost::shared_ptr<MovementController> controller;
 
 	virtual void initController(float movementForce, float maxWalkSpeed, float maxSprintSpeed) = 0;
+
+	virtual MovementController* getController() = 0;
 
 	virtual void tickBrain(float delta)
 	{
@@ -134,7 +136,16 @@ public:
 protected:
 	virtual void initController(float movementForce, float maxWalkSpeed, float maxSprintSpeed);
 
+	virtual MovementController *getController()
+	{
+		return controller.get();
+	}
+
+
 	void tickBrain(float delta) override;
+
+private:
+	boost::shared_ptr<DynamicMovementController> controller;
 };
 
 /**
@@ -149,6 +160,15 @@ public:
 
 protected:
 	virtual void initController(float movementForce, float maxWalkSpeed, float maxSprintSpeed);
+
+	virtual MovementController *getController()
+	{
+		return controller.get();
+	}
+
+
+private:
+	boost::shared_ptr<PlayerMovementController> controller;
 };
 
 #endif

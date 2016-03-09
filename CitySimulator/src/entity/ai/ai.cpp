@@ -16,13 +16,13 @@ void Brain::setEntity(EntityID e, bool stop)
 	phys = es->getComponent<PhysicsComponent>(entity, COMPONENT_PHYSICS);
 
 	if (stop)
-		controller->halt();
+		getController()->halt();
 }
 
 void Brain::tick(float delta)
 {
 	tickBrain(delta);
-	controller->tick(phys, delta);
+	getController()->tick(phys, delta);
 }
 
 
@@ -39,20 +39,20 @@ void EntityBrain::tickBrain(float delta)
 InputBrain::InputBrain(EntityID e)
 {
 	setEntity(e);
-	boost::dynamic_pointer_cast<PlayerMovementController>(controller)->registerListeners();
+	controller->registerListeners();
 }
 
 InputBrain::~InputBrain()
 {
-	boost::dynamic_pointer_cast<PlayerMovementController>(controller)->unregisterListeners();
+	controller->unregisterListeners();
 }
 
 void EntityBrain::initController(float movementForce, float maxWalkSpeed, float maxSprintSpeed)
 {
-	controller.reset(dynamic_cast<MovementController*>(new DynamicMovementController(entity, movementForce, maxWalkSpeed, maxSprintSpeed)));
+	controller.reset(new DynamicMovementController(entity, movementForce, maxWalkSpeed, maxSprintSpeed));
 }
 
 void InputBrain::initController(float movementForce, float maxWalkSpeed, float maxSprintSpeed)
 {
-	controller.reset(dynamic_cast<MovementController*>(new PlayerMovementController(entity, movementForce, maxWalkSpeed, maxSprintSpeed)));
+	controller.reset(new PlayerMovementController(entity, movementForce, maxWalkSpeed, maxSprintSpeed));
 }
