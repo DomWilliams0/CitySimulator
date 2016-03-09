@@ -75,4 +75,82 @@ protected:
 	virtual void initController(float movementForce, float maxWalkSpeed, float maxSprintSpeed);
 };
 
+// steering behaviours
+
+/**
+ * An interface for steering behaviours
+ */
+class BaseSteering
+{
+public:
+	BaseSteering(PhysicsComponent &entity) : entity(entity)
+	{
+	}
+
+	virtual ~BaseSteering()
+	{
+	}
+
+	virtual void tick(b2Vec2 &steeringOut, float delta) = 0;
+
+	PhysicsComponent &getEntity() const;
+
+	void setEntity(PhysicsComponent &entity);
+
+protected:
+	PhysicsComponent &entity;
+};
+
+/**
+ * A steering behaviour with a target position
+ */
+class BaseTargetedSteering : public BaseSteering
+{
+
+public:
+	BaseTargetedSteering(PhysicsComponent &entity, const sf::Vector2f &target) :
+			BaseSteering(entity), target(target)
+	{ }
+
+private:
+	virtual ~BaseTargetedSteering()
+	{
+	}
+
+	virtual void tick(b2Vec2 &steeringOut, float delta) = 0;
+
+	const sf::Vector2f &getTarget() const;
+
+	void setTarget(const sf::Vector2f &target);
+
+protected:
+	sf::Vector2f target;
+};
+
+/**
+ * A steering behaviour to seek directly to the target
+ */
+class SeekSteering : public BaseTargetedSteering
+{
+
+public:
+	SeekSteering(PhysicsComponent &entity, const sf::Vector2f &target) : BaseTargetedSteering(entity, target)
+	{ }
+
+	virtual void tick(b2Vec2 &steeringOut, float delta);
+};
+
+/**
+ * A steering behaviour to seek to and stop at the target
+ */
+class ArriveSteering : public BaseTargetedSteering
+{
+
+public:
+	ArriveSteering(PhysicsComponent &entity, const sf::Vector2f &target) : BaseTargetedSteering(entity, target)
+	{ }
+
+	virtual void tick(b2Vec2 &steeringOut, float delta);
+};
+
 #endif

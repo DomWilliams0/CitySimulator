@@ -32,6 +32,7 @@ set(SOURCE_FILES
         include/utils.hpp
         include/world.hpp
         src/entity/ai/ai.cpp
+        src/entity/ai/steering.cpp
         src/entity/animation.cpp
         src/entity/ecs/component.cpp
         src/entity/ecs/system.cpp
