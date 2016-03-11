@@ -136,9 +136,9 @@ namespace Utils
 
 namespace Math
 {
-	extern const float EPSILON;
-	extern const float degToRad;
-	extern const float radToDeg;
+	extern const double EPSILON;
+	extern const double degToRad;
+	extern const double radToDeg;
 
 	template<class V=float>
 	float lengthSquared(const sf::Vector2<V> &v)

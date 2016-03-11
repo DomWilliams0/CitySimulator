@@ -148,7 +148,7 @@ void Utils::TimeTicker::reset()
 
 namespace Math
 {
-	const float EPSILON = 0.000001f;
-	const float degToRad = static_cast<float>(M_PI / 180.0);
-	const float radToDeg = static_cast<float>(180.0 / M_PI);
+	const double EPSILON = 0.000001f;
+	const double degToRad = static_cast<float>(M_PI / 180.0);
+	const double radToDeg = static_cast<float>(180.0 / M_PI);
 }
