@@ -137,6 +137,7 @@ namespace Utils
 namespace Math
 {
 	extern const double EPSILON;
+	extern const double PI;
 	extern const double degToRad;
 	extern const double radToDeg;
 
