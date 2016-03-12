@@ -55,106 +55,88 @@ namespace TMX
 		DIAGONAL = rot(1 << 29)
 	};
 
+	enum TileType
+	{
+		TILE_TILE,
+		TILE_OBJECT,
+		TILE_PROPERTY_SHAPE
+	};
+
+
+	/**
+	 * Strips flip flags from gid, and returns the block type
+	 * @param flips [0] = horizontal, [1] = vertical, [2] = diagonal
+	 * @return Real blocktype
+	 */
 	int stripFlip(const int &gid, std::bitset<3> &flips);
 
 	struct Tile
 	{
-		Tile() : gid(0)
+		Tile() : Tile(TILE_TILE)
 		{
 		}
+
+		Tile(TileType type) : gid(0), tileType(type)
+		{
+		}
+
+		Tile(const std::string &id) : Tile(TILE_TILE, id)
+		{
+		}
+
+		Tile(TileType type, const std::string &id);
 
 		virtual ~Tile()
 		{
 		}
 
-		explicit Tile(const std::string &id);
-
-		virtual inline bool isTile()
+		inline TileType getTileType() const
 		{
-			return true;
+			return tileType;
 		}
 
-		inline bool isFlipped()
+		inline bool isFlipped() const
 		{
 			return flipped;
 		}
 
-		/// <returns>Either -90, 0 or 90</returns>
-		inline int getRotationAngle()
+		// @return Either -90, 0 or 90
+		inline int getRotationAngle() const
 		{
 			return rotationAngle;
 		}
 
-		/// <returns>Block ID | horizontal or vertical flip flags</returns>
-		inline int getFlipGID()
+		// @return Block ID | horizontal or vertical flip flags
+		inline int getFlipGID() const
 		{
 			return flipGID;
 		}
 
-		unsigned gid;
-		bool flipped;
-
-	private:
-
-		void processRotation(std::bitset<3> rotation)
+		inline unsigned int getGID() const
 		{
-			rotationAngle = 0;
-			flipGID = gid;
-
-			bool h = rotation[0];
-			bool v = rotation[1];
-			bool d = rotation[2];
-
-			if (h)
-				flipGID |= HORIZONTAL;
-			if (v)
-				flipGID |= VERTICAL;
-			if (d)
-			{
-				if (h && v)
-				{
-					rotationAngle = 90;
-					flipGID ^= VERTICAL;
-				}
-
-				else if (h)
-				{
-					rotationAngle = -90;
-					flipGID ^= VERTICAL;
-				}
-
-				else if (v)
-				{
-					rotationAngle = 90;
-					flipGID ^= HORIZONTAL;
-				}
-
-				else
-				{
-					rotationAngle = -90;
-					flipGID ^= HORIZONTAL;
-				}
-			}
+			return gid;
 		}
 
+	private:
+		unsigned gid;
+		bool flipped;
+		TileType tileType;
 		int rotationAngle, flipGID;
+
+		void processRotation(std::bitset<3> rotation);
 	};
 
 	struct PropertyObject : Tile, PropertyOwner
 	{
 
+		PropertyObject() : Tile(TILE_PROPERTY_SHAPE)
+		{ }
 	};
 
 	struct Object : Tile
 	{
-		explicit Object(const std::string &id)
-				: Tile(id)
+		Object(const std::string &id) : Tile(TILE_OBJECT, id)
 		{
-		}
-
-		inline bool isTile() override
-		{
-			return false;
 		}
 
 		sf::Vector2f position;
@@ -163,11 +145,7 @@ namespace TMX
 
 	struct Layer : PropertyOwner
 	{
-		~Layer()
-		{
-			for (Tile *tile : items)
-				delete tile;
-		}
+		~Layer();
 
 		std::string name;
 		std::vector<Tile *> items;
@@ -176,12 +154,7 @@ namespace TMX
 
 	struct TileMap : PropertyOwner
 	{
-		~TileMap()
-		{
-			for (auto &layer : layers)
-				delete layer;
-		}
-
+		~TileMap();
 
 		int width, height;
 		std::vector<Layer *> layers;

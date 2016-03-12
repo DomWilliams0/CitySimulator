@@ -360,7 +360,7 @@ void WorldTerrain::discoverFlippedTiles(const std::vector<TMX::Layer *> &layers,
 			if (tile == nullptr || !tile->isFlipped())
 				continue;
 
-			if (tile->gid == BLOCK_BLANK)
+			if (tile->getGID() == BLOCK_BLANK)
 				continue;
 
 			int flipGID = tile->getFlipGID();
@@ -393,7 +393,7 @@ void WorldTerrain::addTiles(const std::vector<TMX::Layer *> &layers, const std::
 				if (tile == nullptr)
 					continue;
 
-				BlockType blockType = static_cast<BlockType>(tile->gid);
+				BlockType blockType = static_cast<BlockType>(tile->getGID());
 				if (blockType == BLOCK_BLANK)
 					continue;
 

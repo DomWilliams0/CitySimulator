@@ -56,11 +56,6 @@ void addProperties(TMX::TileMap *tile_map, boost::property_tree::ptree &tree)
 }
 
 
-/// <summary>
-/// Strips flip flags from gid, and returns the blocktype
-/// </summary>
-/// <param name="flips">[0] = horizontal, [1] = vertical, [2] = diagonal</param>
-/// <returns>Real blocktype</returns>
 int TMX::stripFlip(const int &gid, std::bitset<3> &flips)
 {
 	flips.set(0, (gid & HORIZONTAL) != 0);
@@ -70,7 +65,7 @@ int TMX::stripFlip(const int &gid, std::bitset<3> &flips)
 	return gid & ~(HORIZONTAL | VERTICAL | DIAGONAL);
 }
 
-TMX::Tile::Tile(const std::string &id)
+TMX::Tile::Tile(TileType type, const std::string &id) : tileType(type)
 {
 	gid = boost::lexical_cast<rot>(id);
 	if (gid != 0)
@@ -177,4 +172,54 @@ TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 
 
 	return map;
+}
+void TMX::Tile::processRotation(std::bitset<3> rotation)
+{
+	rotationAngle = 0;
+	flipGID = gid;
+
+	bool h = rotation[0];
+	bool v = rotation[1];
+	bool d = rotation[2];
+
+	if (h)
+		flipGID |= HORIZONTAL;
+	if (v)
+		flipGID |= VERTICAL;
+	if (d)
+	{
+		if (h && v)
+		{
+			rotationAngle = 90;
+			flipGID ^= VERTICAL;
+		}
+
+		else if (h)
+		{
+			rotationAngle = -90;
+			flipGID ^= VERTICAL;
+		}
+
+		else if (v)
+		{
+			rotationAngle = 90;
+			flipGID ^= HORIZONTAL;
+		}
+
+		else
+		{
+			rotationAngle = -90;
+			flipGID ^= HORIZONTAL;
+		}
+	}
+}
+TMX::Layer::~Layer()
+{
+	for (Tile *tile : items)
+		delete tile;
+}
+TMX::TileMap::~TileMap()
+{
+	for (auto &layer : layers)
+		delete layer;
 }
