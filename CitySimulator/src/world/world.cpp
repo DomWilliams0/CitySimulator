@@ -387,7 +387,7 @@ sf::IntRect WorldService::discoverBuildingHeight(const sf::Vector2i &start, cons
 }
 
 
-World::World() : terrain(this), collisionMap(this)
+World::World() : terrain(this), collisionMap(this), interactionMap(this)
 {
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
@@ -430,6 +430,11 @@ WorldTerrain &World::getTerrain()
 CollisionMap &World::getCollisionMap()
 {
 	return collisionMap;
+}
+
+InteractionMap &World::getInteractionMap()
+{
+	return interactionMap;
 }
 
 b2World *World::getBox2DWorld()

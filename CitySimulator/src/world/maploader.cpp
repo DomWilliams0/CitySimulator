@@ -11,6 +11,12 @@ TMX::PropertyType propertyTypeFromString(const std::string &s)
 		return TMX::PROPERTY_TYPE;
 	if (s == "visible")
 		return TMX::PROPERTY_VISIBLE;
+	if (s == "buildingWorld")
+		return TMX::PROPERTY_BUILDING_WORLD;
+	if (s == "buildingID")
+		return TMX::PROPERTY_BUILDING_ID;
+	if (s == "door")
+		return TMX::PROPERTY_BUILDING_DOOR;
 
 	Logger::logWarning("Unknown PropertyType: " + s);
 	return TMX::PROPERTY_UNKNOWN;

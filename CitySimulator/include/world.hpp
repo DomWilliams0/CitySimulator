@@ -60,6 +60,9 @@ bool isTileLayer(const LayerType &layerType);
 
 bool isOverLayer(const LayerType &layerType);
 
+/**
+ * The tileset for the world
+ */
 class Tileset
 {
 public:
@@ -102,6 +105,9 @@ private:
 	int getIndex(int x, int y) const;
 };
 
+/**
+ * A base world item, which only holds a pointer to its parent container
+ */
 class BaseWorld
 {
 public:
@@ -113,6 +119,9 @@ protected:
 	World *container;
 };
 
+/**
+ * An tile or object in the world
+ */
 struct WorldObject
 {
 	BlockType type;
@@ -125,6 +134,9 @@ struct WorldObject
 	}
 };
 
+/**
+ * An ordered layer in the world
+ */
 struct WorldLayer
 {
 	LayerType type;
@@ -135,6 +147,9 @@ struct WorldLayer
 	}
 };
 
+/**
+ * A world item that holds the block type of every tile in the world
+ */
 class WorldTerrain : public BaseWorld
 {
 public:
@@ -195,6 +210,9 @@ protected:
 	friend class World;
 };
 
+/**
+ * A world item that holds static world collision boxes
+ */
 class CollisionMap : public BaseWorld
 {
 public:
@@ -241,6 +259,19 @@ private:
 	void mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar);
 };
 
+/**
+ * A world item that deals with block interaction
+ */
+class InteractionMap : public BaseWorld
+{
+public:
+	InteractionMap(World *container) : BaseWorld(container)
+	{
+	}
+
+	void load(const TMX::TileMap &tileMap);
+};
+
 class World : public sf::Drawable
 {
 public:
@@ -253,6 +284,8 @@ public:
 	WorldTerrain &getTerrain();
 
 	CollisionMap &getCollisionMap();
+
+	InteractionMap &getInteractionMap();
 
 	b2World *getBox2DWorld();
 
@@ -271,6 +304,7 @@ public:
 private:
 	WorldTerrain terrain;
 	CollisionMap collisionMap;
+	InteractionMap interactionMap;
 
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 

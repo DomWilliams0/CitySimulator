@@ -54,6 +54,7 @@ set(SOURCE_FILES
         src/world/building.cpp
         src/world/maploader.cpp
         src/world/world.cpp
+        src/world/world_interaction.cpp
         src/world/world_rendering.cpp
         )
 
