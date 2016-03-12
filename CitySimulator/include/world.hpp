@@ -272,7 +272,7 @@ public:
 	}
 
 	void load(const TMX::TileMap &tileMap, std::vector<std::string> &worldsToLoad);
-	void gatherBuildings(std::vector<Building> &buildings, TMX::Layer *buildingLayer);
+	void gatherBuildings(std::map<int, Building> buildings, TMX::Layer *buildingLayer);
 };
 
 class World : public sf::Drawable

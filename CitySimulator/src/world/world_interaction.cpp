@@ -4,7 +4,7 @@
 #include "building.hpp"
 
 
-void BuildingMap::gatherBuildings(std::vector<Building> &buildings, TMX::Layer *buildingLayer)
+void BuildingMap::gatherBuildings(std::map<int, Building> buildings, TMX::Layer *buildingLayer)
 {
 	for (TMX::Tile *tile : buildingLayer->items)
 	{
@@ -17,7 +17,7 @@ void BuildingMap::gatherBuildings(std::vector<Building> &buildings, TMX::Layer *
 			continue;
 
 		std::string buildingWorld(propObj->getProperty(TMX::PROPERTY_BUILDING_WORLD));
-		std::string buildingID(propObj->getProperty(TMX::PROPERTY_BUILDING_ID));
+		int buildingID = boost::lexical_cast<int>(propObj->getProperty(TMX::PROPERTY_BUILDING_ID));
 
 		sf::IntRect bounds(
 				(int) (propObj->position.x / Constants::tileScale),
@@ -27,47 +27,55 @@ void BuildingMap::gatherBuildings(std::vector<Building> &buildings, TMX::Layer *
 		);
 
 
-		buildings.emplace_back(*container, bounds, boost::lexical_cast<int>(buildingID), buildingWorld);
+		Building b(*container, bounds, buildingID, buildingWorld);
+		buildings.insert({buildingID, b});
 	}
 }
 
 
-	void BuildingMap::load(const TMX::TileMap &tileMap, std::vector<std::string> &worldsToLoad)
+void BuildingMap::load(const TMX::TileMap &tileMap, std::vector<std::string> &worldsToLoad)
+{
+	auto buildingLayer = std::find_if(tileMap.layers.begin(), tileMap.layers.end(),
+	                                  [](const TMX::Layer *layer)
+	                                  {
+		                                  return layer->name == "buildings";
+	                                  });
+
+	if (buildingLayer == tileMap.layers.end())
 	{
-		auto buildingLayer = std::find_if(tileMap.layers.begin(), tileMap.layers.end(),
-		                                  [](const TMX::Layer *layer)
-		                                  {
-			                                  return layer->name == "buildings";
-		                                  });
-
-		if (buildingLayer == tileMap.layers.end())
-		{
-			Logger::logWarning("No \"buildings\" layer was found in BuildingMap::load");
-			return;
-		}
-
-		TMX::Layer *layer = *buildingLayer;
-
-
-		std::vector<Building> buildings;
-		gatherBuildings(buildings, layer);
-
-		// entrances
-		for (TMX::Tile *tile : layer->items)
-		{
-			if (tile->getTileType() != TMX::TILE_PROPERTY_SHAPE)
-				continue;
-
-			TMX::PropertyObject *propObj = dynamic_cast<TMX::PropertyObject *>(tile);
-
-			if (!propObj->hasProperty(TMX::PROPERTY_BUILDING_DOOR))
-				continue;
-
-
-			std::string buildingID(propObj->getProperty(TMX::PROPERTY_BUILDING_ID));
-			std::string doorID(propObj->getProperty(TMX::PROPERTY_BUILDING_DOOR));
-			// todo
-
-
-		}
+		Logger::logWarning("No \"buildings\" layer was found in BuildingMap::load");
+		return;
 	}
+
+	TMX::Layer *layer = *buildingLayer;
+
+
+	std::map<int, Building> buildings;
+	gatherBuildings(buildings, layer);
+
+	// entrances
+	for (TMX::Tile *tile : layer->items)
+	{
+		if (tile->getTileType() != TMX::TILE_PROPERTY_SHAPE)
+			continue;
+
+		TMX::PropertyObject *propObj = dynamic_cast<TMX::PropertyObject *>(tile);
+
+		if (!propObj->hasProperty(TMX::PROPERTY_BUILDING_DOOR))
+			continue;
+
+
+		int buildingID = boost::lexical_cast<int>(propObj->getProperty(TMX::PROPERTY_BUILDING_ID));
+		int doorID = boost::lexical_cast<int>(propObj->getProperty(TMX::PROPERTY_BUILDING_DOOR));
+
+		auto bFind = buildings.find(buildingID);
+		if (bFind == buildings.end())
+		{
+			Logger::logWarning(format("Entrance at (%1%, %2%) has an unknown building ID '%3%'",
+			                          _str(propObj->position.x), _str(propObj->position.y), _str(buildingID)));
+			continue;
+		}
+
+		bFind->second.addDoor(doorID, tile->position, container);
+	}
+}

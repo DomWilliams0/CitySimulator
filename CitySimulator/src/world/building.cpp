@@ -50,3 +50,23 @@ void Building::setWindowLight(const sf::Vector2i &tile, bool lit)
 	BlockType newBlock = lit ? BLOCK_BUILDING_WINDOW_ON : BLOCK_BUILDING_WINDOW_OFF;
 	outsideWorld->getTerrain().setBlockType(tile, newBlock, LAYER_OVERTERRAIN);
 }
+void Building::addDoor(int doorID, const sf::Vector2f &doorTilePos, World *doorWorld)
+{
+	std::vector<Door> *doors;
+
+	// inside
+	if (doorWorld == insideWorld)
+		doors = &insideDoors;
+	else if (doorWorld == outsideWorld)
+		doors = &outsideDoors;
+	else
+	{
+		Logger::logWarning(
+				format("Tried to add a door at (%1%, %2%) to a building which isn't in its world",
+				       _str(doorTilePos.x), _str(doorTilePos.y)));
+		return;
+	}
+
+	doors->emplace_back(doorID, doorWorld, doorTilePos);
+
+}
