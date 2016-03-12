@@ -173,21 +173,21 @@
   <object id="39" x="704" y="352" width="16" height="16">
    <properties>
     <property name="buildingWorld" value="double"/>
-    <property name="bulidingID" value="double0"/>
+    <property name="buildingID" value="double0"/>
     <property name="door" value="0"/>
    </properties>
   </object>
   <object id="40" x="800" y="352" width="16" height="16">
    <properties>
     <property name="buildingWorld" value="double"/>
-    <property name="bulidingID" value="double0"/>
+    <property name="buildingID" value="double0"/>
     <property name="door" value="1"/>
    </properties>
   </object>
   <object id="41" x="320" y="288" width="16" height="16">
    <properties>
     <property name="buildingWorld" value="single"/>
-    <property name="bulidingID" value="single0"/>
+    <property name="buildingID" value="single0"/>
     <property name="door" value="0"/>
    </properties>
   </object>
