@@ -3,7 +3,8 @@
 #include "utils.hpp"
 #include "service/logging_service.hpp"
 
-Building::Building(const sf::IntRect &tileBounds, World &world) : world(world)
+Building::Building(World &world, const sf::IntRect &tileBounds, int id, std::string buildingWorldName)
+		: outsideWorld(&world), buildingID(id), insideWorldName(buildingWorldName)
 {
 	for (int x = tileBounds.left; x <= tileBounds.left + tileBounds.width; ++x)
 	{
@@ -47,5 +48,5 @@ void Building::setWindowLight(const sf::Vector2i &tile, bool lit)
 	windows[tile] = lit;
 
 	BlockType newBlock = lit ? BLOCK_BUILDING_WINDOW_ON : BLOCK_BUILDING_WINDOW_OFF;
-	world.getTerrain().setBlockType(tile, newBlock, LAYER_OVERTERRAIN);
+	outsideWorld->getTerrain().setBlockType(tile, newBlock, LAYER_OVERTERRAIN);
 }

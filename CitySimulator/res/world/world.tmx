@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="41" tilewidth="16" tileheight="16" nextobjectid="42">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="41" tilewidth="16" tileheight="16" nextobjectid="47">
  <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="100" columns="10">
   <image source="tileset.png" width="160" height="160"/>
  </tileset>
@@ -172,23 +172,32 @@
  <objectgroup name="buildings">
   <object id="39" x="704" y="352" width="16" height="16">
    <properties>
-    <property name="buildingWorld" value="double"/>
-    <property name="buildingID" value="double0"/>
+    <property name="buildingID" value="0"/>
     <property name="door" value="0"/>
    </properties>
   </object>
   <object id="40" x="800" y="352" width="16" height="16">
    <properties>
-    <property name="buildingWorld" value="double"/>
-    <property name="buildingID" value="double0"/>
+    <property name="buildingID" value="0"/>
     <property name="door" value="1"/>
    </properties>
   </object>
   <object id="41" x="320" y="288" width="16" height="16">
    <properties>
-    <property name="buildingWorld" value="single"/>
-    <property name="buildingID" value="single0"/>
+    <property name="buildingID" value="1"/>
     <property name="door" value="0"/>
+   </properties>
+  </object>
+  <object id="42" x="672" y="176" width="176" height="192">
+   <properties>
+    <property name="buildingID" value="0"/>
+    <property name="buildingWorld" value="double"/>
+   </properties>
+  </object>
+  <object id="45" x="288" y="224" width="144" height="80">
+   <properties>
+    <property name="buildingID" value="1"/>
+    <property name="buildingWorld" value="single"/>
    </properties>
   </object>
  </objectgroup>

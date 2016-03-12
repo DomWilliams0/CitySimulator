@@ -12,7 +12,8 @@ protected:
 		Locator::provide(SERVICE_CONFIG,
 		                 new ConfigService(DATA_ROOT, "test_reference_config.json", "test_config.json"));
 
-		world.loadFromFile("test_world.tmx", "data/test_tileset.png");
+		std::vector<std::string> worldsToLoad;
+		world.loadFromFile("test_world.tmx", "data/test_tileset.png", worldsToLoad);
 	}
 
 	virtual void TearDown() override

@@ -10,6 +10,7 @@
 #include "maploader.hpp"
 
 class World;
+class Building;
 
 enum BlockType
 {
@@ -261,16 +262,17 @@ private:
 };
 
 /**
- * A world item that deals with block interaction
+ * A world item that deals with buildings and their entrances
  */
-class InteractionMap : public BaseWorld
+class BuildingMap : public BaseWorld
 {
 public:
-	InteractionMap(World *container) : BaseWorld(container)
+	BuildingMap(World *container) : BaseWorld(container)
 	{
 	}
 
-	void load(const TMX::TileMap &tileMap);
+	void load(const TMX::TileMap &tileMap, std::vector<std::string> &worldsToLoad);
+	void gatherBuildings(std::vector<Building> &buildings, TMX::Layer *buildingLayer);
 };
 
 class World : public sf::Drawable
@@ -278,7 +280,7 @@ class World : public sf::Drawable
 public:
 	World();
 
-	void loadFromFile(const std::string &filename, const std::string &tileset);
+	void loadFromFile(const std::string &filename, const std::string &tileset, std::vector<std::string> &worldsToLoad);
 
 	void resize(sf::Vector2i size);
 
@@ -286,7 +288,7 @@ public:
 
 	CollisionMap &getCollisionMap();
 
-	InteractionMap &getInteractionMap();
+	BuildingMap &getBuildingMap();
 
 	b2World *getBox2DWorld();
 
@@ -305,7 +307,7 @@ public:
 private:
 	WorldTerrain terrain;
 	CollisionMap collisionMap;
-	InteractionMap interactionMap;
+	BuildingMap buildingMap;
 
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 
