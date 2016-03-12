@@ -120,6 +120,8 @@ namespace TMX
 			return gid;
 		}
 
+		sf::Vector2f position;
+
 	private:
 		unsigned gid;
 		bool flipped;
@@ -134,6 +136,8 @@ namespace TMX
 
 		PropertyObject() : Tile(TILE_PROPERTY_SHAPE)
 		{ }
+
+		sf::Vector2f dimensions;
 	};
 
 	struct Object : Tile
@@ -142,7 +146,6 @@ namespace TMX
 		{
 		}
 
-		sf::Vector2f position;
 		float rotationAnglef;
 	};
 

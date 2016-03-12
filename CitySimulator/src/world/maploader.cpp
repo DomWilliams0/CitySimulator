@@ -125,7 +125,8 @@ TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 			{
 				if (o.first == "object")
 				{
-
+					float x = o.second.get<float>("<xmlattr>.x");
+					float y = o.second.get<float>("<xmlattr>.y");
 					boost::optional<std::string> gid = o.second.get_optional<std::string>("<xmlattr>.gid");
 
 					// has a tile gid
@@ -133,8 +134,8 @@ TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 					{
 						Object *obj = new Object(*gid);
 
-						obj->position.x = o.second.get<float>("<xmlattr>.x");
-						obj->position.y = o.second.get<float>("<xmlattr>.y");
+						obj->position.x = x;
+						obj->position.y = y;
 						obj->rotationAnglef = o.second.get<float>("<xmlattr>.rotation", 0.0);
 
 						layer->items.push_back(obj);
@@ -144,6 +145,12 @@ TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 					else
 					{
 						PropertyObject *propObj = new PropertyObject;
+						propObj->position.x = x;
+						propObj->position.y = y;
+						propObj->dimensions.x = o.second.get<float>("<xmlattr>.width");
+						propObj->dimensions.y = o.second.get<float>("<xmlattr>.height");
+
+
 						for (auto &prop : o.second.get_child("properties"))
 						{
 							std::string key(prop.second.get<std::string>("<xmlattr>.name"));
