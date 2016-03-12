@@ -5,21 +5,21 @@
 #include "utils.hpp"
 #include "service/logging_service.hpp"
 
-TMX::PropertyType propertyTypeFromString(const std::string &s)
+TMX::PropertyType TMX::propertyTypeFromString(const std::string &s)
 {
 	if (s == "type")
-		return TMX::PROPERTY_TYPE;
+		return PROPERTY_TYPE;
 	if (s == "visible")
-		return TMX::PROPERTY_VISIBLE;
+		return PROPERTY_VISIBLE;
 	if (s == "buildingWorld")
-		return TMX::PROPERTY_BUILDING_WORLD;
+		return PROPERTY_BUILDING_WORLD;
 	if (s == "buildingID")
-		return TMX::PROPERTY_BUILDING_ID;
+		return PROPERTY_BUILDING_ID;
 	if (s == "door")
-		return TMX::PROPERTY_BUILDING_DOOR;
+		return PROPERTY_BUILDING_DOOR;
 
 	Logger::logWarning("Unknown PropertyType: " + s);
-	return TMX::PROPERTY_UNKNOWN;
+	return PROPERTY_UNKNOWN;
 }
 
 void addProperties(TMX::TileMap *tile_map, boost::property_tree::ptree &tree)
@@ -42,7 +42,7 @@ void addProperties(TMX::TileMap *tile_map, boost::property_tree::ptree &tree)
 
 			Logger::logDebuggier(format("Found world property '%1%' => '%2%'", name, value));
 
-			TMX::PropertyType type = propertyTypeFromString(name);
+			TMX::PropertyType type = TMX::propertyTypeFromString(name);
 			if (type != TMX::PROPERTY_UNKNOWN)
 				tile_map->addProperty(type, value);
 		}
