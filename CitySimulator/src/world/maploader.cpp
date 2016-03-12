@@ -159,8 +159,8 @@ TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 							}
 
 							propObj->addProperty(propType, value);
-							layer->items.push_back(propObj);
 						}
+						layer->items.push_back(propObj);
 
 					}
 				}
