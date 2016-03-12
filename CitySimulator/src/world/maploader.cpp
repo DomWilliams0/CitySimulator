@@ -105,8 +105,7 @@ TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 		Layer *layer = new Layer;
 		layer->name = pair.second.get<std::string>("<xmlattr>.name");
 		layer->visible = pair.second.get<int>("<xmlattr>.visible", 1) != 0;
-		layer->items.resize(map->width * map->height);
-		int i(0);
+		layer->items.reserve(map->width * map->height);
 
 		// tile layerDepths
 		if (pair.first == "layer")
@@ -119,16 +118,14 @@ TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 			tk tokens(data, sep(",\n\r"));
 
 			for (auto it = tokens.begin(); it != tokens.end(); ++it)
-			{
-				Tile *t = new Tile(*it);
-				layer->items[i++] = t;
-			}
+				layer->items.push_back(new Tile(*it));
+
+			layer->items.resize(map->width * map->height);
 		}
 
 			// object groups
 		else
 		{
-			i = 0;
 			for (auto &o : pair.second)
 			{
 				if (o.first == "object")
@@ -140,7 +137,7 @@ TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 					obj->position.y = o.second.get<float>("<xmlattr>.y");
 					obj->rotationAnglef = o.second.get<float>("<xmlattr>.rotation", 0.0);
 
-					layer->items[i++] = obj;
+					layer->items.push_back(obj);
 				}
 			}
 		}
