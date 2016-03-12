@@ -29,6 +29,8 @@ LayerType layerTypeFromString(const std::string &s)
 		return LAYER_OBJECTS;
 	if (s == "collisions")
 		return LAYER_COLLISIONS;
+	if (s == "buildings")
+		return LAYER_BUILDINGS;
 
 	Logger::logWarning("Unknown LayerType: " + s);
 	return LAYER_UNKNOWN;
