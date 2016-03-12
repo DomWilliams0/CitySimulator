@@ -17,6 +17,8 @@ struct BlockInteraction
 	{
 	}
 
+	void (*callback)(EntityIdentifier);
+
 	// todo
 };
 
@@ -33,9 +35,11 @@ struct BodyData
 	BodyData()
 	{
 	}
+
 };
 
 BodyData *createBodyDataForBlock(const BlockType &block);
 
+void interactWithSlidingDoor(EntityIdentifier entity);
 
 #endif

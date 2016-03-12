@@ -14,12 +14,12 @@
     },
     "debug": {
         "window-title": "Chity Shimulator",
-        "world-name": "collision_test.tmx",
+        "world-name": "world.tmx",
         "human-skin": "Business Man",
         "zoom": 1,
         "reload-config": true,
         "fps-tick-rate": 0.2,
-        "log-level": "info",
+        "log-level": "debuggiest",
         "render-physics": true,
         "movement": {
             "stop-decay": 8,
