@@ -123,21 +123,51 @@ TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 			layer->items.resize(map->width * map->height);
 		}
 
-			// object groups
+			// object layers
 		else
 		{
 			for (auto &o : pair.second)
 			{
 				if (o.first == "object")
 				{
-					std::string gid = o.second.get<std::string>("<xmlattr>.gid");
-					Object *obj = new Object(gid);
 
-					obj->position.x = o.second.get<float>("<xmlattr>.x");
-					obj->position.y = o.second.get<float>("<xmlattr>.y");
-					obj->rotationAnglef = o.second.get<float>("<xmlattr>.rotation", 0.0);
+					boost::optional<std::string> gid = o.second.get_optional<std::string>("<xmlattr>.gid");
 
-					layer->items.push_back(obj);
+					// has a tile gid
+					if (gid)
+					{
+						Object *obj = new Object(*gid);
+
+						obj->position.x = o.second.get<float>("<xmlattr>.x");
+						obj->position.y = o.second.get<float>("<xmlattr>.y");
+						obj->rotationAnglef = o.second.get<float>("<xmlattr>.rotation", 0.0);
+
+						layer->items.push_back(obj);
+					}
+
+						// property object
+					else
+					{
+						PropertyObject *propObj = new PropertyObject;
+						for (auto &prop : o.second.get_child("properties"))
+						{
+							std::string key(prop.second.get<std::string>("<xmlattr>.name"));
+							std::string value(prop.second.get<std::string>("<xmlattr>.value"));
+
+							PropertyType propType = propertyTypeFromString(key);
+							if (propType == PROPERTY_UNKNOWN)
+							{
+								Logger::logWarning(format("Found unknown property '%1%' in layer '%2%', skipping",
+								                          layer->name, key));
+								continue;
+
+							}
+
+							propObj->addProperty(propType, value);
+							layer->items.push_back(propObj);
+						}
+
+					}
 				}
 			}
 		}

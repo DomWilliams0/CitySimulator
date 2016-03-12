@@ -140,6 +140,11 @@ namespace TMX
 		int rotationAngle, flipGID;
 	};
 
+	struct PropertyObject : Tile, PropertyOwner
+	{
+
+	};
+
 	struct Object : Tile
 	{
 		explicit Object(const std::string &id)
