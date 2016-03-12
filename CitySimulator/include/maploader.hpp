@@ -40,10 +40,13 @@ namespace TMX
 			return map.at(type);
 		}
 
+		inline bool hasProperty(PropertyType type)
+		{
+			return map.find(type) != map.end();
+		}
 
 	private:
-		typedef std::map<PropertyType, std::string> PropMap;
-		PropMap map;
+		std::map<PropertyType, std::string> map;
 	};
 
 	typedef uint32_t rot;

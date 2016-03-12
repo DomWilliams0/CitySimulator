@@ -412,6 +412,7 @@ void World::loadFromFile(const std::string &filename, const std::string &tileset
 	// terrain
 	terrain.load(tmx, tileset);
 	collisionMap.load();
+	interactionMap.load(*tmx);
 
 	Logger::popIndent();
 	Logger::logInfo(format("Loaded world %1%", filename));
