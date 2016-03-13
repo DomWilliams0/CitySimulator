@@ -84,7 +84,7 @@ void BuildingMap::load(const TMX::TileMap &tileMap, std::vector<std::string> &wo
 			continue;
 		}
 
-		bFind->second.addDoor(doorID, tile->position, container);
+		bFind->second.addDoor(doorID, doorPos, container);
 		Logger::logDebuggiest(format("Found door %1% to building %2%", _str(doorID), _str(buildingID)));
 	}
 
@@ -94,4 +94,24 @@ void BuildingMap::load(const TMX::TileMap &tileMap, std::vector<std::string> &wo
 
 	Logger::popIndent();
 	Logger::logDebug(format("Found %1% buildings", _str(buildings.size())));
+}
+
+Building *BuildingMap::getBuildingByOutsideDoorTile(const sf::Vector2i &tile)
+{
+	for(auto &it : buildings)
+	{
+		auto &doors = it.second.getOutsideDoors();
+		for (const Door &door : doors)
+			if (door.localTilePos == tile)
+				return &it.second;
+	}
+
+	Logger::logWarning(format("Could not find building from door at (%1%, %2%)", _str(tile.x), _str(tile.y)));
+	return nullptr;
+}
+
+Building *BuildingMap::getBuildingByID(int id)
+{
+	auto it = buildings.find(id);
+	return it == buildings.end() ? nullptr : &it->second;
 }

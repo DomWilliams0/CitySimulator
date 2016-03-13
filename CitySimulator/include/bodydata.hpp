@@ -10,16 +10,21 @@ enum BodyDataType
 	BODYDATA_BLOCK
 };
 
-
-struct BlockInteraction
+enum BlockDataType
 {
-	BlockInteraction()
-	{
-	}
+	BLOCKDATA_DOOR
+};
 
-	void (*callback)(EntityIdentifier, sf::Vector2i);
+struct DoorBlockData
+{
+	int doorID;
+	int buildingID;
+};
 
-	// todo
+struct BlockData
+{
+	BlockDataType blockDataType;
+	DoorBlockData door;
 };
 
 struct BodyData
@@ -29,7 +34,7 @@ struct BodyData
 	union
 	{
 		EntityIdentifier entityID;
-		BlockInteraction blockInteraction;
+		BlockData blockData;
 	};
 
 	BodyData()
@@ -37,8 +42,5 @@ struct BodyData
 	}
 
 };
-
-// todo this shouldnt be here and has nowhere to go :(
-void interactWithSlidingDoor(EntityIdentifier entity, sf::Vector2i tilePos);
 
 #endif

@@ -9,8 +9,10 @@
 #include "SFMLDebugDraw.h"
 #include "maploader.hpp"
 #include "building.hpp"
+#include "bodydata.hpp"
 
 class World;
+class BodyData;
 
 enum BlockType
 {
@@ -265,6 +267,8 @@ private:
 	void mergeAdjacentTiles(std::vector<CollisionRect> &rects, std::vector<sf::FloatRect> &ret);
 
 	void mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar);
+
+	BodyData *createBodyData(BlockType blockType, const sf::Vector2i &tilePos);
 };
 
 /**
@@ -278,10 +282,14 @@ public:
 	}
 
 	void load(const TMX::TileMap &tileMap, std::vector<std::string> &worldsToLoad);
-	void gatherBuildings(TMX::Layer *buildingLayer);
+
+	Building *getBuildingByOutsideDoorTile(const sf::Vector2i &tile);
+	Building *getBuildingByID(int id);
 
 private:
 	std::unordered_map<int, Building> buildings;
+
+	void gatherBuildings(TMX::Layer *buildingLayer);
 };
 
 class World : public sf::Drawable

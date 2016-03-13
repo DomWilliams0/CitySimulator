@@ -24,26 +24,6 @@ World &WorldService::getWorld()
 	return world;
 }
 
-BodyData *WorldService::getSharedBodyDataForBlockType(BlockType blockType)
-{
-	auto it = bodyDataCache.find(blockType);
-	if (it != bodyDataCache.end())
-		return &it->second;
-
-	// create new data
-	if (blockType == BLOCK_SLIDING_DOOR)
-	{
-		BodyData data;
-		data.type = BODYDATA_BLOCK;
-		data.blockInteraction.callback = &interactWithSlidingDoor;
-
-		return &bodyDataCache.insert({blockType, data}).first->second;
-	}
-
-	Logger::logError(format("Cannot create body data for blocktype %1%", _str(blockType)));
-	return nullptr;
-}
-
 bool isCollidable(BlockType blockType)
 {
 	static const std::set<BlockType> collidables(
@@ -111,8 +91,8 @@ void World::loadFromFile(const std::string &filename,
 
 	// terrain
 	terrain.load(tmx, tileset);
-	collisionMap.load();
 	buildingMap.load(*tmx, worldsToLoad);
+	collisionMap.load();
 
 	Logger::popIndent();
 	Logger::logInfo(format("Loaded world %1%", filename));

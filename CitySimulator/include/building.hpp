@@ -13,10 +13,10 @@ struct Door
 {
 	int id;
 	World *ownedWorld;
-	sf::Vector2f localTilePos;
+	sf::Vector2i localTilePos;
 
 
-	Door(int id, World *ownedWorld, const sf::Vector2f &localTilePos)
+	Door(int id, World *ownedWorld, const sf::Vector2i &localTilePos)
 			: id(id), ownedWorld(ownedWorld), localTilePos(localTilePos)
 	{
 	}
@@ -42,7 +42,12 @@ public:
 	 * @param doorTilePos The door's tile position in its own world
 	 * @param doorWorld The door's own world, which must be either insideWorld or outsideWorld
 	 */
-	void addDoor(int doorID, const sf::Vector2f &doorTilePos, World *doorWorld);
+	void addDoor(int doorID, const sf::Vector2i &doorTilePos, World *doorWorld);
+
+
+	const std::vector<Door> &getOutsideDoors() const;
+
+	const std::vector<Door> &getInsideDoors() const;
 
 private:
 	World *outsideWorld;

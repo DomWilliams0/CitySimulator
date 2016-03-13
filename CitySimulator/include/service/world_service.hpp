@@ -17,9 +17,6 @@ public:
 
 	World &getWorld();
 
-	BodyData*getSharedBodyDataForBlockType(BlockType blockType);
-
-
 private:
 	// todo 1 main world, list of auxiliary worlds (or tree?)
 	World world;

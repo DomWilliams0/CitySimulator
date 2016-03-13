@@ -237,13 +237,8 @@ void CollisionMap::load()
 			aabb = transform.transformRect(aabb);
 		}
 
-		// interactable
-		if (isInteractable(collisionRect.blockType))
-		{
-			BodyData *bodyData = Locator::locate<WorldService>()->
-					getSharedBodyDataForBlockType(collisionRect.blockType);
-			fixDef.userData = bodyData;
-		}
+		// attach block data
+		fixDef.userData = createBodyData(collisionRect.blockType, {(int) aabb.left, (int) aabb.top});
 
 		box.SetAsBox(
 				size.x / 2, // half dimensions
@@ -253,6 +248,30 @@ void CollisionMap::load()
 		);
 		worldBody->CreateFixture(&fixDef);
 	}
+}
+
+BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &tilePos)
+{
+	// outside building doors
+	if (blockType == BLOCK_SLIDING_DOOR)
+	{
+		BodyData *data = new BodyData; // todo cache
+		data->type = BODYDATA_BLOCK;
+		data->blockData.blockDataType = BLOCKDATA_DOOR;
+
+		Building *building = container->getBuildingMap().getBuildingByOutsideDoorTile(tilePos);
+		if (building == nullptr)
+		{
+			Logger::logWarning(
+					format("Cannot add block data for door at (%1%, %2%), because there is no building there",
+						   _str(tilePos.x), _str(tilePos.y)));
+			return nullptr;
+		}
+
+		return data;
+	}
+
+	return nullptr;
 }
 
 void CollisionMap::GlobalContactListener::BeginContact(b2Contact *contact)
@@ -275,7 +294,8 @@ void CollisionMap::GlobalContactListener::BeginContact(b2Contact *contact)
 		b2PolygonShape *blockShape = (b2PolygonShape *) (block == aData ? a->GetShape() : b->GetShape());
 		sf::Vector2i blockTile(Utils::fromB2Vec<int>(blockShape->m_centroid));
 
-		block->blockInteraction.callback(entity->entityID, blockTile);
+		// todo
+		Logger::logDebug("Door action!");
 	}
 
 }

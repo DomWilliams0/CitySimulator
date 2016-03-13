@@ -49,7 +49,7 @@ void Building::setWindowLight(const sf::Vector2i &tile, bool lit)
 	BlockType newBlock = lit ? BLOCK_BUILDING_WINDOW_ON : BLOCK_BUILDING_WINDOW_OFF;
 	outsideWorld->getTerrain().setBlockType(tile, newBlock, LAYER_OVERTERRAIN);
 }
-void Building::addDoor(int doorID, const sf::Vector2f &doorTilePos, World *doorWorld)
+void Building::addDoor(int doorID, const sf::Vector2i &doorTilePos, World *doorWorld)
 {
 	std::vector<Door> *doors;
 
@@ -68,4 +68,14 @@ void Building::addDoor(int doorID, const sf::Vector2f &doorTilePos, World *doorW
 
 	doors->emplace_back(doorID, doorWorld, doorTilePos);
 
+}
+
+const std::vector<Door> &Building::getOutsideDoors() const
+{
+	return outsideDoors;
+}
+
+const std::vector<Door> &Building::getInsideDoors() const
+{
+	return insideDoors;
 }
