@@ -227,6 +227,7 @@ void CollisionMap::load()
 	{
 		sf::FloatRect aabb = Utils::scaleToBox2D(collisionRect.rect);
 		sf::Vector2f size(aabb.width, aabb.height);
+		fixDef.userData = nullptr;
 
 		// rotated
 		if (collisionRect.rotation != 0.f)
@@ -239,8 +240,8 @@ void CollisionMap::load()
 		// interactable
 		if (isInteractable(collisionRect.blockType))
 		{
-			BodyData *bodyData = Locator::locate<WorldService>()->getSharedBodyDataForBlockType(
-					collisionRect.blockType);
+			BodyData *bodyData = Locator::locate<WorldService>()->
+					getSharedBodyDataForBlockType(collisionRect.blockType);
 			fixDef.userData = bodyData;
 		}
 
