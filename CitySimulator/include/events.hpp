@@ -16,7 +16,7 @@ enum EventType
 	EVENT_INPUT_STOP_MOVING,
 	EVENT_INPUT_YIELD_CONTROL,
 
-	EVENT_HUMAN_SPAWN,
+	EVENT_HUMAN_JOIN_WORLD,
 	EVENT_HUMAN_DEATH,
 	EVENT_HUMAN_INTERACT,
 
@@ -55,6 +55,14 @@ struct Event
 		bool start;
 	};
 
+	struct HumanJoinWorldEvent
+	{
+		int newWorldID;
+		int spawnX;
+		int spawnY;
+		DirectionType spawnDirection;
+	};
+
 	EventType type;
 	EntityID entityID;
 
@@ -65,6 +73,7 @@ struct Event
 		InputStartMoveEvent startMove;
 		InputStopMoveEvent stopMove;
 		InputSprintEvent sprintToggle;
+		HumanJoinWorldEvent joinWorld;
 	};
 };
 

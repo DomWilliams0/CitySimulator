@@ -221,7 +221,7 @@ class CollisionMap : public BaseWorld
 {
 public:
 	explicit CollisionMap(World *container) : BaseWorld(container), world(b2Vec2(0.f, 0.f)),
-											  worldBody(nullptr)
+											  worldBody(nullptr), globalContactListener(container)
 	{
 		world.SetAllowSleeping(true);
 		world.SetContactListener(&globalContactListener);
@@ -244,8 +244,16 @@ protected:
 private:
 	struct GlobalContactListener : public b2ContactListener
 	{
+		GlobalContactListener(World *container) : container(container)
+		{ }
+
 		virtual void BeginContact(b2Contact *contact) override;
-	} globalContactListener;
+		
+	private:
+		World *container;
+	}; 
+			
+	GlobalContactListener globalContactListener;
 
 	struct CollisionRect
 	{

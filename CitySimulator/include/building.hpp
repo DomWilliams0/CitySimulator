@@ -46,7 +46,11 @@ public:
 
 	Door *getDoorByTile(const sf::Vector2i &tile);
 
-	int getID();
+	int getID() const;
+
+	std::string getInsideWorldName() const;
+
+	Door *getConnectedDoor(Door *door);
 
 private:
 	World *outsideWorld;
@@ -59,6 +63,7 @@ private:
 
 	sf::IntRect bounds;
 
+	Door *getDoorByID(int doorID, World *doorWorld);
 };
 
 
