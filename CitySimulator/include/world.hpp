@@ -283,13 +283,15 @@ public:
 
 	void load(const TMX::TileMap &tileMap, std::vector<std::string> &worldsToLoad);
 
-	Building *getBuildingByOutsideDoorTile(const sf::Vector2i &tile);
+	void getBuildingByOutsideDoorTile(const sf::Vector2i &tile, boost::optional<std::pair<Building &, Door &>> &out);
+
 	Building *getBuildingByID(int id);
 
 private:
 	std::unordered_map<int, Building> buildings;
 
 	void gatherBuildings(TMX::Layer *buildingLayer);
+
 };
 
 class World : public sf::Drawable

@@ -45,9 +45,11 @@ public:
 	void addDoor(int doorID, const sf::Vector2i &doorTilePos, World *doorWorld);
 
 
-	const std::vector<Door> &getOutsideDoors() const;
+	std::vector<Door> &getOutsideDoors();
 
-	const std::vector<Door> &getInsideDoors() const;
+	std::vector<Door> &getInsideDoors();
+
+	int getID();
 
 private:
 	World *outsideWorld;

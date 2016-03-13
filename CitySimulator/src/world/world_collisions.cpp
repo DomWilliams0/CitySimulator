@@ -259,14 +259,20 @@ BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &
 		data->type = BODYDATA_BLOCK;
 		data->blockData.blockDataType = BLOCKDATA_DOOR;
 
-		Building *building = container->getBuildingMap().getBuildingByOutsideDoorTile(tilePos);
-		if (building == nullptr)
+		boost::optional<std::pair<Building&, Door&>> buildingAndDoor;
+		container->getBuildingMap().getBuildingByOutsideDoorTile(tilePos, buildingAndDoor);
+
+		if (!buildingAndDoor)
 		{
 			Logger::logWarning(
 					format("Cannot add block data for door at (%1%, %2%), because there is no building there",
 						   _str(tilePos.x), _str(tilePos.y)));
 			return nullptr;
 		}
+
+		DoorBlockData *doorData = &data->blockData.door;
+		doorData->buildingID = buildingAndDoor->first.getID();
+		doorData->doorID = buildingAndDoor->second.id;
 
 		return data;
 	}
@@ -291,11 +297,16 @@ void CollisionMap::GlobalContactListener::BeginContact(b2Contact *contact)
 		BodyData *entity = aData->type == BODYDATA_ENTITY ? aData : bData;
 		BodyData *block = entity == aData ? bData : aData;
 
-		b2PolygonShape *blockShape = (b2PolygonShape *) (block == aData ? a->GetShape() : b->GetShape());
-		sf::Vector2i blockTile(Utils::fromB2Vec<int>(blockShape->m_centroid));
+		// door
+		if (block->blockData.blockDataType == BLOCKDATA_DOOR)
+		{
+			DoorBlockData *door = &block->blockData.door;
+			Logger::logDebug(format("Entity %1% interacts with door %2% of building %3%",
+									_str(entity->entityID.id), _str(door->doorID), _str(door->buildingID)));
+			// todo fire move to world event
+		}
 
-		// todo
-		Logger::logDebug("Door action!");
+
 	}
 
 }

@@ -70,12 +70,17 @@ void Building::addDoor(int doorID, const sf::Vector2i &doorTilePos, World *doorW
 
 }
 
-const std::vector<Door> &Building::getOutsideDoors() const
+std::vector<Door> & Building::getOutsideDoors()
 {
 	return outsideDoors;
 }
 
-const std::vector<Door> &Building::getInsideDoors() const
+std::vector<Door> &Building::getInsideDoors()
 {
 	return insideDoors;
+}
+
+int Building::getID()
+{
+	return buildingID;
 }

@@ -96,18 +96,25 @@ void BuildingMap::load(const TMX::TileMap &tileMap, std::vector<std::string> &wo
 	Logger::logDebug(format("Found %1% buildings", _str(buildings.size())));
 }
 
-Building *BuildingMap::getBuildingByOutsideDoorTile(const sf::Vector2i &tile)
+void BuildingMap::getBuildingByOutsideDoorTile(const sf::Vector2i &tile,
+											   boost::optional<std::pair<Building &, Door &>> &out)
 {
 	for(auto &it : buildings)
 	{
 		auto &doors = it.second.getOutsideDoors();
-		for (const Door &door : doors)
+		for (Door &door : doors)
+		{
 			if (door.localTilePos == tile)
-				return &it.second;
+			{
+				std::pair<Building&, Door&> pair = {it.second, door};
+				out = pair;
+				return;
+			}
+
+		}
 	}
 
 	Logger::logWarning(format("Could not find building from door at (%1%, %2%)", _str(tile.x), _str(tile.y)));
-	return nullptr;
 }
 
 Building *BuildingMap::getBuildingByID(int id)
