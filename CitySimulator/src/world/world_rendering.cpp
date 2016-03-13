@@ -385,28 +385,35 @@ void WorldTerrain::addTiles(const std::vector<TMX::Layer *> &layers, const std::
 	{
 		LayerType layerType = types[layerIndex++];
 
-		for (int y = 0; y < tileSize.y; ++y)
+		if (layerType == LAYER_OBJECTS)
 		{
-			for (int x = 0; x < tileSize.x; ++x)
+			// objects
+			for (TMX::Tile *item : layer->items)
 			{
-				TMX::Tile *tile = layer->items[x + y * tileSize.x];
-				if (tile == nullptr)
-					continue;
-
-				BlockType blockType = static_cast<BlockType>(tile->getGID());
+				BlockType blockType = static_cast<BlockType>(item->getGID());
 				if (blockType == BLOCK_BLANK)
 					continue;
 
-				// objects are not stuck to the grid
-				if (layerType == LAYER_OBJECTS)
-				{
-					TMX::Object *object = dynamic_cast<TMX::Object *>(tile);
-					addObject(object->position, blockType, object->rotationAnglef, tile->getFlipGID());
-				}
+				TMX::Object *object = dynamic_cast<TMX::Object *>(item);
+				addObject(object->position, blockType, object->rotationAnglef, item->getFlipGID());
+			}
+		}
 
-					// tiles
-				else
+		else if (isTileLayer(layerType))
+		{
+			// tiles
+			for (int y = 0; y < tileSize.y; ++y)
+			{
+				for (int x = 0; x < tileSize.x; ++x)
 				{
+					TMX::Tile *tile = layer->items[x + y * tileSize.x];
+					if (tile == nullptr)
+						continue;
+
+					BlockType blockType = static_cast<BlockType>(tile->getGID());
+					if (blockType == BLOCK_BLANK)
+						continue;
+
 					pos.x = x;
 					pos.y = y;
 
