@@ -283,7 +283,7 @@ public:
 
 	void load(const TMX::TileMap &tileMap, std::vector<std::string> &worldsToLoad);
 
-	void getBuildingByOutsideDoorTile(const sf::Vector2i &tile, boost::optional<std::pair<Building &, Door &>> &out);
+	void getBuildingByOutsideDoorTile(const sf::Vector2i &tile, boost::optional<std::pair<Building *, Door *>> &out);
 
 	Building *getBuildingByID(int id);
 

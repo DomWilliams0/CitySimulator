@@ -97,7 +97,7 @@ void BuildingMap::load(const TMX::TileMap &tileMap, std::vector<std::string> &wo
 }
 
 void BuildingMap::getBuildingByOutsideDoorTile(const sf::Vector2i &tile,
-											   boost::optional<std::pair<Building &, Door &>> &out)
+											   boost::optional<std::pair<Building *, Door *>>& out)
 {
 	for(auto &it : buildings)
 	{
@@ -106,7 +106,7 @@ void BuildingMap::getBuildingByOutsideDoorTile(const sf::Vector2i &tile,
 		{
 			if (door.localTilePos == tile)
 			{
-				std::pair<Building&, Door&> pair = {it.second, door};
+				std::pair<Building*, Door*> pair = {&it.second, &door};
 				out = pair;
 				return;
 			}

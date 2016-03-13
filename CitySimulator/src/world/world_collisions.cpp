@@ -259,7 +259,7 @@ BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &
 		data->type = BODYDATA_BLOCK;
 		data->blockData.blockDataType = BLOCKDATA_DOOR;
 
-		boost::optional<std::pair<Building&, Door&>> buildingAndDoor;
+		boost::optional<std::pair<Building*, Door*>> buildingAndDoor;
 		container->getBuildingMap().getBuildingByOutsideDoorTile(tilePos, buildingAndDoor);
 
 		if (!buildingAndDoor)
@@ -271,8 +271,8 @@ BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &
 		}
 
 		DoorBlockData *doorData = &data->blockData.door;
-		doorData->buildingID = buildingAndDoor->first.getID();
-		doorData->doorID = buildingAndDoor->second.id;
+		doorData->building = buildingAndDoor->first;
+		doorData->door = buildingAndDoor->second;
 
 		return data;
 	}
@@ -302,7 +302,7 @@ void CollisionMap::GlobalContactListener::BeginContact(b2Contact *contact)
 		{
 			DoorBlockData *door = &block->blockData.door;
 			Logger::logDebug(format("Entity %1% interacts with door %2% of building %3%",
-									_str(entity->entityID.id), _str(door->doorID), _str(door->buildingID)));
+									_str(entity->entityID.id), _str(door->door->id), _str(door->building->getID())));
 			// todo fire move to world event
 		}
 
