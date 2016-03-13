@@ -222,6 +222,7 @@ public:
 											  worldBody(nullptr)
 	{
 		world.SetAllowSleeping(true);
+		world.SetContactListener(&globalContactListener);
 	}
 
 	~CollisionMap();
@@ -239,6 +240,11 @@ protected:
 	friend class World;
 
 private:
+	struct GlobalContactListener : public b2ContactListener
+	{
+		virtual void BeginContact(b2Contact *contact) override;
+	} globalContactListener;
+
 	struct CollisionRect
 	{
 		sf::FloatRect rect;

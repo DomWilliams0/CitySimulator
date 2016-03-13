@@ -254,3 +254,27 @@ void CollisionMap::load()
 	}
 }
 
+void CollisionMap::GlobalContactListener::BeginContact(b2Contact *contact)
+{
+	b2Fixture *a = contact->GetFixtureA();
+	b2Fixture *b = contact->GetFixtureB();
+
+	BodyData *aData = (BodyData *) a->GetUserData();
+	BodyData *bData = (BodyData *) b->GetUserData();
+
+	if (aData == nullptr || bData == nullptr)
+		return;
+
+	// entity with block
+	if (aData->type != bData->type)
+	{
+		BodyData *entity = aData->type == BODYDATA_ENTITY ? aData : bData;
+		BodyData *block = entity == aData ? bData : aData;
+
+		b2PolygonShape *blockShape = (b2PolygonShape *) (block == aData ? a->GetShape() : b->GetShape());
+		sf::Vector2i blockTile(Utils::fromB2Vec<int>(blockShape->m_centroid));
+
+		block->blockInteraction.callback(entity->entityID, blockTile);
+	}
+
+}
