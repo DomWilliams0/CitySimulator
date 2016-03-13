@@ -157,10 +157,7 @@ struct WorldLayer
 class WorldTerrain : public BaseWorld
 {
 public:
-
 	WorldTerrain(World *container, Tileset &tileset);
-
-	~WorldTerrain();
 
 	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = LAYER_TERRAIN,
 					  int rotationAngle = 0, int flipGID = 0);
@@ -200,7 +197,6 @@ private:
 	sf::VertexArray &getVertices(const LayerType &layerType);
 
 protected:
-
 	void resizeVertices();
 
 	void registerLayer(LayerType layerType, int depth);

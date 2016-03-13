@@ -177,10 +177,6 @@ WorldTerrain::WorldTerrain(World *container, Tileset &tileset) : BaseWorld(conta
 	overLayerVertices.setPrimitiveType(sf::Quads);
 }
 
-WorldTerrain::~WorldTerrain()
-{
-}
-
 int WorldTerrain::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
 {
 	int index = (pos.x + pos.y * container->tileSize.x);
