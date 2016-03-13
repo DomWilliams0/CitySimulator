@@ -23,12 +23,9 @@ void WorldService::onEnable()
 		{
 			int id = lastID++;
 
-			// World &w = worlds.emplace(id, id).first->second;
-			// this doesn't want to compile :(
-			// looks like i have to use an unnecessary temporary instead
-
-			World &w = worlds.insert({id, {id, tileset}}).first->second;
+			World w(id, tileset);
 			w.loadFromFile(worldName, flippedGIDs, worldsToLoad);
+			worlds.insert({id, std::move(w)});
 		}
 	}
 
