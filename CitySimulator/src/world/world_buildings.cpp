@@ -29,6 +29,9 @@ void BuildingMap::gatherBuildings(std::map<int, Building> buildings, TMX::Layer 
 
 		Building b(*container, bounds, buildingID, buildingWorld);
 		buildings.insert({buildingID, b});
+
+		Logger::logDebuggiest(format("Found building %1% at (%2%, %3%)",
+									 _str(buildingID), _str(bounds.left), _str(bounds.top)));
 	}
 }
 
@@ -77,5 +80,6 @@ void BuildingMap::load(const TMX::TileMap &tileMap, std::vector<std::string> &wo
 		}
 
 		bFind->second.addDoor(doorID, tile->position, container);
+		Logger::logDebuggiest(format("Found door %1% to building %2%", _str(doorID), _str(buildingID)));
 	}
 }
