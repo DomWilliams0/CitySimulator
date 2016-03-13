@@ -13,30 +13,42 @@ void WorldService::onEnable()
 	lastID = 0;
 
 	std::vector<int> flippedGIDs;
+	std::map<TMX::TileMap *, World *> tileMapCache;
 
-	while(!worldsToLoad.empty())
+	while (!worldsToLoad.empty())
 	{
 		std::vector<std::string> loadingNow(worldsToLoad.begin(), worldsToLoad.end());
 		worldsToLoad.clear();
 
-		for(std::string &worldName : loadingNow)
+		for (std::string &worldName : loadingNow)
 		{
 			int id = lastID++;
 
-			World w(id, tileset);
-			w.loadFromFile(worldName, flippedGIDs, worldsToLoad);
-			worlds.insert({id, std::move(w)});
+			TMX::TileMap *tmx = new TMX::TileMap;
+			World *w = new World(id, tileset);
+			w->loadFromFile(worldName, flippedGIDs, worldsToLoad, tmx);
+			tileMapCache.insert({tmx, w});
+			worlds.insert({id, w});
 		}
 	}
 
 	tileset.load(tilesetPath);
 	tileset.convertToTexture(flippedGIDs);
 
-	mainWorld = &worlds.at(0);
+	for (auto &pair : tileMapCache)
+	{
+		pair.second->finishLoading(pair.first);
+		delete pair.first;
+	}
+
+	mainWorld = worlds.at(0);
 }
 
 void WorldService::onDisable()
 {
+	mainWorld = nullptr;
+	for (auto &pair : worlds)
+		delete pair.second;
 }
 
 
@@ -94,24 +106,28 @@ World::World(int id, Tileset &tileset) : terrain(this, tileset), collisionMap(th
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
 
-void World::loadFromFile(const std::string &filename,
-						 std::vector<int> &flippedGIDs, std::set<std::string> &worldsToLoad)
+void World::loadFromFile(std::string &filename, std::vector<int> flippedGIDs,
+						 std::set<std::string> &worldsToLoad, TMX::TileMap *tmx)
 {
 	Logger::logDebug(format("Began loading world %1%", filename));
 	Logger::pushIndent();
 
 	std::string path(Utils::joinPaths(Config::getResource("world.root"), filename));
 
-	TMX::TileMap tmx;
-	tmx.load(path);
-	resize(tmx.size);
+	tmx->load(path);
+	resize(tmx->size);
 
-	terrain.load(tmx, flippedGIDs);
-	buildingMap.load(tmx, worldsToLoad);
-	collisionMap.load();
+	terrain.load(*tmx, flippedGIDs);
+	buildingMap.load(*tmx, worldsToLoad);
 
 	Logger::popIndent();
 	Logger::logInfo(format("Loaded world %1%", filename));
+}
+
+void World::finishLoading(TMX::TileMap *tmx)
+{
+	terrain.loadLayers(tmx->layers);
+	collisionMap.load();
 }
 
 void World::resize(sf::Vector2i size)

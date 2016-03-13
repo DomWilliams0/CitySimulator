@@ -19,7 +19,7 @@ public:
 
 private:
 	World *mainWorld;
-	std::unordered_map<int, World> worlds;
+	std::unordered_map<int, World*> worlds;
 	int lastID;
 
 	Tileset tileset;

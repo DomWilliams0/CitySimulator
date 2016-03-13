@@ -371,7 +371,7 @@ void WorldTerrain::discoverFlippedTiles(const std::vector<TMX::Layer *> &layers,
 	}
 }
 
-void WorldTerrain::addTiles(const std::vector<TMX::Layer *> &layers, const std::vector<LayerType> &types)
+void WorldTerrain::loadLayers(const std::vector<TMX::Layer *> &layers)
 {
 	sf::Vector2i tileSize = container->tileSize;
 	sf::Vector2i pos;
@@ -379,7 +379,7 @@ void WorldTerrain::addTiles(const std::vector<TMX::Layer *> &layers, const std::
 
 	for (TMX::Layer *layer : layers)
 	{
-		LayerType layerType = types[layerIndex++];
+		LayerType layerType = this->layers[layerIndex++].type;
 
 		if (layerType == LAYER_OBJECTS)
 		{
@@ -440,9 +440,6 @@ void WorldTerrain::load(TMX::TileMap &tileMap, std::vector<int> &flippedGIDs)
 
 	// collect any gids that need flipping
 	discoverFlippedTiles(tileMap.layers, flippedGIDs);
-
-	// add tiles to terrain
-	addTiles(tileMap.layers, types);
 }
 
 RenderService::RenderService(sf::RenderWindow *renderWindow) : window(renderWindow)

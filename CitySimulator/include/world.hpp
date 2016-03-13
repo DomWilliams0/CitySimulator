@@ -184,7 +184,6 @@ private:
 
 	void discoverFlippedTiles(const std::vector<TMX::Layer *> &layers, std::vector<int> &flippedGIDs);
 
-	void addTiles(const std::vector<TMX::Layer *> &layers, const std::vector<LayerType> &types);
 
 	int getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
 
@@ -204,6 +203,8 @@ protected:
 	void render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const;
 
 	void load(TMX::TileMap &tileMap, std::vector<int> &flippedGIDs);
+
+	void loadLayers(const std::vector<TMX::Layer *> &layers);
 
 	friend struct TMX::TileMap;
 
@@ -301,7 +302,10 @@ class World : public sf::Drawable
 public:
 	World(int id, Tileset &tileset);
 
-	void loadFromFile(const std::string &filename, std::vector<int> &flippedGIDs, std::set<std::string> &worldsToLoad);
+	void loadFromFile(std::string &filename, std::vector<int> flippedGIDs, std::set<std::string>& worldsToLoad,
+						  TMX::TileMap *pMap);
+
+	void finishLoading(TMX::TileMap *tmx);
 
 	void resize(sf::Vector2i size);
 
