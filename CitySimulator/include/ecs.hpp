@@ -16,17 +16,6 @@ typedef int EntityID;
 
 class b2World;
 
-template<class T>
-sf::Vector2<T> fromB2Vec(const b2Vec2 &v)
-{
-	return {static_cast<T>(v.x), static_cast<T>(v.y)};
-}
-
-template<class T>
-b2Vec2 toB2Vec(const sf::Vector2<T> &v)
-{
-	return {static_cast<float>(v.x), static_cast<float>(v.y)};
-}
 
 // component-entity-systems
 
@@ -87,29 +76,29 @@ struct PhysicsComponent : BaseComponent
 
 	inline sf::Vector2f getTilePosition() const
 	{
-		return fromB2Vec<float>(body->GetPosition());
+		return Utils::fromB2Vec<float>(body->GetPosition());
 	}
 
 	inline sf::Vector2f getPosition() const
 	{
 		b2Vec2 pos(body->GetPosition());
-		return Utils::toPixel(fromB2Vec<float>(pos));
+		return Utils::toPixel(Utils::fromB2Vec<float>(pos));
 	}
 
 	inline sf::Vector2f getVelocity() const
 	{
 		b2Vec2 v = body->GetLinearVelocity();
-		return fromB2Vec<float>(v);
+		return Utils::fromB2Vec<float>(v);
 	}
 
 	inline sf::Vector2f getLastVelocity() const
 	{
-		return fromB2Vec<float>(lastVelocity);
+		return Utils::fromB2Vec<float>(lastVelocity);
 	}
 
 	inline void setVelocity(const sf::Vector2f &velocity)
 	{
-		body->SetLinearVelocity(toB2Vec(velocity));
+		body->SetLinearVelocity(Utils::toB2Vec(velocity));
 	}
 
 	inline bool isStopped()

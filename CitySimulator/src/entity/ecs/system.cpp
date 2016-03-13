@@ -74,7 +74,7 @@ void PhysicsSystem::tickEntity(EntityService *es, EntityID e, float dt)
 	// store current velocity for next step
 	auto vel(physics->getVelocity());
 	if (vel.x != 0.f || vel.y != 0.f)
-		physics->lastVelocity = toB2Vec(physics->getVelocity());
+		physics->lastVelocity = Utils::toB2Vec(physics->getVelocity());
 }
 
 void tempDrawVector(PhysicsComponent *physics, const sf::Vector2f vector, sf::Color colour, sf::RenderWindow &window)

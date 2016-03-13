@@ -263,7 +263,7 @@ b2Vec2 DynamicMovementController::tick(float delta, float &newMaxSpeed)
 
 void DynamicMovementController::move(const sf::Vector2f &vector)
 {
-	b2Vec2 vec = toB2Vec(vector);
+	b2Vec2 vec = Utils::toB2Vec(vector);
 //	vec.Normalize();
 	steering += vec;
 }

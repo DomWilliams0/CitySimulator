@@ -2,6 +2,7 @@
 #define CITYSIMULATOR_UTILS_HPP
 
 #include <SFML/Graphics.hpp>
+#include <Box2D/Common/b2Math.h>
 #include <random>
 
 #define _str std::to_string
@@ -87,6 +88,18 @@ namespace Utils
 	sf::Vector2<V> toTile(V x, V y)
 	{
 		return sf::Vector2<V>(x / Constants::tileSize, y / Constants::tileSize);
+	}
+
+	template<class T>
+	sf::Vector2<T> fromB2Vec(const b2Vec2 &v)
+	{
+		return {static_cast<T>(v.x), static_cast<T>(v.y)};
+	}
+
+	template<class T>
+	b2Vec2 toB2Vec(const sf::Vector2<T> &v)
+	{
+		return {static_cast<float>(v.x), static_cast<float>(v.y)};
 	}
 
 	/// <summary>
