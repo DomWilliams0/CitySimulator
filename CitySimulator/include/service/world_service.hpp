@@ -24,7 +24,7 @@ private:
 
 	Tileset tileset;
 
-	std::string mainWorldPath, tilesetPath;
+	std::string mainWorldPath;
 };
 
 #endif

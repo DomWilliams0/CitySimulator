@@ -4,7 +4,7 @@
 #include "service/logging_service.hpp"
 #include "service/render_service.hpp"
 
-Tileset::Tileset() : converted(false)
+Tileset::Tileset(const std::string &path) : converted(false), path(path)
 {
 }
 
@@ -13,7 +13,7 @@ Tileset::~Tileset()
 	delete points;
 }
 
-void Tileset::load(const std::string &path)
+void Tileset::load()
 {
 	// load image
 	image = new sf::Image;

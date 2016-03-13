@@ -70,11 +70,11 @@ bool isOverLayer(const LayerType &layerType);
 class Tileset
 {
 public:
-	Tileset();
+	Tileset(const std::string &path);
 
 	~Tileset();
 
-	void load(const std::string &path);
+	void load();
 
 	void textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipGID);
 
@@ -98,6 +98,7 @@ private:
 	sf::Texture texture;
 	sf::Vector2f *points;
 	sf::Vector2u size;
+	std::string path;
 
 	std::unordered_map<int, int> flippedBlockTypes;
 	bool converted;

@@ -2,7 +2,7 @@
 #include "service/locator.hpp"
 
 WorldService::WorldService(const std::string &mainWorldPath, const std::string &tilesetPath)
-		: mainWorldPath(mainWorldPath), tilesetPath(tilesetPath)
+		: mainWorldPath(mainWorldPath), tileset(tilesetPath)
 {
 }
 
@@ -32,7 +32,7 @@ void WorldService::onEnable()
 		}
 	}
 
-	tileset.load(tilesetPath);
+	tileset.load();
 	tileset.convertToTexture(flippedGIDs);
 
 	for (auto &pair : tileMapCache)
