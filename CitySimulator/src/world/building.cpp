@@ -51,14 +51,7 @@ void Building::setWindowLight(const sf::Vector2i &tile, bool lit)
 }
 void Building::addDoor(int doorID, const sf::Vector2i &doorTilePos, World *doorWorld)
 {
-	std::vector<Door> *doors;
-
-	// inside
-	if (doorWorld == insideWorld)
-		doors = &insideDoors;
-	else if (doorWorld == outsideWorld)
-		doors = &outsideDoors;
-	else
+	if (doorWorld != insideWorld && doorWorld != outsideWorld)
 	{
 		Logger::logWarning(
 				format("Tried to add a door at (%1%, %2%) to a building which isn't in its world",
@@ -66,18 +59,14 @@ void Building::addDoor(int doorID, const sf::Vector2i &doorTilePos, World *doorW
 		return;
 	}
 
-	doors->emplace_back(doorID, doorWorld, doorTilePos);
-
+	doors.insert({doorTilePos, Door(doorID, doorWorld, doorTilePos)});
 }
 
-std::vector<Door> & Building::getOutsideDoors()
-{
-	return outsideDoors;
-}
 
-std::vector<Door> &Building::getInsideDoors()
+Door *Building::getDoorByTile(const sf::Vector2i &tile)
 {
-	return insideDoors;
+	auto it = doors.find(tile);
+	return it == doors.end() ? &it->second : nullptr;
 }
 
 int Building::getID()

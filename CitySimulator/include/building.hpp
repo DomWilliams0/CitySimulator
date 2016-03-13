@@ -44,10 +44,7 @@ public:
 	 */
 	void addDoor(int doorID, const sf::Vector2i &doorTilePos, World *doorWorld);
 
-
-	std::vector<Door> &getOutsideDoors();
-
-	std::vector<Door> &getInsideDoors();
+	Door *getDoorByTile(const sf::Vector2i &tile);
 
 	int getID();
 
@@ -58,8 +55,7 @@ private:
 	int buildingID;
 
 	std::map<sf::Vector2i, bool> windows;
-	std::vector<Door> outsideDoors;
-	std::vector<Door> insideDoors;
+	std::map<sf::Vector2i, Door> doors;
 
 	sf::IntRect bounds;
 

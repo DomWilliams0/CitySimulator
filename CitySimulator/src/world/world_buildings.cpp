@@ -1,7 +1,6 @@
 #include <boost/lexical_cast.hpp>
 #include "world.hpp"
 #include "service/logging_service.hpp"
-#include "building.hpp"
 
 
 void BuildingMap::gatherBuildings(TMX::Layer *buildingLayer)
@@ -42,10 +41,10 @@ void BuildingMap::load(const TMX::TileMap &tileMap, std::vector<std::string> &wo
 	Logger::pushIndent();
 
 	auto buildingLayer = std::find_if(tileMap.layers.begin(), tileMap.layers.end(),
-	                                  [](const TMX::Layer *layer)
-	                                  {
-		                                  return layer->name == "buildings";
-	                                  });
+									  [](const TMX::Layer *layer)
+									  {
+										  return layer->name == "buildings";
+									  });
 
 	if (buildingLayer == tileMap.layers.end())
 	{
@@ -80,7 +79,7 @@ void BuildingMap::load(const TMX::TileMap &tileMap, std::vector<std::string> &wo
 		if (bFind == buildings.end())
 		{
 			Logger::logWarning(format("Entrance at (%1%, %2%) has an unknown building ID %3%",
-			                          _str(doorPos.x), _str(doorPos.y), _str(buildingID)));
+									  _str(doorPos.x), _str(doorPos.y), _str(buildingID)));
 			continue;
 		}
 
@@ -97,21 +96,18 @@ void BuildingMap::load(const TMX::TileMap &tileMap, std::vector<std::string> &wo
 }
 
 void BuildingMap::getBuildingByOutsideDoorTile(const sf::Vector2i &tile,
-											   boost::optional<std::pair<Building *, Door *>>& out)
+											   boost::optional<std::pair<Building *, Door *>> &out)
 {
-	for(auto &it : buildings)
+	for (auto &it : buildings)
 	{
-		auto &doors = it.second.getOutsideDoors();
-		for (Door &door : doors)
+		Door *door = it.second.getDoorByTile(tile);
+		if (door != nullptr)
 		{
-			if (door.localTilePos == tile)
-			{
-				std::pair<Building*, Door*> pair = {&it.second, &door};
-				out = pair;
-				return;
-			}
-
+			std::pair<Building *, Door *> pair = {&it.second, door};
+			out = pair;
+			return;
 		}
+
 	}
 
 	Logger::logWarning(format("Could not find building from door at (%1%, %2%)", _str(tile.x), _str(tile.y)));
