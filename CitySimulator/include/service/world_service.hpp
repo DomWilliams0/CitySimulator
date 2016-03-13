@@ -9,7 +9,7 @@
 class WorldService : public BaseService
 {
 public:
-	WorldService(const std::string &worldPath, const std::string &tilesetPath);
+	WorldService(const std::string &mainWorldPath, const std::string &tilesetPath);
 
 	virtual void onEnable() override;
 
@@ -19,11 +19,11 @@ public:
 
 private:
 	// todo 1 main world, list of auxiliary worlds (or tree?)
-	World world;
+	World mainWorld;
+	std::unordered_map<int, World> worlds;
+	int lastID;
 
-	std::string worldPath, tilesetPath;
-
-	std::unordered_map<BlockType, BodyData, std::hash<int>> bodyDataCache;
+	std::string mainWorldPath, tilesetPath;
 };
 
 #endif

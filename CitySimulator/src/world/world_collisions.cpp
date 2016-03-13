@@ -154,23 +154,6 @@ CollisionMap::~CollisionMap()
 		world.DestroyBody(worldBody);
 }
 
-void CollisionMap::getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::Rect<float>> &ret)
-{
-	const static int edge = 1; // todo dependent on entity size
-
-	// gather all (unique) rects in the given range
-	sf::FloatRect rect;
-	for (int y = -edge; y <= edge; ++y)
-	{
-		for (int x = -edge; x <= edge; ++x)
-		{
-			sf::Vector2i offsetTile(tilePos.x + x, tilePos.y + y);
-			if (getRectAt(offsetTile, rect))
-				ret.insert(rect);
-		}
-	}
-}
-
 bool CollisionMap::getRectAt(const sf::Vector2i &tilePos, sf::FloatRect &ret)
 {
 	auto result(cellGrid.find(Utils::toPixel(tilePos)));

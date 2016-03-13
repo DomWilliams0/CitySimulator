@@ -3,7 +3,7 @@
 #include "service/logging_service.hpp"
 
 
-void BuildingMap::gatherBuildings(TMX::Layer *buildingLayer)
+void BuildingMap::gatherBuildings(TMX::Layer *buildingLayer, std::set<std::string> &worldsToLoad)
 {
 	for (TMX::Tile *tile : buildingLayer->items)
 	{
@@ -29,13 +29,15 @@ void BuildingMap::gatherBuildings(TMX::Layer *buildingLayer)
 		Building b(*container, bounds, buildingID, buildingWorld);
 		buildings.insert({buildingID, b});
 
+		worldsToLoad.insert("buildings/" + buildingWorld + ".tmx"); // todo have a getWorldPath function
+
 		Logger::logDebuggiest(format("Found building %1% at (%2%, %3%)",
 									 _str(buildingID), _str(bounds.left), _str(bounds.top)));
 	}
 }
 
 
-void BuildingMap::load(const TMX::TileMap &tileMap, std::vector<std::string> &worldsToLoad)
+void BuildingMap::load(const TMX::TileMap &tileMap, std::set<std::string> &worldsToLoad)
 {
 	Logger::logDebug("Loading buildings");
 	Logger::pushIndent();
@@ -55,7 +57,7 @@ void BuildingMap::load(const TMX::TileMap &tileMap, std::vector<std::string> &wo
 
 	TMX::Layer *layer = *buildingLayer;
 
-	gatherBuildings(layer);
+	gatherBuildings(layer, worldsToLoad);
 
 	// entrances
 	for (TMX::Tile *tile : layer->items)

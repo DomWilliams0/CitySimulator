@@ -229,8 +229,6 @@ public:
 
 	~CollisionMap();
 
-	void getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::FloatRect> &ret);
-
 	bool getRectAt(const sf::Vector2i &tilePos, sf::FloatRect &ret);
 
 protected:
@@ -289,7 +287,7 @@ public:
 	{
 	}
 
-	void load(const TMX::TileMap &tileMap, std::vector<std::string> &worldsToLoad);
+	void load(const TMX::TileMap &tileMap, std::set<std::string> &worldsToLoad);
 
 	void getBuildingByOutsideDoorTile(const sf::Vector2i &tile, boost::optional<std::pair<Building *, Door *>> &out);
 
@@ -298,16 +296,16 @@ public:
 private:
 	std::unordered_map<int, Building> buildings;
 
-	void gatherBuildings(TMX::Layer *buildingLayer);
+	void gatherBuildings(TMX::Layer *buildingLayer, std::set<std::string> &worldsToLoad);
 
 };
 
 class World : public sf::Drawable
 {
 public:
-	World();
+	World(int id);
 
-	void loadFromFile(const std::string &filename, const std::string &tileset, std::vector<std::string> &worldsToLoad);
+	bool loadFromFile(const std::string &filename, const std::string &tileset, std::set<std::string> &worldsToLoad);
 
 	void resize(sf::Vector2i size);
 
@@ -329,12 +327,14 @@ public:
 
 	BlockType getBlockAt(const sf::Vector2i &tile, LayerType layer = LAYER_TERRAIN);
 
-	void getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::FloatRect> &ret);
+	int getID() const;
 
 private:
 	WorldTerrain terrain;
 	CollisionMap collisionMap;
 	BuildingMap buildingMap;
+
+	int id;
 
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 

@@ -437,8 +437,8 @@ void WorldTerrain::load(const TMX::TileMap *tileMap, const std::string &tilesetP
 	std::vector<LayerType> types;
 	discoverLayers(layers, types);
 
-	Logger::logDebug(format("Discovered %1% tile layer(s), of which %2% is/are overlayer(s)", _str(tileLayerCount),
-							_str(overLayerCount)));
+	Logger::logDebug(format("Discovered %1% tile layer(s), of which %2% is/are overlayer(s)",
+							_str(tileLayerCount), _str(overLayerCount)));
 
 	// resize vertex array to accommodate for layer count
 	resizeVertices();

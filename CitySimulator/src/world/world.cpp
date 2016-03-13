@@ -2,16 +2,31 @@
 #include "bodydata.hpp"
 #include "service/locator.hpp"
 
-WorldService::WorldService(const std::string &worldPath, const std::string &tilesetPath)
-		: worldPath(worldPath), tilesetPath(tilesetPath)
+WorldService::WorldService(const std::string &mainWorldPath, const std::string &tilesetPath)
+		: mainWorldPath(mainWorldPath), tilesetPath(tilesetPath), mainWorld(0)
 {
 }
 
 void WorldService::onEnable()
 {
-	std::vector<std::string> worldsToLoad;
-	world.loadFromFile(worldPath, tilesetPath, worldsToLoad);
-	// todo clear worldsToLoad and keep loading until it's empty
+	std::set<std::string> worldsToLoad;
+	worldsToLoad.insert(mainWorldPath);
+	lastID = 0;
+
+	while(!worldsToLoad.empty())
+	{
+		std::vector<std::string> loadingNow(worldsToLoad.begin(), worldsToLoad.end());
+		worldsToLoad.clear();
+
+		for(std::string &worldName : loadingNow)
+		{
+			int id = lastID++;
+			World &w = worlds.emplace(id, id).first->second;
+			bool success = w.loadFromFile(worldName, tilesetPath, worldsToLoad);
+		}
+	}
+
+	mainWorld = worlds.at(0);
 }
 
 void WorldService::onDisable()
@@ -21,7 +36,7 @@ void WorldService::onDisable()
 
 World &WorldService::getWorld()
 {
-	return world;
+	return mainWorld;
 }
 
 bool isCollidable(BlockType blockType)
@@ -68,13 +83,13 @@ bool isOverLayer(const LayerType &layerType)
 	return layerType == LAYER_OVERTERRAIN;
 }
 
-World::World() : terrain(this), collisionMap(this), buildingMap(this)
+World::World(int id) : terrain(this), collisionMap(this), buildingMap(this), id(id)
 {
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
 
-void World::loadFromFile(const std::string &filename,
-						 const std::string &tileset, std::vector<std::string> &worldsToLoad)
+bool World::loadFromFile(const std::string &filename,
+						 const std::string &tileset, std::set<std::string> &worldsToLoad)
 {
 	Logger::logDebug(format("Began loading world %1%", filename));
 	Logger::pushIndent();
@@ -84,7 +99,11 @@ void World::loadFromFile(const std::string &filename,
 
 	// failure
 	if (tmx == nullptr)
-		throw std::runtime_error("Could not load world from null TileMap");
+	{
+		Logger::logError(format("Could not load world %1%", _str(id)));
+		Logger::popIndent();
+		return false;
+	}
 
 	sf::Vector2i size(tmx->width, tmx->height);
 	resize(size);
@@ -97,6 +116,8 @@ void World::loadFromFile(const std::string &filename,
 	Logger::popIndent();
 	Logger::logInfo(format("Loaded world %1%", filename));
 	delete tmx;
+
+	return true;
 }
 
 void World::resize(sf::Vector2i size)
@@ -146,9 +167,9 @@ BlockType World::getBlockAt(const sf::Vector2i &tile, LayerType layer)
 	return terrain.blockTypes[index];
 }
 
-void World::getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::FloatRect> &ret)
+int World::getID() const
 {
-	return collisionMap.getSurroundingTiles(tilePos, ret);
+	return id;
 }
 
 void World::tick(float delta)
