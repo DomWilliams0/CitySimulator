@@ -8,9 +8,9 @@
 #include <boost/optional.hpp>
 #include "SFMLDebugDraw.h"
 #include "maploader.hpp"
+#include "building.hpp"
 
 class World;
-class Building;
 
 enum BlockType
 {
@@ -272,7 +272,10 @@ public:
 	}
 
 	void load(const TMX::TileMap &tileMap, std::vector<std::string> &worldsToLoad);
-	void gatherBuildings(std::map<int, Building> buildings, TMX::Layer *buildingLayer);
+	void gatherBuildings(TMX::Layer *buildingLayer);
+
+private:
+	std::unordered_map<int, Building> buildings;
 };
 
 class World : public sf::Drawable

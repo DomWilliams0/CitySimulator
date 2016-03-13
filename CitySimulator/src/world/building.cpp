@@ -3,28 +3,27 @@
 #include "utils.hpp"
 #include "service/logging_service.hpp"
 
-Building::Building(World &world, const sf::IntRect &tileBounds, int id, std::string buildingWorldName)
-		: outsideWorld(&world), buildingID(id), insideWorldName(buildingWorldName)
+
+
+void Building::discoverWindows()
 {
-	for (int x = tileBounds.left; x <= tileBounds.left + tileBounds.width; ++x)
+	for (int x = bounds.left; x <= bounds.left + bounds.width; ++x)
 	{
-		for (int y = tileBounds.top; y <= tileBounds.top + tileBounds.height; ++y)
+		for (int y = bounds.top; y <= bounds.top + bounds.height; ++y)
 		{
 			sf::Vector2i tile(x, y);
-			BlockType b = world.getBlockAt(tile, LAYER_OVERTERRAIN);
+			BlockType b = outsideWorld->getBlockAt(tile, LAYER_OVERTERRAIN);
 
 			// windows
 			if (b == BLOCK_BUILDING_WINDOW_OFF || b == BLOCK_BUILDING_WINDOW_ON)
 			{
 				windows[tile] = b == BLOCK_BUILDING_WINDOW_ON;
-				setWindowLight(tile, Utils::random(0.f, 1.f) < 0.5f);
+				setWindowLight(tile, Utils::random(0.f, 1.f) < 0.5f); // debug random windows
 			}
-
-			// todo doors
 		}
 	}
 
-	Logger::logDebuggier(format("Found %1% building windows", _str(windows.size())));
+	Logger::logDebuggiest(format("Found %1% building windows in building %2%", _str(windows.size()), _str(buildingID)));
 }
 
 bool Building::isWindowLit(const sf::Vector2i &tile)

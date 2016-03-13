@@ -25,7 +25,12 @@ struct Door
 class Building
 {
 public:
-	Building(World &world, const sf::IntRect &tileBounds, int id, std::string buildingWorldName);
+	Building(World &world, const sf::IntRect &tileBounds, int id, std::string buildingWorldName)
+			: outsideWorld(&world), buildingID(id), insideWorldName(buildingWorldName), bounds(tileBounds)
+	{
+	}
+
+	void discoverWindows();
 
 	bool isWindowLit(const sf::Vector2i &tile);
 
@@ -49,6 +54,7 @@ private:
 	std::vector<Door> outsideDoors;
 	std::vector<Door> insideDoors;
 
+	sf::IntRect bounds;
 
 };
 
