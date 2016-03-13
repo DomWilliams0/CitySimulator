@@ -17,7 +17,7 @@ struct BlockInteraction
 	{
 	}
 
-	void (*callback)(EntityIdentifier);
+	void (*callback)(EntityIdentifier, sf::Vector2i);
 
 	// todo
 };
@@ -38,8 +38,7 @@ struct BodyData
 
 };
 
-BodyData *createBodyDataForBlock(const BlockType &block);
-
-void interactWithSlidingDoor(EntityIdentifier entity);
+// todo this shouldnt be here and has nowhere to go :(
+void interactWithSlidingDoor(EntityIdentifier entity, sf::Vector2i tilePos);
 
 #endif

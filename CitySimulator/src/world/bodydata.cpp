@@ -1,24 +1,9 @@
 #include "bodydata.hpp"
 #include "service/logging_service.hpp"
 
-void interactWithSlidingDoor(EntityIdentifier entity)
+void interactWithSlidingDoor(EntityIdentifier entity, sf::Vector2i tilePos)
 {
-	Logger::logDebuggier("An entity interacted with a sliding door!");
+	Logger::logDebuggier(format("Entity %1% interacted with a door at (%2%, %3%)",
+								_str(entity.id), _str(tilePos.x), _str(tilePos.y)));
 }
 
-
-BodyData *createBodyDataForBlock(const BlockType &block)
-{
-	// interactive doors
-	if (block == BLOCK_SLIDING_DOOR)
-	{
-		BodyData *data = new BodyData;
-		data->type = BODYDATA_BLOCK;
-		data->blockInteraction.callback = &interactWithSlidingDoor;
-
-		Logger::logDebuggier("Creating body data for a sliding door");
-		return data;
-	}
-
-	return nullptr;
-}

@@ -283,7 +283,7 @@ void CollisionMap::load()
 		// interactable
 		if (isInteractable(collisionRect.blockType))
 		{
-			BodyData *bodyData = createBodyDataForBlock(collisionRect.blockType);
+			BodyData *bodyData = Locator::locate<WorldService>()->getSharedBodyDataForBlockType(collisionRect.blockType);
 			fixDef.userData = bodyData;
 		}
 
@@ -316,30 +316,38 @@ void WorldService::onDisable()
 }
 
 
-sf::IntRect WorldService::discoverBuildingHeight(const sf::Vector2i &start, const sf::Vector2i &end)
+World &WorldService::getWorld()
 {
-	// find roof
-	int roof(start.y);
-	while (roof >= 0 && world.getBlockAt({start.x, roof}, LAYER_OVERTERRAIN) != BLOCK_BUILDING_ROOF_CORNER)
-		--roof;
-	--roof;
-
-	sf::IntRect bounds;
-	bounds.left = start.x;
-	bounds.top = roof;
-	bounds.width = end.x - start.x;
-	bounds.height = start.y - roof;
-
-	return bounds;
+	return world;
 }
 
+BodyData* WorldService::getSharedBodyDataForBlockType(BlockType blockType)
+{
+	auto it = bodyDataCache.find(blockType);
+	if (it != bodyDataCache.end())
+		return &it->second;
+
+	// create new data
+	if (blockType == BLOCK_SLIDING_DOOR)
+	{
+		BodyData data;
+		data.type = BODYDATA_BLOCK;
+		data.blockInteraction.callback = &interactWithSlidingDoor;
+
+		return &bodyDataCache.insert({blockType, data}).first->second;
+	}
+
+	Logger::logError(format("Cannot create body data for blocktype %1%", _str(blockType)));
+	return nullptr;
+}
 
 World::World() : terrain(this), collisionMap(this), buildingMap(this)
 {
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
 
-void World::loadFromFile(const std::string &filename, const std::string &tileset, std::vector<std::string> &worldsToLoad)
+void World::loadFromFile(const std::string &filename,
+						 const std::string &tileset, std::vector<std::string> &worldsToLoad)
 {
 	Logger::logDebug(format("Began loading world %1%", filename));
 	Logger::pushIndent();

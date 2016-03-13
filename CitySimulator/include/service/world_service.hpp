@@ -4,6 +4,7 @@
 #include "base_service.hpp"
 #include "world.hpp"
 #include "building.hpp"
+#include "bodydata.hpp"
 
 class WorldService : public BaseService
 {
@@ -14,20 +15,18 @@ public:
 
 	virtual void onDisable() override;
 
-	inline World &getWorld()
-	{
-		return world;
-	}
+	World &getWorld();
+
+	BodyData*getSharedBodyDataForBlockType(BlockType blockType);
+
 
 private:
+	// todo 1 main world, list of auxiliary worlds (or tree?)
 	World world;
-	std::vector<Building> buildings;
 
 	std::string worldPath, tilesetPath;
 
-	void discoverBuildings();
-
-	sf::IntRect discoverBuildingHeight(const sf::Vector2i &start, const sf::Vector2i &end);
+	std::unordered_map<BlockType, BodyData, std::hash<int>> bodyDataCache;
 };
 
 #endif
