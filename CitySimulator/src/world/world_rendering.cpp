@@ -171,7 +171,7 @@ int Tileset::getIndex(int x, int y) const
 }
 
 
-WorldTerrain::WorldTerrain(World *container) : BaseWorld(container)
+WorldTerrain::WorldTerrain(World *container, Tileset &tileset) : BaseWorld(container), tileset(tileset)
 {
 	tileVertices.setPrimitiveType(sf::Quads);
 	overLayerVertices.setPrimitiveType(sf::Quads);
@@ -430,12 +430,11 @@ void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states, bo
 	target.draw(overLayers ? overLayerVertices : tileVertices, states);
 }
 
-void WorldTerrain::load(const TMX::TileMap *tileMap, const std::string &tilesetPath)
+void WorldTerrain::load(TMX::TileMap &tileMap, std::vector<int> &flippedGIDs)
 {
 	// find layer count and depths
-	std::vector<TMX::Layer *> layers = tileMap->layers;
 	std::vector<LayerType> types;
-	discoverLayers(layers, types);
+	discoverLayers(tileMap.layers, types);
 
 	Logger::logDebug(format("Discovered %1% tile layer(s), of which %2% is/are overlayer(s)",
 							_str(tileLayerCount), _str(overLayerCount)));
@@ -443,14 +442,11 @@ void WorldTerrain::load(const TMX::TileMap *tileMap, const std::string &tilesetP
 	// resize vertex array to accommodate for layer count
 	resizeVertices();
 
-	// update tileset with flipped textures
-	std::vector<int> flippedGIDs;
-	discoverFlippedTiles(layers, flippedGIDs);
-	tileset.load(tilesetPath);
-	tileset.convertToTexture(flippedGIDs);
+	// collect any gids that need flipping
+	discoverFlippedTiles(tileMap.layers, flippedGIDs);
 
 	// add tiles to terrain
-	addTiles(layers, types);
+	addTiles(tileMap.layers, types);
 }
 
 RenderService::RenderService(sf::RenderWindow *renderWindow) : window(renderWindow)

@@ -1,9 +1,8 @@
 #include "world.hpp"
-#include "bodydata.hpp"
 #include "service/locator.hpp"
 
 WorldService::WorldService(const std::string &mainWorldPath, const std::string &tilesetPath)
-		: mainWorldPath(mainWorldPath), tilesetPath(tilesetPath), mainWorld(0)
+		: mainWorldPath(mainWorldPath), tilesetPath(tilesetPath)
 {
 }
 
@@ -13,6 +12,8 @@ void WorldService::onEnable()
 	worldsToLoad.insert(mainWorldPath);
 	lastID = 0;
 
+	std::vector<int> flippedGIDs;
+
 	while(!worldsToLoad.empty())
 	{
 		std::vector<std::string> loadingNow(worldsToLoad.begin(), worldsToLoad.end());
@@ -21,12 +22,20 @@ void WorldService::onEnable()
 		for(std::string &worldName : loadingNow)
 		{
 			int id = lastID++;
-			World &w = worlds.emplace(id, id).first->second;
-			bool success = w.loadFromFile(worldName, tilesetPath, worldsToLoad);
+
+			// World &w = worlds.emplace(id, id).first->second;
+			// this doesn't want to compile :(
+			// looks like i have to use an unnecessary temporary instead
+
+			World &w = worlds.insert({id, {id, tileset}}).first->second;
+			w.loadFromFile(worldName, flippedGIDs, worldsToLoad);
 		}
 	}
 
-	mainWorld = worlds.at(0);
+	tileset.load(tilesetPath);
+	tileset.convertToTexture(flippedGIDs);
+
+	mainWorld = &worlds.at(0);
 }
 
 void WorldService::onDisable()
@@ -36,7 +45,7 @@ void WorldService::onDisable()
 
 World &WorldService::getWorld()
 {
-	return mainWorld;
+	return *mainWorld;
 }
 
 bool isCollidable(BlockType blockType)
@@ -83,41 +92,29 @@ bool isOverLayer(const LayerType &layerType)
 	return layerType == LAYER_OVERTERRAIN;
 }
 
-World::World(int id) : terrain(this), collisionMap(this), buildingMap(this), id(id)
+World::World(int id, Tileset &tileset) : terrain(this, tileset), collisionMap(this), buildingMap(this), id(id)
 {
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
 
-bool World::loadFromFile(const std::string &filename,
-						 const std::string &tileset, std::set<std::string> &worldsToLoad)
+void World::loadFromFile(const std::string &filename,
+						 std::vector<int> &flippedGIDs, std::set<std::string> &worldsToLoad)
 {
 	Logger::logDebug(format("Began loading world %1%", filename));
 	Logger::pushIndent();
 
 	std::string path(Utils::joinPaths(Config::getResource("world.root"), filename));
-	TMX::TileMap *tmx = TMX::TileMap::load(path);
 
-	// failure
-	if (tmx == nullptr)
-	{
-		Logger::logError(format("Could not load world %1%", _str(id)));
-		Logger::popIndent();
-		return false;
-	}
+	TMX::TileMap tmx;
+	tmx.load(path);
+	resize(tmx.size);
 
-	sf::Vector2i size(tmx->width, tmx->height);
-	resize(size);
-
-	// terrain
-	terrain.load(tmx, tileset);
-	buildingMap.load(*tmx, worldsToLoad);
+	terrain.load(tmx, flippedGIDs);
+	buildingMap.load(tmx, worldsToLoad);
 	collisionMap.load();
 
 	Logger::popIndent();
 	Logger::logInfo(format("Loaded world %1%", filename));
-	delete tmx;
-
-	return true;
 }
 
 void World::resize(sf::Vector2i size)

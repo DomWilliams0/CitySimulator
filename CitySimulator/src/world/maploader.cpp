@@ -79,18 +79,18 @@ TMX::Tile::Tile(TileType type, const std::string &id) : tileType(type)
 	processRotation(flips);
 }
 
-TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
+void TMX::TileMap::load(const std::string &filePath)
 {
 	boost::property_tree::ptree tree;
 	read_xml(filePath, tree);
 
-	TileMap *map = new TileMap();
+	size.x = tree.get<int>("map.<xmlattr>.width", 0);
+	size.y = tree.get<int>("map.<xmlattr>.height", 0);
+	int area = size.x * size.y;
 
-	map->width = tree.get<int>("map.<xmlattr>.width", 0);
-	map->height = tree.get<int>("map.<xmlattr>.height", 0);
 
 	boost::property_tree::ptree treeRoot = tree.get_child("map");
-	addProperties(map, treeRoot);
+	addProperties(this, treeRoot);
 
 	for (auto &pair : treeRoot)
 	{
@@ -100,7 +100,7 @@ TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 		Layer *layer = new Layer;
 		layer->name = pair.second.get<std::string>("<xmlattr>.name");
 		layer->visible = pair.second.get<int>("<xmlattr>.visible", 1) != 0;
-		layer->items.reserve(map->width * map->height);
+		layer->items.reserve(area);
 
 		// tile layerDepths
 		if (pair.first == "layer")
@@ -115,7 +115,7 @@ TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 			for (auto it = tokens.begin(); it != tokens.end(); ++it)
 				layer->items.push_back(new Tile(*it));
 
-			layer->items.resize(map->width * map->height);
+			layer->items.resize(area);
 		}
 
 			// object layers
@@ -174,11 +174,8 @@ TMX::TileMap *TMX::TileMap::load(const std::string &filePath)
 			}
 		}
 
-		map->layers.push_back(layer);
+		layers.push_back(layer);
 	}
-
-
-	return map;
 }
 void TMX::Tile::processRotation(std::bitset<3> rotation)
 {

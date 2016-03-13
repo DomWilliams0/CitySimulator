@@ -160,12 +160,12 @@ namespace TMX
 
 	struct TileMap : PropertyOwner
 	{
-		~TileMap();
+		virtual ~TileMap() override;
 
-		int width, height;
+		sf::Vector2i size;
 		std::vector<Layer *> layers;
 
-		static TileMap *load(const std::string &filePath);
+		void load(const std::string &filePath);
 	};
 }
 #endif

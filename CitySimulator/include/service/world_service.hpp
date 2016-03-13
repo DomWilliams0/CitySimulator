@@ -18,10 +18,11 @@ public:
 	World &getWorld();
 
 private:
-	// todo 1 main world, list of auxiliary worlds (or tree?)
-	World mainWorld;
+	World *mainWorld;
 	std::unordered_map<int, World> worlds;
 	int lastID;
+
+	Tileset tileset;
 
 	std::string mainWorldPath, tilesetPath;
 };

@@ -158,7 +158,7 @@ class WorldTerrain : public BaseWorld
 {
 public:
 
-	explicit WorldTerrain(World *container);
+	WorldTerrain(World *container, Tileset &tileset);
 
 	~WorldTerrain();
 
@@ -172,7 +172,7 @@ public:
 	const std::vector<WorldLayer> &getLayers();
 
 private:
-	Tileset tileset;
+	Tileset &tileset;
 	sf::VertexArray tileVertices;
 	sf::VertexArray overLayerVertices;
 
@@ -207,7 +207,7 @@ protected:
 
 	void render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const;
 
-	void load(const TMX::TileMap *tileMap, const std::string &tilesetPath);
+	void load(TMX::TileMap &tileMap, std::vector<int> &flippedGIDs);
 
 	friend struct TMX::TileMap;
 
@@ -303,9 +303,9 @@ private:
 class World : public sf::Drawable
 {
 public:
-	World(int id);
+	World(int id, Tileset &tileset);
 
-	bool loadFromFile(const std::string &filename, const std::string &tileset, std::set<std::string> &worldsToLoad);
+	void loadFromFile(const std::string &filename, std::vector<int> &flippedGIDs, std::set<std::string> &worldsToLoad);
 
 	void resize(sf::Vector2i size);
 
