@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="12" height="12" tilewidth="16" tileheight="16" nextobjectid="38">
+ <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="100" columns="10">
+  <image source="../tileset.png" width="160" height="160"/>
+  <tile id="8">
+   <properties>
+    <property name="dest" value="single"/>
+    <property name="door" value="0"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="underterrain" width="12" height="12">
+  <data encoding="csv">
+0,18,18,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer name="terrain" width="12" height="12">
+  <data encoding="csv">
+18,1073741843,3221225491,18,18,18,18,18,18,18,18,18,
+18,18,18,18,18,3,3,3,3,3,3,3,
+18,3,3,3,18,3,3,3,3,3,3,3,
+18,3,3,3,18,18,18,18,18,18,18,18,
+18,3,3,3,18,1,1,0,0,0,0,0,
+18,3,3,3,18,1,1,0,0,0,0,0,
+18,3,3,3,18,1,1,0,0,0,0,0,
+18,18,18,18,18,18,18,18,18,18,18,18,
+18,3,3,3,18,18,3,3,3,3,3,18,
+18,3,3,3,18,18,3,3,3,3,3,18,
+18,3,3,3,18,18,3,3,3,3,3,18,
+18,18,18,18,18,18,18,18,18,18,18,18
+</data>
+ </layer>
+ <objectgroup name="objects">
+  <object id="21" gid="9" x="157.5" y="131.75" width="16" height="16" rotation="90"/>
+  <object id="22" gid="9" x="105.173" y="148.022" width="16" height="16" rotation="-7.8849"/>
+  <object id="23" gid="1073741833" x="135.677" y="175.148" width="16" height="16" rotation="-25.2488"/>
+  <object id="24" gid="9" x="63.4865" y="159.549" width="16" height="16" rotation="-148.813"/>
+  <object id="25" gid="2147483657" x="24.75" y="50.25" width="16" height="16"/>
+  <object id="26" gid="1073741833" x="37.25" y="98.75" width="16" height="16" rotation="30"/>
+  <object id="27" gid="1073741833" x="42.7216" y="60.65" width="16" height="16" rotation="77.627"/>
+  <object id="28" gid="9" x="23.3344" y="86.2034" width="16" height="16" rotation="-26.0954"/>
+  <object id="31" gid="9" x="102.225" y="33.0181" width="16" height="16" rotation="268.362"/>
+  <object id="33" gid="9" x="164.75" y="40.25" width="16" height="16"/>
+  <object id="36" gid="9" x="129.123" y="23.1694" width="16" height="16" rotation="79.0247"/>
+  <object id="37" gid="2147483657" x="35.6693" y="149.21" width="16" height="16" rotation="-97.0327"/>
+ </objectgroup>
+ <objectgroup name="buildings">
+  <object id="8" x="16" y="0" width="32" height="16">
+   <properties>
+    <property name="door" value="0"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
