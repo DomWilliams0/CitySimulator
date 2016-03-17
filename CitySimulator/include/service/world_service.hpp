@@ -28,7 +28,24 @@ private:
 
 	struct WorldLoader
 	{
-		unsigned int lastWorldID;
+		struct UnloadedBuilding
+		{
+			int insideWorldID;
+			std::string insideWorldName;
+			sf::IntRect bounds;
+		};
+
+		struct UnloadedDoor
+		{
+			sf::Vector2i tile;
+
+			// only one needed
+			std::string worldName;
+			int worldID;
+		};
+
+
+		int lastWorldID;
 		std::vector<int> flippedTileGIDs;
 		WorldTreeNode &treeRoot;
 
@@ -40,7 +57,12 @@ private:
 
 		std::string getBuildingFilePath(const std::string &name);
 
-		void findBuildings(TMX::TileMap &tmx, std::vector<std::string> &buildingWorldNames);
+		void findBuildingsAndDoors(TMX::TileMap tmx,
+								   std::vector<UnloadedBuilding> &buildingsToLoad,
+								   std::vector<UnloadedDoor> &doorsToLoad);
+
+		UnloadedBuilding *findBuildingOwner(const UnloadedDoor &door,
+											std::vector<UnloadedBuilding> &buildings);
 	};
 
 };
