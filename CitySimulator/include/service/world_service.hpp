@@ -18,13 +18,31 @@ public:
 	World &getWorld();
 
 private:
-	World *mainWorld;
-	std::unordered_map<int, World*> worlds;
-	int lastID;
+	typedef TreeNode<World> WorldTreeNode;
 
 	Tileset tileset;
+	std::string mainWorldName;
 
-	std::string mainWorldPath;
+	World *mainWorld;
+	WorldTreeNode worldTree;
+
+	struct WorldLoader
+	{
+		unsigned int lastWorldID;
+		std::vector<int> flippedTileGIDs;
+		WorldTreeNode &treeRoot;
+
+		WorldLoader(WorldTreeNode &treeRoot);
+
+		World *loadWorlds(const std::string &mainWorldName, Tileset &tileset);
+
+		World *loadMainWorld(const std::string &name, Tileset &tileset);
+
+		std::string getBuildingFilePath(const std::string &name);
+
+		void findBuildings(World *world);
+	};
+
 };
 
 #endif

@@ -2,53 +2,77 @@
 #include "service/locator.hpp"
 
 WorldService::WorldService(const std::string &mainWorldPath, const std::string &tilesetPath)
-		: mainWorldPath(mainWorldPath), tileset(tilesetPath)
+		: mainWorldName(mainWorldPath), tileset(tilesetPath)
 {
 }
 
 void WorldService::onEnable()
 {
-	std::set<std::string> worldsToLoad;
-	worldsToLoad.insert(mainWorldPath);
-	lastID = 0;
+	WorldLoader loader(worldTree);
+	mainWorld = loader.loadWorlds(mainWorldName, tileset);
 
-	std::vector<int> flippedGIDs;
-	std::map<TMX::TileMap *, World *> tileMapCache;
-
-	while (!worldsToLoad.empty())
-	{
-		std::vector<std::string> loadingNow(worldsToLoad.begin(), worldsToLoad.end());
-		worldsToLoad.clear();
-
-		for (std::string &worldName : loadingNow)
-		{
-			int id = lastID++;
-
-			TMX::TileMap *tmx = new TMX::TileMap;
-			World *w = new World(id, tileset);
-			w->loadFromFile(worldName, flippedGIDs, worldsToLoad, tmx);
-			tileMapCache.insert({tmx, w});
-			worlds.insert({id, w});
-		}
-	}
-
-	tileset.load();
-	tileset.convertToTexture(flippedGIDs);
-
-	for (auto &pair : tileMapCache)
-	{
-		pair.second->finishLoading(pair.first);
-		delete pair.first;
-	}
-
-	mainWorld = worlds.at(0);
+	/*
+	 * todo: building loading
+	 * use a tree for worlds loaded in worlds
+	 * share terrain/collisionmap across same world maps: easy peasy! just share worldterrain etc.
+	 * assign IDs incrementally
+	 *
+	 * collect all building bounds and WORLD tags in main world
+	 * load all these building worlds and allocate IDs
+	 *
+	 * for every door in main world:
+	 * 	find containing building
+	 * 	set world ID tag to WORLD_ID from building
+	 *
+	 * now all doors with positive door numbers have a WORLD or WORLD_ID tag
+	 * time to recurse
+	 *
+	 * sort doors so all with WORLD_ID and WORLD_SHARE tag are first
+	 *
+	 * for every door:
+	 * 	read DOOR
+	 *		positive: goes inside/to a child node
+	 * 		negative: goes outside/up to parent node
+	 * 		0: illegal, indexing starts at 1
+	 *
+	 * 	if positive:
+	 * 		if door has a WORLD_ID tag:
+	 * 			WORLD_INSTANCE = already loaded world with id WORLD_ID
+	 *
+	 * 		else if door has a WORLD_SHARE tag:
+	 * 			find a door with same WORLD_SHARE and WORLD_ID tag
+	 * 			it should already be loaded due to sorting above
+	 * 			WORLD_ID = other door WORLD_ID
+	 * 			WORLD_INSTANCE = other door WORLD_INSTANCE
+	 *
+	 * 		else no already loaded world tag:
+	 * 			read WORLD tag
+	 * 			WORLD_ID = newly allocated ID
+	 * 			WORLD_INSTANCE = create new instance and save with new id WORLD_ID
+	 *
+	 * 	recurse on all new child nodes
+	 *	END
+	 *
+	 * now all worlds are loaded, connections are added
+	 * recursion time again
+	 *
+	 * for every door:
+	 * 	if positive:
+	 * 		get world from door WORLD_ID in children
+	 * 		from this world, get door with negative DOOR_ID
+	 * 		add connection between this door and that door
+	 * 	else:
+	 * 		get door with positive DOOR_ID in parent
+	 * 		add connection between this door and that door
+	 *
+	 * recurse on all children
+	 * END
+	 */
 }
 
 void WorldService::onDisable()
 {
 	mainWorld = nullptr;
-	for (auto &pair : worlds)
-		delete pair.second;
 }
 
 
@@ -106,22 +130,18 @@ World::World(int id, Tileset &tileset) : terrain(this, tileset), collisionMap(th
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
 
-void World::loadFromFile(std::string &filename, std::vector<int> flippedGIDs,
-						 std::set<std::string> &worldsToLoad, TMX::TileMap *tmx)
+void World::loadFromFile(const std::string &filePath, std::vector<int> flippedGIDs, TMX::TileMap &tmx)
 {
-	Logger::logDebug(format("Began loading world %1%", filename));
+	Logger::logDebug(format("Began loading world %1%", filePath));
 	Logger::pushIndent();
 
-	std::string path(Utils::joinPaths(Config::getResource("world.root"), filename));
+	tmx.load(filePath);
+	resize(tmx.size);
 
-	tmx->load(path);
-	resize(tmx->size);
-
-	terrain.load(*tmx, flippedGIDs);
-	buildingMap.load(*tmx, worldsToLoad);
+	terrain.load(tmx, flippedGIDs);
 
 	Logger::popIndent();
-	Logger::logInfo(format("Loaded world %1%", filename));
+	Logger::logInfo(format("Loaded world %1%", filePath));
 }
 
 void World::finishLoading(TMX::TileMap *tmx)

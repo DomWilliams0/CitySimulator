@@ -172,32 +172,27 @@
  <objectgroup name="buildings">
   <object id="39" x="704" y="352" width="16" height="16">
    <properties>
-    <property name="buildingID" value="0"/>
-    <property name="door" value="0"/>
+    <property name="door" value="1"/>
    </properties>
   </object>
   <object id="40" x="800" y="352" width="16" height="16">
    <properties>
-    <property name="buildingID" value="0"/>
-    <property name="door" value="1"/>
+    <property name="door" value="2"/>
    </properties>
   </object>
   <object id="41" x="320" y="288" width="16" height="16">
    <properties>
-    <property name="buildingID" value="1"/>
-    <property name="door" value="0"/>
+    <property name="door" value="1"/>
    </properties>
   </object>
   <object id="42" x="672" y="176" width="176" height="192">
    <properties>
-    <property name="buildingID" value="0"/>
-    <property name="buildingWorld" value="double"/>
+    <property name="world" value="double"/>
    </properties>
   </object>
   <object id="45" x="288" y="224" width="144" height="80">
    <properties>
-    <property name="buildingID" value="1"/>
-    <property name="buildingWorld" value="single"/>
+    <property name="world" value="single"/>
    </properties>
   </object>
  </objectgroup>

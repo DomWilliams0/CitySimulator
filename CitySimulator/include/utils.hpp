@@ -274,4 +274,19 @@ namespace sf
 		return !operator<(lhs, rhs);
 	}
 }
+
+template <class T>
+struct TreeNode
+{
+	T *value;
+	TreeNode<T> *parent;
+	std::vector<T*> children;
+
+	bool isRoot() const
+	{
+		return parent == nullptr;
+	}
+};
+
+
 #endif

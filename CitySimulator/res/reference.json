@@ -14,7 +14,7 @@
     },
     "debug": {
         "window-title": "Chity Shimulator",
-        "world-name": "world.tmx",
+        "world-name": "world",
         "human-skin": "Business Man",
         "zoom": 1,
         "reload-config": true,
@@ -47,7 +47,8 @@
         },
         "world": {
             "root": "world",
-            "tileset": "tileset.png"
+            "tileset": "tileset.png",
+            "buildings": "buildings"
         },
         "gui": {
             "root": "gui",

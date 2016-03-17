@@ -58,7 +58,7 @@
  <objectgroup name="buildings">
   <object id="8" x="16" y="0" width="32" height="16">
    <properties>
-    <property name="door" value="0"/>
+    <property name="door" value="-1"/>
    </properties>
   </object>
  </objectgroup>

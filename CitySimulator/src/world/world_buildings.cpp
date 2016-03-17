@@ -3,7 +3,7 @@
 #include "service/logging_service.hpp"
 
 
-void BuildingMap::gatherBuildings(TMX::Layer *buildingLayer, std::set<std::string> &worldsToLoad)
+void BuildingMap::gatherBuildings(TMX::Layer *buildingLayer)
 {
 	for (TMX::Tile *tile : buildingLayer->items)
 	{
@@ -29,7 +29,7 @@ void BuildingMap::gatherBuildings(TMX::Layer *buildingLayer, std::set<std::strin
 		Building b(*container, bounds, buildingID, buildingWorld);
 		buildings.insert({buildingID, b});
 
-		worldsToLoad.insert("buildings/" + buildingWorld + ".tmx"); // todo have a getWorldPath function
+//		worldsToLoad.insert("buildings/" + buildingWorld + ".tmx"); // todo have a getWorldPath function
 
 		Logger::logDebuggiest(format("Found building %1% at (%2%, %3%)",
 									 _str(buildingID), _str(bounds.left), _str(bounds.top)));
@@ -37,7 +37,7 @@ void BuildingMap::gatherBuildings(TMX::Layer *buildingLayer, std::set<std::strin
 }
 
 
-void BuildingMap::load(const TMX::TileMap &tileMap, std::set<std::string> &worldsToLoad)
+void BuildingMap::load(const TMX::TileMap &tileMap)
 {
 	Logger::logDebug("Loading buildings");
 	Logger::pushIndent();
@@ -57,7 +57,7 @@ void BuildingMap::load(const TMX::TileMap &tileMap, std::set<std::string> &world
 
 	TMX::Layer *layer = *buildingLayer;
 
-	gatherBuildings(layer, worldsToLoad);
+	gatherBuildings(layer);
 
 	// entrances
 	for (TMX::Tile *tile : layer->items)

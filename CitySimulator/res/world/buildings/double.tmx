@@ -46,12 +46,12 @@
  <objectgroup name="buildings">
   <object id="2" x="16" y="240" width="32" height="16">
    <properties>
-    <property name="door" value="0"/>
+    <property name="door" value="1"/>
    </properties>
   </object>
   <object id="3" x="160" y="240" width="32" height="16">
    <properties>
-    <property name="door" value="1"/>
+    <property name="door" value="2"/>
    </properties>
   </object>
  </objectgroup>

@@ -285,7 +285,7 @@ public:
 	{
 	}
 
-	void load(const TMX::TileMap &tileMap, std::set<std::string> &worldsToLoad);
+	void load(const TMX::TileMap &tileMap);
 
 	void getBuildingByOutsideDoorTile(const sf::Vector2i &tile, boost::optional<std::pair<Building *, Door *>> &out);
 
@@ -294,7 +294,7 @@ public:
 private:
 	std::unordered_map<int, Building> buildings;
 
-	void gatherBuildings(TMX::Layer *buildingLayer, std::set<std::string> &worldsToLoad);
+	void gatherBuildings(TMX::Layer *buildingLayer);
 
 };
 
@@ -303,8 +303,7 @@ class World : public sf::Drawable
 public:
 	World(int id, Tileset &tileset);
 
-	void loadFromFile(std::string &filename, std::vector<int> flippedGIDs, std::set<std::string>& worldsToLoad,
-						  TMX::TileMap *pMap);
+	void loadFromFile(const std::string &filePath, std::vector<int> flippedGIDs, TMX::TileMap &pMap);
 
 	void finishLoading(TMX::TileMap *tmx);
 
