@@ -11,9 +11,9 @@ TMX::PropertyType TMX::propertyTypeFromString(const std::string &s)
 		return PROPERTY_TYPE;
 	if (s == "visible")
 		return PROPERTY_VISIBLE;
-	if (s == "buildingWorld")
+	if (s == "world")
 		return PROPERTY_BUILDING_WORLD;
-	if (s == "buildingID")
+	if (s == "worldID")
 		return PROPERTY_BUILDING_ID;
 	if (s == "door")
 		return PROPERTY_BUILDING_DOOR;
@@ -81,6 +81,7 @@ TMX::Tile::Tile(TileType type, const std::string &id) : tileType(type)
 
 void TMX::TileMap::load(const std::string &filePath)
 {
+	Logger::logDebuggier(format("Loading world from %1%", filePath));
 	boost::property_tree::ptree tree;
 	read_xml(filePath, tree);
 
@@ -160,7 +161,7 @@ void TMX::TileMap::load(const std::string &filePath)
 							if (propType == PROPERTY_UNKNOWN)
 							{
 								Logger::logWarning(format("Found unknown property '%1%' in layer '%2%', skipping",
-								                          layer->name, key));
+														  key, layer->name));
 								continue;
 
 							}

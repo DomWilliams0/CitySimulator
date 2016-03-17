@@ -275,12 +275,21 @@ namespace sf
 	}
 }
 
-template <class T>
+template<class T>
 struct TreeNode
 {
 	T *value;
 	TreeNode<T> *parent;
-	std::vector<T*> children;
+	std::vector<TreeNode<T>> children;
+
+
+	TreeNode(T *value, TreeNode<T> *parent) : value(value), parent(parent)
+	{
+	}
+
+
+	TreeNode() : TreeNode(nullptr, nullptr)
+	{ }
 
 	bool isRoot() const
 	{

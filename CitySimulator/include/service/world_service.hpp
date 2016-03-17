@@ -36,11 +36,11 @@ private:
 
 		World *loadWorlds(const std::string &mainWorldName, Tileset &tileset);
 
-		World *loadMainWorld(const std::string &name, Tileset &tileset);
+		World *loadMainWorld(const std::string &name, Tileset &tileset, TMX::TileMap &tmx);
 
 		std::string getBuildingFilePath(const std::string &name);
 
-		void findBuildings(World *world);
+		void findBuildings(TMX::TileMap &tmx, std::vector<std::string> &buildingWorldNames);
 	};
 
 };

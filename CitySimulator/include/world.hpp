@@ -12,6 +12,7 @@
 #include "bodydata.hpp"
 
 class World;
+
 class BodyData;
 
 enum BlockType
@@ -244,11 +245,11 @@ private:
 		{ }
 
 		virtual void BeginContact(b2Contact *contact) override;
-		
+
 	private:
 		World *container;
-	}; 
-			
+	};
+
 	GlobalContactListener globalContactListener;
 
 	struct CollisionRect
@@ -301,10 +302,9 @@ private:
 class World : public sf::Drawable
 {
 public:
-	World(int id);
+	World(int id, const std::string &fullPath);
 
-	void loadFromFile(const std::string &filePath, std::vector<int> flippedGIDs, TMX::TileMap &pMap,
-						  Tileset *tileset);
+	void loadFromFile(TMX::TileMap &tmx);
 
 	void finishLoading(TMX::TileMap *tmx);
 
@@ -336,6 +336,7 @@ private:
 	BuildingMap buildingMap;
 
 	int id;
+	std::string filePath;
 
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 

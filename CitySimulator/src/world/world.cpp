@@ -8,8 +8,11 @@ WorldService::WorldService(const std::string &mainWorldPath, const std::string &
 
 void WorldService::onEnable()
 {
+	Logger::logDebug("Starting to load worlds");
+	Logger::pushIndent();
 	WorldLoader loader(worldTree);
 	mainWorld = loader.loadWorlds(mainWorldName, tileset);
+	Logger::popIndent();
 
 	/*
 	 * todo: building loading
@@ -125,24 +128,19 @@ bool isOverLayer(const LayerType &layerType)
 	return layerType == LAYER_OVERTERRAIN;
 }
 
-World::World(int id) : terrain(this), collisionMap(this), buildingMap(this), id(id)
+World::World(int id, const std::string &fullPath) :
+		terrain(this), collisionMap(this), buildingMap(this), id(id), filePath(fullPath)
 {
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
 
-void World::loadFromFile(const std::string &filePath, std::vector<int> flippedGIDs, TMX::TileMap &tmx,
-						 Tileset *tileset)
+void World::loadFromFile(TMX::TileMap &tmx)
 {
-	Logger::logDebug(format("Began loading world %1%", filePath));
-	Logger::pushIndent();
+	// todo all of this, eek
+//	tmx.load(filePath);
+//	resize(tmx.size);
 
-	tmx.load(filePath);
-	resize(tmx.size);
-
-	terrain.load(tmx, flippedGIDs, tileset);
-
-	Logger::popIndent();
-	Logger::logInfo(format("Loaded world %1%", filePath));
+//	terrain.load(tmx, flippedGIDs, tileset);
 }
 
 void World::finishLoading(TMX::TileMap *tmx)
