@@ -125,12 +125,13 @@ bool isOverLayer(const LayerType &layerType)
 	return layerType == LAYER_OVERTERRAIN;
 }
 
-World::World(int id, Tileset &tileset) : terrain(this, tileset), collisionMap(this), buildingMap(this), id(id)
+World::World(int id) : terrain(this), collisionMap(this), buildingMap(this), id(id)
 {
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
 
-void World::loadFromFile(const std::string &filePath, std::vector<int> flippedGIDs, TMX::TileMap &tmx)
+void World::loadFromFile(const std::string &filePath, std::vector<int> flippedGIDs, TMX::TileMap &tmx,
+						 Tileset *tileset)
 {
 	Logger::logDebug(format("Began loading world %1%", filePath));
 	Logger::pushIndent();
@@ -138,7 +139,7 @@ void World::loadFromFile(const std::string &filePath, std::vector<int> flippedGI
 	tmx.load(filePath);
 	resize(tmx.size);
 
-	terrain.load(tmx, flippedGIDs);
+	terrain.load(tmx, flippedGIDs, tileset);
 
 	Logger::popIndent();
 	Logger::logInfo(format("Loaded world %1%", filePath));

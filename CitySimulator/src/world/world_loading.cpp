@@ -30,10 +30,10 @@ World *WorldService::WorldLoader::loadMainWorld(const std::string &name, Tileset
 {
 	auto worldPath = Utils::joinPaths(Config::getResource("world.root"), name) + ".tmx";
 
-	World *mainWorld = new World(0, tileset);
+	World *mainWorld = new World(0);
 	TMX::TileMap tmx;
 	tmx.load(worldPath);
-	mainWorld->loadFromFile(worldPath, flippedTileGIDs, tmx);
+	mainWorld->loadFromFile(worldPath, flippedTileGIDs, tmx, &tileset);
 
 	return mainWorld;
 }

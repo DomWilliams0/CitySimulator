@@ -171,7 +171,7 @@ int Tileset::getIndex(int x, int y) const
 }
 
 
-WorldTerrain::WorldTerrain(World *container, Tileset &tileset) : BaseWorld(container), tileset(tileset)
+WorldTerrain::WorldTerrain(World *container) : BaseWorld(container), tileset(tileset)
 {
 	tileVertices.setPrimitiveType(sf::Quads);
 	overLayerVertices.setPrimitiveType(sf::Quads);
@@ -268,7 +268,7 @@ void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, La
 	sf::Vertex *quad = &vertices[vertexIndex];
 
 	positionVertices(quad, static_cast<sf::Vector2f>(pos), 1);
-	tileset.textureQuad(quad, blockType, rotationAngle, flipGID);
+	tileset->textureQuad(quad, blockType, rotationAngle, flipGID);
 
 	blockTypes[getBlockIndex(pos, layer)] = blockType;
 }
@@ -282,7 +282,7 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, float
 											(pos.y - Constants::tilesetResolution) / Constants::tilesetResolution);
 
 	positionVertices(&quad[0], adjustedPos, 1);
-	tileset.textureQuad(&quad[0], blockType, 0, flipGID);
+	tileset->textureQuad(&quad[0], blockType, 0, flipGID);
 
 	if (rotationAngle != 0)
 		rotateObject(&quad[0], rotationAngle, adjustedPos);
@@ -422,12 +422,14 @@ void WorldTerrain::loadLayers(const std::vector<TMX::Layer *> &layers)
 
 void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const
 {
-	states.texture = tileset.getTexture();
+	states.texture = tileset->getTexture();
 	target.draw(overLayers ? overLayerVertices : tileVertices, states);
 }
 
-void WorldTerrain::load(TMX::TileMap &tileMap, std::vector<int> &flippedGIDs)
+void WorldTerrain::load(TMX::TileMap &tileMap, std::vector<int> &flippedGIDs, Tileset *tileset)
 {
+	this->tileset = tileset;
+
 	// find layer count and depths
 	std::vector<LayerType> types;
 	discoverLayers(tileMap.layers, types);

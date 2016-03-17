@@ -158,7 +158,7 @@ struct WorldLayer
 class WorldTerrain : public BaseWorld
 {
 public:
-	WorldTerrain(World *container, Tileset &tileset);
+	WorldTerrain(World *container);
 
 	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = LAYER_TERRAIN,
 					  int rotationAngle = 0, int flipGID = 0);
@@ -170,7 +170,7 @@ public:
 	const std::vector<WorldLayer> &getLayers();
 
 private:
-	Tileset &tileset;
+	Tileset *tileset;
 	sf::VertexArray tileVertices;
 	sf::VertexArray overLayerVertices;
 
@@ -203,7 +203,7 @@ protected:
 
 	void render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const;
 
-	void load(TMX::TileMap &tileMap, std::vector<int> &flippedGIDs);
+	void load(TMX::TileMap &tileMap, std::vector<int> &flippedGIDs, Tileset *tileset);
 
 	void loadLayers(const std::vector<TMX::Layer *> &layers);
 
@@ -301,9 +301,10 @@ private:
 class World : public sf::Drawable
 {
 public:
-	World(int id, Tileset &tileset);
+	World(int id);
 
-	void loadFromFile(const std::string &filePath, std::vector<int> flippedGIDs, TMX::TileMap &pMap);
+	void loadFromFile(const std::string &filePath, std::vector<int> flippedGIDs, TMX::TileMap &pMap,
+						  Tileset *tileset);
 
 	void finishLoading(TMX::TileMap *tmx);
 
