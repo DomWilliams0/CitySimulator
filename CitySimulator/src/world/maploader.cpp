@@ -13,8 +13,10 @@ TMX::PropertyType TMX::propertyTypeFromString(const std::string &s)
 		return PROPERTY_VISIBLE;
 	if (s == "world")
 		return PROPERTY_BUILDING_WORLD;
+	if (s == "world-share")
+		return PROPERTY_BUILDING_WORLD_SHARE;
 	if (s == "worldID")
-		return PROPERTY_BUILDING_ID;
+		return PROPERTY_BUILDING_WORLD_ID;
 	if (s == "door")
 		return PROPERTY_BUILDING_DOOR;
 

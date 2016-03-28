@@ -16,7 +16,7 @@ void BuildingMap::gatherBuildings(TMX::Layer *buildingLayer)
 			continue;
 
 		std::string buildingWorld(propObj->getProperty(TMX::PROPERTY_BUILDING_WORLD));
-		int buildingID = boost::lexical_cast<int>(propObj->getProperty(TMX::PROPERTY_BUILDING_ID));
+		int buildingID = boost::lexical_cast<int>(propObj->getProperty(TMX::PROPERTY_BUILDING_WORLD_ID));
 
 		sf::IntRect bounds(
 				(int) (propObj->position.x / Constants::tilesetResolution),
@@ -71,7 +71,7 @@ void BuildingMap::load(const TMX::TileMap &tileMap)
 			continue;
 
 
-		int buildingID = boost::lexical_cast<int>(propObj->getProperty(TMX::PROPERTY_BUILDING_ID));
+		int buildingID = boost::lexical_cast<int>(propObj->getProperty(TMX::PROPERTY_BUILDING_WORLD_ID));
 		int doorID = boost::lexical_cast<int>(propObj->getProperty(TMX::PROPERTY_BUILDING_DOOR));
 
 		sf::Vector2i doorPos = (sf::Vector2i) Math::multiply(propObj->position, 1.f / Constants::tilesetResolution);
