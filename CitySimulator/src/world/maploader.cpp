@@ -228,3 +228,34 @@ TMX::TileMap::~TileMap()
 	for (auto &layer : layers)
 		delete layer;
 }
+
+void TMX::PropertyOwner::addProperty(PropertyType type, std::string value)
+{
+	map.insert(std::make_pair(type, value));
+}
+
+std::string TMX::PropertyOwner::getProperty(PropertyType type)
+{
+	return map.at(type);
+}
+
+bool TMX::PropertyOwner::hasProperty(PropertyType type)
+{
+	return map.find(type) != map.end();
+}
+
+void TMX::PropertyOwner::getProperty(TMX::PropertyType type, boost::optional<std::string> &out)
+{
+	if (hasProperty(type))
+		out = getProperty(type);
+}
+
+
+boost::optional<std::string> TMX::PropertyOwner::getPropertyOptional(TMX::PropertyType type)
+{
+	boost::optional<std::string> ret;
+	getProperty(type);
+	return ret;
+}
+
+

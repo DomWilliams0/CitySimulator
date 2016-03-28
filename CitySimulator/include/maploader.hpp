@@ -30,20 +30,15 @@ namespace TMX
 		{
 		}
 
-		inline void addProperty(PropertyType type, std::string value)
-		{
-			map.insert(std::make_pair(type, value));
-		}
+		void addProperty(PropertyType type, std::string value);
 
-		inline std::string getProperty(PropertyType type)
-		{
-			return map.at(type);
-		}
+		std::string getProperty(PropertyType type);
 
-		inline bool hasProperty(PropertyType type)
-		{
-			return map.find(type) != map.end();
-		}
+		bool hasProperty(PropertyType type);
+
+		void getProperty(PropertyType type, boost::optional<std::string> &out);
+
+		boost::optional<std::string> getPropertyOptional(PropertyType type);
 
 	private:
 		std::map<PropertyType, std::string> map;
