@@ -75,6 +75,9 @@ private:
 		std::vector<UnloadedBuilding> buildingsToLoad;
 		std::vector<UnloadedDoor> doorsToLoad;
 
+		// todo implicit map, with incremental integer keys
+		std::vector<LoadedWorld> loadedWorlds;
+
 		WorldLoader(WorldTreeNode &treeRoot);
 
 		/**
@@ -87,17 +90,17 @@ private:
 		/**
 		 * Loads the given world
 		 * @param name The world name, sans file extension
-		 * @param out The LoadedWorld to populate with the newly loaded world
 		 * @param isBuilding True if the world is a building, otherwise false
+		 * @return A reference to the newly loaded world
 		 */
-		void *loadWorld(const std::string &name, LoadedWorld &out, bool isBuilding);
+		LoadedWorld &loadWorld(const std::string &name, bool isBuilding);
 
 		void recurseOnDoors();
 
 		/**
 		 * @return The next building ID to use
 		 */
-		int generateBuildingID();
+		WorldID generateBuildingID();
 
 		/**
 		 * @param name The world name, sans file extension

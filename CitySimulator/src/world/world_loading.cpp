@@ -10,8 +10,7 @@ WorldService::WorldLoader::WorldLoader(WorldTreeNode &treeRoot) : lastWorldID(0)
 World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, Tileset &tileset)
 {
 	// load main world
-	LoadedWorld mainWorld;
-	loadWorld(getWorldFilePath(mainWorldName, false), mainWorld, false);
+	LoadedWorld &mainWorld = loadWorld(mainWorldName, false);
 	if (mainWorld.failed())
 	{
 		Logger::logError("Failed to load main world");
@@ -58,7 +57,7 @@ void WorldService::WorldLoader::recurseOnDoors()
 	for (UnloadedDoor &door : doorsToLoad)
 	{
 		// only positive IDs load worlds
-		if (!door.doorID > 0)
+		if (door.doorID <= 0)
 			continue;
 
 		// find the other door with same world share
@@ -88,8 +87,7 @@ void WorldService::WorldLoader::recurseOnDoors()
 		// load world
 		else if (door.doorTag == DOORTAG_WORLD_NAME)
 		{
-			LoadedWorld loadedWorld;
-			loadWorld(door.worldName, loadedWorld, true);
+			LoadedWorld &loadedWorld = loadWorld(door.worldName, true);
 			if (loadedWorld.failed())
 			{
 				Logger::logError(format("Cannot find building world '%1%', owner of door %2%",
@@ -110,13 +108,22 @@ void WorldService::WorldLoader::recurseOnDoors()
 
 
 }
-void *WorldService::WorldLoader::loadWorld(const std::string &name, LoadedWorld &out, bool isBuilding)
+WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(const std::string &name, bool isBuilding)
 {
-	auto path = getWorldFilePath(name, isBuilding);
-	out.tmx.load(path);
+	WorldID id = generateBuildingID();
+	loadedWorlds.emplace_back();
+	LoadedWorld &loadedWorld = loadedWorlds[id];
 
-	out.world = new World(generateBuildingID(), path);
-	out.world->loadFromFile(out.tmx);
+	auto path = getWorldFilePath(name, isBuilding);
+
+	loadedWorld.tmx.load(path);
+
+	loadedWorld.world = new World(generateBuildingID(), path);
+	loadedWorld.world->loadFromFile(loadedWorld.tmx);
+
+	Logger::logDebuggier(format("World '%1%' has been allocated ID %2%", name, _str(id)));
+
+	return loadedWorld;
 }
 
 WorldID WorldService::WorldLoader::generateBuildingID()
