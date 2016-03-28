@@ -59,7 +59,8 @@ private:
 			World *world;
 			TMX::TileMap tmx;
 
-			bool failed() const {
+			bool failed() const
+			{
 				return world == nullptr;
 			}
 		};
@@ -73,12 +74,26 @@ private:
 
 		WorldLoader(WorldTreeNode &treeRoot);
 
+		/**
+		 * Recursively loads all worlds into the WorldTree
+		 * @param tileset The tileset to use
+		 * @return The main world
+		 */
 		World *loadWorlds(const std::string &mainWorldName, Tileset &tileset);
+
+		/**
+		 * Loads the given world
+		 * @param name The world name, sans file extension
+		 * @param out The LoadedWorld to populate with the newly loaded world
+		 * @param isBuilding True if the world is a building, otherwise false
+		 */
+		void *loadWorld(const std::string &name, LoadedWorld &out, bool isBuilding);
 
 		void recurseOnDoors();
 
-		void *loadWorld(const std::string &name, LoadedWorld &out, bool isBuilding);
-
+		/**
+		 * @return The next building ID to use
+		 */
 		int generateBuildingID();
 
 		/**
@@ -90,8 +105,10 @@ private:
 
 		void findBuildingsAndDoors(TMX::TileMap tmx);
 
-		WorldService::WorldLoader::UnloadedBuilding *findBuildingOwner(
-				const WorldService::WorldLoader::UnloadedDoor &door);
+		/**
+		 * @return The building that physically contains the given door, null if not found
+		 */
+		UnloadedBuilding *findBuildingOwner(const UnloadedDoor &door);
 	};
 
 };
