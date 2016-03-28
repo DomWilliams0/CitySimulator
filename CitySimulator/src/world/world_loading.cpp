@@ -10,16 +10,17 @@ WorldService::WorldLoader::WorldLoader(WorldTreeNode &treeRoot) : lastWorldID(0)
 World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, Tileset &tileset)
 {
 	// load main world
-	TMX::TileMap mainTMX;
-	World *mainWorld = loadMainWorld(mainWorldName, tileset, mainTMX);
-	if (mainWorld == nullptr)
+	LoadedWorld mainWorld;
+	loadWorld(getWorldFilePath(mainWorldName, false), mainWorld, false);
+	if (mainWorld.failed())
 	{
 		Logger::logError("Failed to load main world");
 		return nullptr;
 	}
 
 	// find all buildings from main world and allocate them IDs
-	findBuildingsAndDoors(mainTMX);
+	// todo pass collections to fill
+	findBuildingsAndDoors(mainWorld.tmx);
 
 	for (auto &building : buildingsToLoad)
 	{
@@ -48,7 +49,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
 	// recurse
 	recurseOnDoors();
 
-	return mainWorld;
+	return mainWorld.world;
 }
 
 
@@ -84,18 +85,19 @@ void WorldService::WorldLoader::recurseOnDoors()
 			door.worldID = otherDoor->worldID;
 		}
 
-			// load world
+		// load world
 		else if (door.doorTag == DOORTAG_WORLD_NAME)
 		{
-			World *newWorld = nullptr; // = loadWorld(door.worldName); // todo
-			if (newWorld == nullptr)
+			LoadedWorld loadedWorld;
+			loadWorld(door.worldName, loadedWorld, true);
+			if (loadedWorld.failed())
 			{
 				Logger::logError(format("Cannot find building world '%1%', owner of door %2%",
 				                        door.worldName, _str(door.doorID)));
 				continue;
 			}
 
-			door.worldID = newWorld->getID();
+			door.worldID = loadedWorld.world->getID();
 		}
 		else if (door.doorTag == DOORTAG_UNKNOWN)
 		{
@@ -108,18 +110,14 @@ void WorldService::WorldLoader::recurseOnDoors()
 
 
 }
-
-World *WorldService::WorldLoader::loadMainWorld(const std::string &name, Tileset &tileset, TMX::TileMap &tmx)
+void *WorldService::WorldLoader::loadWorld(const std::string &name, LoadedWorld &out, bool isBuilding)
 {
-	auto worldPath = Utils::joinPaths(Config::getResource("world.root"), name) + ".tmx";
+	auto path = getWorldFilePath(name, isBuilding);
+	out.tmx.load(path);
 
-	World *mainWorld = new World(0, worldPath);
-	tmx.load(worldPath);
-	mainWorld->loadFromFile(tmx);
-
-	return mainWorld;
+	out.world = new World(generateBuildingID(), path);
+	out.world->loadFromFile(out.tmx);
 }
-
 
 int WorldService::WorldLoader::generateBuildingID()
 {
@@ -217,13 +215,19 @@ void WorldService::WorldLoader::findBuildingsAndDoors(TMX::TileMap tmx)
 
 }
 
-std::string WorldService::WorldLoader::getBuildingFilePath(const std::string &name)
+std::string WorldService::WorldLoader::getWorldFilePath(const std::string &name, bool isBuilding)
 {
 	static const std::string extension = ".tmx";
 
-	return Utils::joinPaths(
-			Utils::joinPaths(
-					Config::getResource("world.root"),
-					Config::getResource("world.buildings")),
-			name + extension);
+	if (isBuilding)
+		return Utils::joinPaths(
+				Utils::joinPaths(
+						Config::getResource("world.root"),
+						Config::getResource("world.buildings")),
+				name + extension);
+	else
+		return Utils::joinPaths(
+				Config::getResource("world.root"),
+				name + extension);
+
 }

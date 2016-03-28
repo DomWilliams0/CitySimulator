@@ -35,7 +35,8 @@ private:
 			sf::IntRect bounds;
 		};
 
-		enum DoorTag {
+		enum DoorTag
+		{
 			DOORTAG_WORLD_ID,
 			DOORTAG_WORLD_SHARE,
 			DOORTAG_WORLD_NAME,
@@ -53,6 +54,15 @@ private:
 			int worldID;
 		};
 
+		struct LoadedWorld
+		{
+			World *world;
+			TMX::TileMap tmx;
+
+			bool failed() const {
+				return world == nullptr;
+			}
+		};
 
 		int lastWorldID;
 		std::vector<int> flippedTileGIDs;
@@ -66,11 +76,17 @@ private:
 		World *loadWorlds(const std::string &mainWorldName, Tileset &tileset);
 
 		void recurseOnDoors();
-		World *loadMainWorld(const std::string &name, Tileset &tileset, TMX::TileMap &tmx);
+
+		void *loadWorld(const std::string &name, LoadedWorld &out, bool isBuilding);
 
 		int generateBuildingID();
 
-		std::string getBuildingFilePath(const std::string &name);
+		/**
+		 * @param name The world name, sans file extension
+		 * @param isBuilding True if the world is a building, otherwise false
+		 * @return The true file path of the world
+		 */
+		std::string getWorldFilePath(const std::string &name, bool isBuilding);
 
 		void findBuildingsAndDoors(TMX::TileMap tmx);
 
