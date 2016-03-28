@@ -6,6 +6,9 @@
 #include "building.hpp"
 #include "bodydata.hpp"
 
+typedef int WorldID;
+
+
 class WorldService : public BaseService
 {
 public:
@@ -30,7 +33,7 @@ private:
 	{
 		struct UnloadedBuilding
 		{
-			int insideWorldID;
+			WorldID insideWorldID;
 			std::string insideWorldName;
 			sf::IntRect bounds;
 		};
@@ -51,7 +54,7 @@ private:
 			DoorTag doorTag;
 			std::string worldName;
 			std::string worldShare;
-			int worldID;
+			WorldID worldID;
 		};
 
 		struct LoadedWorld
@@ -65,7 +68,7 @@ private:
 			}
 		};
 
-		int lastWorldID;
+		WorldID lastWorldID;
 		std::vector<int> flippedTileGIDs;
 		WorldTreeNode &treeRoot;
 

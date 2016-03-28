@@ -119,7 +119,7 @@ void *WorldService::WorldLoader::loadWorld(const std::string &name, LoadedWorld 
 	out.world->loadFromFile(out.tmx);
 }
 
-int WorldService::WorldLoader::generateBuildingID()
+WorldID WorldService::WorldLoader::generateBuildingID()
 {
 	lastWorldID++;
 	return lastWorldID;
@@ -193,7 +193,7 @@ void WorldService::WorldLoader::findBuildingsAndDoors(TMX::TileMap tmx)
 			if (propObj->hasProperty(TMX::PROPERTY_BUILDING_WORLD_ID))
 			{
 				d.doorTag = DOORTAG_WORLD_ID;
-				d.worldID = boost::lexical_cast<int>(propObj->getProperty(TMX::PROPERTY_BUILDING_WORLD_ID));
+				d.worldID = boost::lexical_cast<WorldID>(propObj->getProperty(TMX::PROPERTY_BUILDING_WORLD_ID));
 			}
 			else if (propObj->hasProperty(TMX::PROPERTY_BUILDING_WORLD))
 			{
