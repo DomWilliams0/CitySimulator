@@ -128,8 +128,7 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 
 WorldID WorldService::WorldLoader::generateBuildingID()
 {
-	lastWorldID++;
-	return lastWorldID;
+	return lastWorldID++;
 }
 
 
