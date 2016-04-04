@@ -62,6 +62,9 @@ private:
 			World *world;
 			TMX::TileMap tmx;
 
+			std::vector<UnloadedDoor> doors;
+			std::vector<UnloadedBuilding> buildings;
+
 			bool failed() const
 			{
 				return world == nullptr;
@@ -108,15 +111,12 @@ private:
 		 */
 		std::string getWorldFilePath(const std::string &name, bool isBuilding);
 
-		void findBuildingsAndDoors(TMX::TileMap &tmx,
-		                           std::vector<UnloadedBuilding> &buildings,
-		                           std::vector<UnloadedDoor> &doors);
-
 		/**
 		 * @return The building that physically contains the given door, null if not found
 		 */
-		WorldService::WorldLoader::UnloadedBuilding *findBuildingOwner(UnloadedDoor &door,
-		                                                               std::vector<UnloadedBuilding> &buildings);
+		WorldService::WorldLoader::UnloadedBuilding 
+      *findBuildingOwner(UnloadedDoor &door,
+                         std::vector<WorldService::WorldLoader::UnloadedBuilding> &buildings);
 	};
 
 };
