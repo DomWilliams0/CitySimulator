@@ -17,9 +17,11 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
 		return nullptr;
 	}
 
+	std::vector<UnloadedBuilding> buildingsToLoad;
+	std::vector<UnloadedDoor> doorsToLoad;
+
 	// find all buildings from main world and allocate them IDs
-	// todo pass collections to fill
-	findBuildingsAndDoors(mainWorld.tmx);
+	findBuildingsAndDoors(mainWorld.tmx, buildingsToLoad, doorsToLoad);
 
 	for (auto &building : buildingsToLoad)
 	{
@@ -33,7 +35,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
 	// transfer building IDs to doors
 	for (auto &door : doorsToLoad)
 	{
-		UnloadedBuilding *owningBuilding = findBuildingOwner(door);
+		UnloadedBuilding *owningBuilding = findBuildingOwner(door, buildingsToLoad);
 		if (owningBuilding == nullptr)
 		{
 			Logger::logError(format("A door at (%1%, %2%) is not in any buildings!",
@@ -45,16 +47,22 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
 		door.worldID = owningBuilding->insideWorldID;
 	}
 
-	// recurse
-	recurseOnDoors();
+	// load all worlds recursively without connecting doors
+	discoverAndLoadAllWorlds(buildingsToLoad, doorsToLoad);
 
 	return mainWorld.world;
 }
 
 
-void WorldService::WorldLoader::recurseOnDoors()
+void WorldService::WorldLoader::discoverAndLoadAllWorlds(
+		std::vector<UnloadedBuilding> &buildings,
+		std::vector<UnloadedDoor> &doors)
 {
-	for (UnloadedDoor &door : doorsToLoad)
+	std::vector<UnloadedDoor> nextDoors;
+	std::vector<UnloadedBuilding> nextBuildings;
+
+	// iterate all doors found in last world
+	for (UnloadedDoor &door : doors)
 	{
 		// only positive IDs load worlds
 		if (door.doorID <= 0)
@@ -65,20 +73,19 @@ void WorldService::WorldLoader::recurseOnDoors()
 		if (door.doorTag == DOORTAG_WORLD_SHARE)
 		{
 
-			auto otherDoor = std::find_if(doorsToLoad.begin(), doorsToLoad.end(),
+			auto otherDoor = std::find_if(doors.begin(), doors.end(),
 			                              [door](const UnloadedDoor &d)
 			                              {
 				                              return d.doorTag != DOORTAG_WORLD_SHARE &&
 				                                     d.worldShare == door.worldShare;
 			                              });
 
-			if (otherDoor == doorsToLoad.end())
+			if (otherDoor == doors.end())
 			{
 				Logger::logError(format("Door %1% has an unknown world share tag '%2%'",
 				                        _str(door.doorID), door.worldShare));
 				continue;
 			}
-
 
 			// share world ID
 			door.worldID = otherDoor->worldID;
@@ -96,16 +103,20 @@ void WorldService::WorldLoader::recurseOnDoors()
 			}
 
 			door.worldID = loadedWorld.world->getID();
+
+			// add loaded buildings and doors to next recurse
+			findBuildingsAndDoors(loadedWorld.tmx, nextBuildings, nextDoors);
+
 		}
 		else if (door.doorTag == DOORTAG_UNKNOWN)
 		{
 			Logger::logError(format("Door %1% has no assigned door tag", _str(door.doorID)));
 			continue;
 		}
-
-
 	}
 
+	if (!doors.empty())
+		discoverAndLoadAllWorlds(nextBuildings, nextDoors);
 
 }
 WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(const std::string &name, bool isBuilding)
@@ -132,12 +143,12 @@ WorldID WorldService::WorldLoader::generateBuildingID()
 }
 
 
-WorldService::WorldLoader::UnloadedBuilding *WorldService::WorldLoader::findBuildingOwner(
-		const WorldService::WorldLoader::UnloadedDoor &door)
+WorldService::WorldLoader::UnloadedBuilding *WorldService::WorldLoader::findBuildingOwner(UnloadedDoor &door,
+                                                               std::vector<UnloadedBuilding> &buildings)
 {
 	const sf::Vector2i &tile = door.tile;
 
-	for (auto &building : buildingsToLoad)
+	for (auto &building : buildings)
 	{
 		const sf::IntRect &bounds = building.bounds;
 		if (bounds.left <= tile.x && bounds.left + bounds.width >= tile.x &&
@@ -148,23 +159,24 @@ WorldService::WorldLoader::UnloadedBuilding *WorldService::WorldLoader::findBuil
 	return nullptr;
 }
 
-void WorldService::WorldLoader::findBuildingsAndDoors(TMX::TileMap &tmx)
-{
-	auto buildingLayerIterator = std::find_if(tmx.layers.begin(), tmx.layers.end(),
-	                                          [](const TMX::Layer &layer)
-	                                          {
-		                                          return layer.name == "buildings";
-	                                          });
 
-	if (buildingLayerIterator == tmx.layers.end())
+void WorldService::WorldLoader::findBuildingsAndDoors(TMX::TileMap &tmx,
+                                                      std::vector<UnloadedBuilding> &buildings,
+                                                      std::vector<UnloadedDoor> &doors)
+{
+	auto buildingLayer = std::find_if(tmx.layers.begin(), tmx.layers.end(),
+	                                  [](const TMX::Layer &layer)
+	                                  {
+		                                  return layer.name == "buildings";
+	                                  });
+
+	if (buildingLayer == tmx.layers.end())
 	{
 		Logger::logInfo("No \"buildings\" layer was found in main world");
 		return;
 	}
 
-	const TMX::Layer &buildingLayer = *buildingLayerIterator;
-
-	for (const TMX::TileWrapper &tile : buildingLayer.items)
+	for (const TMX::TileWrapper &tile : buildingLayer->items)
 	{
 		if (tile.type != TMX::TILE_PROPERTY_SHAPE)
 			continue;
@@ -184,7 +196,7 @@ void WorldService::WorldLoader::findBuildingsAndDoors(TMX::TileMap &tmx)
 			UnloadedBuilding b;
 			b.bounds = bounds;
 			b.insideWorldName = propObj.getProperty(TMX::PROPERTY_BUILDING_WORLD);
-			buildingsToLoad.push_back(b);
+			buildings.push_back(b);
 		}
 
 		else if (propObj.hasProperty(TMX::PROPERTY_BUILDING_DOOR))
@@ -215,7 +227,7 @@ void WorldService::WorldLoader::findBuildingsAndDoors(TMX::TileMap &tmx)
 				d.worldShare = propObj.getProperty(TMX::PROPERTY_BUILDING_WORLD_SHARE);
 			}
 
-			doorsToLoad.push_back(d);
+			doors.push_back(d);
 		}
 	}
 

@@ -69,11 +69,8 @@ private:
 		};
 
 		WorldID lastWorldID;
-		std::vector<int> flippedTileGIDs;
+		std::unordered_set<int> flippedTileGIDs;
 		WorldTreeNode &treeRoot;
-
-		std::vector<UnloadedBuilding> buildingsToLoad;
-		std::vector<UnloadedDoor> doorsToLoad;
 
 		// todo implicit map, with incremental integer keys
 		std::vector<LoadedWorld> loadedWorlds;
@@ -95,7 +92,9 @@ private:
 		 */
 		LoadedWorld &loadWorld(const std::string &name, bool isBuilding);
 
-		void recurseOnDoors();
+		void discoverAndLoadAllWorlds(
+				std::vector<UnloadedBuilding> &buildings,
+				std::vector<UnloadedDoor> &doors);
 
 		/**
 		 * @return The next building ID to use
@@ -109,12 +108,15 @@ private:
 		 */
 		std::string getWorldFilePath(const std::string &name, bool isBuilding);
 
-		void findBuildingsAndDoors(TMX::TileMap &tmx);
+		void findBuildingsAndDoors(TMX::TileMap &tmx,
+		                           std::vector<UnloadedBuilding> &buildings,
+		                           std::vector<UnloadedDoor> &doors);
 
 		/**
 		 * @return The building that physically contains the given door, null if not found
 		 */
-		UnloadedBuilding *findBuildingOwner(const UnloadedDoor &door);
+		WorldService::WorldLoader::UnloadedBuilding *findBuildingOwner(UnloadedDoor &door,
+		                                                               std::vector<UnloadedBuilding> &buildings);
 	};
 
 };
