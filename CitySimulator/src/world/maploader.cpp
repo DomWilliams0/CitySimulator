@@ -67,7 +67,7 @@ int TMX::stripFlip(const int &gid, std::bitset<3> &flips)
 	return gid & ~(HORIZONTAL | VERTICAL | DIAGONAL);
 }
 
-TMX::Tile::Tile(TileType type, const std::string &id) : tileType(type)
+void TMX::Tile::setGID(const std::string &id)
 {
 	gid = boost::lexical_cast<rot>(id);
 	if (gid != 0)
@@ -89,8 +89,6 @@ void TMX::TileMap::load(const std::string &filePath)
 
 	size.x = tree.get<int>("map.<xmlattr>.width", 0);
 	size.y = tree.get<int>("map.<xmlattr>.height", 0);
-	int area = size.x * size.y;
-
 
 	boost::property_tree::ptree treeRoot = tree.get_child("map");
 	addProperties(this, treeRoot);
@@ -100,25 +98,27 @@ void TMX::TileMap::load(const std::string &filePath)
 		if (pair.first != "layer" && pair.first != "objectgroup")
 			continue;
 
-		Layer *layer = new Layer;
-		layer->name = pair.second.get<std::string>("<xmlattr>.name");
-		layer->visible = pair.second.get<int>("<xmlattr>.visible", 1) != 0;
-		layer->items.reserve(area);
+		layers.emplace_back();
+		Layer &layer = layers[layers.size() - 1];
+		layer.name = pair.second.get<std::string>("<xmlattr>.name");
+		layer.visible = pair.second.get<int>("<xmlattr>.visible", 1) != 0;
 
-		// tile layerDepths
+		// tile layers
 		if (pair.first == "layer")
 		{
 			// add all tiles
 			typedef boost::char_separator<char> sep;
-			typedef boost::tokenizer<sep> tk;
 
 			std::string data = pair.second.get<std::string>("data");
-			tk tokens(data, sep(",\n\r"));
+			boost::tokenizer<sep> tokens(data, sep(",\n\r"));
 
 			for (auto it = tokens.begin(); it != tokens.end(); ++it)
-				layer->items.push_back(new Tile(*it));
-
-			layer->items.resize(area);
+			{
+				TileWrapper wrapper;
+				wrapper.type = TILE_TILE;
+				wrapper.tile.setGID(*it);
+				layer.items.push_back(wrapper);
+			}
 		}
 
 			// object layers
@@ -128,31 +128,26 @@ void TMX::TileMap::load(const std::string &filePath)
 			{
 				if (o.first == "object")
 				{
-					float x = o.second.get<float>("<xmlattr>.x");
-					float y = o.second.get<float>("<xmlattr>.y");
+					TileWrapper wrapper;
+					wrapper.tile.position.x = o.second.get<float>("<xmlattr>.x");
+					wrapper.tile.position.y = o.second.get<float>("<xmlattr>.y");
 					boost::optional<std::string> gid = o.second.get_optional<std::string>("<xmlattr>.gid");
 
 					// has a tile gid
 					if (gid)
 					{
-						Object *obj = new Object(*gid);
+						wrapper.type = TILE_OBJECT;
+						wrapper.tile.setGID(*gid);
 
-						obj->position.x = x;
-						obj->position.y = y;
-						obj->rotationAnglef = o.second.get<float>("<xmlattr>.rotation", 0.0);
-
-						layer->items.push_back(obj);
+						wrapper.objectRotation = o.second.get<float>("<xmlattr>.rotation", 0.0);
 					}
 
-						// property object
 					else
 					{
-						PropertyObject *propObj = new PropertyObject;
-						propObj->position.x = x;
-						propObj->position.y = y;
-						propObj->dimensions.x = o.second.get<float>("<xmlattr>.width");
-						propObj->dimensions.y = o.second.get<float>("<xmlattr>.height");
-
+						// property object
+						wrapper.type = TILE_PROPERTY_SHAPE;
+						wrapper.property.dimensions.x = o.second.get<float>("<xmlattr>.width");
+						wrapper.property.dimensions.y = o.second.get<float>("<xmlattr>.height");
 
 						for (auto &prop : o.second.get_child("properties"))
 						{
@@ -163,21 +158,20 @@ void TMX::TileMap::load(const std::string &filePath)
 							if (propType == PROPERTY_UNKNOWN)
 							{
 								Logger::logWarning(format("Found unknown property '%1%' in layer '%2%', skipping",
-														  key, layer->name));
+								                          key, layer.name));
 								continue;
 
 							}
 
-							propObj->addProperty(propType, value);
+							wrapper.property.addProperty(propType, value);
 						}
-						layer->items.push_back(propObj);
 
 					}
+
+					layer.items.push_back(wrapper);
 				}
 			}
 		}
-
-		layers.push_back(layer);
 	}
 }
 void TMX::Tile::processRotation(std::bitset<3> rotation)
@@ -220,40 +214,30 @@ void TMX::Tile::processRotation(std::bitset<3> rotation)
 		}
 	}
 }
-TMX::Layer::~Layer()
-{
-	for (Tile *tile : items)
-		delete tile;
-}
-TMX::TileMap::~TileMap()
-{
-	for (auto &layer : layers)
-		delete layer;
-}
 
-void TMX::PropertyOwner::addProperty(PropertyType type, std::string value)
+void TMX::PropertyHolder::addProperty(PropertyType type, std::string value)
 {
 	map.insert(std::make_pair(type, value));
 }
 
-std::string TMX::PropertyOwner::getProperty(PropertyType type)
+std::string TMX::PropertyHolder::getProperty(PropertyType type) const
 {
 	return map.at(type);
 }
 
-bool TMX::PropertyOwner::hasProperty(PropertyType type)
+bool TMX::PropertyHolder::hasProperty(PropertyType type) const
 {
 	return map.find(type) != map.end();
 }
 
-void TMX::PropertyOwner::getProperty(TMX::PropertyType type, boost::optional<std::string> &out)
+void TMX::PropertyHolder::getProperty(TMX::PropertyType type, boost::optional<std::string> &out)
 {
 	if (hasProperty(type))
 		out = getProperty(type);
 }
 
 
-boost::optional<std::string> TMX::PropertyOwner::getPropertyOptional(TMX::PropertyType type)
+boost::optional<std::string> TMX::PropertyHolder::getPropertyOptional(TMX::PropertyType type)
 {
 	boost::optional<std::string> ret;
 	getProperty(type);
@@ -261,3 +245,23 @@ boost::optional<std::string> TMX::PropertyOwner::getPropertyOptional(TMX::Proper
 }
 
 
+TMX::TileType TMX::Tile::getTileType() const
+{
+	return tileType;
+}
+bool TMX::Tile::isFlipped() const
+{
+	return flipped;
+}
+int TMX::Tile::getRotationAngle() const
+{
+	return rotationAngle;
+}
+int TMX::Tile::getFlipGID() const
+{
+	return flipGID;
+}
+unsigned int TMX::Tile::getGID() const
+{
+	return gid;
+}

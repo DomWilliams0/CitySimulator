@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <set>
 #include <boost/optional.hpp>
+#include <bits/unordered_set.h>
 #include "SFMLDebugDraw.h"
 #include "maploader.hpp"
 #include "building.hpp"
@@ -182,9 +183,9 @@ private:
 	int tileLayerCount;
 	int overLayerCount;
 
-	void discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<LayerType> &layerTypes);
+	void discoverLayers(std::vector<TMX::Layer> &layers, std::vector<LayerType> &layerTypes);
 
-	void discoverFlippedTiles(const std::vector<TMX::Layer *> &layers, std::vector<int> &flippedGIDs);
+	void discoverFlippedTiles(const std::vector<TMX::Layer> &layers, std::unordered_set<int> &flippedGIDs);
 
 
 	int getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
@@ -204,9 +205,9 @@ protected:
 
 	void render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const;
 
-	void load(TMX::TileMap &tileMap, std::vector<int> &flippedGIDs, Tileset *tileset);
+	void load(TMX::TileMap &tileMap, std::unordered_set<int> &flippedGIDs, Tileset *tileset);
 
-	void loadLayers(const std::vector<TMX::Layer *> &layers);
+	void loadLayers(const std::vector<TMX::Layer> &layers);
 
 	friend struct TMX::TileMap;
 
@@ -295,7 +296,7 @@ public:
 private:
 	std::unordered_map<int, Building> buildings;
 
-	void gatherBuildings(TMX::Layer *buildingLayer);
+	void gatherBuildings(const TMX::Layer &buildingLayer);
 
 };
 

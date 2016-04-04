@@ -148,12 +148,12 @@ WorldService::WorldLoader::UnloadedBuilding *WorldService::WorldLoader::findBuil
 	return nullptr;
 }
 
-void WorldService::WorldLoader::findBuildingsAndDoors(TMX::TileMap tmx)
+void WorldService::WorldLoader::findBuildingsAndDoors(TMX::TileMap &tmx)
 {
 	auto buildingLayerIterator = std::find_if(tmx.layers.begin(), tmx.layers.end(),
-	                                          [](const TMX::Layer *layer)
+	                                          [](const TMX::Layer &layer)
 	                                          {
-		                                          return layer->name == "buildings";
+		                                          return layer.name == "buildings";
 	                                          });
 
 	if (buildingLayerIterator == tmx.layers.end())
@@ -162,57 +162,57 @@ void WorldService::WorldLoader::findBuildingsAndDoors(TMX::TileMap tmx)
 		return;
 	}
 
-	TMX::Layer *buildingLayer = *buildingLayerIterator;
+	const TMX::Layer &buildingLayer = *buildingLayerIterator;
 
-	for (TMX::Tile *tile : buildingLayer->items)
+	for (const TMX::TileWrapper &tile : buildingLayer.items)
 	{
-		if (tile->getTileType() != TMX::TILE_PROPERTY_SHAPE)
+		if (tile.type != TMX::TILE_PROPERTY_SHAPE)
 			continue;
 
-		TMX::PropertyObject *propObj = dynamic_cast<TMX::PropertyObject *>(tile);
+		const TMX::PropertyObject &propObj = tile.property;
 
-		if (propObj->hasProperty(TMX::PROPERTY_BUILDING_WORLD))
+		if (propObj.hasProperty(TMX::PROPERTY_BUILDING_WORLD))
 		{
 			// buildings
 			sf::IntRect bounds(
-					(int) (propObj->position.x / Constants::tilesetResolution),
-					(int) (propObj->position.y / Constants::tilesetResolution),
-					(int) (propObj->dimensions.x / Constants::tilesetResolution),
-					(int) (propObj->dimensions.y / Constants::tilesetResolution)
+					(int) (tile.tile.position.x / Constants::tilesetResolution),
+					(int) (tile.tile.position.y / Constants::tilesetResolution),
+					(int) (propObj.dimensions.x / Constants::tilesetResolution),
+					(int) (propObj.dimensions.y / Constants::tilesetResolution)
 			);
 
 			UnloadedBuilding b;
 			b.bounds = bounds;
-			b.insideWorldName = propObj->getProperty(TMX::PROPERTY_BUILDING_WORLD);
+			b.insideWorldName = propObj.getProperty(TMX::PROPERTY_BUILDING_WORLD);
 			buildingsToLoad.push_back(b);
 		}
 
-		else if (propObj->hasProperty(TMX::PROPERTY_BUILDING_DOOR))
+		else if (propObj.hasProperty(TMX::PROPERTY_BUILDING_DOOR))
 		{
 			// doors
 			UnloadedDoor d;
-			d.tile.x = (int) (propObj->position.x / Constants::tilesetResolution);
-			d.tile.y = (int) (propObj->position.y / Constants::tilesetResolution);
-			d.doorID = boost::lexical_cast<int>(propObj->getProperty(TMX::PROPERTY_BUILDING_DOOR));
+			d.tile.x = (int) (tile.tile.position.x / Constants::tilesetResolution);
+			d.tile.y = (int) (tile.tile.position.y / Constants::tilesetResolution);
+			d.doorID = boost::lexical_cast<int>(propObj.getProperty(TMX::PROPERTY_BUILDING_DOOR));
 			d.doorTag = DOORTAG_UNKNOWN;
 
-			if (propObj->hasProperty(TMX::PROPERTY_BUILDING_WORLD_ID))
+			if (propObj.hasProperty(TMX::PROPERTY_BUILDING_WORLD_ID))
 			{
 				d.doorTag = DOORTAG_WORLD_ID;
-				d.worldID = boost::lexical_cast<WorldID>(propObj->getProperty(TMX::PROPERTY_BUILDING_WORLD_ID));
+				d.worldID = boost::lexical_cast<WorldID>(propObj.getProperty(TMX::PROPERTY_BUILDING_WORLD_ID));
 			}
-			else if (propObj->hasProperty(TMX::PROPERTY_BUILDING_WORLD))
+			else if (propObj.hasProperty(TMX::PROPERTY_BUILDING_WORLD))
 			{
 				d.doorTag = DOORTAG_WORLD_NAME;
-				d.worldName = propObj->getProperty(TMX::PROPERTY_BUILDING_WORLD);
+				d.worldName = propObj.getProperty(TMX::PROPERTY_BUILDING_WORLD);
 			}
 
-			if (propObj->hasProperty(TMX::PROPERTY_BUILDING_WORLD_SHARE))
+			if (propObj.hasProperty(TMX::PROPERTY_BUILDING_WORLD_SHARE))
 			{
 				// only set if not already
 				if (d.doorTag == DOORTAG_UNKNOWN)
 					d.doorTag = DOORTAG_WORLD_SHARE;
-				d.worldShare = propObj->getProperty(TMX::PROPERTY_BUILDING_WORLD_SHARE);
+				d.worldShare = propObj.getProperty(TMX::PROPERTY_BUILDING_WORLD_SHARE);
 			}
 
 			doorsToLoad.push_back(d);

@@ -1,6 +1,5 @@
 #include <unordered_set>
 #include "world.hpp"
-#include "utils.hpp"
 #include "service/logging_service.hpp"
 #include "service/render_service.hpp"
 
@@ -137,9 +136,9 @@ sf::IntRect Tileset::getTileRect(unsigned blockType)
 	int tileX = blockType % size.x;
 	int tileY = blockType / size.x;
 	return sf::IntRect(tileX * Constants::tilesetResolution,
-					   tileY * Constants::tilesetResolution,
-					   Constants::tilesetResolution,
-					   Constants::tilesetResolution);
+	                   tileY * Constants::tilesetResolution,
+	                   Constants::tilesetResolution,
+	                   Constants::tilesetResolution);
 }
 
 void Tileset::createTileImage(sf::Image *image, unsigned blockType)
@@ -154,7 +153,7 @@ void Tileset::createTileImage(sf::Image *image, unsigned blockType)
 void Tileset::addPoint(int x, int y)
 {
 	points[getIndex(x, y)] = sf::Vector2f(x * Constants::tilesetResolution,
-										  y * Constants::tilesetResolution);
+	                                      y * Constants::tilesetResolution);
 }
 
 void Tileset::generatePoints()
@@ -256,11 +255,11 @@ void WorldTerrain::registerLayer(LayerType layerType, int depth)
 {
 	layers.emplace_back(layerType, depth);
 	Logger::logDebuggier(format("Found %3%layer type %1% at depth %2%", _str(layerType), _str(depth),
-								isOverLayer(layerType) ? "overterrain " : ""));
+	                            isOverLayer(layerType) ? "overterrain " : ""));
 }
 
 void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer, int rotationAngle,
-								int flipGID)
+                                int flipGID)
 {
 	int vertexIndex = getVertexIndex(pos, layer);
 	sf::VertexArray &vertices = getVertices(layer);
@@ -279,7 +278,7 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, float
 
 	std::vector<sf::Vertex> quad(4);
 	sf::Vector2f adjustedPos = sf::Vector2f(pos.x / Constants::tilesetResolution,
-											(pos.y - Constants::tilesetResolution) / Constants::tilesetResolution);
+	                                        (pos.y - Constants::tilesetResolution) / Constants::tilesetResolution);
 
 	positionVertices(&quad[0], adjustedPos, 1);
 	tileset->textureQuad(&quad[0], blockType, 0, flipGID);
@@ -304,7 +303,7 @@ const std::vector<WorldLayer> &WorldTerrain::getLayers()
 	return layers;
 }
 
-void WorldTerrain::discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<LayerType> &layerTypes)
+void WorldTerrain::discoverLayers(std::vector<TMX::Layer> &layers, std::vector<LayerType> &layerTypes)
 {
 	auto layerIt = layers.begin();
 	int depth(0);
@@ -315,16 +314,16 @@ void WorldTerrain::discoverLayers(std::vector<TMX::Layer *> &layers, std::vector
 		auto layer = *layerIt;
 
 		// unknown layer type
-		LayerType layerType = layerTypeFromString(layer->name);
+		LayerType layerType = layerTypeFromString(layer.name);
 		if (layerType == LAYER_UNKNOWN)
 		{
-			Logger::logError("Invalid layer name: " + layer->name);
+			Logger::logError("Invalid layer name: " + layer.name);
 			layerIt = layers.erase(layerIt);
 			continue;
 		}
 
 		// invisible layer
-		if (!layer->visible)
+		if (!layer.visible)
 		{
 			layerIt = layers.erase(layerIt);
 			continue;
@@ -344,77 +343,60 @@ void WorldTerrain::discoverLayers(std::vector<TMX::Layer *> &layers, std::vector
 	}
 }
 
-void WorldTerrain::discoverFlippedTiles(const std::vector<TMX::Layer *> &layers, std::vector<int> &flippedGIDs)
+void WorldTerrain::discoverFlippedTiles(const std::vector<TMX::Layer> &layers, std::unordered_set<int> &flippedGIDs)
 {
-	std::unordered_set<int> flipped;
-
-	for (TMX::Layer *layer : layers)
+	for (const TMX::Layer &layer : layers)
 	{
-		for (TMX::Tile *tile : layer->items)
+		for (const TMX::TileWrapper &tile : layer.items)
 		{
-			// doesn't exist or isn't flipped
-			if (tile == nullptr || !tile->isFlipped())
+			if (!tile.tile.isFlipped() || tile.tile.getGID() == BLOCK_BLANK)
 				continue;
 
-			if (tile->getGID() == BLOCK_BLANK)
-				continue;
-
-			int flipGID = tile->getFlipGID();
+			int flipGID = tile.tile.getFlipGID();
 
 			// already done
-			if (flipped.find(flipGID) != flipped.end())
-				continue;
-
-			flippedGIDs.push_back(flipGID);
-			flipped.insert(flipGID);
+			if (flippedGIDs.find(flipGID) == flippedGIDs.end())
+				flippedGIDs.insert(flipGID);
 		}
 	}
 }
 
-void WorldTerrain::loadLayers(const std::vector<TMX::Layer *> &layers)
+void WorldTerrain::loadLayers(const std::vector<TMX::Layer> &layers)
 {
-	sf::Vector2i tileSize = container->tileSize;
-	sf::Vector2i pos;
 	int layerIndex(0);
 
-	for (TMX::Layer *layer : layers)
+	for (const TMX::Layer &layer : layers)
 	{
 		LayerType layerType = this->layers[layerIndex++].type;
 
 		if (layerType == LAYER_OBJECTS)
 		{
 			// objects
-			for (TMX::Tile *item : layer->items)
+			for (const TMX::TileWrapper &tile : layer.items)
 			{
-				BlockType blockType = static_cast<BlockType>(item->getGID());
+				BlockType blockType = static_cast<BlockType>(tile.tile.getGID());
 				if (blockType == BLOCK_BLANK)
 					continue;
 
-				TMX::Object *object = dynamic_cast<TMX::Object *>(item);
-				addObject(object->position, blockType, object->rotationAnglef, item->getFlipGID());
+				addObject(tile.tile.position, blockType, tile.objectRotation, tile.tile.getFlipGID());
 			}
 		}
 
 		else if (isTileLayer(layerType))
 		{
+			sf::Vector2i tempPos;
+
 			// tiles
-			for (int y = 0; y < tileSize.y; ++y)
+			for (const TMX::TileWrapper &tile : layer.items)
 			{
-				for (int x = 0; x < tileSize.x; ++x)
-				{
-					TMX::Tile *tile = layer->items[x + y * tileSize.x];
-					if (tile == nullptr)
-						continue;
+				BlockType blockType = static_cast<BlockType>(tile.tile.getGID());
+				if (blockType == BLOCK_BLANK)
+					continue;
 
-					BlockType blockType = static_cast<BlockType>(tile->getGID());
-					if (blockType == BLOCK_BLANK)
-						continue;
+				tempPos.x = (int) tile.tile.position.x;
+				tempPos.y = (int) tile.tile.position.y;
 
-					pos.x = x;
-					pos.y = y;
-
-					setBlockType(pos, blockType, layerType, tile->getRotationAngle(), tile->getFlipGID());
-				}
+				setBlockType(tempPos, blockType, layerType, tile.tile.getRotationAngle(), tile.tile.getFlipGID());
 			}
 		}
 	}
@@ -426,7 +408,7 @@ void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states, bo
 	target.draw(overLayers ? overLayerVertices : tileVertices, states);
 }
 
-void WorldTerrain::load(TMX::TileMap &tileMap, std::vector<int> &flippedGIDs, Tileset *tileset)
+void WorldTerrain::load(TMX::TileMap &tileMap, std::unordered_set<int> &flippedGIDs, Tileset *tileset)
 {
 	this->tileset = tileset;
 
@@ -435,7 +417,7 @@ void WorldTerrain::load(TMX::TileMap &tileMap, std::vector<int> &flippedGIDs, Ti
 	discoverLayers(tileMap.layers, types);
 
 	Logger::logDebug(format("Discovered %1% tile layer(s), of which %2% is/are overlayer(s)",
-							_str(tileLayerCount), _str(overLayerCount)));
+	                        _str(tileLayerCount), _str(overLayerCount)));
 
 	// resize vertex array to accommodate for layer count
 	resizeVertices();

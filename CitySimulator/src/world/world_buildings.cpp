@@ -3,26 +3,24 @@
 #include "service/logging_service.hpp"
 
 
-void BuildingMap::gatherBuildings(TMX::Layer *buildingLayer)
+void BuildingMap::gatherBuildings(const TMX::Layer &buildingLayer)
 {
-	for (TMX::Tile *tile : buildingLayer->items)
+	for (const TMX::TileWrapper &tile : buildingLayer.items)
 	{
-		if (tile->getTileType() != TMX::TILE_PROPERTY_SHAPE)
+		if (tile.type != TMX::TILE_PROPERTY_SHAPE)
 			continue;
 
-		TMX::PropertyObject *propObj = dynamic_cast<TMX::PropertyObject *>(tile);
-
-		if (!propObj->hasProperty(TMX::PROPERTY_BUILDING_WORLD))
+		if (!tile.property.hasProperty(TMX::PROPERTY_BUILDING_WORLD))
 			continue;
 
-		std::string buildingWorld(propObj->getProperty(TMX::PROPERTY_BUILDING_WORLD));
-		int buildingID = boost::lexical_cast<int>(propObj->getProperty(TMX::PROPERTY_BUILDING_WORLD_ID));
+		std::string buildingWorld(tile.property.getProperty(TMX::PROPERTY_BUILDING_WORLD));
+		int buildingID = boost::lexical_cast<int>(tile.property.getProperty(TMX::PROPERTY_BUILDING_WORLD_ID));
 
 		sf::IntRect bounds(
-				(int) (propObj->position.x / Constants::tilesetResolution),
-				(int) (propObj->position.y / Constants::tilesetResolution),
-				(int) (propObj->dimensions.x / Constants::tilesetResolution),
-				(int) (propObj->dimensions.y / Constants::tilesetResolution)
+				(int) (tile.tile.position.x / Constants::tilesetResolution),
+				(int) (tile.tile.position.y / Constants::tilesetResolution),
+				(int) (tile.property.dimensions.x / Constants::tilesetResolution),
+				(int) (tile.property.dimensions.y / Constants::tilesetResolution)
 		);
 
 
@@ -43,9 +41,9 @@ void BuildingMap::load(const TMX::TileMap &tileMap)
 	Logger::pushIndent();
 
 	auto buildingLayer = std::find_if(tileMap.layers.begin(), tileMap.layers.end(),
-									  [](const TMX::Layer *layer)
+									  [](const TMX::Layer &layer)
 									  {
-										  return layer->name == "buildings";
+										  return layer.name == "buildings";
 									  });
 
 	if (buildingLayer == tileMap.layers.end())
@@ -55,26 +53,26 @@ void BuildingMap::load(const TMX::TileMap &tileMap)
 		return;
 	}
 
-	TMX::Layer *layer = *buildingLayer;
+	const TMX::Layer &layer = *buildingLayer;
 
 	gatherBuildings(layer);
 
 	// entrances
-	for (TMX::Tile *tile : layer->items)
+	for (const TMX::TileWrapper &tile : layer.items)
 	{
-		if (tile->getTileType() != TMX::TILE_PROPERTY_SHAPE)
+		if (tile.type != TMX::TILE_PROPERTY_SHAPE)
 			continue;
 
-		TMX::PropertyObject *propObj = dynamic_cast<TMX::PropertyObject *>(tile);
+		const TMX::PropertyObject &propObj = tile.property;
 
-		if (!propObj->hasProperty(TMX::PROPERTY_BUILDING_DOOR))
+		if (!propObj.hasProperty(TMX::PROPERTY_BUILDING_DOOR))
 			continue;
 
 
-		int buildingID = boost::lexical_cast<int>(propObj->getProperty(TMX::PROPERTY_BUILDING_WORLD_ID));
-		int doorID = boost::lexical_cast<int>(propObj->getProperty(TMX::PROPERTY_BUILDING_DOOR));
+		int buildingID = boost::lexical_cast<int>(propObj.getProperty(TMX::PROPERTY_BUILDING_WORLD_ID));
+		int doorID = boost::lexical_cast<int>(propObj.getProperty(TMX::PROPERTY_BUILDING_DOOR));
 
-		sf::Vector2i doorPos = (sf::Vector2i) Math::multiply(propObj->position, 1.f / Constants::tilesetResolution);
+		sf::Vector2i doorPos = (sf::Vector2i) Math::multiply(tile.tile.position, 1.f / Constants::tilesetResolution);
 
 
 		auto bFind = buildings.find(buildingID);

@@ -23,19 +23,22 @@ namespace TMX
 	PropertyType propertyTypeFromString(const std::string &s);
 
 
-	class PropertyOwner
+	/**
+	 * A map of PropertyType -> string pairs
+	 */
+	class PropertyHolder
 	{
 	public:
 
-		virtual ~PropertyOwner()
+		virtual ~PropertyHolder()
 		{
 		}
 
 		void addProperty(PropertyType type, std::string value);
 
-		std::string getProperty(PropertyType type);
+		std::string getProperty(PropertyType type) const;
 
-		bool hasProperty(PropertyType type);
+		bool hasProperty(PropertyType type) const;
 
 		void getProperty(PropertyType type, boost::optional<std::string> &out);
 
@@ -79,42 +82,23 @@ namespace TMX
 		{
 		}
 
-		Tile(const std::string &id) : Tile(TILE_TILE, id)
-		{
-		}
-
-		Tile(TileType type, const std::string &id);
-
 		virtual ~Tile()
 		{
 		}
 
-		inline TileType getTileType() const
-		{
-			return tileType;
-		}
+		void setGID(const std::string &id);
 
-		inline bool isFlipped() const
-		{
-			return flipped;
-		}
+		TileType getTileType() const;
+
+		bool isFlipped() const;
 
 		// @return Either -90, 0 or 90
-		inline int getRotationAngle() const
-		{
-			return rotationAngle;
-		}
+		int getRotationAngle() const;
 
 		// @return Block ID | horizontal or vertical flip flags
-		inline int getFlipGID() const
-		{
-			return flipGID;
-		}
+		int getFlipGID() const;
 
-		inline unsigned int getGID() const
-		{
-			return gid;
-		}
+		unsigned int getGID() const;
 
 		sf::Vector2f position;
 
@@ -127,39 +111,32 @@ namespace TMX
 		void processRotation(std::bitset<3> rotation);
 	};
 
-	struct PropertyObject : Tile, PropertyOwner
+	struct PropertyObject : PropertyHolder
 	{
-
-		PropertyObject() : Tile(TILE_PROPERTY_SHAPE)
-		{ }
-
 		sf::Vector2f dimensions;
 	};
 
-	struct Object : Tile
+	struct TileWrapper
 	{
-		Object(const std::string &id) : Tile(TILE_OBJECT, id)
-		{
-		}
+		TileType type;
+		Tile tile;
 
-		float rotationAnglef;
+		// would be a union but too trivial to bother
+		float objectRotation;
+		PropertyObject property;
 	};
 
-	struct Layer : PropertyOwner
+	struct Layer : PropertyHolder
 	{
-		~Layer();
-
 		std::string name;
-		std::vector<Tile *> items;
+		std::vector<TileWrapper> items;
 		bool visible;
 	};
 
-	struct TileMap : PropertyOwner
+	struct TileMap : PropertyHolder
 	{
-		virtual ~TileMap() override;
-
 		sf::Vector2i size;
-		std::vector<Layer *> layers;
+		std::vector<Layer> layers;
 
 		void load(const std::string &filePath);
 	};

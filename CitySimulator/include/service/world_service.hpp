@@ -109,7 +109,7 @@ private:
 		 */
 		std::string getWorldFilePath(const std::string &name, bool isBuilding);
 
-		void findBuildingsAndDoors(TMX::TileMap tmx);
+		void findBuildingsAndDoors(TMX::TileMap &tmx);
 
 		/**
 		 * @return The building that physically contains the given door, null if not found
