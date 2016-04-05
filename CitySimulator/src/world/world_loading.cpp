@@ -33,7 +33,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
 	// transfer building IDs to doors
 	for (auto &door : mainWorld.doors)
 	{
-		UnloadedBuilding *owningBuilding = findBuildingOwner(door, mainWorld.buildings);
+		UnloadedBuilding *owningBuilding = findDoorBuilding(mainWorld, door);
 		if (owningBuilding == nullptr)
 		{
 			Logger::logError(format("A door at (%1%, %2%) is not in any buildings!",
@@ -47,6 +47,9 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
 
 	// load all worlds recursively without connecting doors
 	discoverAndLoadAllWorlds(mainWorld);
+
+	// connect up the doors
+	connectDoors(mainWorld);
 
 	return mainWorld.world;
 }
@@ -120,6 +123,17 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world)
 
     	discoverAndLoadAllWorlds(*newWorld);
 	}
+}
+
+WorldService::WorldLoader::UnloadedDoor *WorldService::WorldLoader::findDoor(LoadedWorld &world, int doorID)
+{
+	// todo
+	return nullptr;
+}
+
+void WorldService::WorldLoader::connectDoors(LoadedWorld &world)
+{
+	// todo
 }
 
 WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(const std::string &name, 
@@ -228,12 +242,12 @@ WorldID WorldService::WorldLoader::generateWorldID()
 }
 
 
-WorldService::WorldLoader::UnloadedBuilding *WorldService::WorldLoader::findBuildingOwner(UnloadedDoor &door,
-        std::vector<UnloadedBuilding> &buildings)
+WorldService::WorldLoader::UnloadedBuilding *WorldService::WorldLoader::findDoorBuilding
+	(LoadedWorld &world, UnloadedDoor &door)
 {
 	const sf::Vector2i &tile = door.tile;
 
-	for (auto &building : buildings)
+	for (UnloadedBuilding &building : world.buildings)
 	{
 		const sf::IntRect &bounds = building.bounds;
 		if (bounds.left <= tile.x && bounds.left + bounds.width >= tile.x &&

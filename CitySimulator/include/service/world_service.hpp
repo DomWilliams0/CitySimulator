@@ -122,7 +122,16 @@ private:
 		 */
 		LoadedWorld &loadWorld(const std::string &name, bool isBuilding);
 
+		/**
+		 * Discovers all worlds by recursing door connections, and loads
+		 * them
+		 */
 		void discoverAndLoadAllWorlds(LoadedWorld &world);
+
+		/**
+		 * Populates the WorldTree with connections between doors
+		 */
+		void connectDoors(LoadedWorld &world);
 
 		/**
 		 * @return The next world ID to use
@@ -139,9 +148,13 @@ private:
 		/**
 		 * @return The building that physically contains the given door, null if not found
 		 */
-		WorldService::WorldLoader::UnloadedBuilding 
-      *findBuildingOwner(UnloadedDoor &door,
-                         std::vector<WorldService::WorldLoader::UnloadedBuilding> &buildings);
+		UnloadedBuilding *findDoorBuilding(LoadedWorld &world, UnloadedDoor &door);
+
+		/**
+		 * @return The door in the given world with the given door ID, null if not found
+		 */
+		UnloadedDoor *findDoor(LoadedWorld &world, int doorID);
+
 	};
 
 };
