@@ -60,7 +60,7 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world)
       	return;
   	done.insert(world.world->getID());
 
-  	Logger::logDebuggier(format("Discovering worlds in %1%", _str(world.world->getID())));
+  	/* Logger::logDebuggier(format("Discovering worlds in %1%", _str(world.world->getID()))); */
 
 	// iterate all doors found in last world
 	for (UnloadedDoor &door : world.doors)
@@ -69,14 +69,12 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world)
 		if (door.doorID <= 0)
 			continue;
 
-
     	LoadedWorld *newWorld = nullptr;
 
 		// find the other door with same world share
 		// todo make sure the list of ALL doors is searched
 		if (door.doorTag == DOORTAG_WORLD_SHARE)
 		{
-      		Logger::logDebuggiest(format("Door ID %1% has share tag '%2%'", _str(door.doorID), door.worldShare));
 			auto otherDoor = std::find_if(world.doors.begin(), world.doors.end(),
 			        [door](const UnloadedDoor &d)
 			        {
@@ -99,7 +97,7 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world)
 		else if (door.doorTag == DOORTAG_WORLD_NAME)
 		{
       		Logger::logDebuggiest(format("Door ID %1% loads world '%2%'", _str(door.doorID), door.worldName));
-			LoadedWorld &loadedWorld = loadWorld(door.worldName, true, door.worldID);
+			LoadedWorld &loadedWorld = loadWorld(door.worldName, true);
 			if (loadedWorld.failed())
 			{
 				Logger::logError(format("Cannot find building world '%1%', owner of door %2%",
@@ -198,7 +196,7 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 			}
 
 			// unloaded
-			else if (propObj.hasProperty(TMX::PROPERTY_DOOR_WORLD))
+			if (propObj.hasProperty(TMX::PROPERTY_DOOR_WORLD))
 			{
 				d.doorTag = DOORTAG_WORLD_NAME;
 				d.worldName = propObj.getProperty(TMX::PROPERTY_DOOR_WORLD);
