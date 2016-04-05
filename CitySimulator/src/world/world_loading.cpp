@@ -119,7 +119,7 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world)
 		}
 
     	if (newWorld == nullptr)
-      		newWorld = &loadedWorlds[door.worldID];
+      		newWorld = getLoadedWorld(door.worldID);
 
     	discoverAndLoadAllWorlds(*newWorld);
 	}
@@ -239,6 +239,12 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 WorldID WorldService::WorldLoader::generateWorldID()
 {
 	return lastWorldID++;
+}
+
+WorldService::WorldLoader::LoadedWorld *WorldService::WorldLoader::getLoadedWorld(WorldID id)
+{
+	auto found = loadedWorlds.find(id);
+	return found == loadedWorlds.end() ? nullptr : &found->second;
 }
 
 

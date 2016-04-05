@@ -139,6 +139,11 @@ private:
 		WorldID generateWorldID();
 
 		/**
+		 * @return The world with the given ID
+		 */
+		LoadedWorld *getLoadedWorld(WorldID id);
+
+		/**
 		 * @param name The world name, sans file extension
 		 * @param isBuilding True if the world is a building, otherwise false
 		 * @return The true file path of the world
