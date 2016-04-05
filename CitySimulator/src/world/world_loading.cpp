@@ -49,7 +49,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
 	discoverAndLoadAllWorlds(mainWorld);
 
 	// connect up the doors
-	connectDoors(mainWorld);
+	connectDoors(treeRoot, mainWorld);
 
 	return mainWorld.world;
 }
@@ -125,15 +125,69 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world)
 	}
 }
 
-WorldService::WorldLoader::UnloadedDoor *WorldService::WorldLoader::findDoor(LoadedWorld &world, int doorID)
+WorldService::WorldLoader::UnloadedDoor *WorldService::WorldLoader::findDoor(
+		LoadedWorld &world, int doorID)
 {
-	// todo
+	for (UnloadedDoor &door : world.doors)
+		if (door.worldID < 0 && 
+				door.doorID == doorID)
+			return &door;
+
 	return nullptr;
 }
 
-void WorldService::WorldLoader::connectDoors(LoadedWorld &world)
+void WorldService::WorldLoader::connectDoors(WorldTreeNode &parent, LoadedWorld &world)
 {
-	// todo
+	for (UnloadedDoor &door : world.doors)
+	{
+		// parent -> child
+		if (door.doorID > 0)
+		{
+			LoadedWorld *childWorld = getLoadedWorld(door.worldID);
+			if (childWorld == nullptr)
+			{
+				Logger::logError(format("World %1% has not been loaded yet in connectDoors()", 
+							_str(door.worldID)));
+				return;
+			}
+
+			UnloadedDoor *targetDoor = findDoor(*childWorld, -door.doorID);
+			if (targetDoor == nullptr)
+			{
+				Logger::logError(format("Cannot find partner door in world %1% for door %2% in world %3%",
+							_str(door.worldID), _str(door.doorID), _str(world.world->getID())));
+				return;
+			}
+
+			WorldConnection connection;
+			connection.doorID = door.doorID;
+			connection.targetTile = targetDoor->tile;
+			connection.src = world.world->getID();
+			connection.dst = childWorld->world->getID();
+			Logger::logDebuggiest(format("Made world connection %1% from world %2% to %3%",
+						_str(connection.doorID), _str(connection.src), _str(connection.dst)));
+
+			// add node
+			parent.children.emplace_back();
+			WorldTreeNode &node = parent.children.back();
+			node.parent = &parent;
+			node.value = childWorld->world;
+
+			// todo add connection (map from door ID -> WorldConnection)
+
+			// recurse
+			connectDoors(node, *childWorld);
+		}
+
+		// child -> parent
+		else
+		{
+
+
+		}
+
+
+	}
 }
 
 WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(const std::string &name, 

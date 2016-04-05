@@ -8,6 +8,17 @@
 
 typedef int WorldID;
 
+/**
+ * A connection between two doors in two (possibly) different worlds
+ */
+struct WorldConnection
+{
+	WorldID src;
+	WorldID dst;
+
+	sf::Vector2i targetTile;
+	int doorID; // todo needed?
+};
 
 class WorldService : public BaseService
 {
@@ -131,7 +142,7 @@ private:
 		/**
 		 * Populates the WorldTree with connections between doors
 		 */
-		void connectDoors(LoadedWorld &world);
+		void connectDoors(WorldTreeNode &parent, LoadedWorld &world);
 
 		/**
 		 * @return The next world ID to use
@@ -156,7 +167,8 @@ private:
 		UnloadedBuilding *findDoorBuilding(LoadedWorld &world, UnloadedDoor &door);
 
 		/**
-		 * @return The door in the given world with the given door ID, null if not found
+		 * @return The negative/backwards door in the given world with the given door ID,
+		 * null if not found
 		 */
 		UnloadedDoor *findDoor(LoadedWorld &world, int doorID);
 
