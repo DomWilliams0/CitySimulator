@@ -5,7 +5,8 @@
 
 void BuildingMap::gatherBuildings(const TMX::Layer &buildingLayer)
 {
-	for (const TMX::TileWrapper &tile : buildingLayer.items)
+	// todo
+	/* for (const TMX::TileWrapper &tile : buildingLayer.items)
 	{
 		if (tile.type != TMX::TILE_PROPERTY_SHAPE)
 			continue;
@@ -27,17 +28,16 @@ void BuildingMap::gatherBuildings(const TMX::Layer &buildingLayer)
 		Building b(*container, bounds, buildingID, buildingWorld);
 		buildings.insert({buildingID, b});
 
-//		worldsToLoad.insert("buildings/" + buildingWorld + ".tmx"); // todo have a getWorldPath function
-
 		Logger::logDebuggiest(format("Found building %1% at (%2%, %3%)",
 									 _str(buildingID), _str(bounds.left), _str(bounds.top)));
-	}
+	} */
 }
 
 
 void BuildingMap::load(const TMX::TileMap &tileMap)
 {
-	Logger::logDebug("Loading buildings");
+	// todo
+	/* Logger::logDebug("Loading buildings");
 	Logger::pushIndent();
 
 	auto buildingLayer = std::find_if(tileMap.layers.begin(), tileMap.layers.end(),
@@ -93,6 +93,7 @@ void BuildingMap::load(const TMX::TileMap &tileMap)
 
 	Logger::popIndent();
 	Logger::logDebug(format("Found %1% buildings", _str(buildings.size())));
+	*/
 }
 
 void BuildingMap::getBuildingByOutsideDoorTile(const sf::Vector2i &tile,

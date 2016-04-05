@@ -69,6 +69,7 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world)
 		if (door.doorID <= 0)
 			continue;
 
+
     	LoadedWorld *newWorld = nullptr;
 
 		// find the other door with same world share
@@ -79,8 +80,8 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world)
 			auto otherDoor = std::find_if(world.doors.begin(), world.doors.end(),
 			        [door](const UnloadedDoor &d)
 			        {
-				    return d.doorTag != DOORTAG_WORLD_SHARE &&
-				    d.worldShare == door.worldShare;
+				    	return d.doorTag != DOORTAG_WORLD_SHARE &&
+				    	d.worldShare == door.worldShare;
 			        });
 
 			if (otherDoor == world.doors.end())
@@ -180,32 +181,40 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 			loadedWorld.buildings.push_back(b);
 		}
 
-		else if (propObj.hasProperty(TMX::PROPERTY_BUILDING_DOOR))
+		else if (propObj.hasProperty(TMX::PROPERTY_DOOR_ID))
 		{
 			// doors
 			UnloadedDoor d;
 			d.tile.x = (int) (tile.tile.position.x / Constants::tilesetResolution);
 			d.tile.y = (int) (tile.tile.position.y / Constants::tilesetResolution);
-			d.doorID = boost::lexical_cast<int>(propObj.getProperty(TMX::PROPERTY_BUILDING_DOOR));
+			d.doorID = boost::lexical_cast<int>(propObj.getProperty(TMX::PROPERTY_DOOR_ID));
 			d.doorTag = DOORTAG_UNKNOWN;
 
-			if (propObj.hasProperty(TMX::PROPERTY_BUILDING_WORLD_ID))
+			// preloaded
+			if (propObj.hasProperty(TMX::PROPERTY_DOOR_ID))
 			{
 				d.doorTag = DOORTAG_WORLD_ID;
-				d.worldID = boost::lexical_cast<WorldID>(propObj.getProperty(TMX::PROPERTY_BUILDING_WORLD_ID));
-			}
-			else if (propObj.hasProperty(TMX::PROPERTY_BUILDING_WORLD))
-			{
-				d.doorTag = DOORTAG_WORLD_NAME;
-				d.worldName = propObj.getProperty(TMX::PROPERTY_BUILDING_WORLD);
+				d.worldID = boost::lexical_cast<WorldID>(propObj.getProperty(TMX::PROPERTY_DOOR_ID));
 			}
 
-			if (propObj.hasProperty(TMX::PROPERTY_BUILDING_WORLD_SHARE))
+			// unloaded
+			else if (propObj.hasProperty(TMX::PROPERTY_DOOR_WORLD))
 			{
-				// only set if not already
-				if (d.doorTag == DOORTAG_UNKNOWN)
-					d.doorTag = DOORTAG_WORLD_SHARE;
-				d.worldShare = propObj.getProperty(TMX::PROPERTY_BUILDING_WORLD_SHARE);
+				d.doorTag = DOORTAG_WORLD_NAME;
+				d.worldName = propObj.getProperty(TMX::PROPERTY_DOOR_WORLD);
+			}
+
+			// sharing
+			else if (propObj.hasProperty(TMX::PROPERTY_DOOR_WORLD_SHARE_SPECIFIER))
+			{
+				d.doorTag = DOORTAG_WORLD_SHARE;
+				d.worldShare = propObj.getProperty(TMX::PROPERTY_DOOR_WORLD_SHARE_SPECIFIER);
+			}
+
+			// share source
+			if (propObj.hasProperty(TMX::PROPERTY_DOOR_WORLD_SHARE_SOURCE))
+			{
+				d.worldShare = propObj.getProperty(TMX::PROPERTY_DOOR_WORLD_SHARE_SOURCE);
 			}
 
 			loadedWorld.doors.push_back(d);

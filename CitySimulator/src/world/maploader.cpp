@@ -7,20 +7,22 @@
 
 TMX::PropertyType TMX::propertyTypeFromString(const std::string &s)
 {
-	if (s == "type")
-		return PROPERTY_TYPE;
 	if (s == "visible")
 		return PROPERTY_VISIBLE;
-	if (s == "world")
+	if (s == "building-world")
 		return PROPERTY_BUILDING_WORLD;
+	if (s == "world-share-source")
+		return PROPERTY_DOOR_WORLD_SHARE_SOURCE;
 	if (s == "world-share")
-		return PROPERTY_BUILDING_WORLD_SHARE;
-	if (s == "worldID")
-		return PROPERTY_BUILDING_WORLD_ID;
-	if (s == "door")
-		return PROPERTY_BUILDING_DOOR;
+		return PROPERTY_DOOR_WORLD_SHARE_SPECIFIER;
+	if (s == "loaded-world-id")
+		return PROPERTY_DOOR_WORLD_ID;
+	if (s == "door-world")
+		return PROPERTY_DOOR_WORLD;
+	if (s == "door-id")
+		return PROPERTY_DOOR_ID;
 
-	Logger::logWarning("Unknown PropertyType: " + s);
+	Logger::logWarning("Unknown property: " + s);
 	return PROPERTY_UNKNOWN;
 }
 
@@ -84,7 +86,7 @@ void TMX::Tile::setGID(const std::string &id)
 void TMX::TileMap::load(const std::string &filePath)
 {
 	Logger::logDebuggier(format("Loading world from %1%", filePath));
-  this->filePath = Utils::getFileName(filePath);
+  	this->filePath = Utils::getFileName(filePath);
 	boost::property_tree::ptree tree;
 	read_xml(filePath, tree);
 
@@ -122,9 +124,9 @@ void TMX::TileMap::load(const std::string &filePath)
 			}
 		}
 
-			// object layers
 		else
 		{
+			// object layers
 			for (auto &o : pair.second)
 			{
 				if (o.first == "object")
@@ -163,7 +165,6 @@ void TMX::TileMap::load(const std::string &filePath)
 								continue;
 
 							}
-
 							wrapper.property.addProperty(propType, value);
 						}
 

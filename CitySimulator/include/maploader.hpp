@@ -10,12 +10,47 @@ namespace TMX
 {
 	enum PropertyType
 	{
-		PROPERTY_TYPE,
+
+		/**
+		 * The visibility of an object/layer
+		 */
 		PROPERTY_VISIBLE,
+
+		/**
+		 * A building's world name
+		 */
 		PROPERTY_BUILDING_WORLD,
-		PROPERTY_BUILDING_WORLD_SHARE,
-		PROPERTY_BUILDING_WORLD_ID,
-		PROPERTY_BUILDING_DOOR,
+
+		/**
+		 * Any doors with an equal WORLD_SHARE_SPECIFIER 
+		 * will share this door's world
+		 */
+		PROPERTY_DOOR_WORLD_SHARE_SOURCE,
+
+		/**
+		 * This door's world is specified by the single
+		 * door with an equivalent WORLD_SHARE_SOURCE
+		 */
+		PROPERTY_DOOR_WORLD_SHARE_SPECIFIER,
+
+		/**
+		 * The ID of a preloaded door's world
+		 */
+		PROPERTY_DOOR_WORLD_ID,
+
+		/**
+		 * The name of a door's world
+		 */
+		PROPERTY_DOOR_WORLD,
+
+		/**
+		 * A door ID
+		 */
+		PROPERTY_DOOR_ID,
+
+		/**
+		 * An invalid property
+		 */
 
 		PROPERTY_UNKNOWN
 	};

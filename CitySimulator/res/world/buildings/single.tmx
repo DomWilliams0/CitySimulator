@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="12" height="12" tilewidth="16" tileheight="16" nextobjectid="15">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="12" height="12" tilewidth="16" tileheight="16" nextobjectid="16">
  <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="100" columns="10">
   <image source="../tileset.png" width="160" height="160"/>
  </tileset>
  <layer name="underterrain" width="12" height="12">
   <data encoding="csv">
-0,18,18,0,0,0,0,0,0,0,0,0,
+0,18,18,0,0,0,0,0,18,18,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
@@ -21,7 +21,7 @@
  </layer>
  <layer name="terrain" width="12" height="12">
   <data encoding="csv">
-18,1073741843,3221225491,18,18,18,18,18,18,18,18,18,
+18,1073741843,3221225491,18,18,18,18,18,1073741843,3221225491,18,18,
 18,18,18,18,18,18,18,18,18,18,18,18,
 18,18,18,18,18,18,18,18,18,18,18,18,
 18,18,18,18,18,18,18,18,18,18,18,18,
@@ -47,14 +47,20 @@
  <objectgroup name="buildings">
   <object id="8" x="16" y="176" width="32" height="16">
    <properties>
-    <property name="door" value="-1"/>
+    <property name="door-id" value="-1"/>
    </properties>
   </object>
-  <object id="9" x="16" y="0" width="32" height="16">
+  <object id="9" x="128" y="0" width="32" height="16">
    <properties>
-    <property name="door" value="1"/>
-    <property name="world" value="single_upstairs"/>
-    <property name="world-share" value=""/>
+    <property name="door-id" value="2"/>
+    <property name="world-share" value="farm"/>
+   </properties>
+  </object>
+  <object id="15" x="16" y="0" width="32" height="16">
+   <properties>
+    <property name="door-id" value="1"/>
+    <property name="door-world" value="single_upstairs"/>
+    <property name="world-share-source" value="farm"/>
    </properties>
   </object>
  </objectgroup>

@@ -40,9 +40,27 @@ private:
 
 		enum DoorTag
 		{
+
+			/**
+			 * This door connects to a preloaded world
+			 */
 			DOORTAG_WORLD_ID,
+
+			/**
+			 * This door connects to the world of the
+			 * source for this share tag
+			 */
 			DOORTAG_WORLD_SHARE,
+
+			/**
+			 * This door connects to a currently
+			 * unloaded instance of this world name
+			 */
 			DOORTAG_WORLD_NAME,
+
+			/**
+			 * Error
+			 */
 			DOORTAG_UNKNOWN
 		};
 
