@@ -98,6 +98,12 @@ std::string Utils::joinPaths(const std::string &root, const std::string &path)
 	return (boost::filesystem::path(root) / path).string();
 }
 
+
+std::string Utils::getFileName(const std::string &path)
+{
+  return boost::filesystem::path(path).stem().string();
+}
+
 int Utils::roundToMultiple(double x, int multiple)
 {
 	return static_cast<int>(multiple * round(x / multiple));

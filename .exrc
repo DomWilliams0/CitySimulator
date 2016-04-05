@@ -1,4 +1,4 @@
-set makeprg=make\ -C\ build\ -j4
+set makeprg=make\ CitySimulator_run\ -C\ build\ -j4
 
 set colorcolumn=110
 highlight ColorColumn ctermbg=darkgray

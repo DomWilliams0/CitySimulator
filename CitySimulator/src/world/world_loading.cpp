@@ -17,13 +17,17 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
 		return nullptr;
 	}
 
+  	// allocate main world building IDs
 	for (auto &building : mainWorld.buildings)
 	{
-		Logger::logDebuggier(format("Found building '%1%' in main world", building.insideWorldName));
-		building.insideWorldID = generateBuildingID();
-		World *buildingWorld = new World(building.insideWorldID, building.insideWorldName);
+		Logger::logDebuggier(format("Found building %1% '%2%' in main world", 
+          			_str(building.insideWorldID), building.insideWorldName));
+    	Logger::pushIndent();
 
-		treeRoot.children.emplace_back(buildingWorld, &treeRoot);
+    	loadWorld(building.insideWorldName, true, building.insideWorldID);
+
+    	Logger::popIndent();
+		// treeRoot.children.emplace_back(buildingWorld, &treeRoot);
 	}
 
 	// transfer building IDs to doors
@@ -33,7 +37,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
 		if (owningBuilding == nullptr)
 		{
 			Logger::logError(format("A door at (%1%, %2%) is not in any buildings!",
-			                        _str(door.tile.x), _str(door.tile.y)));
+			            _str(door.tile.x), _str(door.tile.y)));
 			return nullptr;
 		}
 
@@ -42,42 +46,47 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
 	}
 
 	// load all worlds recursively without connecting doors
-	discoverAndLoadAllWorlds(mainWorld.buildings, mainWorld.doors);
+	discoverAndLoadAllWorlds(mainWorld);
 
 	return mainWorld.world;
 }
 
 
-void WorldService::WorldLoader::discoverAndLoadAllWorlds(
-		std::vector<UnloadedBuilding> &buildings,
-		std::vector<UnloadedDoor> &doors)
+void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world)
 {
-	boost::optional<std::vector<UnloadedDoor>> nextDoors;
-	boost::optional<std::vector<UnloadedBuilding>> nextBuildings;
+  	static std::set<WorldID> done;
+
+  	if (done.find(world.world->getID()) != done.end())
+      	return;
+  	done.insert(world.world->getID());
+
+  	Logger::logDebuggier(format("Discovering worlds in %1%", _str(world.world->getID())));
 
 	// iterate all doors found in last world
-	for (UnloadedDoor &door : doors)
+	for (UnloadedDoor &door : world.doors)
 	{
 		// only positive IDs load worlds
 		if (door.doorID <= 0)
 			continue;
 
+    	LoadedWorld *newWorld = nullptr;
+
 		// find the other door with same world share
 		// todo make sure the list of ALL doors is searched
 		if (door.doorTag == DOORTAG_WORLD_SHARE)
 		{
+      		Logger::logDebuggiest(format("Door ID %1% has share tag '%2%'", _str(door.doorID), door.worldShare));
+			auto otherDoor = std::find_if(world.doors.begin(), world.doors.end(),
+			        [door](const UnloadedDoor &d)
+			        {
+				    return d.doorTag != DOORTAG_WORLD_SHARE &&
+				    d.worldShare == door.worldShare;
+			        });
 
-			auto otherDoor = std::find_if(doors.begin(), doors.end(),
-			                              [door](const UnloadedDoor &d)
-			                              {
-				                              return d.doorTag != DOORTAG_WORLD_SHARE &&
-				                                     d.worldShare == door.worldShare;
-			                              });
-
-			if (otherDoor == doors.end())
+			if (otherDoor == world.doors.end())
 			{
 				Logger::logError(format("Door %1% has an unknown world share tag '%2%'",
-				                        _str(door.doorID), door.worldShare));
+				            _str(door.doorID), door.worldShare));
 				continue;
 			}
 
@@ -88,55 +97,63 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(
 		// load world
 		else if (door.doorTag == DOORTAG_WORLD_NAME)
 		{
-			LoadedWorld &loadedWorld = loadWorld(door.worldName, true);
+      		Logger::logDebuggiest(format("Door ID %1% loads world '%2%'", _str(door.doorID), door.worldName));
+			LoadedWorld &loadedWorld = loadWorld(door.worldName, true, door.worldID);
 			if (loadedWorld.failed())
 			{
 				Logger::logError(format("Cannot find building world '%1%', owner of door %2%",
-				                        door.worldName, _str(door.doorID)));
+				            door.worldName, _str(door.doorID)));
 				continue;
 			}
 
 			door.worldID = loadedWorld.world->getID();
-
-			nextDoors = loadedWorld.doors;
-			nextBuildings = loadedWorld.buildings;
-
+      		newWorld = &loadedWorld;
 		}
+
 		else if (door.doorTag == DOORTAG_UNKNOWN)
 		{
 			Logger::logError(format("Door %1% has no assigned door tag", _str(door.doorID)));
-			continue;
+      		return;
 		}
+
+    	if (newWorld == nullptr)
+      		newWorld = &loadedWorlds[door.worldID];
+
+    	discoverAndLoadAllWorlds(*newWorld);
 	}
-
-	if (nextDoors)
-		discoverAndLoadAllWorlds(*nextBuildings, *nextDoors);
-
 }
-WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(const std::string &name, bool isBuilding)
+
+WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(const std::string &name, 
+    	bool isBuilding)
 {
-	WorldID id = generateBuildingID();
-	loadedWorlds.emplace_back();
-	LoadedWorld &loadedWorld = loadedWorlds[id];
+  	return loadWorld(name, isBuilding, generateWorldID());
+}
+
+WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(const std::string &name, 
+    	bool isBuilding, WorldID worldID)
+{
+  	// create new LoadedWorld in place
+  	LoadedWorld &loadedWorld = loadedWorlds.emplace(worldID, LoadedWorld{}).first->second;
 
 	// load tmx
 	auto path = getWorldFilePath(name, isBuilding);
 	loadedWorld.tmx.load(path);
-	loadedWorld.world = new World(generateBuildingID(), path);
+	loadedWorld.world = new World(worldID, path);
 	loadedWorld.world->loadFromFile(loadedWorld.tmx);
-
-	Logger::logDebuggier(format("World '%1%' has been allocated ID %2%", name, _str(id)));
 
 	// find buildings and doors
 	auto buildingLayer = std::find_if(loadedWorld.tmx.layers.begin(), loadedWorld.tmx.layers.end(),
-	                                  [](const TMX::Layer &layer)
-	                                  {
-		                                  return layer.name == "buildings";
-	                                  });
+	        [](const TMX::Layer &layer)
+	        {
+		    return layer.name == "buildings";
+	        });
 
 	// no buildings layer
 	if (buildingLayer == loadedWorld.tmx.layers.end())
+  	{
+    	Logger::logDebuggier("No \"buildings\" layer");
 		return loadedWorld;
+  	}
 
 
 	for (const TMX::TileWrapper &tile : buildingLayer->items)
@@ -154,11 +171,12 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 					(int) (tile.tile.position.y / Constants::tilesetResolution),
 					(int) (propObj.dimensions.x / Constants::tilesetResolution),
 					(int) (propObj.dimensions.y / Constants::tilesetResolution)
-			);
+					);
 
 			UnloadedBuilding b;
 			b.bounds = bounds;
 			b.insideWorldName = propObj.getProperty(TMX::PROPERTY_BUILDING_WORLD);
+      		b.insideWorldID = generateWorldID();
 			loadedWorld.buildings.push_back(b);
 		}
 
@@ -197,14 +215,14 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 	return loadedWorld;
 }
 
-WorldID WorldService::WorldLoader::generateBuildingID()
+WorldID WorldService::WorldLoader::generateWorldID()
 {
 	return lastWorldID++;
 }
 
 
 WorldService::WorldLoader::UnloadedBuilding *WorldService::WorldLoader::findBuildingOwner(UnloadedDoor &door,
-                                                               std::vector<UnloadedBuilding> &buildings)
+        std::vector<UnloadedBuilding> &buildings)
 {
 	const sf::Vector2i &tile = door.tile;
 
@@ -212,7 +230,7 @@ WorldService::WorldLoader::UnloadedBuilding *WorldService::WorldLoader::findBuil
 	{
 		const sf::IntRect &bounds = building.bounds;
 		if (bounds.left <= tile.x && bounds.left + bounds.width >= tile.x &&
-		    bounds.top <= tile.y && bounds.top + bounds.height >= tile.y)
+		    	bounds.top <= tile.y && bounds.top + bounds.height >= tile.y)
 			return &building;
 	}
 
@@ -224,15 +242,9 @@ std::string WorldService::WorldLoader::getWorldFilePath(const std::string &name,
 {
 	static const std::string extension = ".tmx";
 
-	if (isBuilding)
-		return Utils::joinPaths(
-				Utils::joinPaths(
-						Config::getResource("world.root"),
-						Config::getResource("world.buildings")),
-				name + extension);
-	else
-		return Utils::joinPaths(
-				Config::getResource("world.root"),
-				name + extension);
-
+  	const std::string &root = Config::getResource(isBuilding ? "world.buildings" : "world.root");
+  	return Utils::joinPaths(
+      		root,
+      		name + extension
+      		);
 }

@@ -76,7 +76,7 @@ private:
 		WorldTreeNode &treeRoot;
 
 		// todo implicit map, with incremental integer keys
-		std::vector<LoadedWorld> loadedWorlds;
+		std::map<int, LoadedWorld> loadedWorlds;
 
 		WorldLoader(WorldTreeNode &treeRoot);
 
@@ -88,21 +88,28 @@ private:
 		World *loadWorlds(const std::string &mainWorldName, Tileset &tileset);
 
 		/**
-		 * Loads the given world
+		 * Loads the given world with the given ID
+		 * @param name The world name, sans file extension
+		 * @param isBuilding True if the world is a building, otherwise false
+	 	 * @param worldID The world's allocated ID
+		 * @return A reference to the newly loaded world
+		 */
+
+		LoadedWorld &loadWorld(const std::string &name, bool isBuilding, WorldID worldID);
+		/**
+		 * Loads the given world with a newly allocated ID
 		 * @param name The world name, sans file extension
 		 * @param isBuilding True if the world is a building, otherwise false
 		 * @return A reference to the newly loaded world
 		 */
 		LoadedWorld &loadWorld(const std::string &name, bool isBuilding);
 
-		void discoverAndLoadAllWorlds(
-				std::vector<UnloadedBuilding> &buildings,
-				std::vector<UnloadedDoor> &doors);
+		void discoverAndLoadAllWorlds(LoadedWorld &world);
 
 		/**
-		 * @return The next building ID to use
+		 * @return The next world ID to use
 		 */
-		WorldID generateBuildingID();
+		WorldID generateWorldID();
 
 		/**
 		 * @param name The world name, sans file extension

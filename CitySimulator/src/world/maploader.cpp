@@ -84,6 +84,7 @@ void TMX::Tile::setGID(const std::string &id)
 void TMX::TileMap::load(const std::string &filePath)
 {
 	Logger::logDebuggier(format("Loading world from %1%", filePath));
+  this->filePath = Utils::getFileName(filePath);
 	boost::property_tree::ptree tree;
 	read_xml(filePath, tree);
 

@@ -137,6 +137,8 @@ namespace Utils
 
 	std::string joinPaths(const std::string &root, const std::string &path);
 
+	std::string getFileName(const std::string &path);
+
 	int roundToMultiple(double x, int multiple);
 
 	template<class T>

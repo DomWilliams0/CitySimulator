@@ -135,6 +135,7 @@ namespace TMX
 
 	struct TileMap : PropertyHolder
 	{
+		std::string filePath;
 		sf::Vector2i size;
 		std::vector<Layer> layers;
 
