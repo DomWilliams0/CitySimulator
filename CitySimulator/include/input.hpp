@@ -65,7 +65,7 @@ public:
 	 */
 	void move(const sf::Vector2f &vector);
 
-	void halt() override;
+	virtual void halt() override;
 
 private:
 	b2Vec2 steering;
@@ -97,7 +97,7 @@ public:
 
 	virtual void onEvent(const Event &event) override;
 
-	virtual void halt();
+	virtual void halt() override;
 
 	virtual void reset(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed) override;
 

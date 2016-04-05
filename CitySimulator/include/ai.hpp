@@ -152,9 +152,9 @@ public:
 	EntityBrain(EntityID e);
 
 protected:
-	virtual void initController(float movementForce, float maxWalkSpeed, float maxSprintSpeed);
+	virtual void initController(float movementForce, float maxWalkSpeed, float maxSprintSpeed) override;
 
-	virtual MovementController *getController()
+	virtual MovementController *getController() override
 	{
 		return controller.get();
 	}

@@ -199,6 +199,8 @@ BaseComponent *EntityService::getComponentOfType(EntityID e, ComponentType type)
 		default:
 			error("Invalid component type %1%", _str(type));
 	}
+
+	return nullptr;
 }
 
 void EntityService::addPhysicsComponent(EntityIdentifier &entity, World *world,
