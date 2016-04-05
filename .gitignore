@@ -4,7 +4,6 @@
 *.cd
 config.json
 
-.exrc
 .ycm_*
 
 ## Ignore Visual Studio temporary files, build results, and
