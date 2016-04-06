@@ -17,6 +17,8 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
 		return nullptr;
 	}
 
+	treeRoot.value = mainWorld.world;
+
   	// allocate main world building IDs
 	for (auto &building : mainWorld.buildings)
 	{
@@ -125,67 +127,63 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world)
 	}
 }
 
-WorldService::WorldLoader::UnloadedDoor *WorldService::WorldLoader::findDoor(
+WorldService::WorldLoader::UnloadedDoor *WorldService::WorldLoader::findPartnerDoor(
 		LoadedWorld &world, int doorID)
 {
 	for (UnloadedDoor &door : world.doors)
-		if (door.doorID == doorID)
+		if (door.doorID == -doorID)
 			return &door;
 
 	return nullptr;
 }
 
-void WorldService::WorldLoader::connectDoors(WorldTreeNode &parent, LoadedWorld &world)
+void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedWorld &world)
 {
+	static std::set<WorldID> visitedWorlds;
+	if (visitedWorlds.find(currentNode.value->getID()) != visitedWorlds.end())
+		return;
+	visitedWorlds.insert(currentNode.value->getID());
+
 	for (UnloadedDoor &door : world.doors)
 	{
-		// parent -> child
+		LoadedWorld *childWorld = getLoadedWorld(door.doorID > 0 ? door.worldID : currentNode.parent->value->getID());
+		if (childWorld == nullptr)
+		{
+			Logger::logError(format("World %1% has not been loaded yet in connectDoors()", 
+						_str(door.worldID)));
+			return;
+		}
+
+		UnloadedDoor *targetDoor = findPartnerDoor(*childWorld, door.doorID);
+		if (targetDoor == nullptr)
+		{
+			Logger::logError(format("Cannot find partner door in world %1% for door %2% in world %3%",
+						_str(door.worldID), _str(door.doorID), _str(world.world->getID())));
+			return;
+		}
+
+		WorldConnection connection;
+		connection.doorID = door.doorID;
+		connection.targetTile = targetDoor->tile;
+		connection.src = world.world->getID();
+		connection.dst = childWorld->world->getID();
+
+		Logger::logDebuggiest(format("Added world connection %1% to %2% from %3% through door %4%",
+					door.doorID < 0 ? "up" : "down", _str(connection.src), _str(connection.dst), _str(connection.doorID)));
+
+		// add node
 		if (door.doorID > 0)
 		{
-			LoadedWorld *childWorld = getLoadedWorld(door.worldID);
-			if (childWorld == nullptr)
-			{
-				Logger::logError(format("World %1% has not been loaded yet in connectDoors()", 
-							_str(door.worldID)));
-				return;
-			}
-
-			UnloadedDoor *targetDoor = findDoor(*childWorld, -door.doorID);
-			if (targetDoor == nullptr)
-			{
-				Logger::logError(format("Cannot find partner door in world %1% for door %2% in world %3%",
-							_str(door.worldID), _str(door.doorID), _str(world.world->getID())));
-				return;
-			}
-
-			WorldConnection connection;
-			connection.doorID = door.doorID;
-			connection.targetTile = targetDoor->tile;
-			connection.src = world.world->getID();
-			connection.dst = childWorld->world->getID();
-			Logger::logDebuggiest(format("Made world connection %1% from world %2% to %3%",
-						_str(connection.doorID), _str(connection.src), _str(connection.dst)));
-
-			// add node
-			parent.children.emplace_back();
-			WorldTreeNode &node = parent.children.back();
-			node.parent = &parent;
-			node.value = childWorld->world;
-
-			// todo add connection (map from door ID -> WorldConnection)
+			currentNode.children.emplace_back();
+			WorldTreeNode &childNode = currentNode.children.back();
+			childNode.parent = &currentNode;
+			childNode.value = childWorld->world;
 
 			// recurse
-			connectDoors(node, *childWorld);
+			connectDoors(childNode, *childWorld);
 		}
 
-		// child -> parent
-		else
-		{
-
-
-		}
-
-
+		// todo add connection (map from door ID -> WorldConnection)
 	}
 }
 

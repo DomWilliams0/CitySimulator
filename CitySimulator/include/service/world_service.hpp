@@ -167,10 +167,10 @@ private:
 		UnloadedBuilding *findDoorBuilding(LoadedWorld &world, UnloadedDoor &door);
 
 		/**
-		 * @return The negative/backwards door in the given world with the given door ID,
+		 * @return The partner door in the given world with the given door ID,
 		 * null if not found
 		 */
-		UnloadedDoor *findDoor(LoadedWorld &world, int doorID);
+		UnloadedDoor *findPartnerDoor(LoadedWorld &world, int doorID);
 
 	};
 
