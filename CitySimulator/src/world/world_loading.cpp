@@ -129,8 +129,7 @@ WorldService::WorldLoader::UnloadedDoor *WorldService::WorldLoader::findDoor(
 		LoadedWorld &world, int doorID)
 {
 	for (UnloadedDoor &door : world.doors)
-		if (door.worldID < 0 && 
-				door.doorID == doorID)
+		if (door.doorID == doorID)
 			return &door;
 
 	return nullptr;
@@ -257,10 +256,10 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 			d.doorTag = DOORTAG_UNKNOWN;
 
 			// preloaded
-			if (propObj.hasProperty(TMX::PROPERTY_DOOR_ID))
+			if (propObj.hasProperty(TMX::PROPERTY_DOOR_WORLD_ID))
 			{
 				d.doorTag = DOORTAG_WORLD_ID;
-				d.worldID = boost::lexical_cast<WorldID>(propObj.getProperty(TMX::PROPERTY_DOOR_ID));
+				d.worldID = boost::lexical_cast<WorldID>(propObj.getProperty(TMX::PROPERTY_DOOR_WORLD_ID));
 			}
 
 			// unloaded

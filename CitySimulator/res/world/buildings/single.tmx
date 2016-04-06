@@ -50,12 +50,6 @@
     <property name="door-id" value="-1"/>
    </properties>
   </object>
-  <object id="9" x="128" y="0" width="32" height="16">
-   <properties>
-    <property name="door-id" value="2"/>
-    <property name="world-share" value="farm"/>
-   </properties>
-  </object>
   <object id="15" x="16" y="0" width="32" height="16">
    <properties>
     <property name="door-id" value="1"/>
