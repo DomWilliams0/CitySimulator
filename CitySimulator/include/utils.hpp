@@ -12,7 +12,11 @@ std::string format(const std::string &s, const std::string &arg1);
 
 std::string format(const std::string &s, const std::string &arg1, const std::string &arg2);
 
-std::string format(const std::string &s, const std::string &arg1, const std::string &arg2, const std::string &arg3);
+std::string format(const std::string &s, const std::string &arg1, 
+		const std::string &arg2, const std::string &arg3);
+
+std::string format(const std::string &s, const std::string &arg1, 
+		const std::string &arg2, const std::string &arg3, const std::string &arg4);
 
 void error(const std::string &msg);
 
