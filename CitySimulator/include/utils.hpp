@@ -4,10 +4,43 @@
 #include <SFML/Graphics.hpp>
 #include <Box2D/Common/b2Math.h>
 #include <random>
+#include <boost/functional/hash_fwd.hpp>
 
 #define _str std::to_string
 
+typedef int WorldID;
 
+/**
+ * A tile in a world
+ */
+struct Location
+{
+	WorldID world;
+	int x, y;
+
+	Location() : world(0), x(0), y(0)
+	{
+	}
+
+	Location(WorldID world, int x, int y) : world(world), x(x), y(y)
+	{
+	}
+
+	Location(WorldID world, const sf::Vector2i &tile) : world(world), x(tile.x), y(tile.y)
+	{
+	}
+
+	friend bool operator==(const Location &a, const Location &b)
+	{
+		return a.world == b.world &&
+			a.x == b.x &&
+			a.y == b.y;
+	}
+};
+
+
+
+// formatting
 std::string format(const std::string &s, const std::string &arg1);
 
 std::string format(const std::string &s, const std::string &arg1, const std::string &arg2);
@@ -106,9 +139,7 @@ namespace Utils
 		return {static_cast<float>(v.x), static_cast<float>(v.y)};
 	}
 
-	/// <summary>
 	/// Generates a random number between min and max-1
-	/// </summary>
 	template<class T=int>
 	T random(T min, T max)
 	{
@@ -261,14 +292,12 @@ namespace sf
 	}
 
 	template<class T>
-
 	inline bool operator>(const Vector2<T> &lhs, const Vector2<T> &rhs)
 	{
 		return operator<(rhs, lhs);
 	}
 
 	template<class T>
-
 	inline bool operator<=(const Vector2<T> &lhs, const Vector2<T> &rhs)
 	{
 		return !operator>(lhs, rhs);
@@ -280,6 +309,39 @@ namespace sf
 		return !operator<(lhs, rhs);
 	}
 }
+
+namespace std
+{
+	/**
+	 * Merci http://stackoverflow.com/questions/2590677/how-do-i-combine-hash-values-in-c0x
+	 */
+	template<> struct hash<Location>
+	{
+		std::size_t operator()(const Location& l) const
+		{
+			std::size_t seed = 0;
+			std::hash<int> hasher;
+			seed ^= hasher(l.world) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hasher(l.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hasher(l.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+
+			return seed;
+		}
+	};
+	template<> struct hash<sf::Vector2i>
+	{
+		std::size_t operator()(const sf::Vector2i& v) const
+		{
+			std::size_t seed = 0;
+			std::hash<int> hasher;
+			seed ^= hasher(v.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hasher(v.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+
+			return seed;
+		}
+	};
+}
+
 
 template<class T>
 struct TreeNode

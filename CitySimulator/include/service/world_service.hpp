@@ -6,19 +6,7 @@
 #include "building.hpp"
 #include "bodydata.hpp"
 
-typedef int WorldID;
-
-/**
- * A connection between two doors in two (possibly) different worlds
- */
-struct WorldConnection
-{
-	WorldID src;
-	WorldID dst;
-
-	sf::Vector2i targetTile;
-	int doorID; // todo needed?
-};
+typedef std::unordered_map<Location, Location> WorldConnectionTable;
 
 class WorldService : public BaseService
 {
@@ -39,6 +27,7 @@ private:
 
 	World *mainWorld;
 	WorldTreeNode worldTree;
+	WorldConnectionTable connectionLookup;
 
 	struct WorldLoader
 	{
@@ -112,9 +101,11 @@ private:
 		/**
 		 * Recursively loads all worlds into the WorldTree
 		 * @param tileset The tileset to use
+		 * @param connectionLookup The connection lookup table to populate
 		 * @return The main world
 		 */
-		World *loadWorlds(const std::string &mainWorldName, Tileset &tileset);
+		World *loadWorlds(const std::string &mainWorldName, Tileset &tileset, 
+				WorldConnectionTable &connectionLookup);
 
 		/**
 		 * Loads the given world with the given ID
@@ -142,7 +133,8 @@ private:
 		/**
 		 * Populates the WorldTree with connections between doors
 		 */
-		void connectDoors(WorldTreeNode &parent, LoadedWorld &world);
+		void connectDoors(WorldTreeNode &parent, LoadedWorld &world, 
+				WorldConnectionTable &connectionLookup);
 
 		/**
 		 * @return The next world ID to use

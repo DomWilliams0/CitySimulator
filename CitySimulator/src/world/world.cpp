@@ -11,7 +11,7 @@ void WorldService::onEnable()
 	Logger::logDebug("Starting to load worlds");
 	Logger::pushIndent();
 	WorldLoader loader(worldTree);
-	mainWorld = loader.loadWorlds(mainWorldName, tileset);
+	mainWorld = loader.loadWorlds(mainWorldName, tileset, connectionLookup);
 	Logger::popIndent();
 
 	/*

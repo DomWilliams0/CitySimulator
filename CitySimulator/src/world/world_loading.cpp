@@ -7,7 +7,8 @@ WorldService::WorldLoader::WorldLoader(WorldTreeNode &treeRoot) : lastWorldID(0)
 {
 }
 
-World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, Tileset &tileset)
+World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, Tileset &tileset,
+	WorldConnectionTable &connectionLookup)
 {
 	// load main world
 	LoadedWorld &mainWorld = loadWorld(mainWorldName, false);
@@ -51,7 +52,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
 	discoverAndLoadAllWorlds(mainWorld);
 
 	// connect up the doors
-	connectDoors(treeRoot, mainWorld);
+	connectDoors(treeRoot, mainWorld, connectionLookup);
 
 	return mainWorld.world;
 }
@@ -137,7 +138,8 @@ WorldService::WorldLoader::UnloadedDoor *WorldService::WorldLoader::findPartnerD
 	return nullptr;
 }
 
-void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedWorld &world)
+void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedWorld &world,
+		WorldConnectionTable &connectionLookup)
 {
 	static std::set<WorldID> visitedWorlds;
 	if (visitedWorlds.find(currentNode.value->getID()) != visitedWorlds.end())
@@ -162,14 +164,15 @@ void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedW
 			return;
 		}
 
-		WorldConnection connection;
-		connection.doorID = door.doorID;
-		connection.targetTile = targetDoor->tile;
-		connection.src = world.world->getID();
-		connection.dst = childWorld->world->getID();
+		// add connection to this world's lookup table
+		connectionLookup.emplace(std::piecewise_construct,
+				std::forward_as_tuple(world.world->getID(), door.tile),             // src
+				std::forward_as_tuple(childWorld->world->getID(), targetDoor->tile) // dst
+				);
 
-		Logger::logDebuggiest(format("Added world connection %1% to %2% from %3% through door %4%",
-					door.doorID < 0 ? "up" : "down", _str(connection.src), _str(connection.dst), _str(connection.doorID)));
+		Logger::logDebuggiest(format("Added world conn %1% to %2% from %3% through door %4%",
+					door.doorID < 0 ? "up" : "down", _str(world.world->getID()), 
+					_str(childWorld->world->getID()), _str(door.doorID)));
 
 		// add node
 		if (door.doorID > 0)
@@ -180,10 +183,9 @@ void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedW
 			childNode.value = childWorld->world;
 
 			// recurse
-			connectDoors(childNode, *childWorld);
+			connectDoors(childNode, *childWorld, connectionLookup);
 		}
 
-		// todo add connection (map from door ID -> WorldConnection)
 	}
 }
 
@@ -248,8 +250,8 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 		{
 			// doors
 			UnloadedDoor d;
-			d.tile.x = (int) (tile.tile.position.x / Constants::tilesetResolution);
-			d.tile.y = (int) (tile.tile.position.y / Constants::tilesetResolution);
+			d.tile.x = (tile.tile.position.x / Constants::tilesetResolution);
+			d.tile.y = (tile.tile.position.y / Constants::tilesetResolution);
 			d.doorID = boost::lexical_cast<int>(propObj.getProperty(TMX::PROPERTY_DOOR_ID));
 			d.doorTag = DOORTAG_UNKNOWN;
 
