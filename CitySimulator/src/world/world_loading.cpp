@@ -170,7 +170,7 @@ void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedW
 				std::forward_as_tuple(childWorld->world->getID(), targetDoor->tile) // dst
 				);
 
-		Logger::logDebuggiest(format("Added world conn %1% to %2% from %3% through door %4%",
+		Logger::logDebuggiest(format("Added world connection %1% to %2% from %3% through door %4%",
 					door.doorID < 0 ? "up" : "down", _str(world.world->getID()), 
 					_str(childWorld->world->getID()), _str(door.doorID)));
 
