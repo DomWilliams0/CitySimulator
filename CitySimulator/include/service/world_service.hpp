@@ -17,7 +17,9 @@ public:
 
 	virtual void onDisable() override;
 
-	World &getWorld();
+	World *getMainWorld();
+
+	World *getWorld(WorldID id);
 
 private:
 	typedef TreeNode<World> WorldTreeNode;
@@ -25,8 +27,8 @@ private:
 	Tileset tileset;
 	std::string mainWorldName;
 
-	World *mainWorld;
 	WorldTreeNode worldTree;
+	std::unordered_map<WorldID, World*> worlds;
 	WorldConnectionTable connectionLookup;
 
 	struct WorldLoader
@@ -92,8 +94,7 @@ private:
 		WorldID lastWorldID;
 		std::unordered_set<int> flippedTileGIDs;
 
-		std::map<int, LoadedWorld> loadedWorlds;
-
+		std::map<WorldID, LoadedWorld> loadedWorlds;
 
 		WorldLoader();
 

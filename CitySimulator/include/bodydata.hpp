@@ -4,6 +4,9 @@
 #include "world.hpp"
 #include "ecs.hpp"
 
+struct Door;
+class Building;
+
 enum BodyDataType
 {
 	BODYDATA_ENTITY,

@@ -243,7 +243,8 @@ BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &
 		data->blockData.blockDataType = BLOCKDATA_DOOR;
 
 		boost::optional<std::pair<Building *, Door *>> buildingAndDoor;
-		container->getBuildingMap().getBuildingByOutsideDoorTile(tilePos, buildingAndDoor);
+		// todo
+		/* container->getBuildingMap().getBuildingByOutsideDoorTile(tilePos, buildingAndDoor); */
 
 		if (!buildingAndDoor)
 		{
@@ -283,28 +284,29 @@ void CollisionMap::GlobalContactListener::BeginContact(b2Contact *contact)
 		// door
 		if (block->blockData.blockDataType == BLOCKDATA_DOOR)
 		{
-			DoorBlockData *door = &block->blockData.door;
-			Door *targetDoor = door->building->getConnectedDoor(door->door);
-			if (targetDoor == nullptr)
-			{
-				Logger::logError(format("Could not find connected door for door %1% in building %2%",
-										_str(door->door->id), _str(door->building->getID())));
-				return;
-			}
+			// todo
+			/* DoorBlockData *door = &block->blockData.door; */
+			/* Door *targetDoor = door->building->getConnectedDoor(door->door); */
+			/* if (targetDoor == nullptr) */
+			/* { */
+			/* 	Logger::logError(format("Could not find connected door for door %1% in building %2%", */
+			/* 							_str(door->door->id), _str(door->building->getID()))); */
+			/* 	return; */
+			/* } */
 
-			Event event;
-			event.type = EVENT_HUMAN_JOIN_WORLD;
-			event.entityID = entity->entityID.id;
-			event.joinWorld.newWorldID = 1010101; // todo world's need IDs!
+			/* Event event; */
+			/* event.type = EVENT_HUMAN_JOIN_WORLD; */
+			/* event.entityID = entity->entityID.id; */
+			/* event.joinWorld.newWorldID = 1010101; // todo world's need IDs! */
 
-			event.joinWorld.spawnDirection = DIRECTION_NORTH; // todo store in Door
-			event.joinWorld.spawnX = targetDoor->localTilePos.x;
-			event.joinWorld.spawnY = targetDoor->localTilePos.y;
+			/* event.joinWorld.spawnDirection = DIRECTION_NORTH; // todo store in Door */
+			/* event.joinWorld.spawnX = targetDoor->localTilePos.x; */
+			/* event.joinWorld.spawnY = targetDoor->localTilePos.y; */
 
-			Logger::logDebug(format("Door interaction with building %1%", _str(door->building->getID())));
+			/* Logger::logDebug(format("Door interaction with building %1%", _str(door->building->getID()))); */
 
-			// todo complete the two above todos before actually calling the event
-			// Locator::locate<EventService>()->callEvent(event);
+			/* // todo complete the two above todos before actually calling the event */
+			/* // Locator::locate<EventService>()->callEvent(event); */
 		}
 
 

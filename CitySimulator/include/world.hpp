@@ -7,9 +7,9 @@
 #include <set>
 #include <boost/optional.hpp>
 #include <bits/unordered_set.h>
+#include "building.hpp"
 #include "SFMLDebugDraw.h"
 #include "maploader.hpp"
-#include "building.hpp"
 #include "bodydata.hpp"
 
 class World;
@@ -278,7 +278,7 @@ private:
 };
 
 /**
- * A world item that deals with buildings and their entrances
+ * A world item that deals with buildings 
  */
 class BuildingMap : public BaseWorld
 {
@@ -287,14 +287,13 @@ public:
 	{
 	}
 
+	// todo load from WorldLoader
 	void load(const TMX::TileMap &tileMap);
 
-	void getBuildingByOutsideDoorTile(const sf::Vector2i &tile, boost::optional<std::pair<Building *, Door *>> &out);
-
-	Building *getBuildingByID(int id);
+	/* Building *getBuildingByID(Build); */
 
 private:
-	std::unordered_map<int, Building> buildings;
+	std::unordered_map<BuildingID, Building> buildings;
 
 	void gatherBuildings(const TMX::Layer &buildingLayer);
 

@@ -96,26 +96,26 @@ void BuildingMap::load(const TMX::TileMap &tileMap)
 	*/
 }
 
-void BuildingMap::getBuildingByOutsideDoorTile(const sf::Vector2i &tile,
-											   boost::optional<std::pair<Building *, Door *>> &out)
-{
-	for (auto &it : buildings)
-	{
-		Door *door = it.second.getDoorByTile(tile);
-		if (door != nullptr)
-		{
-			std::pair<Building *, Door *> pair = {&it.second, door};
-			out = pair;
-			return;
-		}
+/* void BuildingMap::getBuildingByOutsideDoorTile(const sf::Vector2i &tile, */
+/* 											   boost::optional<std::pair<Building *, Door *>> &out) */
+/* { */
+/* 	for (auto &it : buildings) */
+/* 	{ */
+/* 		Door *door = it.second.getDoorByTile(tile); */
+/* 		if (door != nullptr) */
+/* 		{ */
+/* 			std::pair<Building *, Door *> pair = {&it.second, door}; */
+/* 			out = pair; */
+/* 			return; */
+/* 		} */
 
-	}
+/* 	} */
 
-	Logger::logWarning(format("Could not find building from door at (%1%, %2%)", _str(tile.x), _str(tile.y)));
-}
+/* 	Logger::logWarning(format("Could not find building from door at (%1%, %2%)", _str(tile.x), _str(tile.y))); */
+/* } */
 
-Building *BuildingMap::getBuildingByID(int id)
-{
-	auto it = buildings.find(id);
-	return it == buildings.end() ? nullptr : &it->second;
-}
+/* Building *BuildingMap::getBuildingByID(int id) */
+/* { */
+/* 	auto it = buildings.find(id); */
+/* 	return it == buildings.end() ? nullptr : &it->second; */
+/* } */

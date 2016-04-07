@@ -13,7 +13,15 @@ void WorldService::onEnable()
 	
 	// load and connect all worlds
 	WorldLoader loader;
-	mainWorld = loader.loadWorlds(mainWorldName, connectionLookup, worldTree);
+	loader.loadWorlds(mainWorldName, connectionLookup, worldTree);
+
+	// transfer loaded worlds
+	for (auto &lwPair : loader.loadedWorlds)
+	{
+		World *world = lwPair.second.world;
+		worlds[world->getID()] = world;
+	}
+
 
 	Logger::popIndent();
 
@@ -78,57 +86,21 @@ void WorldService::onEnable()
 
 void WorldService::onDisable()
 {
-	mainWorld = nullptr;
+	Logger::logDebug("Deleting all loaded worlds");
+	for (auto &pair : worlds)
+		delete pair.second;
 }
 
 
-World &WorldService::getWorld()
+World *WorldService::getMainWorld()
 {
-	return *mainWorld;
+	return getWorld(0);
 }
 
-bool isCollidable(BlockType blockType)
+World *WorldService::getWorld(WorldID id)
 {
-	static const std::set<BlockType> collidables(
-			{BLOCK_WATER, BLOCK_TREE, BLOCK_BUILDING_WALL, BLOCK_BUILDING_EDGE, BLOCK_BUILDING_ROOF,
-			 BLOCK_BUILDING_ROOF_CORNER});
-	return collidables.find(blockType) != collidables.end();
-}
-
-bool isInteractable(BlockType blockType)
-{
-	static const std::set<BlockType> interactables(
-			{BLOCK_SLIDING_DOOR});
-	return interactables.find(blockType) != interactables.end();
-}
-
-LayerType layerTypeFromString(const std::string &s)
-{
-	if (s == "underterrain")
-		return LAYER_UNDERTERRAIN;
-	if (s == "terrain")
-		return LAYER_TERRAIN;
-	if (s == "overterrain")
-		return LAYER_OVERTERRAIN;
-	if (s == "objects")
-		return LAYER_OBJECTS;
-	if (s == "collisions")
-		return LAYER_COLLISIONS;
-	if (s == "buildings")
-		return LAYER_BUILDINGS;
-
-	Logger::logWarning("Unknown LayerType: " + s);
-	return LAYER_UNKNOWN;
-}
-
-bool isTileLayer(const LayerType &layerType)
-{
-	return layerType == LAYER_UNDERTERRAIN || layerType == LAYER_TERRAIN || layerType == LAYER_OVERTERRAIN;
-}
-
-bool isOverLayer(const LayerType &layerType)
-{
-	return layerType == LAYER_OVERTERRAIN;
+	auto world = worlds.find(id);
+	return world == worlds.end() ? nullptr : world->second;
 }
 
 World::World(int id, const std::string &fullPath) :
@@ -148,8 +120,8 @@ void World::loadFromFile(TMX::TileMap &tmx)
 
 void World::finishLoading(TMX::TileMap *tmx)
 {
-	terrain.loadLayers(tmx->layers);
-	collisionMap.load();
+	/* terrain.loadLayers(tmx->layers); */
+	/* collisionMap.load(); */
 }
 
 void World::resize(sf::Vector2i size)
@@ -210,6 +182,7 @@ void World::tick(float delta)
 	getBox2DWorld()->Step(delta, 6, 2);
 }
 
+// todo move to world_rendering
 void World::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
 	states.transform *= transform;

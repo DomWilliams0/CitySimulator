@@ -1,7 +1,51 @@
 #include "world.hpp"
 #include "service/logging_service.hpp"
 
-WorldTerrain::WorldTerrain(World *container) : BaseWorld(container), tileset(tileset)
+bool isCollidable(BlockType blockType)
+{
+	static const std::set<BlockType> collidables(
+			{BLOCK_WATER, BLOCK_TREE, BLOCK_BUILDING_WALL, BLOCK_BUILDING_EDGE, BLOCK_BUILDING_ROOF,
+			 BLOCK_BUILDING_ROOF_CORNER});
+	return collidables.find(blockType) != collidables.end();
+}
+
+bool isInteractable(BlockType blockType)
+{
+	static const std::set<BlockType> interactables(
+			{BLOCK_SLIDING_DOOR});
+	return interactables.find(blockType) != interactables.end();
+}
+
+LayerType layerTypeFromString(const std::string &s)
+{
+	if (s == "underterrain")
+		return LAYER_UNDERTERRAIN;
+	if (s == "terrain")
+		return LAYER_TERRAIN;
+	if (s == "overterrain")
+		return LAYER_OVERTERRAIN;
+	if (s == "objects")
+		return LAYER_OBJECTS;
+	if (s == "collisions")
+		return LAYER_COLLISIONS;
+	if (s == "buildings")
+		return LAYER_BUILDINGS;
+
+	Logger::logWarning("Unknown LayerType: " + s);
+	return LAYER_UNKNOWN;
+}
+
+bool isTileLayer(const LayerType &layerType)
+{
+	return layerType == LAYER_UNDERTERRAIN || layerType == LAYER_TERRAIN || layerType == LAYER_OVERTERRAIN;
+}
+
+bool isOverLayer(const LayerType &layerType)
+{
+	return layerType == LAYER_OVERTERRAIN;
+}
+
+WorldTerrain::WorldTerrain(World *container) : BaseWorld(container)
 {
 	tileVertices.setPrimitiveType(sf::Quads);
 	overLayerVertices.setPrimitiveType(sf::Quads);
