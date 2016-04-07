@@ -39,14 +39,22 @@ void error(const std::string &msg, const std::string &arg1)
 	throw std::runtime_error(format(msg, arg1));
 }
 
-void error(const std::string &msg, const std::string &arg1, const std::string &arg2)
+void error(const std::string &msg, const std::string &arg1,
+		const std::string &arg2)
 {
 	throw std::runtime_error(format(msg, arg1, arg2));
 }
 
-void error(const std::string &msg, const std::string &arg1, const std::string &arg2, const std::string &arg3)
+void error(const std::string &msg, const std::string &arg1,
+		const std::string &arg2, const std::string &arg3)
 {
 	throw std::runtime_error(format(msg, arg1, arg2, arg3));
+}
+
+void error(const std::string &msg, const std::string &arg1,
+		const std::string &arg2, const std::string &arg3, const std::string &arg4)
+{
+	throw std::runtime_error(format(msg, arg1, arg2, arg3, arg4));
 }
 
 

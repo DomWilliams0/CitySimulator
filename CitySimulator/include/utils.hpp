@@ -55,9 +55,14 @@ void error(const std::string &msg);
 
 void error(const std::string &msg, const std::string &arg1);
 
-void error(const std::string &msg, const std::string &arg1, const std::string &arg2);
+void error(const std::string &msg, const std::string &arg1,
+		const std::string &arg2);
 
-void error(const std::string &msg, const std::string &arg1, const std::string &arg2, const std::string &arg3);
+void error(const std::string &msg, const std::string &arg1,
+		const std::string &arg2, const std::string &arg3);
+
+void error(const std::string &msg, const std::string &arg1,
+		const std::string &arg2, const std::string &arg3, const std::string &arg4);
 
 namespace Constants
 {
@@ -312,7 +317,7 @@ namespace sf
 
 namespace std
 {
-	/**
+		/**
 	 * Merci http://stackoverflow.com/questions/2590677/how-do-i-combine-hash-values-in-c0x
 	 */
 	template<> struct hash<Location>
