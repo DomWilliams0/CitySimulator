@@ -48,23 +48,25 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
 		door.worldID = owningBuilding->insideWorldID;
 	}
 
+  	std::set<WorldID> visitedWorlds;
+
 	// load all worlds recursively without connecting doors
-	discoverAndLoadAllWorlds(mainWorld);
+	discoverAndLoadAllWorlds(mainWorld, visitedWorlds);
+	visitedWorlds.clear();
 
 	// connect up the doors
-	connectDoors(treeRoot, mainWorld, connectionLookup);
+	connectDoors(treeRoot, mainWorld, connectionLookup, visitedWorlds);
 
 	return mainWorld.world;
 }
 
 
-void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world)
+void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world, 
+		std::set<WorldID> &visitedWorlds)
 {
-  	static std::set<WorldID> done;
-
-  	if (done.find(world.world->getID()) != done.end())
+  	if (visitedWorlds.find(world.world->getID()) != visitedWorlds.end())
       	return;
-  	done.insert(world.world->getID());
+  	visitedWorlds.insert(world.world->getID());
 
   	/* Logger::logDebuggier(format("Discovering worlds in %1%", _str(world.world->getID()))); */
 
@@ -124,7 +126,7 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world)
     	if (newWorld == nullptr)
       		newWorld = getLoadedWorld(door.worldID);
 
-    	discoverAndLoadAllWorlds(*newWorld);
+    	discoverAndLoadAllWorlds(*newWorld, visitedWorlds);
 	}
 }
 
@@ -139,12 +141,11 @@ WorldService::WorldLoader::UnloadedDoor *WorldService::WorldLoader::findPartnerD
 }
 
 void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedWorld &world,
-		WorldConnectionTable &connectionLookup)
+		WorldConnectionTable &connectionLookup, std::set<WorldID> &visitedWorlds)
 {
-	static std::set<WorldID> visitedWorlds;
-	if (visitedWorlds.find(currentNode.value->getID()) != visitedWorlds.end())
+	if (visitedWorlds.find(world.world->getID()) != visitedWorlds.end())
 		return;
-	visitedWorlds.insert(currentNode.value->getID());
+	visitedWorlds.insert(world.world->getID());
 
 	for (UnloadedDoor &door : world.doors)
 	{
@@ -183,7 +184,7 @@ void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedW
 			childNode.value = childWorld->world;
 
 			// recurse
-			connectDoors(childNode, *childWorld, connectionLookup);
+			connectDoors(childNode, *childWorld, connectionLookup, visitedWorlds);
 		}
 
 	}

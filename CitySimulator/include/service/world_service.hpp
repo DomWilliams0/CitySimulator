@@ -128,13 +128,13 @@ private:
 		 * Discovers all worlds by recursing door connections, and loads
 		 * them
 		 */
-		void discoverAndLoadAllWorlds(LoadedWorld &world);
+		void discoverAndLoadAllWorlds(LoadedWorld &world, std::set<WorldID> &visitedWorlds);
 
 		/**
 		 * Populates the WorldTree with connections between doors
 		 */
 		void connectDoors(WorldTreeNode &parent, LoadedWorld &world, 
-				WorldConnectionTable &connectionLookup);
+				WorldConnectionTable &connectionLookup, std::set<WorldID> &visitedWorlds);
 
 		/**
 		 * @return The next world ID to use
