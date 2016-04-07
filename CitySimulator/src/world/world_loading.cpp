@@ -30,7 +30,6 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, T
     	loadWorld(building.insideWorldName, true, building.insideWorldID);
 
     	Logger::popIndent();
-		// treeRoot.children.emplace_back(buildingWorld, &treeRoot);
 	}
 
 	// transfer building IDs to doors
@@ -68,8 +67,6 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world,
       	return;
   	visitedWorlds.insert(world.world->getID());
 
-  	/* Logger::logDebuggier(format("Discovering worlds in %1%", _str(world.world->getID()))); */
-
 	// iterate all doors found in last world
 	for (UnloadedDoor &door : world.doors)
 	{
@@ -80,7 +77,6 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world,
     	LoadedWorld *newWorld = nullptr;
 
 		// find the other door with same world share
-		// todo make sure the list of ALL doors is searched
 		if (door.doorTag == DOORTAG_WORLD_SHARE)
 		{
 			auto otherDoor = std::find_if(world.doors.begin(), world.doors.end(),
