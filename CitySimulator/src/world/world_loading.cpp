@@ -3,12 +3,13 @@
 #include "service/logging_service.hpp"
 #include "service/world_service.hpp"
 
-WorldService::WorldLoader::WorldLoader(WorldTreeNode &treeRoot) : lastWorldID(0), treeRoot(treeRoot)
+WorldService::WorldLoader::WorldLoader() : lastWorldID(0)
 {
 }
 
-World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName, Tileset &tileset,
-	WorldConnectionTable &connectionLookup)
+
+World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName,
+	WorldConnectionTable &connectionLookup, WorldTreeNode &treeRoot)
 {
 	// load main world
 	LoadedWorld &mainWorld = loadWorld(mainWorldName, false);

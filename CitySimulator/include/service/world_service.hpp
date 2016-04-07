@@ -91,21 +91,20 @@ private:
 
 		WorldID lastWorldID;
 		std::unordered_set<int> flippedTileGIDs;
-		WorldTreeNode &treeRoot;
 
-		// todo implicit map, with incremental integer keys
 		std::map<int, LoadedWorld> loadedWorlds;
 
-		WorldLoader(WorldTreeNode &treeRoot);
+
+		WorldLoader();
 
 		/**
 		 * Recursively loads all worlds into the WorldTree
-		 * @param tileset The tileset to use
 		 * @param connectionLookup The connection lookup table to populate
+		 * @param treeRoot The world tree to populate
 		 * @return The main world
 		 */
-		World *loadWorlds(const std::string &mainWorldName, Tileset &tileset, 
-				WorldConnectionTable &connectionLookup);
+		World *loadWorlds(const std::string &mainWorldName,
+				WorldConnectionTable &connectionLookup, WorldTreeNode &treeRoot);
 
 		/**
 		 * Loads the given world with the given ID
