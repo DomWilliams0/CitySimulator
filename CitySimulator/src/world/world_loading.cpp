@@ -3,12 +3,15 @@
 #include "service/logging_service.hpp"
 #include "service/world_service.hpp"
 
-WorldService::WorldLoader::WorldLoader() : lastWorldID(0)
+WorldService::WorldLoader::WorldLoader(
+		WorldConnectionTable &connectionLookup,
+		std::unordered_map<std::string, WorldTerrain> &terrainCache
+		) :
+	lastWorldID(0), connectionLookup(connectionLookup), terrainCache(terrainCache)
 {
 }
 
-World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName,
-	WorldConnectionTable &connectionLookup)
+World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName)
 {
 	// load main world
 	LoadedWorld &mainWorld = loadWorld(mainWorldName, false);
@@ -55,7 +58,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName,
 	visitedWorlds.clear();
 
 	// connect up the doors
-	connectDoors(worldTreeRoot, mainWorld, connectionLookup, visitedWorlds);
+	connectDoors(worldTreeRoot, mainWorld, visitedWorlds);
 
 	return mainWorld.world;
 }
@@ -139,7 +142,7 @@ WorldService::WorldLoader::LoadedDoor *WorldService::WorldLoader::findPartnerDoo
 }
 
 void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedWorld &world,
-		WorldConnectionTable &connectionLookup, std::set<WorldID> &visitedWorlds)
+		std::set<WorldID> &visitedWorlds)
 {
 	if (visitedWorlds.find(world.world->getID()) != visitedWorlds.end())
 		return;
@@ -182,7 +185,7 @@ void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedW
 			childNode.value = childWorld->world;
 
 			// recurse
-			connectDoors(childNode, *childWorld, connectionLookup, visitedWorlds);
+			connectDoors(childNode, *childWorld, visitedWorlds);
 		}
 
 	}
@@ -202,9 +205,14 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 
 	// load tmx
 	auto path = getWorldFilePath(name, isBuilding);
-	// todo terrain cache
 	loadedWorld.tmx.load(path);
 	loadedWorld.world = new World(worldID, path);
+
+	// load terrain if first time
+	auto cachedTerrain = terrainCache.find(name);
+	// todo
+
+
 	/* loadedWorld.world->loadFromFile(loadedWorld.tmx); */
 
 	// find buildings and doors

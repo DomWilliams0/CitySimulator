@@ -12,8 +12,8 @@ void WorldService::onEnable()
 	Logger::pushIndent();
 	
 	// load and connect all worlds
-	WorldLoader loader;
-	loader.loadWorlds(mainWorldName, connectionLookup);
+	WorldLoader loader(connectionLookup, terrainCache);
+	loader.loadWorlds(mainWorldName);
 
 	// transfer loaded worlds
 	for (auto &lwPair : loader.loadedWorlds)
@@ -23,6 +23,10 @@ void WorldService::onEnable()
 	}
 	
 	// load terrain
+	// create worldterrains in cache as we go
+	// gather all flipped gids at once
+	// generate tileset
+	// loadLayers on all terrains, i.e. set all blocks and add objects from tmx
 
 	// transfer buildings
 	/* BuildingMap *bm = getMainWorld()->getBuildingMap(); */

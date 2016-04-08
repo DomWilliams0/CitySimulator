@@ -129,8 +129,7 @@ void WorldTerrain::resizeVertices()
 void WorldTerrain::registerLayer(LayerType layerType, int depth)
 {
 	layers.emplace_back(layerType, depth);
-	Logger::logDebuggier(format("Found %3%layer type %1% at depth %2%", _str(layerType), _str(depth),
-	                            isOverLayer(layerType) ? "overterrain " : ""));
+	Logger::logDebuggier(format("Found layer type %1% at depth %2%", _str(layerType), _str(depth)));
 }
 
 void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer, int rotationAngle,
@@ -283,10 +282,8 @@ void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states, bo
 	target.draw(overLayers ? overLayerVertices : tileVertices, states);
 }
 
-void WorldTerrain::load(TMX::TileMap &tileMap, std::unordered_set<int> &flippedGIDs, Tileset *tileset)
+void WorldTerrain::loadFromTileMap(TMX::TileMap &tileMap, std::unordered_set<int> &flippedGIDs)
 {
-	this->tileset = tileset;
-
 	// find layer count and depths
 	std::vector<LayerType> types;
 	discoverLayers(tileMap.layers, types);
@@ -299,4 +296,10 @@ void WorldTerrain::load(TMX::TileMap &tileMap, std::unordered_set<int> &flippedG
 
 	// collect any gids that need flipping
 	discoverFlippedTiles(tileMap.layers, flippedGIDs);
+}
+
+
+CollisionMap *WorldTerrain::getCollisionMap() const
+{
+	return collisionMap;
 }

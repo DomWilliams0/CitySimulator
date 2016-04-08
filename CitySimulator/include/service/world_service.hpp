@@ -93,17 +93,26 @@ private:
 		WorldID lastWorldID; // todo be static inside generate()
 		std::unordered_set<int> flippedTileGIDs;
 
+		std::unordered_map<std::string, WorldTerrain> &terrainCache;
+		WorldConnectionTable &connectionLookup;
+
 		std::map<WorldID, LoadedWorld> loadedWorlds;
 		std::vector<LoadedBuilding> buildings;
 
-		WorldLoader();
+		/**
+		 * @param connectionLookup The connection lookup table to populate
+		 * @param terrainCache The terrain cache to populate
+		 */
+		WorldLoader(
+				WorldConnectionTable &connectionLookup,
+				std::unordered_map<std::string, WorldTerrain> &terrainCache
+				);
 
 		/**
-		 * Recursively loads all worlds into the WorldTree
-		 * @param connectionLookup The connection lookup table to populate
+		 * Recursively loads all worlds connected to the given main world
 		 * @return The main world
 		 */
-		World *loadWorlds(const std::string &mainWorldName, WorldConnectionTable &connectionLookup);
+		World *loadWorlds(const std::string &mainWorldName);
 
 		/**
 		 * Loads the given world with the given ID
@@ -132,7 +141,7 @@ private:
 		 * Populates the WorldTree with connections between doors
 		 */
 		void connectDoors(WorldTreeNode &parent, LoadedWorld &world, 
-				WorldConnectionTable &connectionLookup, std::set<WorldID> &visitedWorlds);
+				std::set<WorldID> &visitedWorlds);
 
 		/**
 		 * @return The next world ID to use
