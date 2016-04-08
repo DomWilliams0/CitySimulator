@@ -28,12 +28,12 @@ private:
 	std::string mainWorldName;
 
 	WorldTreeNode worldTree;
-	std::unordered_map<WorldID, World*> worlds;
+	std::unordered_map<WorldID, World *> worlds;
 	WorldConnectionTable connectionLookup;
 
 	struct WorldLoader
 	{
-		struct UnloadedBuilding
+		struct LoadedBuilding
 		{
 			WorldID insideWorldID;
 			std::string insideWorldName;
@@ -66,7 +66,7 @@ private:
 			DOORTAG_UNKNOWN
 		};
 
-		struct UnloadedDoor
+		struct LoadedDoor
 		{
 			sf::Vector2i tile;
 			int doorID;
@@ -82,8 +82,7 @@ private:
 			World *world;
 			TMX::TileMap tmx;
 
-			std::vector<UnloadedDoor> doors;
-			std::vector<UnloadedBuilding> buildings;
+			std::vector<LoadedDoor> doors;
 
 			bool failed() const
 			{
@@ -91,10 +90,11 @@ private:
 			}
 		};
 
-		WorldID lastWorldID;
+		WorldID lastWorldID; // todo be static inside generate()
 		std::unordered_set<int> flippedTileGIDs;
 
 		std::map<WorldID, LoadedWorld> loadedWorlds;
+		std::vector<LoadedBuilding> buildings;
 
 		WorldLoader();
 
@@ -156,13 +156,13 @@ private:
 		/**
 		 * @return The building that physically contains the given door, null if not found
 		 */
-		UnloadedBuilding *findDoorBuilding(LoadedWorld &world, UnloadedDoor &door);
+		LoadedBuilding *findDoorBuilding(LoadedWorld &world, LoadedDoor &door);
 
 		/**
 		 * @return The partner door in the given world with the given door ID,
 		 * null if not found
 		 */
-		UnloadedDoor *findPartnerDoor(LoadedWorld &world, int doorID);
+		LoadedDoor *findPartnerDoor(LoadedWorld &world, int doorID);
 
 	};
 

@@ -7,7 +7,6 @@ WorldService::WorldLoader::WorldLoader() : lastWorldID(0)
 {
 }
 
-
 World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName,
 	WorldConnectionTable &connectionLookup, WorldTreeNode &treeRoot)
 {
@@ -22,7 +21,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName,
 	treeRoot.value = mainWorld.world;
 
   	// allocate main world building IDs
-	for (auto &building : mainWorld.buildings)
+	for (auto &building : buildings)
 	{
 		Logger::logDebuggier(format("Found building %1% '%2%' in main world", 
           			_str(building.insideWorldID), building.insideWorldName));
@@ -36,7 +35,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName,
 	// transfer building IDs to doors
 	for (auto &door : mainWorld.doors)
 	{
-		UnloadedBuilding *owningBuilding = findDoorBuilding(mainWorld, door);
+		LoadedBuilding *owningBuilding = findDoorBuilding(mainWorld, door);
 		if (owningBuilding == nullptr)
 		{
 			Logger::logError(format("A door at (%1%, %2%) is not in any buildings!",
@@ -69,7 +68,7 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world,
   	visitedWorlds.insert(world.world->getID());
 
 	// iterate all doors found in last world
-	for (UnloadedDoor &door : world.doors)
+	for (LoadedDoor &door : world.doors)
 	{
 		// only positive IDs load worlds
 		if (door.doorID <= 0)
@@ -81,7 +80,7 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world,
 		if (door.doorTag == DOORTAG_WORLD_SHARE)
 		{
 			auto otherDoor = std::find_if(world.doors.begin(), world.doors.end(),
-			        [door](const UnloadedDoor &d)
+			        [door](const LoadedDoor &d)
 			        {
 				    	return d.doorTag != DOORTAG_WORLD_SHARE &&
 				    	d.worldShare == door.worldShare;
@@ -127,10 +126,10 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world,
 	}
 }
 
-WorldService::WorldLoader::UnloadedDoor *WorldService::WorldLoader::findPartnerDoor(
+WorldService::WorldLoader::LoadedDoor *WorldService::WorldLoader::findPartnerDoor(
 		LoadedWorld &world, int doorID)
 {
-	for (UnloadedDoor &door : world.doors)
+	for (LoadedDoor &door : world.doors)
 		if (door.doorID == -doorID)
 			return &door;
 
@@ -144,7 +143,7 @@ void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedW
 		return;
 	visitedWorlds.insert(world.world->getID());
 
-	for (UnloadedDoor &door : world.doors)
+	for (LoadedDoor &door : world.doors)
 	{
 		LoadedWorld *childWorld = getLoadedWorld(door.doorID > 0 ? door.worldID : currentNode.parent->value->getID());
 		if (childWorld == nullptr)
@@ -154,7 +153,7 @@ void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedW
 			return;
 		}
 
-		UnloadedDoor *targetDoor = findPartnerDoor(*childWorld, door.doorID);
+		LoadedDoor *targetDoor = findPartnerDoor(*childWorld, door.doorID);
 		if (targetDoor == nullptr)
 		{
 			Logger::logError(format("Cannot find partner door in world %1% for door %2% in world %3%",
@@ -230,6 +229,10 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 		if (propObj.hasProperty(TMX::PROPERTY_BUILDING_WORLD))
 		{
 			// buildings
+			if (isBuilding)
+				error("Unsupported: a building cannot have a building inside it");
+
+
 			sf::IntRect bounds(
 					(int) (tile.tile.position.x / Constants::tilesetResolution),
 					(int) (tile.tile.position.y / Constants::tilesetResolution),
@@ -237,17 +240,17 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 					(int) (propObj.dimensions.y / Constants::tilesetResolution)
 					);
 
-			UnloadedBuilding b;
+			LoadedBuilding b;
 			b.bounds = bounds;
 			b.insideWorldName = propObj.getProperty(TMX::PROPERTY_BUILDING_WORLD);
       		b.insideWorldID = generateWorldID();
-			loadedWorld.buildings.push_back(b);
+			buildings.push_back(b);
 		}
 
 		else if (propObj.hasProperty(TMX::PROPERTY_DOOR_ID))
 		{
 			// doors
-			UnloadedDoor d;
+			LoadedDoor d;
 			d.tile.x = (tile.tile.position.x / Constants::tilesetResolution);
 			d.tile.y = (tile.tile.position.y / Constants::tilesetResolution);
 			d.doorID = boost::lexical_cast<int>(propObj.getProperty(TMX::PROPERTY_DOOR_ID));
@@ -299,12 +302,12 @@ WorldService::WorldLoader::LoadedWorld *WorldService::WorldLoader::getLoadedWorl
 }
 
 
-WorldService::WorldLoader::UnloadedBuilding *WorldService::WorldLoader::findDoorBuilding
-	(LoadedWorld &world, UnloadedDoor &door)
+WorldService::WorldLoader::LoadedBuilding *WorldService::WorldLoader::findDoorBuilding
+	(LoadedWorld &world, LoadedDoor &door)
 {
 	const sf::Vector2i &tile = door.tile;
 
-	for (UnloadedBuilding &building : world.buildings)
+	for (LoadedBuilding &building : buildings)
 	{
 		const sf::IntRect &bounds = building.bounds;
 		if (bounds.left <= tile.x && bounds.left + bounds.width >= tile.x &&

@@ -21,6 +21,11 @@ void WorldService::onEnable()
 		World *world = lwPair.second.world;
 		worlds[world->getID()] = world;
 	}
+	
+	// transfer buildings
+	BuildingMap &bm = getMainWorld()->getBuildingMap();
+	for (auto &building : loader.buildings)
+		bm.addBuilding(building.bounds, building.insideWorldID);
 
 
 	Logger::popIndent();

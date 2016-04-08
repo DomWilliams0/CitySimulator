@@ -287,10 +287,9 @@ public:
 	{
 	}
 
-	// todo load from WorldLoader
-	void load(const TMX::TileMap &tileMap);
+	void addBuilding(const sf::IntRect &bounds, WorldID insideWorld);
 
-	/* Building *getBuildingByID(Build); */
+	Building *getBuildingByID(BuildingID id);
 
 private:
 	std::unordered_map<BuildingID, Building> buildings;
