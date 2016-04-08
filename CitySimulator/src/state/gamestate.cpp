@@ -43,15 +43,16 @@ GameState::GameState() : State(STATE_GAME)
 	Locator::provide(SERVICE_CAMERA, new CameraService(*world));
 
 	// create some humans
-	int count = Config::getInt("debug.humans.count");
+	// todo not now you won't
+	/* int count = Config::getInt("debug.humans.count"); */
 
-	for (int i = 0; i < count; ++i)
-	{
-		int x = Utils::random(0, world->getTileSize().x);
-		int y = Utils::random(0, world->getTileSize().y);
+	/* for (int i = 0; i < count; ++i) */
+	/* { */
+	/* 	int x = Utils::random(0, world->getTileSize().x); */
+	/* 	int y = Utils::random(0, world->getTileSize().y); */
 
-		createTestHuman(*world, x, y, animationService->getRandomAnimationName(ENTITY_HUMAN), Direction::random());
-	}
+	/* 	createTestHuman(*world, x, y, animationService->getRandomAnimationName(ENTITY_HUMAN), Direction::random()); */
+	/* } */
 }
 
 void GameState::tick(float delta)

@@ -45,7 +45,8 @@ bool isOverLayer(const LayerType &layerType)
 	return layerType == LAYER_OVERTERRAIN;
 }
 
-WorldTerrain::WorldTerrain(World *container, const sf::Vector2i &size) : BaseWorld(container), size(size)
+WorldTerrain::WorldTerrain(World *container, const sf::Vector2i &size) : 
+	BaseWorld(container), size(size), collisionMap(container)
 {
 	tileVertices.setPrimitiveType(sf::Quads);
 	overLayerVertices.setPrimitiveType(sf::Quads);
@@ -279,6 +280,8 @@ void WorldTerrain::applyTiles(Tileset &tileset)
 			}
 		}
 	}
+
+	tmx = nullptr;
 }
 
 void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const
@@ -306,7 +309,7 @@ void WorldTerrain::loadFromTileMap(TMX::TileMap &tileMap, std::unordered_set<int
 }
 
 
-CollisionMap *WorldTerrain::getCollisionMap() const
+CollisionMap *WorldTerrain::getCollisionMap()
 {
-	return collisionMap;
+	return &collisionMap;
 }
