@@ -13,7 +13,6 @@
 #include "bodydata.hpp"
 
 class World;
-
 class BodyData;
 
 enum BlockType
@@ -154,6 +153,8 @@ struct WorldLayer
 	}
 };
 
+class CollisionMap;
+
 /**
  * A world item that holds the block type of every tile in the world
  */
@@ -173,6 +174,8 @@ public:
 
 private:
 	Tileset *tileset;
+	CollisionMap *collisionMap;
+
 	sf::VertexArray tileVertices;
 	sf::VertexArray overLayerVertices;
 
@@ -182,6 +185,11 @@ private:
 
 	int tileLayerCount;
 	int overLayerCount;
+
+	CollisionMap *getCollisionMap() const
+	{
+		return collisionMap;
+	}
 
 	void discoverLayers(std::vector<TMX::Layer> &layers, std::vector<LayerType> &layerTypes);
 
@@ -295,25 +303,25 @@ private:
 	std::unordered_map<BuildingID, Building> buildings;
 
 	void gatherBuildings(const TMX::Layer &buildingLayer);
-
 };
 
 class World : public sf::Drawable
 {
 public:
-	World(int id, const std::string &fullPath);
+	World(WorldID id, const std::string &name);
 
-	void loadFromFile(TMX::TileMap &tmx);
+	/**
+	 * Copies references to terrain, collision map etc. from
+	 * WorldService's cache
+	 */
+	void loadTerrain();
 
-	void finishLoading(TMX::TileMap *tmx);
+	WorldTerrain *getTerrain();
 
-	void resize(sf::Vector2i size);
+	CollisionMap *getCollisionMap();
 
-	WorldTerrain &getTerrain();
-
-	CollisionMap &getCollisionMap();
-
-	BuildingMap &getBuildingMap();
+	// todo only OutsideWorld should have this, not a base World
+	BuildingMap *getBuildingMap();
 
 	b2World *getBox2DWorld();
 
@@ -327,16 +335,16 @@ public:
 
 	BlockType getBlockAt(const sf::Vector2i &tile, LayerType layer = LAYER_TERRAIN);
 
-	int getID() const;
+	WorldID getID() const;
 
 private:
-	WorldTerrain terrain;
-	CollisionMap collisionMap;
-	BuildingMap buildingMap;
+	WorldID id;
+	std::string name;
 
-	int id;
-	std::string filePath;
+	WorldTerrain *terrain;
+	BuildingMap *buildingMap;
 
+	// todo move to a WorldRenderer
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 
 protected:
@@ -345,9 +353,7 @@ protected:
 	sf::Transform transform;
 
 	friend class BaseWorld;
-
 	friend class WorldTerrain;
-
 	friend class CollisionMap;
 };
 

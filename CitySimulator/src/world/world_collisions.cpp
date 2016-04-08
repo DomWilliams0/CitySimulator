@@ -25,7 +25,7 @@ void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 	}
 
 	// objects
-	auto objects = container->getTerrain().getObjects();
+	auto objects = container->getTerrain()->getObjects();
 	for (auto &obj : objects)
 	{
 		auto pos = obj.tilePos;

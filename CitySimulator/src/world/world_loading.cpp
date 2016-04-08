@@ -129,6 +129,7 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world,
 WorldService::WorldLoader::LoadedDoor *WorldService::WorldLoader::findPartnerDoor(
 		LoadedWorld &world, int doorID)
 {
+	// todo what if multiple doors to multiple worlds? compare world ID too
 	for (LoadedDoor &door : world.doors)
 		if (door.doorID == -doorID)
 			return &door;
@@ -200,9 +201,10 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 
 	// load tmx
 	auto path = getWorldFilePath(name, isBuilding);
+	// todo terrain cache
 	loadedWorld.tmx.load(path);
 	loadedWorld.world = new World(worldID, path);
-	loadedWorld.world->loadFromFile(loadedWorld.tmx);
+	/* loadedWorld.world->loadFromFile(loadedWorld.tmx); */
 
 	// find buildings and doors
 	auto buildingLayer = std::find_if(loadedWorld.tmx.layers.begin(), loadedWorld.tmx.layers.end(),

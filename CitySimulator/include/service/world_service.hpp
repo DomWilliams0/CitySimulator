@@ -27,8 +27,9 @@ private:
 	Tileset tileset;
 	std::string mainWorldName;
 
-	WorldTreeNode worldTree;
+	WorldTreeNode worldTree; // todo unneeded?
 	std::unordered_map<WorldID, World *> worlds;
+	std::unordered_map<std::string, WorldTerrain> terrainCache;
 	WorldConnectionTable connectionLookup;
 
 	struct WorldLoader

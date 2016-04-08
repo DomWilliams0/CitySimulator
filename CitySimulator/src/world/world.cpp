@@ -22,10 +22,12 @@ void WorldService::onEnable()
 		worlds[world->getID()] = world;
 	}
 	
+	// load terrain
+
 	// transfer buildings
-	BuildingMap &bm = getMainWorld()->getBuildingMap();
-	for (auto &building : loader.buildings)
-		bm.addBuilding(building.bounds, building.insideWorldID);
+	/* BuildingMap *bm = getMainWorld()->getBuildingMap(); */
+	/* for (auto &building : loader.buildings) */
+	/* 	bm->addBuilding(building.bounds, building.insideWorldID); */
 
 
 	Logger::popIndent();
@@ -108,51 +110,36 @@ World *WorldService::getWorld(WorldID id)
 	return world == worlds.end() ? nullptr : world->second;
 }
 
-World::World(int id, const std::string &fullPath) :
-		terrain(this), collisionMap(this), buildingMap(this), id(id), filePath(fullPath)
+World::World(WorldID id, const std::string &name) : id(id), name(name)
 {
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
 
-void World::loadFromFile(TMX::TileMap &tmx)
+void World::loadTerrain()
 {
-	// todo all of this, eek
-//	tmx.load(filePath);
-//	resize(tmx.size);
-
-//	terrain.load(tmx, flippedGIDs, tileset);
+	// todo load from WorldService cache
+	/* tileSize = size; */
+	/* pixelSize = Utils::toPixel(size); */
 }
 
-void World::finishLoading(TMX::TileMap *tmx)
-{
-	/* terrain.loadLayers(tmx->layers); */
-	/* collisionMap.load(); */
-}
-
-void World::resize(sf::Vector2i size)
-{
-	tileSize = size;
-	pixelSize = Utils::toPixel(size);
-}
-
-WorldTerrain &World::getTerrain()
+WorldTerrain *World::getTerrain()
 {
 	return terrain;
 }
 
-CollisionMap &World::getCollisionMap()
+CollisionMap *World::getCollisionMap()
 {
-	return collisionMap;
+	return terrain == nullptr ? nullptr : terrain->getCollisionMap();
 }
 
-BuildingMap &World::getBuildingMap()
+BuildingMap *World::getBuildingMap()
 {
 	return buildingMap;
 }
 
 b2World *World::getBox2DWorld()
 {
-	return &collisionMap.world;
+	return &getCollisionMap()->world;
 }
 
 sf::Vector2i World::getPixelSize() const
@@ -172,11 +159,11 @@ sf::Transform World::getTransform() const
 
 BlockType World::getBlockAt(const sf::Vector2i &tile, LayerType layer)
 {
-	int index = terrain.getBlockIndex(tile, layer);
-	return terrain.blockTypes[index];
+	int index = terrain->getBlockIndex(tile, layer);
+	return terrain->blockTypes[index];
 }
 
-int World::getID() const
+WorldID World::getID() const
 {
 	return id;
 }
@@ -193,12 +180,12 @@ void World::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	states.transform *= transform;
 
 	// terrain
-	terrain.render(target, states, false);
+	terrain->render(target, states, false);
 
 	// entities
 	Locator::locate<EntityService>()->renderSystems();
 
 	// overterrain
-	terrain.render(target, states, true);
+	terrain->render(target, states, true);
 
 }

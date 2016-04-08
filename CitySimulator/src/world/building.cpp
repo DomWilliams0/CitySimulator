@@ -5,7 +5,6 @@
 #include "service/locator.hpp"
 
 
-
 Building::Building(const sf::IntRect &tileBounds, BuildingID id,
 		WorldID outsideWorld, WorldID insideWorld) : bounds(tileBounds), id(id)
 {
@@ -14,7 +13,6 @@ Building::Building(const sf::IntRect &tileBounds, BuildingID id,
 
 
 }
-
 
 void Building::discoverWindows()
 {
@@ -60,7 +58,7 @@ void Building::setWindowLight(WindowID windowID, bool isNowLit)
 	window->second.status = isNowLit;
 
 	BlockType newBlock = isNowLit ? BLOCK_BUILDING_WINDOW_ON : BLOCK_BUILDING_WINDOW_OFF;
-	outsideWorld->getTerrain().setBlockType(window->second.location, newBlock, LAYER_OVERTERRAIN);
+	outsideWorld->getTerrain()->setBlockType(window->second.location, newBlock, LAYER_OVERTERRAIN);
 }
 
 void Building::addDoor(const Location &location)
