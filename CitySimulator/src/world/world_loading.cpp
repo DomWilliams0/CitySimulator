@@ -8,7 +8,7 @@ WorldService::WorldLoader::WorldLoader() : lastWorldID(0)
 }
 
 World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName,
-	WorldConnectionTable &connectionLookup, WorldTreeNode &treeRoot)
+	WorldConnectionTable &connectionLookup)
 {
 	// load main world
 	LoadedWorld &mainWorld = loadWorld(mainWorldName, false);
@@ -18,7 +18,8 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName,
 		return nullptr;
 	}
 
-	treeRoot.value = mainWorld.world;
+	WorldTreeNode worldTreeRoot;
+	worldTreeRoot.value = mainWorld.world;
 
   	// allocate main world building IDs
 	for (auto &building : buildings)
@@ -54,7 +55,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName,
 	visitedWorlds.clear();
 
 	// connect up the doors
-	connectDoors(treeRoot, mainWorld, connectionLookup, visitedWorlds);
+	connectDoors(worldTreeRoot, mainWorld, connectionLookup, visitedWorlds);
 
 	return mainWorld.world;
 }

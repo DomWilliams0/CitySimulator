@@ -13,7 +13,7 @@ void WorldService::onEnable()
 	
 	// load and connect all worlds
 	WorldLoader loader;
-	loader.loadWorlds(mainWorldName, connectionLookup, worldTree);
+	loader.loadWorlds(mainWorldName, connectionLookup);
 
 	// transfer loaded worlds
 	for (auto &lwPair : loader.loadedWorlds)

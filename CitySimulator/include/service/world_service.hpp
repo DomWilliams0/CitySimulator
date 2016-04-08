@@ -27,7 +27,6 @@ private:
 	Tileset tileset;
 	std::string mainWorldName;
 
-	WorldTreeNode worldTree; // todo unneeded?
 	std::unordered_map<WorldID, World *> worlds;
 	std::unordered_map<std::string, WorldTerrain> terrainCache;
 	WorldConnectionTable connectionLookup;
@@ -102,11 +101,9 @@ private:
 		/**
 		 * Recursively loads all worlds into the WorldTree
 		 * @param connectionLookup The connection lookup table to populate
-		 * @param treeRoot The world tree to populate
 		 * @return The main world
 		 */
-		World *loadWorlds(const std::string &mainWorldName,
-				WorldConnectionTable &connectionLookup, WorldTreeNode &treeRoot);
+		World *loadWorlds(const std::string &mainWorldName, WorldConnectionTable &connectionLookup);
 
 		/**
 		 * Loads the given world with the given ID
