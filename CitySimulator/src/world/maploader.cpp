@@ -114,13 +114,18 @@ void TMX::TileMap::load(const std::string &filePath)
 
 			std::string data = pair.second.get<std::string>("data");
 			boost::tokenizer<sep> tokens(data, sep(",\n\r"));
+			layer.items.resize(size.x * size.y);
+			int i(0);
 
 			for (auto it = tokens.begin(); it != tokens.end(); ++it)
 			{
-				TileWrapper wrapper;
+				TileWrapper &wrapper = layer.items[i];
 				wrapper.type = TILE_TILE;
 				wrapper.tile.setGID(*it);
-				layer.items.push_back(wrapper);
+
+				wrapper.tile.position.x = i % size.x;
+				wrapper.tile.position.y = i / size.x;
+				i += 1;
 			}
 		}
 

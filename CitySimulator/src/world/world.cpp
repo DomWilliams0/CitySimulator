@@ -20,20 +20,22 @@ void WorldService::onEnable()
 	{
 		World *world = lwPair.second.world;
 		worlds[world->getID()] = world;
+
 	}
-	
 	// generate tileset
 	tileset.load();
 	tileset.convertToTexture(loader.flippedTileGIDs);
+
+
 
 	// load terrain
 	for (auto &pair : terrainCache)
 		pair.second.applyTiles(tileset);
 
 	// transfer buildings
-	/* BuildingMap *bm = getMainWorld()->getBuildingMap(); */
-	/* for (auto &building : loader.buildings) */
-	/* 	bm->addBuilding(building.bounds, building.insideWorldID); */
+	BuildingMap *bm = getMainWorld()->getBuildingMap();
+	for (auto &building : loader.buildings)
+		bm->addBuilding(building.bounds, building.insideWorldID);
 
 
 	Logger::popIndent();
@@ -116,7 +118,7 @@ World *WorldService::getWorld(WorldID id)
 	return world == worlds.end() ? nullptr : world->second;
 }
 
-World::World(WorldID id, const std::string &name) : id(id), name(name)
+World::World(WorldID id, const std::string &name) : id(id), name(name), buildingMap(this)
 {
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
@@ -138,7 +140,7 @@ CollisionMap *World::getCollisionMap()
 
 BuildingMap *World::getBuildingMap()
 {
-	return buildingMap;
+	return &buildingMap;
 }
 
 b2World *World::getBox2DWorld()

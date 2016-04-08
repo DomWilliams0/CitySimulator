@@ -341,7 +341,7 @@ private:
 	std::string name;
 
 	WorldTerrain *terrain;
-	BuildingMap *buildingMap;
+	BuildingMap buildingMap;
 
 	// todo move to a WorldRenderer
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;

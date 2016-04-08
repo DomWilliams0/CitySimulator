@@ -9,9 +9,14 @@ Building::Building(const sf::IntRect &tileBounds, BuildingID id,
 		WorldID outsideWorld, WorldID insideWorld) : bounds(tileBounds), id(id)
 {
 	WorldService *ws = Locator::locate<WorldService>();
+	this->insideWorld = ws->getWorld(insideWorld);
+	this->outsideWorld = ws->getWorld(outsideWorld);
 
-
-
+	if (this->insideWorld == nullptr || this->outsideWorld == nullptr)
+	{
+		WorldID badID = this->insideWorld == nullptr ? insideWorld : outsideWorld;
+		error("Building world ID %1% has not been loaded", _str(badID));
+	}
 }
 
 void Building::discoverWindows()
@@ -33,7 +38,8 @@ void Building::discoverWindows()
 		}
 	}
 
-	Logger::logDebuggiest(format("Discovered %1% building windows in building %2%", _str(windows.size()), _str(id)));
+	Logger::logDebuggiest(format("Discovered %1% building windows in building %2%", 
+				_str(windows.size()), _str(this->id)));
 }
 
 bool Building::isWindowLightOn(WindowID window)
