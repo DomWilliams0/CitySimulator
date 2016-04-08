@@ -45,7 +45,7 @@ bool isOverLayer(const LayerType &layerType)
 	return layerType == LAYER_OVERTERRAIN;
 }
 
-WorldTerrain::WorldTerrain(World *container) : BaseWorld(container)
+WorldTerrain::WorldTerrain(World *container, const sf::Vector2i &size) : BaseWorld(container), size(size)
 {
 	tileVertices.setPrimitiveType(sf::Quads);
 	overLayerVertices.setPrimitiveType(sf::Quads);
@@ -53,8 +53,8 @@ WorldTerrain::WorldTerrain(World *container) : BaseWorld(container)
 
 int WorldTerrain::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
 {
-	int index = (pos.x + pos.y * container->tileSize.x);
-	index += layers.at(layerType).depth * container->tileSize.x * container->tileSize.y;
+	int index = (pos.x + pos.y * size.x);
+	index += layers.at(layerType).depth * size.x * size.y;
 	index *= 4;
 
 	return index;
@@ -63,7 +63,7 @@ int WorldTerrain::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
 
 int WorldTerrain::getVertexIndex(const sf::Vector2i &pos, LayerType layerType)
 {
-	int index = (pos.x + pos.y * container->tileSize.x);
+	int index = (pos.x + pos.y * size.x);
 	int depth = layers.at(layerType).depth;
 	if (isOverLayer(layerType))
 	{
@@ -71,7 +71,7 @@ int WorldTerrain::getVertexIndex(const sf::Vector2i &pos, LayerType layerType)
 		depth -= diff;
 	}
 
-	index += depth * container->tileSize.x * container->tileSize.y;
+	index += depth * size.x * size.y;
 	index *= 4;
 
 	return index;
@@ -101,6 +101,11 @@ void WorldTerrain::rotateObject(sf::Vertex *quad, float degrees, const sf::Vecto
 	}
 }
 
+void WorldTerrain::positionVertices(sf::Vertex *quad, const sf::Vector2i &pos, int delta)
+{
+	positionVertices(quad, sf::Vector2f(pos.x, pos.y), delta);
+}
+
 void WorldTerrain::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta)
 {
 	quad[0].position = sf::Vector2f(pos.x, pos.y);
@@ -117,8 +122,7 @@ sf::VertexArray &WorldTerrain::getVertices(const LayerType &layerType)
 
 void WorldTerrain::resizeVertices()
 {
-	sf::Vector2i tilesetResolution(container->getTileSize());
-	const int sizeMultiplier = tilesetResolution.x * tilesetResolution.y * 4;
+	const int sizeMultiplier = size.x * size.y * 4;
 
 	blockTypes.resize(tileLayerCount * sizeMultiplier);
 
@@ -137,10 +141,9 @@ void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, La
 {
 	int vertexIndex = getVertexIndex(pos, layer);
 	sf::VertexArray &vertices = getVertices(layer);
-	auto size = vertices.getVertexCount();
 	sf::Vertex *quad = &vertices[vertexIndex];
 
-	positionVertices(quad, static_cast<sf::Vector2f>(pos), 1);
+	positionVertices(quad, pos, 1);
 	tileset->textureQuad(quad, blockType, rotationAngle, flipGID);
 
 	blockTypes[getBlockIndex(pos, layer)] = blockType;
@@ -235,10 +238,12 @@ void WorldTerrain::discoverFlippedTiles(const std::vector<TMX::Layer> &layers, s
 	}
 }
 
-void WorldTerrain::loadLayers(const std::vector<TMX::Layer> &layers)
+void WorldTerrain::applyTiles(Tileset &tileset)
 {
 	int layerIndex(0);
+	this->tileset = &tileset;
 
+	auto &layers = tmx->layers;
 	for (const TMX::Layer &layer : layers)
 	{
 		LayerType layerType = this->layers[layerIndex++].type;
@@ -284,12 +289,13 @@ void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states, bo
 
 void WorldTerrain::loadFromTileMap(TMX::TileMap &tileMap, std::unordered_set<int> &flippedGIDs)
 {
+	tmx = &tileMap;
+
 	// find layer count and depths
 	std::vector<LayerType> types;
 	discoverLayers(tileMap.layers, types);
 
-	Logger::logDebug(format("Discovered %1% tile layer(s), of which %2% is/are overlayer(s)",
-	                        _str(tileLayerCount), _str(overLayerCount)));
+	Logger::logDebug(format("Discovered %1% tile layer(s)", _str(tileLayerCount)));
 
 	// resize vertex array to accommodate for layer count
 	resizeVertices();

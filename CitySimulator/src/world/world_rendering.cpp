@@ -7,10 +7,6 @@ Tileset::Tileset(const std::string &path) : converted(false), path(path)
 {
 }
 
-Tileset::~Tileset()
-{
-	delete points;
-}
 
 void Tileset::load()
 {
@@ -35,10 +31,9 @@ void Tileset::textureQuad(sf::Vertex *quad, const BlockType &blockType, int rota
 	if (flipGID == 0 || flipResult == flippedBlockTypes.end())
 		blockID = blockType;
 
-		// flipped
+	// flipped
 	else
 		blockID = flipResult->second;
-
 
 	int row = blockID % size.x;
 	int col = blockID / size.x;
@@ -76,7 +71,7 @@ sf::Vector2u Tileset::getSize() const
 	return size;
 }
 
-void Tileset::convertToTexture(const std::vector<int> &flippedGIDs)
+void Tileset::convertToTexture(const std::unordered_set<int> &flippedGIDs)
 {
 	// resize image
 	int totalBlockTypes = BLOCK_UNKNOWN + flippedGIDs.size();
@@ -158,7 +153,7 @@ void Tileset::addPoint(int x, int y)
 
 void Tileset::generatePoints()
 {
-	points = new sf::Vector2f[(size.x + 1) * (size.y + 1)];
+	points.resize((size.x + 1) * (size.y + 1));
 	for (size_t y = 0; y <= size.y; y++)
 		for (size_t x = 0; x <= size.x; x++)
 			addPoint(x, y);

@@ -7,7 +7,13 @@ void BuildingMap::addBuilding(const sf::IntRect &bounds, WorldID insideWorld)
 
 	BuildingID id = lastID++;
 	Building &b = 
-		buildings.emplace(id, Building{bounds, id, container->getID(), insideWorld}).first->second;
+		buildings.emplace(
+				std::piecewise_construct,
+				std::forward_as_tuple(id),
+				std::forward_as_tuple(bounds, id, container->getID(), insideWorld)
+				).first->second;
+
+	b.discoverWindows();
 }
 
 

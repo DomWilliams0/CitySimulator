@@ -192,7 +192,7 @@ void CollisionMap::load()
 	// world borders
 	int borderThickness = Constants::tileSize;
 	int padding = Constants::tileSize / 4;
-	auto worldSize = container->pixelSize;
+	auto worldSize = container->getPixelSize();
 	rects.emplace_back(sf::FloatRect(-borderThickness - padding, 0, borderThickness, worldSize.y), 0.f);
 	rects.emplace_back(sf::FloatRect(0, -borderThickness - padding, worldSize.x, borderThickness), 0.f);
 	rects.emplace_back(sf::FloatRect(worldSize.x + padding, 0, borderThickness, worldSize.y), 0.f);

@@ -22,11 +22,13 @@ void WorldService::onEnable()
 		worlds[world->getID()] = world;
 	}
 	
-	// load terrain
-	// create worldterrains in cache as we go
-	// gather all flipped gids at once
 	// generate tileset
-	// loadLayers on all terrains, i.e. set all blocks and add objects from tmx
+	tileset.load();
+	tileset.convertToTexture(loader.flippedTileGIDs);
+
+	// load terrain
+	for (auto &pair : terrainCache)
+		pair.second.applyTiles(tileset);
 
 	// transfer buildings
 	/* BuildingMap *bm = getMainWorld()->getBuildingMap(); */
@@ -119,11 +121,9 @@ World::World(WorldID id, const std::string &name) : id(id), name(name)
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
 }
 
-void World::loadTerrain()
+void World::setTerrain(WorldTerrain &terrain)
 {
-	// todo load from WorldService cache
-	/* tileSize = size; */
-	/* pixelSize = Utils::toPixel(size); */
+	this->terrain = &terrain;
 }
 
 WorldTerrain *World::getTerrain()
@@ -148,12 +148,12 @@ b2World *World::getBox2DWorld()
 
 sf::Vector2i World::getPixelSize() const
 {
-	return pixelSize;
+	return Utils::toPixel(getTileSize());
 }
 
 sf::Vector2i World::getTileSize() const
 {
-	return tileSize;
+	return terrain->size;
 }
 
 sf::Transform World::getTransform() const
@@ -170,6 +170,11 @@ BlockType World::getBlockAt(const sf::Vector2i &tile, LayerType layer)
 WorldID World::getID() const
 {
 	return id;
+}
+
+std::string World::getName() const
+{
+	return name;
 }
 
 void World::tick(float delta)

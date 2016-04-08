@@ -206,14 +206,19 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 	// load tmx
 	auto path = getWorldFilePath(name, isBuilding);
 	loadedWorld.tmx.load(path);
-	loadedWorld.world = new World(worldID, path);
+	loadedWorld.world = new World(worldID, path); // todo dont use heap
 
-	// load terrain if first time
+	// load terrain if first time for this world name
 	auto cachedTerrain = terrainCache.find(name);
-	// todo
-
-
-	/* loadedWorld.world->loadFromFile(loadedWorld.tmx); */
+	if (cachedTerrain == terrainCache.end())
+	{
+		Logger::logDebuggier(format("Loading terrain for world '%1%'", name));
+		Logger::pushIndent();
+		WorldTerrain &terrain = terrainCache.emplace(name, WorldTerrain{loadedWorld.world, loadedWorld.tmx.size}).first->second;
+		loadedWorld.world->setTerrain(terrain);
+		terrain.loadFromTileMap(loadedWorld.tmx, flippedTileGIDs);
+		Logger::popIndent();
+	}
 
 	// find buildings and doors
 	auto buildingLayer = std::find_if(loadedWorld.tmx.layers.begin(), loadedWorld.tmx.layers.end(),

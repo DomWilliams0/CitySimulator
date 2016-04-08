@@ -73,8 +73,6 @@ class Tileset
 public:
 	Tileset(const std::string &path);
 
-	~Tileset();
-
 	void load();
 
 	void textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipGID);
@@ -85,19 +83,14 @@ public:
 
 	sf::Vector2u getSize() const;
 
-	void convertToTexture(const std::vector<int> &flippedGIDs);
+	void convertToTexture(const std::unordered_set<int> &flippedGIDs);
 
 	sf::IntRect getTileRect(unsigned blockType);
-
-	void createTileImage(sf::Image *image, unsigned blockType);
-
-protected:
-	friend class WorldTerrain;
 
 private:
 	sf::Image *image;
 	sf::Texture texture;
-	sf::Vector2f *points;
+	std::vector<sf::Vector2f> points;
 	sf::Vector2u size;
 	std::string path;
 
@@ -109,6 +102,8 @@ private:
 	void generatePoints();
 
 	int getIndex(int x, int y) const;
+
+	void createTileImage(sf::Image *image, unsigned blockType);
 };
 
 /**
@@ -161,7 +156,7 @@ class CollisionMap;
 class WorldTerrain : public BaseWorld
 {
 public:
-	WorldTerrain(World *container);
+	WorldTerrain(World *container, const sf::Vector2i &size);
 
 	void setBlockType(const sf::Vector2i &pos, BlockType blockType, 
 			LayerType layer = LAYER_TERRAIN, int rotationAngle = 0, int flipGID = 0);
@@ -173,12 +168,20 @@ public:
 
 	const std::vector<WorldLayer> &getLayers();
 
+	/**
+	 * Discovers layers and which tile types require rotating
+	 * @param tmx The tilemap
+	 * @param flippedGIDs A set of tile GIDs to populate
+	 */
 	void loadFromTileMap(TMX::TileMap &tmx, std::unordered_set<int> &flippedGIDs);
+
+	void applyTiles(Tileset &tileset);
 
 
 private:
 	Tileset *tileset;
 	CollisionMap *collisionMap;
+	TMX::TileMap *tmx;
 
 	sf::VertexArray tileVertices;
 	sf::VertexArray overLayerVertices;
@@ -194,12 +197,13 @@ private:
 
 	void discoverFlippedTiles(const std::vector<TMX::Layer> &layers, std::unordered_set<int> &flippedGIDs);
 
-
 	int getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
 
 	int getVertexIndex(const sf::Vector2i &pos, LayerType layerType);
 
 	void rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos);
+
+	void positionVertices(sf::Vertex *quad, const sf::Vector2i &pos, int delta);
 
 	void positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
 
@@ -208,19 +212,15 @@ private:
 	CollisionMap *getCollisionMap() const;
 
 protected:
+	sf::Vector2i size;
+
 	void resizeVertices();
 
 	void registerLayer(LayerType layerType, int depth);
 
 	void render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const;
 
-	void load(TMX::TileMap &tileMap, std::unordered_set<int> &flippedGIDs, Tileset *tileset);
-
-	void loadLayers(const std::vector<TMX::Layer> &layers);
-
-	friend struct TMX::TileMap;
-
-	friend class World;
+	friend World;
 };
 
 /**
@@ -311,11 +311,7 @@ class World : public sf::Drawable
 public:
 	World(WorldID id, const std::string &name);
 
-	/**
-	 * Copies references to terrain, collision map etc. from
-	 * WorldService's cache
-	 */
-	void loadTerrain();
+	void setTerrain(WorldTerrain &terrain);
 
 	WorldTerrain *getTerrain();
 
@@ -338,6 +334,8 @@ public:
 
 	WorldID getID() const;
 
+	std::string getName() const;
+
 private:
 	WorldID id;
 	std::string name;
@@ -349,8 +347,6 @@ private:
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 
 protected:
-	sf::Vector2i tileSize;
-	sf::Vector2i pixelSize;
 	sf::Transform transform;
 
 	friend class BaseWorld;
