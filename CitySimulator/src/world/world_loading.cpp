@@ -214,7 +214,10 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 	{
 		Logger::logDebuggier(format("Loading terrain for world '%1%'", name));
 		Logger::pushIndent();
-		WorldTerrain &terrain = terrainCache.emplace(name, WorldTerrain{loadedWorld.world, loadedWorld.tmx.size}).first->second;
+		WorldTerrain &terrain = terrainCache.emplace(
+				std::piecewise_construct,
+				std::forward_as_tuple(name),
+				std::forward_as_tuple(loadedWorld.world, loadedWorld.tmx.size)).first->second;
 		loadedWorld.world->setTerrain(terrain);
 		terrain.loadFromTileMap(loadedWorld.tmx, flippedTileGIDs);
 		Logger::popIndent();

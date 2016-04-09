@@ -154,23 +154,16 @@ struct WorldLayer
 class CollisionMap : public BaseWorld
 {
 public:
-	explicit CollisionMap(World *container) : BaseWorld(container), world(b2Vec2(0.f, 0.f)),
-											  worldBody(nullptr), globalContactListener(container)
-	{
-		world.SetAllowSleeping(true);
-		world.SetContactListener(&globalContactListener);
-	}
+	CollisionMap(World *container);
 
 	~CollisionMap();
 
-	bool getRectAt(const sf::Vector2i &tilePos, sf::FloatRect &ret);
-
-protected:
 	void load();
 
+protected:
 	b2World world;
 	b2Body *worldBody;
-
+	
 	friend class World;
 
 private:
@@ -209,6 +202,9 @@ private:
 	void mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar);
 
 	BodyData *createBodyData(BlockType blockType, const sf::Vector2i &tilePos);
+
+	// todo unneeded?
+	bool getRectAt(const sf::Vector2i &tilePos, sf::FloatRect &ret);
 };
 
 
@@ -301,8 +297,6 @@ public:
 
 private:
 	std::unordered_map<BuildingID, Building> buildings;
-
-	void gatherBuildings(const TMX::Layer &buildingLayer);
 };
 
 class World : public sf::Drawable

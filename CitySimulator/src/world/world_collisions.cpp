@@ -2,6 +2,14 @@
 #include "service/render_service.hpp"
 #include "service/locator.hpp"
 
+CollisionMap::CollisionMap(World *container) 
+: BaseWorld(container), world({0.f, 0.f}), globalContactListener(container)
+	{
+		world.SetAllowSleeping(true);
+		world.SetContactListener(&globalContactListener);
+	}
+
+
 void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 {
 	sf::Vector2i worldTileSize = container->getTileSize();

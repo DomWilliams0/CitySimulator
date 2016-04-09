@@ -15,13 +15,6 @@ void WorldService::onEnable()
 	WorldLoader loader(connectionLookup, terrainCache);
 	loader.loadWorlds(mainWorldName);
 
-	// transfer loaded worlds
-	for (auto &lwPair : loader.loadedWorlds)
-	{
-		World *world = lwPair.second.world;
-		worlds[world->getID()] = world;
-
-	}
 	// generate tileset
 	tileset.load();
 	tileset.convertToTexture(loader.flippedTileGIDs);
@@ -29,6 +22,15 @@ void WorldService::onEnable()
 	// load terrain
 	for (auto &pair : terrainCache)
 		pair.second.applyTiles(tileset);
+
+	// transfer loaded worlds
+	for (auto &lwPair : loader.loadedWorlds)
+	{
+		World *world = lwPair.second.world;
+		worlds[world->getID()] = world;
+
+		world->getCollisionMap()->load();
+	}
 
 	// transfer buildings
 	BuildingMap &bm = getMainWorld()->getBuildingMap();
