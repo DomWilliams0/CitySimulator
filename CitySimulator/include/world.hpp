@@ -308,7 +308,7 @@ private:
 class World : public sf::Drawable
 {
 public:
-	World(WorldID id, const std::string &name);
+	World(WorldID id, const std::string &name, bool outside);
 
 	void setTerrain(WorldTerrain &terrain);
 
@@ -316,8 +316,7 @@ public:
 
 	CollisionMap *getCollisionMap();
 
-	// todo only OutsideWorld should have this, not a base World
-	BuildingMap *getBuildingMap();
+	BuildingMap &getBuildingMap();
 
 	b2World *getBox2DWorld();
 
@@ -335,12 +334,15 @@ public:
 
 	std::string getName() const;
 
+	bool isOutside() const;
+
 private:
 	WorldID id;
 	std::string name;
+	bool outside;
 
 	WorldTerrain *terrain;
-	BuildingMap buildingMap;
+	boost::optional<BuildingMap> buildingMap;
 
 	// todo move to a WorldRenderer
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
