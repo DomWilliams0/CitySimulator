@@ -224,8 +224,6 @@ public:
 
 	const std::vector<WorldObject> &getObjects();
 
-	const std::vector<WorldLayer> &getLayers();
-
 	/**
 	 * Discovers layers and which tile types require rotating
 	 * @param tmx The tilemap
@@ -246,7 +244,7 @@ private:
 
 	std::vector<BlockType> blockTypes;
 	std::vector<WorldObject> objects;
-	std::vector<WorldLayer> layers;
+	std::map<LayerType, int> layerDepths;
 
 	int tileLayerCount;
 	int overLayerCount;
@@ -264,6 +262,11 @@ private:
 	void positionVertices(sf::Vertex *quad, const sf::Vector2i &pos, int delta);
 
 	void positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
+
+	/**
+	 * @return The depth of the layer with the given type. Throws an exception if not found
+	 */
+	int getDepth(LayerType layerType) const;
 
 	sf::VertexArray &getVertices(LayerType layerType);
 

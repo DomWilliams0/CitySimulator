@@ -55,7 +55,7 @@ WorldTerrain::WorldTerrain(World *container, const sf::Vector2i &size) :
 int WorldTerrain::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
 {
 	int index = (pos.x + pos.y * size.x);
-	index += layers.at(layerType).depth * size.x * size.y;
+	index += getDepth(layerType) * size.x * size.y;
 	index *= 4;
 
 	return index;
@@ -65,7 +65,7 @@ int WorldTerrain::getBlockIndex(const sf::Vector2i &pos, LayerType layerType)
 int WorldTerrain::getVertexIndex(const sf::Vector2i &pos, LayerType layerType)
 {
 	int index = (pos.x + pos.y * size.x);
-	int depth = layers.at(layerType).depth;
+	int depth = getDepth(layerType);
 	if (isOverLayer(layerType))
 	{
 		int diff = tileLayerCount - overLayerCount;
@@ -113,6 +113,14 @@ void WorldTerrain::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, i
 	quad[1].position = sf::Vector2f(pos.x + delta, pos.y);
 	quad[2].position = sf::Vector2f(pos.x + delta, pos.y + delta);
 	quad[3].position = sf::Vector2f(pos.x, pos.y + delta);
+}
+
+int WorldTerrain::getDepth(LayerType layerType) const
+{
+	auto it = layerDepths.find(layerType);
+	if (it == layerDepths.end())
+		error("Cannot get depth for invalid layer of type %d", _str(layerType));
+	return it->second;
 }
 
 
@@ -170,18 +178,11 @@ const std::vector<WorldObject> &WorldTerrain::getObjects()
 	return objects;
 }
 
-const std::vector<WorldLayer> &WorldTerrain::getLayers()
-{
-	return layers;
-}
-
 void WorldTerrain::discoverLayers(std::vector<TMX::Layer> &tmxLayers)
 {
 	int depth = 0;
 	tileLayerCount = 0;
 	overLayerCount = 0;
-
-	layers.reserve(tmxLayers.size());
 
 	auto layerIt = tmxLayers.cbegin();
 	while (layerIt != tmxLayers.cend())
@@ -209,7 +210,7 @@ void WorldTerrain::discoverLayers(std::vector<TMX::Layer> &tmxLayers)
 		if (isOverLayer(layerType))
 			++overLayerCount;
 
-		layers.emplace_back(layerType, depth);
+		layerDepths.insert({layerType, depth});
 		Logger::logDebuggier(format("Found layer type %1% at depth %2%", _str(layerType), _str(depth)));
 
 		++depth;
@@ -243,7 +244,7 @@ void WorldTerrain::applyTiles(Tileset &tileset)
 	auto &layers = tmx->layers;
 	for (const TMX::Layer &layer : layers)
 	{
-		LayerType layerType = this->layers[layerIndex++].type;
+		LayerType layerType = layerTypeFromString(layer.name);
 
 		if (layerType == LAYER_OBJECTS)
 		{
