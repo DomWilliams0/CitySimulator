@@ -131,12 +131,6 @@ void WorldTerrain::resizeVertices()
 	overLayerVertices.resize(overLayerCount * sizeMultiplier);
 }
 
-void WorldTerrain::registerLayer(LayerType layerType, int depth)
-{
-	layers.emplace_back(layerType, depth);
-	Logger::logDebuggier(format("Found layer type %1% at depth %2%", _str(layerType), _str(depth)));
-}
-
 void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer, int rotationAngle,
                                 int flipGID)
 {
@@ -181,29 +175,32 @@ const std::vector<WorldLayer> &WorldTerrain::getLayers()
 	return layers;
 }
 
-void WorldTerrain::discoverLayers(std::vector<TMX::Layer> &layers, std::vector<LayerType> &layerTypes)
+void WorldTerrain::discoverLayers(std::vector<TMX::Layer> &tmxLayers)
 {
-	auto layerIt = layers.begin();
-	int depth(0);
+	int depth = 0;
 	tileLayerCount = 0;
 	overLayerCount = 0;
-	while (layerIt != layers.end())
+
+	layers.reserve(tmxLayers.size());
+
+	auto layerIt = tmxLayers.cbegin();
+	while (layerIt != tmxLayers.cend())
 	{
-		auto layer = *layerIt;
+		const TMX::Layer &layer = *layerIt;
 
 		// unknown layer type
 		LayerType layerType = layerTypeFromString(layer.name);
 		if (layerType == LAYER_UNKNOWN)
 		{
 			Logger::logError("Invalid layer name: " + layer.name);
-			layerIt = layers.erase(layerIt);
+			layerIt = tmxLayers.erase(layerIt);
 			continue;
 		}
 
 		// invisible layer
 		if (!layer.visible)
 		{
-			layerIt = layers.erase(layerIt);
+			layerIt = tmxLayers.erase(layerIt);
 			continue;
 		}
 
@@ -212,9 +209,8 @@ void WorldTerrain::discoverLayers(std::vector<TMX::Layer> &layers, std::vector<L
 		if (isOverLayer(layerType))
 			++overLayerCount;
 
-		// add layer
-		registerLayer(layerType, depth);
-		layerTypes.push_back(layerType);
+		layers.emplace_back(layerType, depth);
+		Logger::logDebuggier(format("Found layer type %1% at depth %2%", _str(layerType), _str(depth)));
 
 		++depth;
 		++layerIt;
@@ -295,8 +291,7 @@ void WorldTerrain::loadFromTileMap(TMX::TileMap &tileMap, std::unordered_set<int
 	tmx = &tileMap;
 
 	// find layer count and depths
-	std::vector<LayerType> types;
-	discoverLayers(tileMap.layers, types);
+	discoverLayers(tileMap.layers);
 
 	Logger::logDebug(format("Discovered %1% tile layer(s), of which %2% are overterrain",
 				_str(tileLayerCount), _str(overLayerCount)));

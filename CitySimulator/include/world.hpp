@@ -251,7 +251,7 @@ private:
 	int tileLayerCount;
 	int overLayerCount;
 
-	void discoverLayers(std::vector<TMX::Layer> &layers, std::vector<LayerType> &layerTypes);
+	void discoverLayers(std::vector<TMX::Layer> &tmxLayers);
 
 	void discoverFlippedTiles(const std::vector<TMX::Layer> &layers, std::unordered_set<int> &flippedGIDs);
 
@@ -273,8 +273,6 @@ protected:
 	sf::Vector2i size;
 
 	void resizeVertices();
-
-	void registerLayer(LayerType layerType, int depth);
 
 	void render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const;
 
