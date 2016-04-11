@@ -45,3 +45,23 @@ TEST_F(SimpleWorldTest, LayerLoad)
 		EXPECT_EQ(obj.type, BLOCK_TREE);
 
 }
+
+TEST_F(SimpleWorldTest, CollisionBoxes)
+{
+	b2World *bw = world->getBox2DWorld();
+	ASSERT_NE(bw, nullptr);
+
+	EXPECT_EQ(bw->GetBodyCount(), 1);
+
+
+	b2Body &body = bw->GetBodyList()[0];
+
+	std::size_t count = 0;
+	for (b2Fixture *f = body.GetFixtureList(); f; f = f->GetNext())
+		count++;
+
+	// 4 borders
+	// 3 water
+	// 3 trees
+	EXPECT_EQ(count, 10);
+}

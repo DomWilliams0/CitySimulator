@@ -162,16 +162,6 @@ CollisionMap::~CollisionMap()
 		world.DestroyBody(worldBody);
 }
 
-bool CollisionMap::getRectAt(const sf::Vector2i &tilePos, sf::FloatRect &ret)
-{
-	auto result(cellGrid.find(Utils::toPixel(tilePos)));
-	if (result == cellGrid.end())
-		return false;
-
-	ret = result->second;
-	return true;
-}
-
 void CollisionMap::load()
 {
 	std::vector<CollisionRect> rects;
@@ -205,8 +195,6 @@ void CollisionMap::load()
 	rects.emplace_back(sf::FloatRect(0, -borderThickness - padding, worldSize.x, borderThickness), 0.f);
 	rects.emplace_back(sf::FloatRect(worldSize.x + padding, 0, borderThickness, worldSize.y), 0.f);
 	rects.emplace_back(sf::FloatRect(0, worldSize.y + padding, worldSize.x, borderThickness), 0.f);
-
-	// todo make big collision rectangles hollow to work better with box2d?
 
 	// collision fixtures
 	b2FixtureDef fixDef;

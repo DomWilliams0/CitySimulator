@@ -193,7 +193,6 @@ private:
 	};
 
 	boost::optional<SFMLDebugDraw> b2Renderer;
-	std::multimap<sf::Vector2i, sf::FloatRect> cellGrid;
 
 	void findCollidableTiles(std::vector<CollisionRect> &rects) const;
 
@@ -202,9 +201,6 @@ private:
 	void mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar);
 
 	BodyData *createBodyData(BlockType blockType, const sf::Vector2i &tilePos);
-
-	// todo unneeded?
-	bool getRectAt(const sf::Vector2i &tilePos, sf::FloatRect &ret);
 };
 
 
