@@ -21,6 +21,15 @@ protected:
 	}
 };
 
+TEST_F(SimpleWorldTest, WorldService)
+{
+	WorldService *ws = Locator::locate<WorldService>(false);
+	ASSERT_NE(ws, nullptr);
+
+	EXPECT_EQ(ws->getMainWorld(), world);
+	EXPECT_EQ(ws->getWorld(world->getID()), world);
+}
+
 TEST_F(SimpleWorldTest, Size)
 {
 	auto realSize = sf::Vector2i(6, 6);
