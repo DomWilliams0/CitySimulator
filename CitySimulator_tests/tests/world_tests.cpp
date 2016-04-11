@@ -65,3 +65,15 @@ TEST_F(SimpleWorldTest, CollisionBoxes)
 	// 3 trees
 	EXPECT_EQ(count, 10);
 }
+
+TEST_F(SimpleWorldTest, BlockSetting)
+{
+	WorldTerrain *terrain = world->getTerrain();
+	ASSERT_NE(terrain, nullptr);
+
+	EXPECT_EQ(terrain->getBlockType({0, 0}), BLOCK_GRASS);
+	EXPECT_ANY_THROW(terrain->getBlockType({500, 0}));
+
+	terrain->setBlockType({0, 0}, BLOCK_SAND);
+	EXPECT_EQ(terrain->getBlockType({0, 0}), BLOCK_SAND);
+}

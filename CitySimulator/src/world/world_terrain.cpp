@@ -152,6 +152,11 @@ void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, La
 	blockTypes[getBlockIndex(pos, layer)] = blockType;
 }
 
+BlockType WorldTerrain::getBlockType(const sf::Vector2i &tile, LayerType layer)
+{
+	return blockTypes.at(getBlockIndex(tile, layer));
+}
+
 void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, float rotationAngle, int flipGID)
 {
 	std::vector<sf::Vertex> quad(4);

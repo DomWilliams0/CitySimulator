@@ -27,7 +27,7 @@ void Building::discoverWindows()
 		for (int y = bounds.top; y <= bounds.top + bounds.height; ++y)
 		{
 			sf::Vector2i tile(x, y);
-			BlockType b = outsideWorld->getBlockAt(tile, LAYER_OVERTERRAIN);
+			BlockType b = outsideWorld->getTerrain()->getBlockType(tile, LAYER_OVERTERRAIN);
 
 			if (b == BLOCK_BUILDING_WINDOW_OFF || b == BLOCK_BUILDING_WINDOW_ON)
 			{

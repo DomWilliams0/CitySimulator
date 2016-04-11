@@ -215,6 +215,9 @@ public:
 	void setBlockType(const sf::Vector2i &pos, BlockType blockType, 
 			LayerType layer = LAYER_TERRAIN, int rotationAngle = 0, int flipGID = 0);
 
+
+	BlockType getBlockType(const sf::Vector2i &tile, LayerType layer = LAYER_TERRAIN);
+
 	void addObject(const sf::Vector2f &pos, BlockType blockType, 
 			float rotationAngle, int flipGID);
 
@@ -320,8 +323,6 @@ public:
 	sf::Transform getTransform() const;
 
 	void tick(float delta);
-
-	BlockType getBlockAt(const sf::Vector2i &tile, LayerType layer = LAYER_TERRAIN);
 
 	WorldID getID() const;
 

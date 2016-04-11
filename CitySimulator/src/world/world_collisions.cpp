@@ -20,7 +20,8 @@ void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 	{
 		for (auto x = 0; x < worldTileSize.x; ++x)
 		{
-			BlockType bt = container->getBlockAt({x, y}, LAYER_TERRAIN); // the only collidable tile layer
+			// the only collidable tile layer
+			BlockType bt = container->getTerrain()->getBlockType({x, y}, LAYER_TERRAIN); 
 			bool collide = isCollidable(bt);
 			bool interact = isInteractable(bt);
 

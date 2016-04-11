@@ -108,12 +108,6 @@ sf::Transform World::getTransform() const
 	return transform;
 }
 
-BlockType World::getBlockAt(const sf::Vector2i &tile, LayerType layer)
-{
-	int index = terrain->getBlockIndex(tile, layer);
-	return terrain->blockTypes[index];
-}
-
 WorldID World::getID() const
 {
 	return id;
