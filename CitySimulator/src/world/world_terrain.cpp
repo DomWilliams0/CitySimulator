@@ -35,12 +35,12 @@ LayerType layerTypeFromString(const std::string &s)
 	return LAYER_UNKNOWN;
 }
 
-bool isTileLayer(const LayerType &layerType)
+bool isTileLayer(LayerType layerType)
 {
 	return layerType == LAYER_UNDERTERRAIN || layerType == LAYER_TERRAIN || layerType == LAYER_OVERTERRAIN;
 }
 
-bool isOverLayer(const LayerType &layerType)
+bool isOverLayer(LayerType layerType)
 {
 	return layerType == LAYER_OVERTERRAIN;
 }
@@ -116,7 +116,7 @@ void WorldTerrain::positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, i
 }
 
 
-sf::VertexArray &WorldTerrain::getVertices(const LayerType &layerType)
+sf::VertexArray &WorldTerrain::getVertices(LayerType layerType)
 {
 	return isOverLayer(layerType) ? overLayerVertices : tileVertices;
 }

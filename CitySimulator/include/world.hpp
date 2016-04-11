@@ -61,9 +61,9 @@ enum LayerType
 
 LayerType layerTypeFromString(const std::string &s);
 
-bool isTileLayer(const LayerType &layerType);
+bool isTileLayer(LayerType layerType);
 
-bool isOverLayer(const LayerType &layerType);
+bool isOverLayer(LayerType layerType);
 
 /**
  * The tileset for the world
@@ -143,7 +143,7 @@ struct WorldLayer
 	LayerType type;
 	int depth;
 
-	WorldLayer(const LayerType &type, int depth) : type(type), depth(depth)
+	WorldLayer(LayerType type, int depth) : type(type), depth(depth)
 	{
 	}
 };
@@ -265,7 +265,7 @@ private:
 
 	void positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
 
-	sf::VertexArray &getVertices(const LayerType &layerType);
+	sf::VertexArray &getVertices(LayerType layerType);
 
 	CollisionMap *getCollisionMap();
 
