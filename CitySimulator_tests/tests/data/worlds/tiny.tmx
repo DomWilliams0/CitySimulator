@@ -3,33 +3,23 @@
  <properties>
   <property name="type" value="outside"/>
  </properties>
- <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="100">
-  <image source="test_tileset.png" width="160" height="160"/>
+ <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="100" columns="10">
+  <image source="../test_tileset.png" width="160" height="160"/>
  </tileset>
- <layer name="underterrain" width="6" height="6">
-  <data encoding="csv">
-0,0,0,0,3,0,
-0,0,3,3,3,0,
-0,0,3,0,2,0,
-0,0,0,0,0,0,
-0,0,0,0,0,0,
-0,0,0,0,0,0
-</data>
- </layer>
  <layer name="terrain" width="6" height="6">
   <data encoding="csv">
-2,2,2,2,3,3,
-3,3,0,0,0,3,
-2,3,16,11,2147483664,2,
+2,2,2,7,7,7,
+3,3,3,7,7,7,
+2,3,3,7,7,7,
 2,3,2,2,6,6,
 2,2,2,2,6,7,
-2,2,2,6,6,7
+2,2,2,7,7,7
 </data>
  </layer>
  <layer name="overterrain" width="6" height="6">
   <data encoding="csv">
-0,0,17,15,2147483665,0,
-0,0,16,13,2147483664,0,
+0,0,0,0,0,0,
+0,0,0,0,0,0,
 0,0,0,0,0,0,
 0,0,0,0,0,0,
 0,0,0,0,0,0,

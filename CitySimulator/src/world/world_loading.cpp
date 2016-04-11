@@ -206,7 +206,7 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 	// load tmx
 	auto path = getWorldFilePath(name, isBuilding);
 	loadedWorld.tmx.load(path);
-	loadedWorld.world = new World(worldID, path, !isBuilding); // todo dont use heap
+	loadedWorld.world = new World(worldID, name, !isBuilding); // todo dont use heap
 
 	// load terrain if first time for this world name
 	auto cachedTerrain = terrainCache.find(name);

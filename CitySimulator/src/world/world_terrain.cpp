@@ -154,8 +154,6 @@ void WorldTerrain::setBlockType(const sf::Vector2i &pos, BlockType blockType, La
 
 void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, float rotationAngle, int flipGID)
 {
-	// TODO: simply append object vertices to world vertices; remember order of objects so vertices can be referenced in the future
-
 	std::vector<sf::Vertex> quad(4);
 	sf::Vector2f adjustedPos = sf::Vector2f(pos.x / Constants::tilesetResolution,
 	                                        (pos.y - Constants::tilesetResolution) / Constants::tilesetResolution);
@@ -173,9 +171,14 @@ void WorldTerrain::addObject(const sf::Vector2f &pos, BlockType blockType, float
 	objects.emplace_back(blockType, rotationAngle, Utils::toTile(pos));
 }
 
-const std::vector<WorldObject> &WorldTerrain::getObjects()
+const std::vector<WorldObject> &WorldTerrain::getObjects() const
 {
 	return objects;
+}
+
+const std::map<LayerType, int> &WorldTerrain::getLayerDepths() const
+{
+	return layerDepths;
 }
 
 void WorldTerrain::discoverLayers(std::vector<TMX::Layer> &tmxLayers)

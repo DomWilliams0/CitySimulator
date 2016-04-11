@@ -222,7 +222,9 @@ public:
 	void addObject(const sf::Vector2f &pos, BlockType blockType, 
 			float rotationAngle, int flipGID);
 
-	const std::vector<WorldObject> &getObjects();
+	const std::vector<WorldObject> &getObjects() const;
+
+	const std::map<LayerType, int> &getLayerDepths() const;
 
 	/**
 	 * Discovers layers and which tile types require rotating
