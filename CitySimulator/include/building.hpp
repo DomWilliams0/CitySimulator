@@ -48,9 +48,13 @@ public:
 	 */
 	void addDoor(const Location &location);
 
-	bool isWindowLightOn(WindowID window);
-
 	void setWindowLight(WindowID window, bool isNowLit);
+
+	bool isWindowLightOn(WindowID window) const;
+
+	std::size_t getWindowCount() const;
+
+	std::size_t getDoorCount() const;
 
 	BuildingID getID() const;
 

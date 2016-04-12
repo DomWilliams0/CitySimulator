@@ -1,6 +1,7 @@
 #include "test_helpers.hpp"
 #include "world.hpp"
 
+#define MAX_BUILDING_ID 50
 #define DECLARE_WORLD_TEST(fixtureName, worldName) \
 class fixtureName : public ::testing::Test\
 {\
@@ -26,6 +27,7 @@ protected:\
 
 DECLARE_WORLD_TEST(SimpleWorldTest, "tiny")
 DECLARE_WORLD_TEST(ConnectionLookupTest, "hub")
+DECLARE_WORLD_TEST(BuildingMapTest, "buildings")
 
 TEST_F(SimpleWorldTest, WorldService)
 {
@@ -170,4 +172,57 @@ TEST_F(ConnectionLookupTest, ConnectionLookup)
 	EXPECT_NO_THROW(testWorldConnections(2, "single-test", {"hub", "none-test"}));
 	EXPECT_NO_THROW(testWorldConnections(3, "multiple-test", 
 				{"hub", "single-test", "none-test", "none-double-test", "none-double-test"}));
+}
+
+BuildingID findFirstBuilding(BuildingMap &bm, BuildingID max)
+{
+	for (int id = 0; id <= max; ++id)
+		if (bm.getBuildingByID(id) != nullptr)
+			return id;
+
+	error("No buildings found with an ID less than %1%", _str(max));
+	return 0;
+}
+
+TEST_F(BuildingMapTest, BuildingDiscovery)
+{
+	BuildingID firstID = findFirstBuilding(world->getBuildingMap(), MAX_BUILDING_ID);
+
+	Building *first = world->getBuildingMap().getBuildingByID(firstID);
+	ASSERT_NE(first, nullptr);
+	EXPECT_EQ(first->getID(), firstID);
+	EXPECT_EQ(first->getInsideWorldName(), "none-double-test");
+	EXPECT_EQ(first->getDoorCount(), 2);
+
+	Building *second = world->getBuildingMap().getBuildingByID(firstID + 1);
+	ASSERT_NE(second, nullptr);
+	EXPECT_EQ(second->getID(), firstID + 1);
+	EXPECT_EQ(second->getInsideWorldName(), "none-test");
+	EXPECT_EQ(second->getDoorCount(), 1);
+
+	// no more
+	EXPECT_EQ(world->getBuildingMap().getBuildingByID(firstID + 2), nullptr);
+}
+
+int countLitWindows(Building *building)
+{
+	int count = 0;
+	for (WindowID id = 0; id < building->getWindowCount(); ++id)
+		if (building->isWindowLightOn(id))
+			count++;
+
+	return count;
+}
+
+TEST_F(BuildingMapTest, WindowDiscovery)
+{
+	Building *first = world->getBuildingMap().getBuildingByID(
+			findFirstBuilding(world->getBuildingMap(), MAX_BUILDING_ID));
+	Building *second = world->getBuildingMap().getBuildingByID(first->getID() + 1);
+
+	EXPECT_EQ(first->getWindowCount(), 18);
+	EXPECT_EQ(second->getWindowCount(), 8);
+
+	EXPECT_EQ(countLitWindows(first), 3);
+	EXPECT_EQ(countLitWindows(second), 1);
 }

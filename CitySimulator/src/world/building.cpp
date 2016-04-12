@@ -17,6 +17,8 @@ Building::Building(const sf::IntRect &tileBounds, BuildingID id,
 		WorldID badID = this->insideWorld == nullptr ? insideWorld : outsideWorld;
 		error("Building world ID %1% has not been loaded", _str(badID));
 	}
+
+	insideWorldName = this->insideWorld->getName();
 }
 
 void Building::discoverWindows()
@@ -42,31 +44,6 @@ void Building::discoverWindows()
 				_str(windows.size()), _str(this->id)));
 }
 
-bool Building::isWindowLightOn(WindowID window)
-{
-	auto it = windows.find(window);
-	if (it == windows.end())
-		return false;
-
-	return it->second.status;
-}
-
-
-void Building::setWindowLight(WindowID windowID, bool isNowLit)
-{
-	auto window = windows.find(windowID);
-	if (window == windows.end())
-	{
-		Logger::logWarning(format("Window ID %d not found", _str(windowID)));
-		return;
-	}
-
-	window->second.status = isNowLit;
-
-	BlockType newBlock = isNowLit ? BLOCK_BUILDING_WINDOW_ON : BLOCK_BUILDING_WINDOW_OFF;
-	outsideWorld->getTerrain()->setBlockType(window->second.location, newBlock, LAYER_OVERTERRAIN);
-}
-
 void Building::addDoor(const Location &location)
 {
 	static DoorID lastDoorID = 0;
@@ -84,12 +61,44 @@ void Building::addDoor(const Location &location)
 	door.location = location;
 }
 
+void Building::setWindowLight(WindowID windowID, bool isNowLit)
+{
+	auto window = windows.find(windowID);
+	if (window == windows.end())
+	{
+		Logger::logWarning(format("Window ID %d not found", _str(windowID)));
+		return;
+	}
+
+	window->second.status = isNowLit;
+
+	BlockType newBlock = isNowLit ? BLOCK_BUILDING_WINDOW_ON : BLOCK_BUILDING_WINDOW_OFF;
+	outsideWorld->getTerrain()->setBlockType(window->second.location, newBlock, LAYER_OVERTERRAIN);
+}
+
+bool Building::isWindowLightOn(WindowID window) const
+{
+	auto it = windows.find(window);
+	if (it == windows.end())
+		return false;
+
+	return it->second.status;
+}
+
+std::size_t Building::getWindowCount() const
+{
+	return windows.size();
+}
+
+std::size_t Building::getDoorCount() const
+{
+	return doors.size();
+}
 
 BuildingID Building::getID() const
 {
 	return id;
 }
-
 
 std::string Building::getInsideWorldName() const
 {
