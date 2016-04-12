@@ -46,7 +46,7 @@ public:
 	 * Adds a door to the building at the given location
 	 * This must be in either the outside or inside world
 	 */
-	void addDoor(const Location &location);
+	void addDoor(const Location &location, DoorID id);
 
 	void setWindowLight(WindowID window, bool isNowLit);
 
@@ -59,6 +59,10 @@ public:
 	BuildingID getID() const;
 
 	std::string getInsideWorldName() const;
+
+	World *getOutsideWorld() const;
+
+	World *getInsideWorld() const;
 
 private:
 	BuildingID id;

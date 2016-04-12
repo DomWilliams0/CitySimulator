@@ -32,8 +32,12 @@ void WorldService::onEnable()
 
 	// transfer buildings
 	BuildingMap &bm = getMainWorld()->getBuildingMap();
-	for (auto &building : loader.buildings)
-		bm.addBuilding(building.bounds, building.insideWorldID);
+	for (WorldLoader::LoadedBuilding &building : loader.buildings)
+	{
+		Building &b = bm.addBuilding(building.bounds, building.insideWorldID);
+		for (WorldLoader::LoadedDoor &door : building.doors)
+			b.addDoor(Location(b.getOutsideWorld()->getID(), door.tile), door.doorID);
+	}
 
 	Logger::popIndent();
 }

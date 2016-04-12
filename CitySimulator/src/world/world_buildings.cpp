@@ -1,7 +1,7 @@
 #include "world.hpp"
 
 
-void BuildingMap::addBuilding(const sf::IntRect &bounds, WorldID insideWorld)
+Building &BuildingMap::addBuilding(const sf::IntRect &bounds, WorldID insideWorld)
 {
 	static BuildingID lastID = 0;
 
@@ -14,6 +14,7 @@ void BuildingMap::addBuilding(const sf::IntRect &bounds, WorldID insideWorld)
 				).first->second;
 
 	b.discoverWindows();
+	return b;
 }
 
 

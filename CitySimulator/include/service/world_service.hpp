@@ -40,13 +40,6 @@ private:
 
 	struct WorldLoader
 	{
-		struct LoadedBuilding
-		{
-			WorldID insideWorldID;
-			std::string insideWorldName;
-			sf::IntRect bounds;
-		};
-
 		enum DoorTag
 		{
 
@@ -82,6 +75,14 @@ private:
 			std::string worldName;
 			std::string worldShare;
 			WorldID worldID;
+		};
+
+		struct LoadedBuilding
+		{
+			WorldID insideWorldID;
+			std::string insideWorldName;
+			sf::IntRect bounds;
+			std::vector<LoadedDoor> doors;
 		};
 
 		struct LoadedWorld

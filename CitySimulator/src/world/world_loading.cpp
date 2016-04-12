@@ -49,6 +49,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName)
 
 		door.doorTag = DOORTAG_WORLD_ID;
 		door.worldID = owningBuilding->insideWorldID;
+		owningBuilding->doors.push_back(door);
 	}
 
   	std::set<WorldID> visitedWorlds;

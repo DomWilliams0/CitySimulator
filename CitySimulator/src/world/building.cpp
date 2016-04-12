@@ -44,9 +44,9 @@ void Building::discoverWindows()
 				_str(windows.size()), _str(this->id)));
 }
 
-void Building::addDoor(const Location &location)
+void Building::addDoor(const Location &location, DoorID id)
 {
-	static DoorID lastDoorID = 0;
+	/* static DoorID lastDoorID = 0; */
 
 	if (location.world != insideWorld->getID() && 
 			location.world != outsideWorld->getID())
@@ -57,7 +57,7 @@ void Building::addDoor(const Location &location)
 		return;
 	}
 
-	Door &door = doors.emplace(lastDoorID++, Door{}).first->second;
+	Door &door = doors.emplace(id, Door{}).first->second;
 	door.location = location;
 }
 
@@ -105,3 +105,12 @@ std::string Building::getInsideWorldName() const
 	return insideWorldName;
 }
 
+World *Building::getOutsideWorld() const
+{
+	return outsideWorld;
+}
+
+World *Building::getInsideWorld() const
+{
+	return insideWorld;
+}

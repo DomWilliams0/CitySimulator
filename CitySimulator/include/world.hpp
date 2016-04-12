@@ -293,7 +293,7 @@ public:
 	{
 	}
 
-	void addBuilding(const sf::IntRect &bounds, WorldID insideWorld);
+	Building &addBuilding(const sf::IntRect &bounds, WorldID insideWorld);
 
 	Building *getBuildingByID(BuildingID id);
 
