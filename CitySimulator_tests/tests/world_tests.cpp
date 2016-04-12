@@ -37,7 +37,6 @@ TEST_F(SimpleWorldTest, Size)
 	EXPECT_EQ(world->getPixelSize(), Utils::toPixel(realSize));
 }
 
-
 TEST_F(SimpleWorldTest, Properties)
 {
 	EXPECT_EQ(world->getName(), "tiny");	
@@ -85,4 +84,82 @@ TEST_F(SimpleWorldTest, BlockSetting)
 
 	terrain->setBlockType({0, 0}, BLOCK_SAND);
 	EXPECT_EQ(terrain->getBlockType({0, 0}), BLOCK_SAND);
+}
+
+/**
+ * Ensures that every connection found in the source world points to a single
+ * world in the given list. If any connections to worlds that aren't in the given
+ * list are found, or any expected connections are not found, an exception is
+ * thrown
+ */
+void testWorldConnections(WorldID src, const std::string &expectedWorldName,
+		std::vector<std::string> expectedConnections)
+{
+	WorldService *ws = Locator::locate<WorldService>();
+	ASSERT_NE(ws, nullptr);
+
+	World *srcWorld = ws->getWorld(src);
+	ASSERT_NE(srcWorld, nullptr);
+	if (srcWorld->getName() != expectedWorldName)
+		error("World ID %1%'s name is not '%2%' as expected, but '%3%'", 
+				_str(srcWorld->getID()), expectedWorldName, srcWorld->getName());
+
+	sf::Vector2i size = srcWorld->getTileSize();
+	for (int x = 0; x < size.x; ++x)
+	{
+		for (int y = 0; y < size.y; ++y)
+		{
+			// get connection
+			Location out;
+			if (!ws->getConnectionDestination(Location(srcWorld->getID(), x, y), out))
+				continue;
+
+			// get world from connection
+			World *dstWorld = ws->getWorld(out.world);
+			ASSERT_NE(dstWorld, nullptr);
+
+			auto index = std::find(expectedConnections.cbegin(),
+					expectedConnections.cend(), dstWorld->getName());
+			if (index == expectedConnections.cend())
+			{
+				std::stringstream ss;
+				ss << "Unexpected connection from world " << srcWorld->getID() << " to " <<
+					out.world << " (coordinates " << x << ", " << y << " to " << 
+					out.x << ", " << out.y << ")" << std::endl;
+
+				throw std::runtime_error(ss.str());
+			}
+			expectedConnections.erase(index);
+		}
+	}
+
+	if (!expectedConnections.empty())
+		error("%1% expected connections from world %2% not found: ",
+				_str(expectedConnections.size()), _str(srcWorld->getID()));
+}
+
+TEST(WorldLoadTest, ConnectionLookup)
+{
+	WorldService *ws = new WorldService("hub", "data/test_tileset.png");
+	EXPECT_NO_THROW(Locator::provide(SERVICE_WORLD, ws));
+
+	Location out;
+	EXPECT_TRUE(ws->getConnectionDestination({0, 1, 3}, out));
+	EXPECT_EQ(out, Location(1, 1, 5));
+
+	EXPECT_THROW(testWorldConnections(0, "hub", {}), std::runtime_error);
+	EXPECT_THROW(testWorldConnections(0, "hub", {"none-test"}), std::runtime_error);
+	EXPECT_THROW(testWorldConnections(0, "hub", {"none-test", "single-test", "multiple-test", "extra"}),
+			std::runtime_error);
+
+	EXPECT_NO_THROW(testWorldConnections(0, "hub", {"none-test", "single-test", "multiple-test"}));
+	EXPECT_NO_THROW(testWorldConnections(0, "hub", {"single-test", "multiple-test", "none-test"}));
+	EXPECT_NO_THROW(testWorldConnections(0, "hub", {"multiple-test", "none-test", "single-test"}));
+	EXPECT_THROW(testWorldConnections(0, "uh oh", {"none-test", "single-test", "multiple-test"}),
+			std::runtime_error);
+
+	EXPECT_NO_THROW(testWorldConnections(1, "none-test", {"hub"}));
+	EXPECT_NO_THROW(testWorldConnections(2, "single-test", {"hub", "none-test"}));
+	EXPECT_NO_THROW(testWorldConnections(3, "multiple-test", 
+				{"hub", "single-test", "none-test", "none-double-test", "none-double-test"}));
 }

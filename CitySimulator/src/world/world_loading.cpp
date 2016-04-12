@@ -71,6 +71,12 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world,
       	return;
   	visitedWorlds.insert(world.world->getID());
 
+	std::sort(world.doors.begin(), world.doors.end(), 
+			[] (const LoadedDoor &a, const LoadedDoor &b)
+			{
+				return a.doorTag != DOORTAG_WORLD_SHARE;
+			});
+
 	// iterate all doors found in last world
 	for (LoadedDoor &door : world.doors)
 	{
@@ -207,6 +213,7 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 	auto path = getWorldFilePath(name, isBuilding);
 	loadedWorld.tmx.load(path);
 	loadedWorld.world = new World(worldID, name, !isBuilding); // todo dont use heap
+	Logger::logDebuggier(format("World %1% is '%2%'", _str(worldID), name));
 
 	// load terrain if first time for this world name
 	auto cachedTerrain = terrainCache.find(name);

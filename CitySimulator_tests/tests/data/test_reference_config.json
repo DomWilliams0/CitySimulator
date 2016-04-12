@@ -56,7 +56,8 @@
         "root": "data",
         "world": {
             "root": "worlds",
-            "tileset": "tileset.png"
+            "tileset": "tileset.png",
+            "buildings": ""
         },
         "entities": {
             "root": "",

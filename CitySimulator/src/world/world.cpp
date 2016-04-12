@@ -28,8 +28,6 @@ void WorldService::onEnable()
 	{
 		World *world = lwPair.second.world;
 		worlds[world->getID()] = world;
-
-		world->getCollisionMap()->load();
 	}
 
 	// transfer buildings
@@ -57,6 +55,16 @@ World *WorldService::getWorld(WorldID id)
 {
 	auto world = worlds.find(id);
 	return world == worlds.end() ? nullptr : world->second;
+}
+
+bool WorldService::getConnectionDestination(const Location &src, Location &out)
+{
+	auto dst = connectionLookup.find(src);
+	if (dst == connectionLookup.end())
+		return false;
+
+	out = dst->second;
+	return true;
 }
 
 World::World(WorldID id, const std::string &name, bool outside) 

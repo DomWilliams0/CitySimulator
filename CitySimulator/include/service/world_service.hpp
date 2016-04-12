@@ -21,6 +21,13 @@ public:
 
 	World *getWorld(WorldID id);
 
+	/**
+	  * Gets the location paired with the given source location
+	  * @return If true, the destination is stored in our, 
+	  *         otherwise false if no connection was found
+	  */
+	bool getConnectionDestination(const Location &src, Location &out);
+
 private:
 	typedef TreeNode<World> WorldTreeNode;
 

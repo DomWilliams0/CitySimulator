@@ -287,6 +287,7 @@ void WorldTerrain::applyTiles(Tileset &tileset)
 	}
 
 	tmx = nullptr;
+	collisionMap.load();
 }
 
 void WorldTerrain::render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const
