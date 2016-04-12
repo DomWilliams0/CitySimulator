@@ -1,29 +1,34 @@
 #include "test_helpers.hpp"
 #include "world.hpp"
 
-class SimpleWorldTest : public ::testing::Test
-{
-protected:
-	World *world;
+#define DECLARE_WORLD_TEST(fixtureName, worldName) \
+class fixtureName : public ::testing::Test\
+{\
+protected:\
+	WorldService *ws;\
+	World *world;\
+\
+	virtual void SetUp() override\
+	{\
+		Locator::provide(SERVICE_RENDER, new RenderService(nullptr));\
+		Locator::provide(SERVICE_CONFIG,\
+		                 new ConfigService(DATA_ROOT, "test_reference_config.json", "test_config.json"));\
+\
+		ws = new WorldService(worldName, "data/test_tileset.png");\
+		Locator::provide(SERVICE_WORLD, ws);\
+		world = Locator::locate<WorldService>()->getMainWorld();\
+	}\
+\
+	virtual void TearDown() override\
+	{\
+	}\
+};\
 
-	virtual void SetUp() override
-	{
-		Locator::provide(SERVICE_RENDER, new RenderService(nullptr));
-		Locator::provide(SERVICE_CONFIG,
-		                 new ConfigService(DATA_ROOT, "test_reference_config.json", "test_config.json"));
-
-		Locator::provide(SERVICE_WORLD, new WorldService("tiny", "data/test_tileset.png"));
-		world = Locator::locate<WorldService>()->getMainWorld();
-	}
-
-	virtual void TearDown() override
-	{
-	}
-};
+DECLARE_WORLD_TEST(SimpleWorldTest, "tiny")
+DECLARE_WORLD_TEST(ConnectionLookupTest, "hub")
 
 TEST_F(SimpleWorldTest, WorldService)
 {
-	WorldService *ws = Locator::locate<WorldService>(false);
 	ASSERT_NE(ws, nullptr);
 
 	EXPECT_EQ(ws->getMainWorld(), world);
@@ -138,26 +143,29 @@ void testWorldConnections(WorldID src, const std::string &expectedWorldName,
 				_str(expectedConnections.size()), _str(srcWorld->getID()));
 }
 
-TEST(WorldLoadTest, ConnectionLookup)
+TEST_F(ConnectionLookupTest, ConnectionLookupTesterTest)
 {
-	WorldService *ws = new WorldService("hub", "data/test_tileset.png");
-	EXPECT_NO_THROW(Locator::provide(SERVICE_WORLD, ws));
-
-	Location out;
-	EXPECT_TRUE(ws->getConnectionDestination({0, 1, 3}, out));
-	EXPECT_EQ(out, Location(1, 1, 5));
-
+	// incorrect set
 	EXPECT_THROW(testWorldConnections(0, "hub", {}), std::runtime_error);
 	EXPECT_THROW(testWorldConnections(0, "hub", {"none-test"}), std::runtime_error);
 	EXPECT_THROW(testWorldConnections(0, "hub", {"none-test", "single-test", "multiple-test", "extra"}),
 			std::runtime_error);
 
+	// order doesn't matter
 	EXPECT_NO_THROW(testWorldConnections(0, "hub", {"none-test", "single-test", "multiple-test"}));
 	EXPECT_NO_THROW(testWorldConnections(0, "hub", {"single-test", "multiple-test", "none-test"}));
 	EXPECT_NO_THROW(testWorldConnections(0, "hub", {"multiple-test", "none-test", "single-test"}));
 	EXPECT_THROW(testWorldConnections(0, "uh oh", {"none-test", "single-test", "multiple-test"}),
 			std::runtime_error);
+}
 
+TEST_F(ConnectionLookupTest, ConnectionLookup)
+{
+	Location out;
+	EXPECT_TRUE(ws->getConnectionDestination({0, 1, 3}, out));
+	EXPECT_EQ(out, Location(1, 1, 5));
+
+	// 0 tested in tester test
 	EXPECT_NO_THROW(testWorldConnections(1, "none-test", {"hub"}));
 	EXPECT_NO_THROW(testWorldConnections(2, "single-test", {"hub", "none-test"}));
 	EXPECT_NO_THROW(testWorldConnections(3, "multiple-test", 
