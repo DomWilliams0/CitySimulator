@@ -1,138 +1,122 @@
 #include "world.hpp"
-#include "bodydata.hpp"
 #include "service/locator.hpp"
 
-WorldService::WorldService(const std::string &worldPath, const std::string &tilesetPath)
-		: worldPath(worldPath), tilesetPath(tilesetPath)
+WorldService::WorldService(const std::string &mainWorldPath, const std::string &tilesetPath)
+		: mainWorldName(mainWorldPath), tileset(tilesetPath)
 {
 }
 
 void WorldService::onEnable()
 {
-	std::vector<std::string> worldsToLoad;
-	world.loadFromFile(worldPath, tilesetPath, worldsToLoad);
-	// todo clear worldsToLoad and keep loading until it's empty
+	Logger::logDebug("Starting to load worlds");
+	Logger::pushIndent();
+	
+	// load and connect all worlds
+	WorldLoader loader(connectionLookup, terrainCache);
+	loader.loadWorlds(mainWorldName);
+
+	// generate tileset
+	tileset.load();
+	tileset.convertToTexture(loader.flippedTileGIDs);
+
+	// load terrain
+	for (auto &pair : terrainCache)
+		pair.second.applyTiles(tileset);
+
+	// transfer loaded worlds
+	for (auto &lwPair : loader.loadedWorlds)
+	{
+		World *world = lwPair.second.world;
+		worlds[world->getID()] = world;
+	}
+
+	// transfer buildings
+	BuildingMap &bm = getMainWorld()->getBuildingMap();
+	for (WorldLoader::LoadedBuilding &building : loader.buildings)
+	{
+		Building &b = bm.addBuilding(building.bounds, building.insideWorldID);
+		for (WorldLoader::LoadedDoor &door : building.doors)
+			b.addDoor(Location(b.getOutsideWorld()->getID(), door.tile), door.doorID);
+	}
+
+	// load collisions
+	for (auto &pair : terrainCache)
+		pair.second.loadBlockData();
+
+	Logger::popIndent();
 }
 
 void WorldService::onDisable()
 {
+	Logger::logDebug("Deleting all loaded worlds");
+	for (auto &pair : worlds)
+		delete pair.second;
 }
 
 
-World &WorldService::getWorld()
+World *WorldService::getMainWorld()
 {
-	return world;
+	return getWorld(0);
 }
 
-bool isCollidable(BlockType blockType)
+World *WorldService::getWorld(WorldID id)
 {
-	static const std::set<BlockType> collidables(
-			{BLOCK_WATER, BLOCK_TREE, BLOCK_BUILDING_WALL, BLOCK_BUILDING_EDGE, BLOCK_BUILDING_ROOF,
-			 BLOCK_BUILDING_ROOF_CORNER});
-	return collidables.find(blockType) != collidables.end();
+	auto world = worlds.find(id);
+	return world == worlds.end() ? nullptr : world->second;
 }
 
-bool isInteractable(BlockType blockType)
+bool WorldService::getConnectionDestination(const Location &src, Location &out)
 {
-	static const std::set<BlockType> interactables(
-			{BLOCK_SLIDING_DOOR});
-	return interactables.find(blockType) != interactables.end();
+	auto dst = connectionLookup.find(src);
+	if (dst == connectionLookup.end())
+		return false;
+
+	out = dst->second;
+	return true;
 }
 
-LayerType layerTypeFromString(const std::string &s)
-{
-	if (s == "underterrain")
-		return LAYER_UNDERTERRAIN;
-	if (s == "terrain")
-		return LAYER_TERRAIN;
-	if (s == "overterrain")
-		return LAYER_OVERTERRAIN;
-	if (s == "objects")
-		return LAYER_OBJECTS;
-	if (s == "collisions")
-		return LAYER_COLLISIONS;
-	if (s == "buildings")
-		return LAYER_BUILDINGS;
-
-	Logger::logWarning("Unknown LayerType: " + s);
-	return LAYER_UNKNOWN;
-}
-
-bool isTileLayer(const LayerType &layerType)
-{
-	return layerType == LAYER_UNDERTERRAIN || layerType == LAYER_TERRAIN || layerType == LAYER_OVERTERRAIN;
-}
-
-bool isOverLayer(const LayerType &layerType)
-{
-	return layerType == LAYER_OVERTERRAIN;
-}
-
-World::World() : terrain(this), collisionMap(this), buildingMap(this)
+World::World(WorldID id, const std::string &name, bool outside) 
+: id(id), name(name), outside(outside)
 {
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
+
+	if (outside)
+		buildingMap.reset(this);
 }
 
-void World::loadFromFile(const std::string &filename,
-						 const std::string &tileset, std::vector<std::string> &worldsToLoad)
+void World::setTerrain(WorldTerrain &terrain)
 {
-	Logger::logDebug(format("Began loading world %1%", filename));
-	Logger::pushIndent();
-
-	std::string path(Utils::joinPaths(Config::getResource("world.root"), filename));
-	TMX::TileMap *tmx = TMX::TileMap::load(path);
-
-	// failure
-	if (tmx == nullptr)
-		throw std::runtime_error("Could not load world from null TileMap");
-
-	sf::Vector2i size(tmx->width, tmx->height);
-	resize(size);
-
-	// terrain
-	terrain.load(tmx, tileset);
-	buildingMap.load(*tmx, worldsToLoad);
-	collisionMap.load();
-
-	Logger::popIndent();
-	Logger::logInfo(format("Loaded world %1%", filename));
-	delete tmx;
+	this->terrain = &terrain;
 }
 
-void World::resize(sf::Vector2i size)
-{
-	tileSize = size;
-	pixelSize = Utils::toPixel(size);
-}
-
-WorldTerrain &World::getTerrain()
+WorldTerrain *World::getTerrain()
 {
 	return terrain;
 }
 
-CollisionMap &World::getCollisionMap()
+CollisionMap *World::getCollisionMap()
 {
-	return collisionMap;
+	return terrain == nullptr ? nullptr : terrain->getCollisionMap();
 }
 
 BuildingMap &World::getBuildingMap()
 {
-	return buildingMap;
+	return *buildingMap;
 }
 
 b2World *World::getBox2DWorld()
 {
-	return &collisionMap.world;
+	return &getCollisionMap()->world;
 }
 
 sf::Vector2i World::getPixelSize() const
 {
-	return pixelSize;
+	return Utils::toPixel(getTileSize());
 }
 
 sf::Vector2i World::getTileSize() const
 {
-	return tileSize;
+	return terrain->size;
 }
 
 sf::Transform World::getTransform() const
@@ -140,15 +124,19 @@ sf::Transform World::getTransform() const
 	return transform;
 }
 
-BlockType World::getBlockAt(const sf::Vector2i &tile, LayerType layer)
+WorldID World::getID() const
 {
-	int index = terrain.getBlockIndex(tile, layer);
-	return terrain.blockTypes[index];
+	return id;
 }
 
-void World::getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::FloatRect> &ret)
+std::string World::getName() const
 {
-	return collisionMap.getSurroundingTiles(tilePos, ret);
+	return name;
+}
+
+bool World::isOutside() const
+{
+	return outside;
 }
 
 void World::tick(float delta)
@@ -157,17 +145,18 @@ void World::tick(float delta)
 	getBox2DWorld()->Step(delta, 6, 2);
 }
 
+// todo move to world_rendering
 void World::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
 	states.transform *= transform;
 
 	// terrain
-	terrain.render(target, states, false);
+	terrain->render(target, states, false);
 
 	// entities
 	Locator::locate<EntityService>()->renderSystems();
 
 	// overterrain
-	terrain.render(target, states, true);
+	terrain->render(target, states, true);
 
 }

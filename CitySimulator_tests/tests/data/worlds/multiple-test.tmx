@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="9" height="6" tilewidth="16" tileheight="16" nextobjectid="27">
+ <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="100" columns="10">
+  <image source="../test_tileset.png" width="160" height="160"/>
+ </tileset>
+ <layer name="underterrain" width="9" height="6">
+  <data encoding="csv">
+6,6,3,3,0,2,2,2,2,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,18,18,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer name="terrain" width="9" height="6">
+  <data encoding="csv">
+1073741843,3221225491,1073741843,3221225491,18,1073741843,3221225491,1073741843,3221225491,
+18,8,8,8,8,8,8,8,18,
+18,8,8,8,8,8,8,8,18,
+18,8,8,8,8,8,8,8,18,
+18,18,18,18,18,18,18,18,18,
+18,19,2147483667,18,18,18,18,18,18
+</data>
+ </layer>
+ <layer name="overterrain" width="9" height="6">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup name="buildings">
+  <object id="21" x="0" y="0" width="32" height="16">
+   <properties>
+    <property name="door-id" value="1"/>
+    <property name="door-world" value="single-test"/>
+   </properties>
+  </object>
+  <object id="23" x="16" y="80" width="32" height="16">
+   <properties>
+    <property name="door-id" value="-1"/>
+   </properties>
+  </object>
+  <object id="24" x="32" y="0" width="32" height="16">
+   <properties>
+    <property name="door-id" value="1"/>
+    <property name="door-world" value="none-test"/>
+   </properties>
+  </object>
+  <object id="25" x="112" y="0" width="32" height="16">
+   <properties>
+    <property name="door-id" value="2"/>
+    <property name="world-share" value="testy"/>
+   </properties>
+  </object>
+  <object id="26" x="80" y="0" width="32" height="16">
+   <properties>
+    <property name="door-id" value="1"/>
+    <property name="door-world" value="none-double-test"/>
+    <property name="world-share-source" value="testy"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

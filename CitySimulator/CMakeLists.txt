@@ -56,7 +56,9 @@ set(SOURCE_FILES
         src/world/world.cpp
         src/world/world_buildings.cpp
         src/world/world_collisions.cpp
+        src/world/world_loading.cpp
         src/world/world_rendering.cpp
+        src/world/world_terrain.cpp
         )
 
 # create as static library

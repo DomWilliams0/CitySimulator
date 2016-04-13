@@ -6,9 +6,10 @@
 #include <unordered_map>
 #include <set>
 #include <boost/optional.hpp>
+#include <bits/unordered_set.h>
+#include "building.hpp"
 #include "SFMLDebugDraw.h"
 #include "maploader.hpp"
-#include "building.hpp"
 #include "bodydata.hpp"
 
 class World;
@@ -60,9 +61,9 @@ enum LayerType
 
 LayerType layerTypeFromString(const std::string &s);
 
-bool isTileLayer(const LayerType &layerType);
+bool isTileLayer(LayerType layerType);
 
-bool isOverLayer(const LayerType &layerType);
+bool isOverLayer(LayerType layerType);
 
 /**
  * The tileset for the world
@@ -70,11 +71,9 @@ bool isOverLayer(const LayerType &layerType);
 class Tileset
 {
 public:
-	Tileset();
+	Tileset(const std::string &path);
 
-	~Tileset();
-
-	void load(const std::string &path);
+	void load();
 
 	void textureQuad(sf::Vertex *quad, const BlockType &blockType, int rotationAngle, int flipGID);
 
@@ -84,20 +83,16 @@ public:
 
 	sf::Vector2u getSize() const;
 
-	void convertToTexture(const std::vector<int> &flippedGIDs);
+	void convertToTexture(const std::unordered_set<int> &flippedGIDs);
 
 	sf::IntRect getTileRect(unsigned blockType);
-
-	void createTileImage(sf::Image *image, unsigned blockType);
-
-protected:
-	friend class WorldTerrain;
 
 private:
 	sf::Image *image;
 	sf::Texture texture;
-	sf::Vector2f *points;
+	std::vector<sf::Vector2f> points;
 	sf::Vector2u size;
+	std::string path;
 
 	std::unordered_map<int, int> flippedBlockTypes;
 	bool converted;
@@ -107,6 +102,8 @@ private:
 	void generatePoints();
 
 	int getIndex(int x, int y) const;
+
+	void createTileImage(sf::Image *image, unsigned blockType);
 };
 
 /**
@@ -146,72 +143,9 @@ struct WorldLayer
 	LayerType type;
 	int depth;
 
-	WorldLayer(const LayerType &type, int depth) : type(type), depth(depth)
+	WorldLayer(LayerType type, int depth) : type(type), depth(depth)
 	{
 	}
-};
-
-/**
- * A world item that holds the block type of every tile in the world
- */
-class WorldTerrain : public BaseWorld
-{
-public:
-
-	explicit WorldTerrain(World *container);
-
-	~WorldTerrain();
-
-	void setBlockType(const sf::Vector2i &pos, BlockType blockType, LayerType layer = LAYER_TERRAIN,
-					  int rotationAngle = 0, int flipGID = 0);
-
-	void addObject(const sf::Vector2f &pos, BlockType blockType, float rotationAngle, int flipGID);
-
-	const std::vector<WorldObject> &getObjects();
-
-	const std::vector<WorldLayer> &getLayers();
-
-private:
-	Tileset tileset;
-	sf::VertexArray tileVertices;
-	sf::VertexArray overLayerVertices;
-
-	std::vector<BlockType> blockTypes;
-	std::vector<WorldObject> objects;
-	std::vector<WorldLayer> layers;
-
-	int tileLayerCount;
-	int overLayerCount;
-
-	void discoverLayers(std::vector<TMX::Layer *> &layers, std::vector<LayerType> &layerTypes);
-
-	void discoverFlippedTiles(const std::vector<TMX::Layer *> &layers, std::vector<int> &flippedGIDs);
-
-	void addTiles(const std::vector<TMX::Layer *> &layers, const std::vector<LayerType> &types);
-
-	int getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
-
-	int getVertexIndex(const sf::Vector2i &pos, LayerType layerType);
-
-	void rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos);
-
-	void positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
-
-	sf::VertexArray &getVertices(const LayerType &layerType);
-
-protected:
-
-	void resizeVertices();
-
-	void registerLayer(LayerType layerType, int depth);
-
-	void render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const;
-
-	void load(const TMX::TileMap *tileMap, const std::string &tilesetPath);
-
-	friend struct TMX::TileMap;
-
-	friend class World;
 };
 
 /**
@@ -220,25 +154,16 @@ protected:
 class CollisionMap : public BaseWorld
 {
 public:
-	explicit CollisionMap(World *container) : BaseWorld(container), world(b2Vec2(0.f, 0.f)),
-											  worldBody(nullptr), globalContactListener(container)
-	{
-		world.SetAllowSleeping(true);
-		world.SetContactListener(&globalContactListener);
-	}
+	CollisionMap(World *container);
 
 	~CollisionMap();
 
-	void getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::FloatRect> &ret);
-
-	bool getRectAt(const sf::Vector2i &tilePos, sf::FloatRect &ret);
-
-protected:
 	void load();
 
+protected:
 	b2World world;
 	b2Body *worldBody;
-
+	
 	friend class World;
 
 private:
@@ -248,11 +173,11 @@ private:
 		{ }
 
 		virtual void BeginContact(b2Contact *contact) override;
-		
+
 	private:
 		World *container;
-	}; 
-			
+	};
+
 	GlobalContactListener globalContactListener;
 
 	struct CollisionRect
@@ -268,7 +193,6 @@ private:
 	};
 
 	boost::optional<SFMLDebugDraw> b2Renderer;
-	std::multimap<sf::Vector2i, sf::FloatRect> cellGrid;
 
 	void findCollidableTiles(std::vector<CollisionRect> &rects) const;
 
@@ -279,8 +203,90 @@ private:
 	BodyData *createBodyData(BlockType blockType, const sf::Vector2i &tilePos);
 };
 
+
 /**
- * A world item that deals with buildings and their entrances
+ * A world item that holds the block type of every tile in the world
+ */
+class WorldTerrain : public BaseWorld
+{
+public:
+	WorldTerrain(World *container, const sf::Vector2i &size);
+
+	void setBlockType(const sf::Vector2i &pos, BlockType blockType, 
+			LayerType layer = LAYER_TERRAIN, int rotationAngle = 0, int flipGID = 0);
+
+
+	BlockType getBlockType(const sf::Vector2i &tile, LayerType layer = LAYER_TERRAIN);
+
+	void addObject(const sf::Vector2f &pos, BlockType blockType, 
+			float rotationAngle, int flipGID);
+
+	const std::vector<WorldObject> &getObjects() const;
+
+	const std::map<LayerType, int> &getLayerDepths() const;
+
+	/**
+	 * Discovers layers and which tile types require rotating
+	 * @param tmx The tilemap
+	 * @param flippedGIDs A set of tile GIDs to populate
+	 */
+	void loadFromTileMap(TMX::TileMap &tmx, std::unordered_set<int> &flippedGIDs);
+
+	void applyTiles(Tileset &tileset);
+
+	void loadBlockData();
+
+
+private:
+	Tileset *tileset;
+	TMX::TileMap *tmx;
+	CollisionMap collisionMap;
+
+	sf::VertexArray tileVertices;
+	sf::VertexArray overLayerVertices;
+
+	std::vector<BlockType> blockTypes;
+	std::vector<WorldObject> objects;
+	std::map<LayerType, int> layerDepths;
+
+	int tileLayerCount;
+	int overLayerCount;
+
+	void discoverLayers(std::vector<TMX::Layer> &tmxLayers);
+
+	void discoverFlippedTiles(const std::vector<TMX::Layer> &layers, std::unordered_set<int> &flippedGIDs);
+
+	int getBlockIndex(const sf::Vector2i &pos, LayerType layerType);
+
+	int getVertexIndex(const sf::Vector2i &pos, LayerType layerType);
+
+	void rotateObject(sf::Vertex *quad, float degrees, const sf::Vector2f &pos);
+
+	void positionVertices(sf::Vertex *quad, const sf::Vector2i &pos, int delta);
+
+	void positionVertices(sf::Vertex *quad, const sf::Vector2f &pos, int delta);
+
+	/**
+	 * @return The depth of the layer with the given type. Throws an exception if not found
+	 */
+	int getDepth(LayerType layerType) const;
+
+	sf::VertexArray &getVertices(LayerType layerType);
+
+	CollisionMap *getCollisionMap();
+
+protected:
+	sf::Vector2i size;
+
+	void resizeVertices();
+
+	void render(sf::RenderTarget &target, sf::RenderStates &states, bool overLayers) const;
+
+	friend World;
+};
+
+/**
+ * A world item that deals with buildings 
  */
 class BuildingMap : public BaseWorld
 {
@@ -289,31 +295,27 @@ public:
 	{
 	}
 
-	void load(const TMX::TileMap &tileMap, std::vector<std::string> &worldsToLoad);
+	Building &addBuilding(const sf::IntRect &bounds, WorldID insideWorld);
 
-	void getBuildingByOutsideDoorTile(const sf::Vector2i &tile, boost::optional<std::pair<Building *, Door *>> &out);
+	Building *getBuildingByID(BuildingID id);
 
-	Building *getBuildingByID(int id);
+	void getBuildingByOutsideDoorTile(const sf::Vector2i &tile,
+			boost::optional<std::pair<BuildingID, DoorID>> &out);
 
 private:
-	std::unordered_map<int, Building> buildings;
-
-	void gatherBuildings(TMX::Layer *buildingLayer);
-
+	std::unordered_map<BuildingID, Building> buildings;
 };
 
 class World : public sf::Drawable
 {
 public:
-	World();
+	World(WorldID id, const std::string &name, bool outside);
 
-	void loadFromFile(const std::string &filename, const std::string &tileset, std::vector<std::string> &worldsToLoad);
+	void setTerrain(WorldTerrain &terrain);
 
-	void resize(sf::Vector2i size);
+	WorldTerrain *getTerrain();
 
-	WorldTerrain &getTerrain();
-
-	CollisionMap &getCollisionMap();
+	CollisionMap *getCollisionMap();
 
 	BuildingMap &getBuildingMap();
 
@@ -327,26 +329,28 @@ public:
 
 	void tick(float delta);
 
-	BlockType getBlockAt(const sf::Vector2i &tile, LayerType layer = LAYER_TERRAIN);
+	WorldID getID() const;
 
-	void getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::FloatRect> &ret);
+	std::string getName() const;
+
+	bool isOutside() const;
 
 private:
-	WorldTerrain terrain;
-	CollisionMap collisionMap;
-	BuildingMap buildingMap;
+	WorldID id;
+	std::string name;
+	bool outside;
 
+	WorldTerrain *terrain;
+	boost::optional<BuildingMap> buildingMap;
+
+	// todo move to a WorldRenderer
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 
 protected:
-	sf::Vector2i tileSize;
-	sf::Vector2i pixelSize;
 	sf::Transform transform;
 
 	friend class BaseWorld;
-
 	friend class WorldTerrain;
-
 	friend class CollisionMap;
 };
 

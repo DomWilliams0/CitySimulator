@@ -10,11 +10,47 @@ namespace TMX
 {
 	enum PropertyType
 	{
-		PROPERTY_TYPE,
+
+		/**
+		 * The visibility of an object/layer
+		 */
 		PROPERTY_VISIBLE,
+
+		/**
+		 * A building's world name
+		 */
 		PROPERTY_BUILDING_WORLD,
-		PROPERTY_BUILDING_ID,
-		PROPERTY_BUILDING_DOOR,
+
+		/**
+		 * Any doors with an equal WORLD_SHARE_SPECIFIER 
+		 * will share this door's world
+		 */
+		PROPERTY_DOOR_WORLD_SHARE_SOURCE,
+
+		/**
+		 * This door's world is specified by the single
+		 * door with an equivalent WORLD_SHARE_SOURCE
+		 */
+		PROPERTY_DOOR_WORLD_SHARE_SPECIFIER,
+
+		/**
+		 * The ID of a preloaded door's world
+		 */
+		PROPERTY_DOOR_WORLD_ID,
+
+		/**
+		 * The name of a door's world
+		 */
+		PROPERTY_DOOR_WORLD,
+
+		/**
+		 * A door ID
+		 */
+		PROPERTY_DOOR_ID,
+
+		/**
+		 * An invalid property
+		 */
 
 		PROPERTY_UNKNOWN
 	};
@@ -22,28 +58,26 @@ namespace TMX
 	PropertyType propertyTypeFromString(const std::string &s);
 
 
-	class PropertyOwner
+	/**
+	 * A map of PropertyType -> string pairs
+	 */
+	class PropertyHolder
 	{
 	public:
 
-		virtual ~PropertyOwner()
+		virtual ~PropertyHolder()
 		{
 		}
 
-		inline void addProperty(PropertyType type, std::string value)
-		{
-			map.insert(std::make_pair(type, value));
-		}
+		void addProperty(PropertyType type, std::string value);
 
-		inline std::string getProperty(PropertyType type)
-		{
-			return map.at(type);
-		}
+		std::string getProperty(PropertyType type) const;
 
-		inline bool hasProperty(PropertyType type)
-		{
-			return map.find(type) != map.end();
-		}
+		bool hasProperty(PropertyType type) const;
+
+		void getProperty(PropertyType type, boost::optional<std::string> &out);
+
+		boost::optional<std::string> getPropertyOptional(PropertyType type);
 
 	private:
 		std::map<PropertyType, std::string> map;
@@ -79,46 +113,27 @@ namespace TMX
 		{
 		}
 
-		Tile(TileType type) : gid(0), tileType(type)
+		Tile(TileType type) : gid(0), tileType(type), flipped(false)
 		{
 		}
-
-		Tile(const std::string &id) : Tile(TILE_TILE, id)
-		{
-		}
-
-		Tile(TileType type, const std::string &id);
 
 		virtual ~Tile()
 		{
 		}
 
-		inline TileType getTileType() const
-		{
-			return tileType;
-		}
+		void setGID(const std::string &id);
 
-		inline bool isFlipped() const
-		{
-			return flipped;
-		}
+		TileType getTileType() const;
+
+		bool isFlipped() const;
 
 		// @return Either -90, 0 or 90
-		inline int getRotationAngle() const
-		{
-			return rotationAngle;
-		}
+		int getRotationAngle() const;
 
 		// @return Block ID | horizontal or vertical flip flags
-		inline int getFlipGID() const
-		{
-			return flipGID;
-		}
+		int getFlipGID() const;
 
-		inline unsigned int getGID() const
-		{
-			return gid;
-		}
+		unsigned int getGID() const;
 
 		sf::Vector2f position;
 
@@ -131,41 +146,35 @@ namespace TMX
 		void processRotation(std::bitset<3> rotation);
 	};
 
-	struct PropertyObject : Tile, PropertyOwner
+	struct PropertyObject : PropertyHolder
 	{
-
-		PropertyObject() : Tile(TILE_PROPERTY_SHAPE)
-		{ }
-
 		sf::Vector2f dimensions;
 	};
 
-	struct Object : Tile
+	struct TileWrapper
 	{
-		Object(const std::string &id) : Tile(TILE_OBJECT, id)
-		{
-		}
+		TileType type;
+		Tile tile;
 
-		float rotationAnglef;
+		// would be a union but too trivial to bother
+		float objectRotation;
+		PropertyObject property;
 	};
 
-	struct Layer : PropertyOwner
+	struct Layer : PropertyHolder
 	{
-		~Layer();
-
 		std::string name;
-		std::vector<Tile *> items;
+		std::vector<TileWrapper> items;
 		bool visible;
 	};
 
-	struct TileMap : PropertyOwner
+	struct TileMap : PropertyHolder
 	{
-		~TileMap();
+		std::string filePath;
+		sf::Vector2i size;
+		std::vector<Layer> layers;
 
-		int width, height;
-		std::vector<Layer *> layers;
-
-		static TileMap *load(const std::string &filePath);
+		void load(const std::string &filePath);
 	};
 }
 #endif

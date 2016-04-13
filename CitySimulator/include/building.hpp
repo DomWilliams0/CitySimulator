@@ -3,67 +3,79 @@
 
 #include <SFML/Graphics/Rect.hpp>
 #include <map>
+#include "utils.hpp"
 
 class World;
+class Building;
+
+typedef int BuildingID;
+typedef int DoorID;
+typedef int WindowID;
+
+struct Window
+{
+	sf::Vector2i location;
+	bool status;
+};
+
 
 /**
  * A building entrance/exit, either inside or outside
  */
 struct Door
 {
-	int id;
-	World *ownedWorld;
-	sf::Vector2i localTilePos;
-
-
-	Door(int id, World *ownedWorld, const sf::Vector2i &localTilePos)
-			: id(id), ownedWorld(ownedWorld), localTilePos(localTilePos)
-	{
-	}
+	Location location;
+	// todo locked status?
 };
 
+/**
+ * A building, with doors and windows
+ */
 class Building
 {
 public:
-	Building(World &world, const sf::IntRect &tileBounds, int id, std::string buildingWorldName)
-			: outsideWorld(&world), buildingID(id), insideWorldName(buildingWorldName), bounds(tileBounds)
-	{
-	}
-
-	void discoverWindows();
-
-	bool isWindowLit(const sf::Vector2i &tile);
-
-	void setWindowLight(const sf::Vector2i &tile, bool lit);
+	Building(const sf::IntRect &tileBounds, BuildingID id,
+			WorldID outsideWorld, WorldID insideWorld);
 
 	/**
-	 * Adds a door to the building
-	 * @param doorID The ID of this door and its partner
-	 * @param doorTilePos The door's tile position in its own world
-	 * @param doorWorld The door's own world, which must be either insideWorld or outsideWorld
+	 * Finds all windows in the bounds
 	 */
-	void addDoor(int doorID, const sf::Vector2i &doorTilePos, World *doorWorld);
+	void discoverWindows();
 
-	Door *getDoorByTile(const sf::Vector2i &tile);
+	/**
+	 * Adds a door to the building at the given location
+	 * This must be in either the outside or inside world
+	 */
+	void addDoor(const Location &location, DoorID id);
 
-	int getID() const;
+	void setWindowLight(WindowID window, bool isNowLit);
+
+	bool isWindowLightOn(WindowID window) const;
+
+	Door *getDoor(DoorID id);
+
+	std::size_t getWindowCount() const;
+
+	std::size_t getDoorCount() const;
+
+	BuildingID getID() const;
 
 	std::string getInsideWorldName() const;
 
-	Door *getConnectedDoor(Door *door);
+	World *getOutsideWorld() const;
+
+	World *getInsideWorld() const;
 
 private:
-	World *outsideWorld;
+	BuildingID id;
 	World *insideWorld;
+	World *outsideWorld;
 	std::string insideWorldName;
-	int buildingID;
 
-	std::map<sf::Vector2i, bool> windows;
-	std::map<sf::Vector2i, Door> doors;
+	std::map<WindowID, Window> windows;
+	std::map<DoorID, Door> doors;
 
 	sf::IntRect bounds;
-
-	Door *getDoorByID(int doorID, World *doorWorld);
 };
 
 

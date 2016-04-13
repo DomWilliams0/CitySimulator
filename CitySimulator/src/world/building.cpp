@@ -1,94 +1,122 @@
+#include "utils.hpp"
 #include "building.hpp"
-#include "world.hpp"
 #include "service/logging_service.hpp"
+#include "service/world_service.hpp"
+#include "service/locator.hpp"
 
+
+Building::Building(const sf::IntRect &tileBounds, BuildingID id,
+		WorldID outsideWorld, WorldID insideWorld) : bounds(tileBounds), id(id)
+{
+	WorldService *ws = Locator::locate<WorldService>();
+	this->insideWorld = ws->getWorld(insideWorld);
+	this->outsideWorld = ws->getWorld(outsideWorld);
+
+	if (this->insideWorld == nullptr || this->outsideWorld == nullptr)
+	{
+		WorldID badID = this->insideWorld == nullptr ? insideWorld : outsideWorld;
+		error("Building world ID %1% has not been loaded", _str(badID));
+	}
+
+	insideWorldName = this->insideWorld->getName();
+}
 
 void Building::discoverWindows()
 {
+	WindowID id(0);
 	for (int x = bounds.left; x <= bounds.left + bounds.width; ++x)
 	{
 		for (int y = bounds.top; y <= bounds.top + bounds.height; ++y)
 		{
 			sf::Vector2i tile(x, y);
-			BlockType b = outsideWorld->getBlockAt(tile, LAYER_OVERTERRAIN);
+			BlockType b = outsideWorld->getTerrain()->getBlockType(tile, LAYER_OVERTERRAIN);
 
-			// windows
 			if (b == BLOCK_BUILDING_WINDOW_OFF || b == BLOCK_BUILDING_WINDOW_ON)
 			{
-				windows[tile] = b == BLOCK_BUILDING_WINDOW_ON;
-				setWindowLight(tile, Utils::random(0.f, 1.f) < 0.5f); // debug random windows
+				Window &window = windows.emplace(id++, Window{}).first->second;
+				window.location = tile;
+				window.status = b == BLOCK_BUILDING_WINDOW_ON;
 			}
 		}
 	}
 
-	Logger::logDebuggiest(format("Found %1% building windows in building %2%", _str(windows.size()), _str(buildingID)));
+	Logger::logDebuggiest(format("Discovered %1% building windows in building %2%", 
+				_str(windows.size()), _str(this->id)));
 }
 
-bool Building::isWindowLit(const sf::Vector2i &tile)
+void Building::addDoor(const Location &location, DoorID id)
 {
-	auto it = windows.find(tile);
-	if (it == windows.end())
-		return false;
+	/* static DoorID lastDoorID = 0; */
 
-	return it->second;
-}
-
-
-void Building::setWindowLight(const sf::Vector2i &tile, bool lit)
-{
-	if (windows.find(tile) == windows.end())
-	{
-		Logger::logWarning(format("Cannot set window light as (%1%, %2%) is not a window", _str(tile.x), _str(tile.y)));
-		return;
-	}
-
-	windows[tile] = lit;
-
-	BlockType newBlock = lit ? BLOCK_BUILDING_WINDOW_ON : BLOCK_BUILDING_WINDOW_OFF;
-	outsideWorld->getTerrain().setBlockType(tile, newBlock, LAYER_OVERTERRAIN);
-}
-
-void Building::addDoor(int doorID, const sf::Vector2i &doorTilePos, World *doorWorld)
-{
-	if (doorWorld != insideWorld && doorWorld != outsideWorld)
+	if (location.world != insideWorld->getID() && 
+			location.world != outsideWorld->getID())
 	{
 		Logger::logWarning(
 				format("Tried to add a door at (%1%, %2%) to a building which isn't in its world",
-					   _str(doorTilePos.x), _str(doorTilePos.y)));
+					   _str(location.x), _str(location.y)));
 		return;
 	}
 
-	doors.insert({doorTilePos, Door(doorID, doorWorld, doorTilePos)});
+	Door &door = doors.emplace(id, Door{}).first->second;
+	door.location = location;
 }
 
-
-Door *Building::getDoorByTile(const sf::Vector2i &tile)
+void Building::setWindowLight(WindowID windowID, bool isNowLit)
 {
-	auto it = doors.find(tile);
-	return it != doors.end() ? &it->second : nullptr;
+	auto window = windows.find(windowID);
+	if (window == windows.end())
+	{
+		Logger::logWarning(format("Window ID %d not found", _str(windowID)));
+		return;
+	}
+
+	window->second.status = isNowLit;
+
+	BlockType newBlock = isNowLit ? BLOCK_BUILDING_WINDOW_ON : BLOCK_BUILDING_WINDOW_OFF;
+	outsideWorld->getTerrain()->setBlockType(window->second.location, newBlock, LAYER_OVERTERRAIN);
 }
 
-int Building::getID() const
+bool Building::isWindowLightOn(WindowID window) const
 {
-	return buildingID;
+	auto it = windows.find(window);
+	if (it == windows.end())
+		return false;
+
+	return it->second.status;
 }
 
+Door *Building::getDoor(DoorID id)
+{
+	auto door = doors.find(id);
+	return door == doors.end() ? nullptr : &door->second;
+}
+
+std::size_t Building::getWindowCount() const
+{
+	return windows.size();
+}
+
+std::size_t Building::getDoorCount() const
+{
+	return doors.size();
+}
+
+BuildingID Building::getID() const
+{
+	return id;
+}
 
 std::string Building::getInsideWorldName() const
 {
 	return insideWorldName;
 }
 
-Door *Building::getConnectedDoor(Door *door)
+World *Building::getOutsideWorld() const
 {
-	World *targetWorld = door->ownedWorld == insideWorld ? outsideWorld : insideWorld;
-	return getDoorByID(door->id, targetWorld);
+	return outsideWorld;
 }
 
-Door *Building::getDoorByID(int doorID, World *doorWorld)
+World *Building::getInsideWorld() const
 {
-	auto it = std::find_if(doors.begin(), doors.end(),
-						   [doorID, doorWorld](const std::pair<sf::Vector2i, Door> &pair)
-						   { return pair.second.id == doorID && pair.second.ownedWorld == doorWorld; });
-	return it == doors.end() ? nullptr : &it->second;
+	return insideWorld;
 }

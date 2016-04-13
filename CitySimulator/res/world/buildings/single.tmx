@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="12" height="12" tilewidth="16" tileheight="16">
- <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="12" height="12" tilewidth="16" tileheight="16" nextobjectid="16">
+ <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="100" columns="10">
   <image source="../tileset.png" width="160" height="160"/>
  </tileset>
  <layer name="underterrain" width="12" height="12">
   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,
+0,18,18,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
@@ -21,7 +21,7 @@
  </layer>
  <layer name="terrain" width="12" height="12">
   <data encoding="csv">
-18,18,18,18,18,18,18,18,18,18,18,18,
+18,1073741843,3221225491,18,18,18,18,18,18,18,18,18,
 18,18,18,18,18,18,18,18,18,18,18,18,
 18,18,18,18,18,18,18,18,18,18,18,18,
 18,18,18,18,18,18,18,18,18,18,18,18,
@@ -36,12 +36,26 @@
 </data>
  </layer>
  <objectgroup name="objects">
-  <object gid="9" x="0" y="128"/>
-  <object gid="9" x="0" y="192"/>
-  <object gid="9" x="48" y="192"/>
-  <object gid="9" x="176" y="192"/>
-  <object gid="9" x="176" y="16"/>
-  <object gid="9" x="0" y="16"/>
-  <object gid="9" x="0" y="64"/>
+  <object id="1" gid="9" x="0" y="128" width="16" height="16"/>
+  <object id="2" gid="9" x="0" y="192" width="16" height="16"/>
+  <object id="3" gid="9" x="48" y="192" width="16" height="16"/>
+  <object id="4" gid="9" x="176" y="192" width="16" height="16"/>
+  <object id="5" gid="9" x="176" y="16" width="16" height="16"/>
+  <object id="6" gid="9" x="0" y="16" width="16" height="16"/>
+  <object id="7" gid="9" x="0" y="64" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="buildings">
+  <object id="8" x="16" y="176" width="32" height="16">
+   <properties>
+    <property name="door-id" value="-1"/>
+   </properties>
+  </object>
+  <object id="15" x="16" y="0" width="32" height="16">
+   <properties>
+    <property name="door-id" value="1"/>
+    <property name="door-world" value="single_upstairs"/>
+    <property name="world-share-source" value="farm"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

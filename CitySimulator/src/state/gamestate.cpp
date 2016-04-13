@@ -37,7 +37,7 @@ GameState::GameState() : State(STATE_GAME)
 												  Config::getResource("world.tileset"));
 	Locator::provide(SERVICE_WORLD, worldService);
 
-	world = &worldService->getWorld();
+	world = worldService->getMainWorld();
 
 	// load camera
 	Locator::provide(SERVICE_CAMERA, new CameraService(*world));

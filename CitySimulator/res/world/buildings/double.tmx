@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="12" height="16" tilewidth="16" tileheight="16">
- <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="12" height="16" tilewidth="16" tileheight="16" nextobjectid="4">
+ <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="100" columns="10">
   <image source="../tileset.png" width="160" height="160"/>
  </tileset>
  <layer name="underterrain" width="12" height="16">
@@ -43,4 +43,16 @@
 18,19,2147483667,18,1073741845,1073741846,1073741846,1073741846,1073741846,3221225493,19,2147483667
 </data>
  </layer>
+ <objectgroup name="buildings">
+  <object id="2" x="16" y="240" width="32" height="16">
+   <properties>
+    <property name="door-id" value="-1"/>
+   </properties>
+  </object>
+  <object id="3" x="160" y="240" width="32" height="16">
+   <properties>
+    <property name="door-id" value="-2"/>
+   </properties>
+  </object>
+ </objectgroup>
 </map>

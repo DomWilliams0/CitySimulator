@@ -2,6 +2,14 @@
 #include "service/render_service.hpp"
 #include "service/locator.hpp"
 
+CollisionMap::CollisionMap(World *container) 
+: BaseWorld(container), world({0.f, 0.f}), globalContactListener(container)
+	{
+		world.SetAllowSleeping(true);
+		world.SetContactListener(&globalContactListener);
+	}
+
+
 void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 {
 	sf::Vector2i worldTileSize = container->getTileSize();
@@ -12,7 +20,8 @@ void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 	{
 		for (auto x = 0; x < worldTileSize.x; ++x)
 		{
-			BlockType bt = container->getBlockAt({x, y}, LAYER_TERRAIN); // the only collidable tile layer
+			// the only collidable tile layer
+			BlockType bt = container->getTerrain()->getBlockType({x, y}, LAYER_TERRAIN); 
 			bool collide = isCollidable(bt);
 			bool interact = isInteractable(bt);
 
@@ -25,7 +34,7 @@ void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 	}
 
 	// objects
-	auto objects = container->getTerrain().getObjects();
+	auto objects = container->getTerrain()->getObjects();
 	for (auto &obj : objects)
 	{
 		auto pos = obj.tilePos;
@@ -154,33 +163,6 @@ CollisionMap::~CollisionMap()
 		world.DestroyBody(worldBody);
 }
 
-void CollisionMap::getSurroundingTiles(const sf::Vector2i &tilePos, std::set<sf::Rect<float>> &ret)
-{
-	const static int edge = 1; // todo dependent on entity size
-
-	// gather all (unique) rects in the given range
-	sf::FloatRect rect;
-	for (int y = -edge; y <= edge; ++y)
-	{
-		for (int x = -edge; x <= edge; ++x)
-		{
-			sf::Vector2i offsetTile(tilePos.x + x, tilePos.y + y);
-			if (getRectAt(offsetTile, rect))
-				ret.insert(rect);
-		}
-	}
-}
-
-bool CollisionMap::getRectAt(const sf::Vector2i &tilePos, sf::FloatRect &ret)
-{
-	auto result(cellGrid.find(Utils::toPixel(tilePos)));
-	if (result == cellGrid.end())
-		return false;
-
-	ret = result->second;
-	return true;
-}
-
 void CollisionMap::load()
 {
 	std::vector<CollisionRect> rects;
@@ -209,13 +191,11 @@ void CollisionMap::load()
 	// world borders
 	int borderThickness = Constants::tileSize;
 	int padding = Constants::tileSize / 4;
-	auto worldSize = container->pixelSize;
+	auto worldSize = container->getPixelSize();
 	rects.emplace_back(sf::FloatRect(-borderThickness - padding, 0, borderThickness, worldSize.y), 0.f);
 	rects.emplace_back(sf::FloatRect(0, -borderThickness - padding, worldSize.x, borderThickness), 0.f);
 	rects.emplace_back(sf::FloatRect(worldSize.x + padding, 0, borderThickness, worldSize.y), 0.f);
 	rects.emplace_back(sf::FloatRect(0, worldSize.y + padding, worldSize.x, borderThickness), 0.f);
-
-	// todo make big collision rectangles hollow to work better with box2d?
 
 	// collision fixtures
 	b2FixtureDef fixDef;
@@ -259,7 +239,7 @@ BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &
 		data->type = BODYDATA_BLOCK;
 		data->blockData.blockDataType = BLOCKDATA_DOOR;
 
-		boost::optional<std::pair<Building *, Door *>> buildingAndDoor;
+		boost::optional<std::pair<BuildingID, DoorID>> buildingAndDoor;
 		container->getBuildingMap().getBuildingByOutsideDoorTile(tilePos, buildingAndDoor);
 
 		if (!buildingAndDoor)
@@ -273,6 +253,9 @@ BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &
 		DoorBlockData *doorData = &data->blockData.door;
 		doorData->building = buildingAndDoor->first;
 		doorData->door = buildingAndDoor->second;
+
+		Logger::logDebuggiest(format("Added door block data to door %1% of building %2% in world %3%",
+					_str(doorData->door), _str(doorData->building), _str(container->getID())));
 
 		return data;
 	}
@@ -300,28 +283,29 @@ void CollisionMap::GlobalContactListener::BeginContact(b2Contact *contact)
 		// door
 		if (block->blockData.blockDataType == BLOCKDATA_DOOR)
 		{
-			DoorBlockData *door = &block->blockData.door;
-			Door *targetDoor = door->building->getConnectedDoor(door->door);
-			if (targetDoor == nullptr)
-			{
-				Logger::logError(format("Could not find connected door for door %1% in building %2%",
-										_str(door->door->id), _str(door->building->getID())));
-				return;
-			}
+			// todo
+			/* DoorBlockData *door = &block->blockData.door; */
+			/* Door *targetDoor = door->building->getConnectedDoor(door->door); */
+			/* if (targetDoor == nullptr) */
+			/* { */
+			/* 	Logger::logError(format("Could not find connected door for door %1% in building %2%", */
+			/* 							_str(door->door->id), _str(door->building->getID()))); */
+			/* 	return; */
+			/* } */
 
-			Event event;
-			event.type = EVENT_HUMAN_JOIN_WORLD;
-			event.entityID = entity->entityID.id;
-			event.joinWorld.newWorldID = 1010101; // todo world's need IDs!
+			/* Event event; */
+			/* event.type = EVENT_HUMAN_JOIN_WORLD; */
+			/* event.entityID = entity->entityID.id; */
+			/* event.joinWorld.newWorldID = 1010101; // todo world's need IDs! */
 
-			event.joinWorld.spawnDirection = DIRECTION_NORTH; // todo store in Door
-			event.joinWorld.spawnX = targetDoor->localTilePos.x;
-			event.joinWorld.spawnY = targetDoor->localTilePos.y;
+			/* event.joinWorld.spawnDirection = DIRECTION_NORTH; // todo store in Door */
+			/* event.joinWorld.spawnX = targetDoor->localTilePos.x; */
+			/* event.joinWorld.spawnY = targetDoor->localTilePos.y; */
 
-			Logger::logDebug(format("Door interaction with building %1%", _str(door->building->getID())));
+			/* Logger::logDebug(format("Door interaction with building %1%", _str(door->building->getID()))); */
 
-			// todo complete the two above todos before actually calling the event
-			// Locator::locate<EventService>()->callEvent(event);
+			/* // todo complete the two above todos before actually calling the event */
+			/* // Locator::locate<EventService>()->callEvent(event); */
 		}
 
 

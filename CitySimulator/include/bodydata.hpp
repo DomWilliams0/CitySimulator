@@ -4,6 +4,9 @@
 #include "world.hpp"
 #include "ecs.hpp"
 
+struct Door;
+class Building;
+
 enum BodyDataType
 {
 	BODYDATA_ENTITY,
@@ -17,8 +20,8 @@ enum BlockDataType
 
 struct DoorBlockData
 {
-	Door *door;
-	Building *building;
+	DoorID door;
+	BuildingID building;
 };
 
 struct BlockData
