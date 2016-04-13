@@ -128,7 +128,7 @@ protected:
 
 	virtual MovementController* getController() = 0;
 
-	virtual void tickBrain(float delta)
+	virtual void tickBrain(float /* delta */)
 	{
 	}
 

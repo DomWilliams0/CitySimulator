@@ -62,7 +62,7 @@ void GameState::tick(float delta)
 	Locator::locate<EntityService>()->tickSystems(delta);
 }
 
-void GameState::render(sf::RenderWindow &window)
+void GameState::render(sf::RenderWindow &/* window */)
 {
 	Locator::locate<RenderService>()->render(*world);
 }

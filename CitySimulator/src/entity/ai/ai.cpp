@@ -31,7 +31,7 @@ EntityBrain::EntityBrain(EntityID e)
 	setEntity(e);
 }
 
-void EntityBrain::tickBrain(float delta)
+void EntityBrain::tickBrain(float /* delta */)
 {
 	// todo tick behaviours, which tick steerings
 }

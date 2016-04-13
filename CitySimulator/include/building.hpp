@@ -54,9 +54,9 @@ public:
 
 	Door *getDoor(DoorID id);
 
-	std::size_t getWindowCount() const;
+	WindowID getWindowCount() const;
 
-	std::size_t getDoorCount() const;
+	DoorID getDoorCount() const;
 
 	BuildingID getID() const;
 

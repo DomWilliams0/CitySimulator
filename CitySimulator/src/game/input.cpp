@@ -245,13 +245,12 @@ void MovementController::reset(EntityID entity, float movementForce, float maxWa
 
 void MovementController::tick(PhysicsComponent *phys, float delta)
 {
-	float maxSpeed;
 	b2Vec2 steering(tick(delta, maxWalkSpeed));
 	phys->steering.Set(steering.x, steering.y);
 	phys->maxSpeed = maxWalkSpeed;
 }
 
-b2Vec2 DynamicMovementController::tick(float delta, float &newMaxSpeed)
+b2Vec2 DynamicMovementController::tick(float /* delta */, float &newMaxSpeed)
 {
 	newMaxSpeed = running ? maxSprintSpeed : maxWalkSpeed;
 	b2Vec2 ret = steering;
@@ -318,7 +317,7 @@ void PlayerMovementController::halt()
 	std::fill(moving.begin(), moving.end(), false);
 }
 
-b2Vec2 PlayerMovementController::tick(float delta, float &newMaxSpeed)
+b2Vec2 PlayerMovementController::tick(float /* delta */, float &newMaxSpeed)
 {
 	bool north = moving[DIRECTION_NORTH];
 	bool south = moving[DIRECTION_SOUTH];

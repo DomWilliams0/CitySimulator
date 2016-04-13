@@ -113,7 +113,7 @@ namespace TMX
 		{
 		}
 
-		Tile(TileType type) : gid(0), tileType(type), flipped(false)
+		Tile(TileType type) : gid(0), flipped(false), tileType(type)
 		{
 		}
 

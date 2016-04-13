@@ -6,7 +6,7 @@
 
 class Animator;
 
-class PhysicsComponent;
+struct PhysicsComponent;
 
 class GameState : public State
 {

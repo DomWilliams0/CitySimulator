@@ -6,7 +6,7 @@
 
 
 Building::Building(const sf::IntRect &tileBounds, BuildingID id,
-		WorldID outsideWorld, WorldID insideWorld) : bounds(tileBounds), id(id)
+		WorldID outsideWorld, WorldID insideWorld) : id(id), bounds(tileBounds)
 {
 	WorldService *ws = Locator::locate<WorldService>();
 	this->insideWorld = ws->getWorld(insideWorld);
@@ -91,12 +91,12 @@ Door *Building::getDoor(DoorID id)
 	return door == doors.end() ? nullptr : &door->second;
 }
 
-std::size_t Building::getWindowCount() const
+WindowID Building::getWindowCount() const
 {
 	return windows.size();
 }
 
-std::size_t Building::getDoorCount() const
+DoorID Building::getDoorCount() const
 {
 	return doors.size();
 }

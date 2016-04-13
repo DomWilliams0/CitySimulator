@@ -3,7 +3,7 @@
 #include "service/logging_service.hpp"
 #include "service/render_service.hpp"
 
-Tileset::Tileset(const std::string &path) : converted(false), path(path)
+Tileset::Tileset(const std::string &path) : path(path), converted(false)
 {
 }
 

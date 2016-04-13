@@ -3,7 +3,7 @@
 #include "service/locator.hpp"
 
 CollisionMap::CollisionMap(World *container) 
-: BaseWorld(container), world({0.f, 0.f}), globalContactListener(container)
+: BaseWorld(container), world({0.f, 0.f})
 	{
 		world.SetAllowSleeping(true);
 		world.SetContactListener(&globalContactListener);
@@ -67,7 +67,7 @@ bool compareRectsVertically(const sf::FloatRect &a, const sf::FloatRect &b)
 	return false;
 }
 
-void CollisionMap::mergeAdjacentTiles(std::vector<CollisionRect> &rects, std::vector<sf::FloatRect> &ret)
+void CollisionMap::mergeAdjacentTiles(std::vector<CollisionRect> &rects)
 {
 	std::vector<sf::FloatRect> rectangles;
 
@@ -166,13 +166,12 @@ CollisionMap::~CollisionMap()
 void CollisionMap::load()
 {
 	std::vector<CollisionRect> rects;
-	std::vector<sf::FloatRect> mergedRects;
 
 	// gather all collidable tiles
 	findCollidableTiles(rects);
 
 	// merge adjacents
-	mergeAdjacentTiles(rects, mergedRects);
+	mergeAdjacentTiles(rects);
 
 	// debug drawing
 	sf::RenderWindow *window = Locator::locate<RenderService>()->getWindow();

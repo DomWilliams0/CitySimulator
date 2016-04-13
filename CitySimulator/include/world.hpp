@@ -13,7 +13,7 @@
 #include "bodydata.hpp"
 
 class World;
-class BodyData;
+struct BodyData;
 
 enum BlockType
 {
@@ -169,13 +169,7 @@ protected:
 private:
 	struct GlobalContactListener : public b2ContactListener
 	{
-		GlobalContactListener(World *container) : container(container)
-		{ }
-
 		virtual void BeginContact(b2Contact *contact) override;
-
-	private:
-		World *container;
 	};
 
 	GlobalContactListener globalContactListener;
@@ -196,7 +190,7 @@ private:
 
 	void findCollidableTiles(std::vector<CollisionRect> &rects) const;
 
-	void mergeAdjacentTiles(std::vector<CollisionRect> &rects, std::vector<sf::FloatRect> &ret);
+	void mergeAdjacentTiles(std::vector<CollisionRect> &rects);
 
 	void mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar);
 

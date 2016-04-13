@@ -19,7 +19,7 @@ enum LogLevel
 class LoggingService : public BaseService
 {
 public:
-	LoggingService(std::ostream &stream, const LogLevel &level) : stream(stream), level(level)
+	LoggingService(std::ostream &stream, const LogLevel &level) : level(level), stream(stream)
 	{
 	}
 
@@ -83,7 +83,7 @@ public:
 	NullLoggingService();
 
 private:
-	virtual void log(const std::string &msg, LogLevel level) override
+	virtual void log(const std::string &/* msg */, LogLevel /* level */) override
 	{
 	}
 };

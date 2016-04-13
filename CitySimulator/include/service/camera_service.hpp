@@ -6,7 +6,7 @@
 #include "world.hpp"
 #include "input.hpp"
 
-class PhysicsComponent;
+struct PhysicsComponent;
 
 
 class CameraService : public BaseService

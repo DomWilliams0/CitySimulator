@@ -32,7 +32,7 @@ void BuildingMap::getBuildingByOutsideDoorTile(const sf::Vector2i &tile,
 	for (auto &buildingPair : buildings)
 	{
 		Building &building = buildingPair.second;
-		std::size_t doorCount = building.getDoorCount();
+		DoorID doorCount = building.getDoorCount();
 		for (DoorID doorID = 0; doorID <= doorCount; ++doorID)
 		{
 			Door *door = building.getDoor(doorID);

@@ -47,7 +47,7 @@ void InputSystem::tickEntity(EntityService *es, EntityID e, float dt)
 	es->getComponent<InputComponent>(e, COMPONENT_INPUT)->brain->tick(dt);
 }
 
-void PhysicsSystem::tickEntity(EntityService *es, EntityID e, float dt)
+void PhysicsSystem::tickEntity(EntityService *es, EntityID e, float /* dt */)
 {
 	auto *physics = es->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
 

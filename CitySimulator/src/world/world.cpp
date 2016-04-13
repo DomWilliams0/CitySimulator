@@ -2,7 +2,7 @@
 #include "service/locator.hpp"
 
 WorldService::WorldService(const std::string &mainWorldPath, const std::string &tilesetPath)
-		: mainWorldName(mainWorldPath), tileset(tilesetPath)
+		: tileset(tilesetPath), mainWorldName(mainWorldPath)
 {
 }
 

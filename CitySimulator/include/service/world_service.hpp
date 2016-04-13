@@ -171,7 +171,7 @@ private:
 		/**
 		 * @return The building that physically contains the given door, null if not found
 		 */
-		LoadedBuilding *findDoorBuilding(LoadedWorld &world, LoadedDoor &door);
+		LoadedBuilding *findDoorBuilding(LoadedDoor &door);
 
 		/**
 		 * @return The partner door in the given world with the given door ID,

@@ -5,7 +5,7 @@
 #include "ecs.hpp"
 #include "world.hpp"
 
-const unsigned int MAX_ENTITIES = 1024;
+const EntityID MAX_ENTITIES = 1024;
 typedef std::unordered_map<std::string, ConfigKeyValue> EntityTags;
 
 class EntityService : public BaseService

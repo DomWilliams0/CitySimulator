@@ -46,7 +46,7 @@ bool isOverLayer(LayerType layerType)
 }
 
 WorldTerrain::WorldTerrain(World *container, const sf::Vector2i &size) : 
-	BaseWorld(container), size(size), collisionMap(container)
+	BaseWorld(container), collisionMap(container), size(size)
 {
 	tileVertices.setPrimitiveType(sf::Quads);
 	overLayerVertices.setPrimitiveType(sf::Quads);
@@ -246,7 +246,6 @@ void WorldTerrain::discoverFlippedTiles(const std::vector<TMX::Layer> &layers, s
 
 void WorldTerrain::applyTiles(Tileset &tileset)
 {
-	int layerIndex(0);
 	this->tileset = &tileset;
 
 	auto &layers = tmx->layers;

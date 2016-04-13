@@ -7,7 +7,7 @@ WorldService::WorldLoader::WorldLoader(
 		WorldConnectionTable &connectionLookup,
 		std::unordered_map<std::string, WorldTerrain> &terrainCache
 		) :
-	lastWorldID(0), connectionLookup(connectionLookup), terrainCache(terrainCache)
+	lastWorldID(0), terrainCache(terrainCache), connectionLookup(connectionLookup)
 {
 }
 
@@ -39,7 +39,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName)
 	// transfer building IDs to doors
 	for (auto &door : mainWorld.doors)
 	{
-		LoadedBuilding *owningBuilding = findDoorBuilding(mainWorld, door);
+		LoadedBuilding *owningBuilding = findDoorBuilding(door);
 		if (owningBuilding == nullptr)
 		{
 			Logger::logError(format("A door at (%1%, %2%) is not in any buildings!",
@@ -73,7 +73,7 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world,
   	visitedWorlds.insert(world.world->getID());
 
 	std::sort(world.doors.begin(), world.doors.end(), 
-			[] (const LoadedDoor &a, const LoadedDoor &b)
+			[] (const LoadedDoor &a, const LoadedDoor &/* b */)
 			{
 				return a.doorTag != DOORTAG_WORLD_SHARE;
 			});
@@ -330,7 +330,7 @@ WorldService::WorldLoader::LoadedWorld *WorldService::WorldLoader::getLoadedWorl
 
 
 WorldService::WorldLoader::LoadedBuilding *WorldService::WorldLoader::findDoorBuilding
-	(LoadedWorld &world, LoadedDoor &door)
+	(LoadedDoor &door)
 {
 	const sf::Vector2i &tile = door.tile;
 

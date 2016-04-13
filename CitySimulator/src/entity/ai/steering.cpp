@@ -27,7 +27,7 @@ double BaseTargetedSteering::getDistanceSqrd(const sf::Vector2f &entityPos) cons
 	return dx * dx + dy * dy;
 }
 
-void SeekSteering::tick(b2Vec2 &steeringOut, float delta)
+void SeekSteering::tick(b2Vec2 &steeringOut, float /* delta */)
 {
 	const sf::Vector2f &pos = entity->getTilePosition();
 	steeringOut.Set(target.x - pos.x, target.y - pos.y);

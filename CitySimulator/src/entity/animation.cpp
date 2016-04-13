@@ -23,6 +23,7 @@ Animation *AnimationService::getAnimation(EntityType entityType, const std::stri
 	}
 
 	error("Animation '%1%' not found", name);
+	return nullptr; // shh compiler is ok
 }
 
 std::string AnimationService::getRandomAnimationName(EntityType entityType)

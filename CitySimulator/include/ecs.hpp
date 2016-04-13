@@ -24,11 +24,11 @@ struct EntityIdentifier
 	EntityID id;
 	EntityType type;
 
-	EntityIdentifier() : type(ENTITY_UNKNOWN), id(INVALID_ENTITY)
+	EntityIdentifier() : id(INVALID_ENTITY), type(ENTITY_UNKNOWN)
 	{
 	}
 
-	EntityIdentifier(EntityID id, EntityType type) : type(type), id(id)
+	EntityIdentifier(EntityID id, EntityType type) : id(id), type(type)
 	{
 	}
 };
@@ -141,7 +141,7 @@ public:
 
 	virtual void tickEntity(EntityService *es, EntityID e, float dt) = 0;
 
-	virtual void renderEntity(EntityService *es, EntityID e, sf::RenderWindow &window)
+	virtual void renderEntity(EntityService * /* es */, EntityID /* e */, sf::RenderWindow &/* window */)
 	{
 	}
 

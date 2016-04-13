@@ -61,6 +61,9 @@ set(SOURCE_FILES
         src/world/world_terrain.cpp
         )
 
+# compiler flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic")
+
 # create as static library
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES} ${HEADER_FILES})
 
