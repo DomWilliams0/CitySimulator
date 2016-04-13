@@ -239,9 +239,8 @@ BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &
 		data->type = BODYDATA_BLOCK;
 		data->blockData.blockDataType = BLOCKDATA_DOOR;
 
-		boost::optional<std::pair<Building *, Door *>> buildingAndDoor;
-		// todo
-		/* container->getBuildingMap().getBuildingByOutsideDoorTile(tilePos, buildingAndDoor); */
+		boost::optional<std::pair<BuildingID, DoorID>> buildingAndDoor;
+		container->getBuildingMap().getBuildingByOutsideDoorTile(tilePos, buildingAndDoor);
 
 		if (!buildingAndDoor)
 		{
@@ -254,6 +253,9 @@ BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &
 		DoorBlockData *doorData = &data->blockData.door;
 		doorData->building = buildingAndDoor->first;
 		doorData->door = buildingAndDoor->second;
+
+		Logger::logDebuggiest(format("Added door block data to door %1% of building %2% in world %3%",
+					_str(doorData->door), _str(doorData->building), _str(container->getID())));
 
 		return data;
 	}

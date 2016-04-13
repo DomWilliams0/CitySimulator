@@ -85,6 +85,12 @@ bool Building::isWindowLightOn(WindowID window) const
 	return it->second.status;
 }
 
+Door *Building::getDoor(DoorID id)
+{
+	auto door = doors.find(id);
+	return door == doors.end() ? nullptr : &door->second;
+}
+
 std::size_t Building::getWindowCount() const
 {
 	return windows.size();

@@ -287,6 +287,10 @@ void WorldTerrain::applyTiles(Tileset &tileset)
 	}
 
 	tmx = nullptr;
+}
+
+void WorldTerrain::loadBlockData()
+{
 	collisionMap.load();
 }
 

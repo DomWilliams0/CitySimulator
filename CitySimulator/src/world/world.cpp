@@ -39,6 +39,10 @@ void WorldService::onEnable()
 			b.addDoor(Location(b.getOutsideWorld()->getID(), door.tile), door.doorID);
 	}
 
+	// load collisions
+	for (auto &pair : terrainCache)
+		pair.second.loadBlockData();
+
 	Logger::popIndent();
 }
 

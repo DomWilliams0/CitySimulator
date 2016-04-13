@@ -20,8 +20,8 @@ enum BlockDataType
 
 struct DoorBlockData
 {
-	Door *door;
-	Building *building;
+	DoorID door;
+	BuildingID building;
 };
 
 struct BlockData

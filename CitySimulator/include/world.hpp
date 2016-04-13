@@ -234,6 +234,8 @@ public:
 
 	void applyTiles(Tileset &tileset);
 
+	void loadBlockData();
+
 
 private:
 	Tileset *tileset;
@@ -296,6 +298,9 @@ public:
 	Building &addBuilding(const sf::IntRect &bounds, WorldID insideWorld);
 
 	Building *getBuildingByID(BuildingID id);
+
+	void getBuildingByOutsideDoorTile(const sf::Vector2i &tile,
+			boost::optional<std::pair<BuildingID, DoorID>> &out);
 
 private:
 	std::unordered_map<BuildingID, Building> buildings;

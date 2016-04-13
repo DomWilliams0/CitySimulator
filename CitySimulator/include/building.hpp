@@ -52,6 +52,8 @@ public:
 
 	bool isWindowLightOn(WindowID window) const;
 
+	Door *getDoor(DoorID id);
+
 	std::size_t getWindowCount() const;
 
 	std::size_t getDoorCount() const;

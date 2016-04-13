@@ -68,7 +68,6 @@ TEST_F(SimpleWorldTest, CollisionBoxes)
 
 	EXPECT_EQ(bw->GetBodyCount(), 1);
 
-
 	b2Body &body = bw->GetBodyList()[0];
 
 	std::size_t count = 0;
@@ -225,4 +224,48 @@ TEST_F(BuildingMapTest, WindowDiscovery)
 
 	EXPECT_EQ(countLitWindows(first), 3);
 	EXPECT_EQ(countLitWindows(second), 1);
+}
+
+b2Fixture *getFixture(b2World *bw, int x, int y)
+{
+	b2Body &body = bw->GetBodyList()[0];
+
+	for (b2Fixture *f = body.GetFixtureList(); f; f = f->GetNext())
+	{
+		if (f->GetShape()->GetType() == b2Shape::e_polygon)
+		{
+			b2PolygonShape *tile = static_cast<b2PolygonShape *>(f->GetShape());
+			int tileX = static_cast<int>(tile->GetVertex(0).x);
+			int tileY = static_cast<int>(tile->GetVertex(0).y);
+			if (tileX == x + 1 && tileY == y)
+				return f;
+		}
+	}
+
+	return nullptr;
+
+
+}
+
+TEST_F(BuildingMapTest, DoorBlockData)
+{
+	b2World *bw = world->getBox2DWorld();
+	ASSERT_NE(bw, nullptr);
+
+	b2Fixture *doorFixture = getFixture(bw, 32, 12);
+	ASSERT_NE(doorFixture, nullptr);
+	ASSERT_NE(doorFixture->GetUserData(), nullptr);
+
+	BodyData *bodyData = static_cast<BodyData *>(doorFixture->GetUserData());
+	ASSERT_EQ(bodyData->type, BODYDATA_BLOCK);
+
+	BlockData &blockData = bodyData->blockData;
+	ASSERT_EQ(blockData.blockDataType, BLOCKDATA_DOOR);
+
+	DoorBlockData &doorData = blockData.door;
+
+	Building *building = world->getBuildingMap().getBuildingByID(doorData.building);
+	ASSERT_NE(building, nullptr);
+	EXPECT_EQ(doorData.door, 2);
+
 }
