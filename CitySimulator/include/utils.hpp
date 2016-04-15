@@ -30,6 +30,18 @@ struct Location
 	{
 	}
 
+	void set(WorldID world, int x, int y)
+	{
+		this->world = world;
+		this->x = x;
+		this->y = y;
+	}
+
+	void set(WorldID world, const sf::Vector2i &tile)
+	{
+		set(world, tile.x, tile.y);
+	}
+
 	friend bool operator==(const Location &a, const Location &b)
 	{
 		return a.world == b.world &&

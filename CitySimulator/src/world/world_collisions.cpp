@@ -237,6 +237,7 @@ BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &
 		BodyData *data = new BodyData; // todo cache
 		data->type = BODYDATA_BLOCK;
 		data->blockData.blockDataType = BLOCKDATA_DOOR;
+		data->blockData.location.set(container->getID(), tilePos);
 
 		boost::optional<std::pair<BuildingID, DoorID>> buildingAndDoor;
 		container->getBuildingMap().getBuildingByOutsideDoorTile(tilePos, buildingAndDoor);
@@ -282,29 +283,29 @@ void CollisionMap::GlobalContactListener::BeginContact(b2Contact *contact)
 		// door
 		if (block->blockData.blockDataType == BLOCKDATA_DOOR)
 		{
-			// todo
-			/* DoorBlockData *door = &block->blockData.door; */
-			/* Door *targetDoor = door->building->getConnectedDoor(door->door); */
-			/* if (targetDoor == nullptr) */
-			/* { */
-			/* 	Logger::logError(format("Could not find connected door for door %1% in building %2%", */
-			/* 							_str(door->door->id), _str(door->building->getID()))); */
-			/* 	return; */
-			/* } */
+			DoorBlockData *door = &block->blockData.door;
+			WorldService *ws = Locator::locate<WorldService>();
 
-			/* Event event; */
-			/* event.type = EVENT_HUMAN_JOIN_WORLD; */
-			/* event.entityID = entity->entityID.id; */
-			/* event.joinWorld.newWorldID = 1010101; // todo world's need IDs! */
+			Location target;
+			if (!ws->getConnectionDestination(block->blockData.location, target))
+			{
+				Logger::logError(format("Door %1% in world %2% has no target location",
+										_str(door->door), _str(block->blockData.location.world)));
+				return;
+			}
 
-			/* event.joinWorld.spawnDirection = DIRECTION_NORTH; // todo store in Door */
-			/* event.joinWorld.spawnX = targetDoor->localTilePos.x; */
-			/* event.joinWorld.spawnY = targetDoor->localTilePos.y; */
+			Event event;
+			event.type = EVENT_HUMAN_SWITCH_WORLD;
+			event.entityID = entity->entityID.id;
+			event.switchWorld.newWorld = target.world;
 
-			/* Logger::logDebug(format("Door interaction with building %1%", _str(door->building->getID()))); */
+			/* event.switchWorld.spawnDirection = DIRECTION_NORTH; */ // todo store in Door
+			event.switchWorld.spawnX = target.x;
+			event.switchWorld.spawnY = target.y;
 
-			/* // todo complete the two above todos before actually calling the event */
-			/* // Locator::locate<EventService>()->callEvent(event); */
+			Logger::logDebug(format("Door interaction with door %1%", _str(door->door)));
+
+			Locator::locate<EventService>()->callEvent(event);
 		}
 
 

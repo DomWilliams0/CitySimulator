@@ -27,7 +27,12 @@ struct DoorBlockData
 struct BlockData
 {
 	BlockDataType blockDataType;
-	DoorBlockData door;
+	Location location;
+
+	union
+	{
+		DoorBlockData door;
+	};
 };
 
 struct BodyData
