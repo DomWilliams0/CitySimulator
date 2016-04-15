@@ -17,7 +17,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName)
 	LoadedWorld &mainWorld = loadWorld(mainWorldName, false);
 	if (mainWorld.failed())
 	{
-		Logger::logError("Failed to load main world");
+		error("Failed to load main world");
 		return nullptr;
 	}
 
@@ -42,8 +42,8 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName)
 		LoadedBuilding *owningBuilding = findDoorBuilding(door);
 		if (owningBuilding == nullptr)
 		{
-			Logger::logError(format("A door at (%1%, %2%) is not in any buildings!",
-			            _str(door.tile.x), _str(door.tile.y)));
+			error("A door at (%1%, %2%) is not in any buildings!",
+			            _str(door.tile.x), _str(door.tile.y));
 			return nullptr;
 		}
 
