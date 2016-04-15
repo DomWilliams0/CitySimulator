@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="15" tilewidth="16" tileheight="16">
- <properties>
-  <property name="type" value="outside"/>
- </properties>
- <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="15" tilewidth="16" tileheight="16" nextobjectid="16">
+ <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="100" columns="10">
   <image source="tileset.png" width="160" height="160"/>
  </tileset>
  <layer name="underterrain" width="30" height="15">
@@ -64,20 +61,20 @@
 </data>
  </layer>
  <objectgroup name="objects">
-  <object gid="9" x="0" y="112"/>
-  <object gid="9" x="28.9837" y="106.577" rotation="31.8341"/>
-  <object gid="9" x="61.2396" y="100.505" rotation="-297.006"/>
-  <object gid="9" x="97.0541" y="95.0695" rotation="-262.875"/>
-  <object gid="9" x="140.127" y="93.4659" rotation="-203.606"/>
-  <object gid="9" x="177.331" y="97.6028" rotation="-169.433"/>
-  <object gid="9" x="208.783" y="111.132" rotation="-95.9229"/>
-  <object gid="9" x="234.049" y="115.127" rotation="-55.436"/>
-  <object gid="9" x="259.904" y="114.546" rotation="-23.7728"/>
-  <object gid="9" x="293.378" y="115.006" rotation="-31.5986"/>
-  <object gid="9" x="182.399" y="173.311" rotation="212.984"/>
-  <object gid="9" x="54.4865" y="50.5125" rotation="23.322"/>
-  <object gid="9" x="330.62" y="30.7651" rotation="-14.669"/>
-  <object gid="9" x="337.767" y="70.5964" rotation="-243.373"/>
-  <object gid="9" x="440.297" y="120.824" rotation="32.2835"/>
+  <object id="1" gid="9" x="0" y="112" width="16" height="16"/>
+  <object id="2" gid="9" x="28.9837" y="106.577" width="16" height="16" rotation="31.8341"/>
+  <object id="3" gid="9" x="61.2396" y="100.505" width="16" height="16" rotation="-297.006"/>
+  <object id="4" gid="9" x="97.0541" y="95.0695" width="16" height="16" rotation="-262.875"/>
+  <object id="5" gid="9" x="140.127" y="93.4659" width="16" height="16" rotation="-203.606"/>
+  <object id="6" gid="9" x="177.331" y="97.6028" width="16" height="16" rotation="-169.433"/>
+  <object id="7" gid="9" x="208.783" y="111.132" width="16" height="16" rotation="-95.9229"/>
+  <object id="8" gid="9" x="234.049" y="115.127" width="16" height="16" rotation="-55.436"/>
+  <object id="9" gid="9" x="259.904" y="114.546" width="16" height="16" rotation="-23.7728"/>
+  <object id="10" gid="9" x="293.378" y="115.006" width="16" height="16" rotation="-31.5986"/>
+  <object id="11" gid="9" x="182.399" y="173.311" width="16" height="16" rotation="212.984"/>
+  <object id="12" gid="9" x="54.4865" y="50.5125" width="16" height="16" rotation="23.322"/>
+  <object id="13" gid="9" x="330.62" y="30.7651" width="16" height="16" rotation="-14.669"/>
+  <object id="14" gid="9" x="337.767" y="70.5964" width="16" height="16" rotation="-243.373"/>
+  <object id="15" gid="9" x="440.297" y="120.824" width="16" height="16" rotation="32.2835"/>
  </objectgroup>
 </map>

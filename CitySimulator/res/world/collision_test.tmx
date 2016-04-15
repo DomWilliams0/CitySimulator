@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="16" tileheight="16" nextobjectid="74">
- <properties>
-  <property name="type" value="outside"/>
- </properties>
- <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="100">
+ <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="100" columns="10">
   <image source="tileset.png" width="160" height="160"/>
  </tileset>
  <layer name="underterrain" width="16" height="16">
