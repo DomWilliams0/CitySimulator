@@ -2,7 +2,7 @@
 #include "service/locator.hpp"
 
 WorldService::WorldService(const std::string &mainWorldPath, const std::string &tilesetPath)
-		: tileset(tilesetPath), mainWorldName(mainWorldPath)
+		: tileset(tilesetPath), mainWorldName(mainWorldPath), entityTransferListener(this)
 {
 }
 
@@ -44,6 +44,10 @@ void WorldService::onEnable()
 		pair.second.loadBlockData();
 
 	Logger::popIndent();
+
+	// register listener
+	Locator::locate<EventService>()->registerListener(
+			&entityTransferListener, EVENT_HUMAN_SWITCH_WORLD);
 }
 
 void WorldService::onDisable()
@@ -73,6 +77,39 @@ bool WorldService::getConnectionDestination(const Location &src, Location &out)
 
 	out = dst->second;
 	return true;
+}
+
+WorldService::EntityTransferListener::EntityTransferListener(WorldService *ws) : ws(ws)
+{
+}
+
+void WorldService::EntityTransferListener::onEvent(const Event &event)
+{
+	World *newWorld = ws->getWorld(event.switchWorld.newWorld);
+	b2World *newBWorld = newWorld->getBox2DWorld();
+	// todo nullptr should never be returned, throw exception instead
+
+	EntityService *es = Locator::locate<EntityService>();
+	PhysicsComponent *phys = es->getComponent<PhysicsComponent>(event.entityID, COMPONENT_PHYSICS); // todo never return null
+	b2World *oldBWorld = phys->bWorld;
+
+	// clone body and add to new world
+	b2Body *oldBody = phys->body;
+	b2Body *newBody = cloneEntity(oldBody, newBWorld);
+
+	// remove from old world
+	oldBWorld->DestroyBody(oldBody);
+
+	// update component
+	phys->body = newBody;
+	phys->bWorld = newBWorld;
+}
+
+b2Body *WorldService::EntityTransferListener::cloneEntity(b2Body * /* oldBody. */, b2World * /* newWorld */)
+{
+	// todo
+	throw std::runtime_error("Not implemented");
+	return nullptr;
 }
 
 World::World(WorldID id, const std::string &name, bool outside) 

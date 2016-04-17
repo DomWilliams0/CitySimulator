@@ -5,6 +5,7 @@
 #include "world.hpp"
 #include "building.hpp"
 #include "bodydata.hpp"
+#include "events.hpp"
 
 typedef std::unordered_map<Location, Location> WorldConnectionTable;
 
@@ -37,6 +38,17 @@ private:
 	std::unordered_map<WorldID, World *> worlds;
 	std::unordered_map<std::string, WorldTerrain> terrainCache;
 	WorldConnectionTable connectionLookup;
+
+	struct EntityTransferListener : EventListener
+	{
+		WorldService *ws;
+
+		EntityTransferListener(WorldService *ws);
+
+		void onEvent(const Event &event) override;
+
+		b2Body *cloneEntity(b2Body *oldBody, b2World *newWorld);
+	} entityTransferListener;
 
 	struct WorldLoader
 	{
