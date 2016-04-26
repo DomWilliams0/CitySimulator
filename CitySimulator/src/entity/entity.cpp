@@ -214,37 +214,10 @@ void EntityService::addPhysicsComponent(EntityIdentifier &entity, World *world,
 	phys->damping = damping;
 
 	b2World *bWorld = world->getBox2DWorld();
-
 	phys->bWorld = bWorld;
 
-	b2BodyDef def;
-	def.type = b2_dynamicBody;
-	def.position.Set(static_cast<float>(startTilePos.x), static_cast<float>(startTilePos.y));
-	phys->body = bWorld->CreateBody(&def);
-	phys->body->SetFixedRotation(true);
-
-	// basic full body aabb
-	b2PolygonShape aabb;
-
-	const auto scale = Constants::entityScalef / 2;
-	aabb.SetAsBox(
-			scale * (28.f / 32.f), // width: 2px off each side
-			scale * 0.5f, // height: just bottom half
-			b2Vec2(0, scale * 0.75f), // centred over bottom half
-			0.f
-	);
-
-	b2FixtureDef fixDef;
-	fixDef.friction = 0.5f;
-	fixDef.density = 985.f;
-	fixDef.shape = &aabb;
-
-	BodyData *bodyData = new BodyData; // todo make sure to delete bodydata when deleting body (or cache)
-	bodyData->type = BODYDATA_ENTITY;
-	bodyData->entityID = entity;
-	fixDef.userData = bodyData;
-
-	phys->body->CreateFixture(&fixDef);
+	sf::Vector2f pos(static_cast<float>(startTilePos.x), static_cast<float>(startTilePos.y));
+	phys->body = createBody(bWorld, entity, pos);
 }
 
 
@@ -270,3 +243,39 @@ void EntityService::addAIInputComponent(EntityID e)
 	comp->brain.reset(new EntityBrain(e)); // todo allocate on stack
 }
 
+
+/* b2Body *EntityService::createBody(b2World *world, b2Body *clone) */
+b2Body *EntityService::createBody(b2World *world, EntityIdentifier &entity, const sf::Vector2f &pos)
+{
+	b2BodyDef def;
+	def.type = b2_dynamicBody;
+	def.position.Set(pos.x, pos.y);
+	b2Body *ret = world->CreateBody(&def);
+	ret->SetFixedRotation(true);
+
+	// basic full body aabb
+	b2PolygonShape aabb;
+
+	const auto scale = Constants::entityScalef / 2;
+	aabb.SetAsBox(
+			scale * (28.f / 32.f), // width: 2px off each side
+			scale * 0.5f, // height: just bottom half
+			b2Vec2(0, scale * 0.75f), // centred over bottom half
+			0.f
+			);
+
+	b2FixtureDef fixDef;
+	fixDef.friction = 0.5f;
+	fixDef.density = 985.f;
+	fixDef.shape = &aabb;
+
+	BodyData *bodyData = new BodyData; // todo make sure to delete bodydata when deleting body (or cache)
+	bodyData->type = BODYDATA_ENTITY;
+	bodyData->entityID = entity;
+	fixDef.userData = bodyData;
+
+	ret->CreateFixture(&fixDef);
+
+	return ret;
+
+}

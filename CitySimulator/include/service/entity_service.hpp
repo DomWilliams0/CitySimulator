@@ -63,6 +63,11 @@ public:
 
 	void addAIInputComponent(EntityID e);
 
+	/**
+	 * @return A new body with new BodyData for the given entity
+	 */
+	b2Body *createBody(b2World *world, EntityIdentifier &entity, const sf::Vector2f &pos);
+
 private:
 	EntityID entities[MAX_ENTITIES];
 	EntityIdentifier identifiers[MAX_ENTITIES];
