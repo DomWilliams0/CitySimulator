@@ -95,7 +95,7 @@ void WorldService::EntityTransferListener::onEvent(const Event &event)
 
 	// clone body and add to new world
 	b2Body *oldBody = phys->body;
-	b2Body *newBody = cloneEntity(oldBody, newBWorld);
+	b2Body *newBody = es->createBody(newBWorld, oldBody);
 
 	// remove from old world
 	oldBWorld->DestroyBody(oldBody);
@@ -103,13 +103,6 @@ void WorldService::EntityTransferListener::onEvent(const Event &event)
 	// update component
 	phys->body = newBody;
 	phys->bWorld = newBWorld;
-}
-
-b2Body *WorldService::EntityTransferListener::cloneEntity(b2Body * /* oldBody. */, b2World * /* newWorld */)
-{
-	// todo
-	throw std::runtime_error("Not implemented");
-	return nullptr;
 }
 
 World::World(WorldID id, const std::string &name, bool outside) 

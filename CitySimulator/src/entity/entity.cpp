@@ -244,7 +244,17 @@ void EntityService::addAIInputComponent(EntityID e)
 }
 
 
-/* b2Body *EntityService::createBody(b2World *world, b2Body *clone) */
+b2Body *EntityService::createBody(b2World *world, b2Body *clone)
+{
+	sf::Vector2f pos = Utils::fromB2Vec<float>(clone->GetPosition());
+	BodyData *bodyData = static_cast<BodyData*>(clone->GetFixtureList()->GetUserData());
+	if (bodyData->type != BODYDATA_ENTITY)
+		error("Cannot clone non-entities");
+
+	EntityIdentifier &id = bodyData->entityID;
+	return createBody(world, id, pos);
+}
+
 b2Body *EntityService::createBody(b2World *world, EntityIdentifier &entity, const sf::Vector2f &pos)
 {
 	b2BodyDef def;

@@ -68,6 +68,11 @@ public:
 	 */
 	b2Body *createBody(b2World *world, EntityIdentifier &entity, const sf::Vector2f &pos);
 
+	/**
+	 * @return A new body with the same BodyData and position as the given body
+	 */
+	b2Body *createBody(b2World *world, b2Body *clone);
+
 private:
 	EntityID entities[MAX_ENTITIES];
 	EntityIdentifier identifiers[MAX_ENTITIES];
