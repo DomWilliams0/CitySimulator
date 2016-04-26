@@ -79,6 +79,16 @@ bool WorldService::getConnectionDestination(const Location &src, Location &out)
 	return true;
 }
 
+void WorldService::tickActiveWorlds(float delta)
+{
+	for (auto &pair : worlds)
+	{
+		World *world = pair.second;
+		if (!world->isEmpty())
+			world->tick(delta);
+	}
+}
+
 WorldService::EntityTransferListener::EntityTransferListener(WorldService *ws) : ws(ws)
 {
 }
@@ -167,6 +177,11 @@ std::string World::getName() const
 bool World::isOutside() const
 {
 	return outside;
+}
+
+bool World::isEmpty()
+{
+	return getBox2DWorld()->GetBodyCount() == 1; // just block collision body
 }
 
 void World::tick(float delta)

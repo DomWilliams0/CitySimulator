@@ -329,6 +329,11 @@ public:
 
 	bool isOutside() const;
 
+	/**
+	 * @return True if there are no entities in this world, otherwise false
+	 */
+	bool isEmpty();
+
 private:
 	WorldID id;
 	std::string name;

@@ -29,13 +29,15 @@ public:
 	  */
 	bool getConnectionDestination(const Location &src, Location &out);
 
+	void tickActiveWorlds(float delta);
+
 private:
 	typedef TreeNode<World> WorldTreeNode;
 
 	Tileset tileset;
 	std::string mainWorldName;
 
-	std::unordered_map<WorldID, World *> worlds;
+	std::map<WorldID, World *> worlds;
 	std::unordered_map<std::string, WorldTerrain> terrainCache;
 	WorldConnectionTable connectionLookup;
 
