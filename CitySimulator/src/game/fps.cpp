@@ -8,7 +8,7 @@ void FPSCounter::init(float waitTime)
 	fpsText.setFont(Constants::mainFont);
 	fpsText.setCharacterSize(16);
 	fpsText.setPosition(20, 20);
-	fpsText.setFillColor(sf::Color::Red);
+	fpsText.setColor(sf::Color::Red);
 }
 
 
