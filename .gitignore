@@ -3,6 +3,7 @@
 *.vcxproj*
 *.cd
 config.json
+.build
 
 .ycm_*
 
