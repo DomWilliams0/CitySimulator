@@ -4,6 +4,7 @@
 *.cd
 config.json
 .build
+*.swp
 
 .ycm_*
 
