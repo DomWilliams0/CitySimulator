@@ -93,6 +93,15 @@ void InputService::clearPlayerEntity()
 	playerEntity.reset();
 	Locator::locate<CameraService>()->clearPlayerEntity();
 }
+bool InputService::hasPlayerEntity()
+{
+	return playerEntity.is_initialized();
+}
+
+EntityID InputService::getPlayerEntity()
+{
+	return playerEntity.get();
+}
 
 
 struct ClickCallback : public b2QueryCallback

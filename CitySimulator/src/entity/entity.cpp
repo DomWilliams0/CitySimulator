@@ -142,6 +142,14 @@ bool EntityService::isAlive(EntityID e) const
 	return entities[e] != COMPONENT_UNKNOWN;
 }
 
+EntityID EntityService::getComponentMask(EntityID e) const
+{
+	if (e < 0 || e >= MAX_ENTITIES)
+		error("EntityID %1% out of range in getComponentMask", _str(e));
+
+	return entities[e];
+}
+
 boost::optional<EntityIdentifier *> EntityService::getEntityIDFromBody(const b2Body &body)
 {
 	auto data = static_cast<BodyData *>(body.GetFixtureList()[0].GetUserData());

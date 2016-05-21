@@ -190,6 +190,11 @@ sf::Vector2f RenderService::mapScreenToWorld(const sf::Vector2i &screenPos)
 	return window->mapPixelToCoords(screenPos, *view);
 }
 
+void RenderService::setView(sf::View &view)
+{
+	this->view = &view;
+}
+
 void RenderService::limitView(const World &world)
 {
 	const sf::Vector2i &worldSize = world.getPixelSize();

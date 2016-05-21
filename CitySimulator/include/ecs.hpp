@@ -74,42 +74,19 @@ struct PhysicsComponent : BaseComponent
 {
 	void reset() override;
 
-	inline sf::Vector2f getTilePosition() const
-	{
-		return Utils::fromB2Vec<float>(body->GetPosition());
-	}
+	sf::Vector2f getTilePosition() const;
 
-	inline sf::Vector2f getPosition() const
-	{
-		b2Vec2 pos(body->GetPosition());
-		return Utils::toPixel(Utils::fromB2Vec<float>(pos));
-	}
+	sf::Vector2f getPosition() const;
 
-	inline sf::Vector2f getVelocity() const
-	{
-		b2Vec2 v = body->GetLinearVelocity();
-		return Utils::fromB2Vec<float>(v);
-	}
+	sf::Vector2f getVelocity() const;
 
-	inline sf::Vector2f getLastVelocity() const
-	{
-		return Utils::fromB2Vec<float>(lastVelocity);
-	}
+	sf::Vector2f getLastVelocity() const;
 
-	inline void setVelocity(const sf::Vector2f &velocity)
-	{
-		body->SetLinearVelocity(Utils::toB2Vec(velocity));
-	}
+	void setVelocity(const sf::Vector2f &velocity);
 
-	inline bool isStopped()
-	{
-		return Math::lengthSquared(getVelocity()) < 1;
-	}
+	bool isStopped();
 
-	inline bool isSteering()
-	{
-		return steering.x != 0.f || steering.y != 0.f;
-	}
+	bool isSteering();
 
 	float maxSpeed;
 	float damping;

@@ -25,13 +25,7 @@ public:
 
 	bool isAlive(EntityID e) const;
 
-	inline EntityID getComponentMask(EntityID e) const
-	{
-		if (e < 0 || e >= MAX_ENTITIES)
-			error("EntityID %1% out of range in getComponentMask", _str(e));
-
-		return entities[e];
-	}
+	EntityID getComponentMask(EntityID e) const;
 
 	boost::optional<EntityIdentifier *> getEntityIDFromBody(const b2Body &body);
 
