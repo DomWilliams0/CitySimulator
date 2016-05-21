@@ -309,11 +309,11 @@ public:
 
 	WorldTerrain *getTerrain();
 
-	CollisionMap *getCollisionMap();
+	CollisionMap *getCollisionMap() const;
 
 	BuildingMap &getBuildingMap();
 
-	b2World *getBox2DWorld();
+	b2World *getBox2DWorld() const;
 
 	sf::Vector2i getPixelSize() const;
 

@@ -148,7 +148,7 @@ WorldTerrain *World::getTerrain()
 	return terrain;
 }
 
-CollisionMap *World::getCollisionMap()
+CollisionMap *World::getCollisionMap() const
 {
 	return terrain == nullptr ? nullptr : terrain->getCollisionMap();
 }
@@ -158,7 +158,7 @@ BuildingMap &World::getBuildingMap()
 	return *buildingMap;
 }
 
-b2World *World::getBox2DWorld()
+b2World *World::getBox2DWorld() const
 {
 	return &getCollisionMap()->world;
 }
@@ -217,5 +217,9 @@ void World::draw(sf::RenderTarget &target, sf::RenderStates states) const
 
 	// overterrain
 	terrain->render(target, states, true);
+
+	// box2d debug
+	if (Config::getBool("debug.render-physics"))
+		getBox2DWorld()->DrawDebugData();
 
 }

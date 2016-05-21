@@ -13,7 +13,6 @@ Game::Game(sf::RenderWindow &window) : BaseGame(window), current(nullptr)
 void Game::start()
 {
 	switchState(StateType::STATE_GAME);
-	box2DWorld = dynamic_cast<GameState *>(current)->getBox2DWorld();
 }
 
 Game::~Game()
@@ -33,9 +32,6 @@ void Game::tick(float delta)
 void Game::render(sf::RenderWindow &window)
 {
 	current->render(window);
-
-	if (box2DWorld != nullptr)
-		box2DWorld->DrawDebugData();
 }
 
 void Game::switchState(StateType newStateType)
