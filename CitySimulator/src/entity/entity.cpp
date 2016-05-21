@@ -253,6 +253,18 @@ void EntityService::addAIInputComponent(EntityID e)
 }
 
 
+b2Body *EntityService::createBody(b2World *world, b2Body *clone, const sf::Vector2f &newPos)
+{
+	b2Body *body = createBody(world, clone);
+
+	body->SetTransform(
+			Utils::toB2Vec(newPos),
+			body->GetTransform().q.GetAngle()
+	);
+
+	return body;
+}
+
 b2Body *EntityService::createBody(b2World *world, b2Body *clone)
 {
 	sf::Vector2f pos = Utils::fromB2Vec<float>(clone->GetPosition());

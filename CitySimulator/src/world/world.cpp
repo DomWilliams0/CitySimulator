@@ -103,9 +103,13 @@ void WorldService::EntityTransferListener::onEvent(const Event &event)
 	PhysicsComponent *phys = es->getComponent<PhysicsComponent>(event.entityID, COMPONENT_PHYSICS); // todo never return null
 	b2World *oldBWorld = phys->bWorld;
 
+	sf::Vector2f newPosition;
+	newPosition.x = event.humanSwitchWorld.spawnX;
+	newPosition.y = event.humanSwitchWorld.spawnY;
+
 	// clone body and add to new world
 	b2Body *oldBody = phys->body;
-	b2Body *newBody = es->createBody(newBWorld, oldBody);
+	b2Body *newBody = es->createBody(newBWorld, oldBody, newPosition);
 
 	// remove from old world
 	oldBWorld->DestroyBody(oldBody);
