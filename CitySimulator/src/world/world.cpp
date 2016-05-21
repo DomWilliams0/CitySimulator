@@ -113,6 +113,7 @@ void WorldService::EntityTransferListener::onEvent(const Event &event)
 	// update component
 	phys->body = newBody;
 	phys->bWorld = newBWorld;
+	phys->world = newWorld->getID();
 
 	// camera target
 	CameraService *cs = Locator::locate<CameraService>();

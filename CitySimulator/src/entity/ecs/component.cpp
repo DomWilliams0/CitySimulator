@@ -15,6 +15,7 @@ void InputComponent::reset()
 
 void PhysicsComponent::reset()
 {
+	world = 0;
 	if (body != nullptr)
 	{
 		bWorld->DestroyBody(body);

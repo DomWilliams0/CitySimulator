@@ -114,6 +114,7 @@ struct PhysicsComponent : BaseComponent
 	float maxSpeed;
 	float damping;
 
+	WorldID world;
 	b2Body *body;
 	b2World *bWorld;
 	b2Vec2 lastVelocity;

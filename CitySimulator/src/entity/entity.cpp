@@ -215,6 +215,7 @@ void EntityService::addPhysicsComponent(EntityIdentifier &entity, World *world,
 
 	b2World *bWorld = world->getBox2DWorld();
 	phys->bWorld = bWorld;
+	phys->world = world->getID();
 
 	sf::Vector2f pos(static_cast<float>(startTilePos.x), static_cast<float>(startTilePos.y));
 	phys->body = createBody(bWorld, entity, pos);
