@@ -48,8 +48,6 @@ private:
 		EntityTransferListener(WorldService *ws);
 
 		void onEvent(const Event &event) override;
-
-		b2Body *cloneEntity(b2Body *oldBody, b2World *newWorld);
 	} entityTransferListener;
 
 	struct WorldLoader
