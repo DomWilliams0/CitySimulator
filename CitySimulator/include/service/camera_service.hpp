@@ -20,11 +20,13 @@ public:
 
 	void tick(float delta);
 
-	void switchWorld(World &world);
+	World *getCurrentWorld();
 
 	void setTrackedEntity(EntityID entity);
 
 	void clearPlayerEntity();
+
+	PhysicsComponent *getTrackedEntity() const;
 
 	void updateViewSize(unsigned int width, unsigned int height);
 
@@ -38,6 +40,16 @@ private:
 	float zoom;
 
 	PlayerMovementController controller;
+
+	struct WorldChangeListener : public EventListener
+	{
+		CameraService *cs;
+
+		WorldChangeListener(CameraService *cs);
+
+		virtual void onEvent(const Event &event) override;
+
+	} worldChangeListener;
 };
 
 #endif

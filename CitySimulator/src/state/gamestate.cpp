@@ -65,7 +65,8 @@ void GameState::tick(float delta)
 
 void GameState::render(sf::RenderWindow &/* window */)
 {
-	Locator::locate<RenderService>()->render(*mainWorld);
+	CameraService *cs = Locator::locate<CameraService>();
+	Locator::locate<RenderService>()->render(*cs->getCurrentWorld());
 }
 
 b2World *GameState::getBox2DWorld()

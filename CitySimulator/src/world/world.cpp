@@ -113,6 +113,19 @@ void WorldService::EntityTransferListener::onEvent(const Event &event)
 	// update component
 	phys->body = newBody;
 	phys->bWorld = newBWorld;
+
+	// camera target
+	CameraService *cs = Locator::locate<CameraService>();
+	if (phys == cs->getTrackedEntity())
+	{
+		Event e;
+		e.type = EVENT_CAMERA_SWITCH_WORLD;
+		e.cameraSwitchWorld.newWorld = event.humanSwitchWorld.newWorld;
+		e.cameraSwitchWorld.centreX = event.humanSwitchWorld.spawnX;
+		e.cameraSwitchWorld.centreY = event.humanSwitchWorld.spawnY;
+
+		Locator::locate<EventService>()->callEvent(e);
+	}
 }
 
 World::World(WorldID id, const std::string &name, bool outside) 
