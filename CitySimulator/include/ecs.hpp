@@ -138,11 +138,12 @@ public:
 
 	void tick(EntityService *es, float dt);
 
-	void render(EntityService *es, sf::RenderWindow &window);
+	void render(EntityService *es, WorldID currentWorld, sf::RenderWindow &window);
 
 	virtual void tickEntity(EntityService *es, EntityID e, float dt) = 0;
 
-	virtual void renderEntity(EntityService * /* es */, EntityID /* e */, sf::RenderWindow &/* window */)
+	virtual void renderEntity(EntityService * /* es */, EntityID /* e */,
+	                          WorldID /* currentWorld */, sf::RenderWindow &/* window */)
 	{
 	}
 
@@ -159,7 +160,7 @@ public:
 
 	void tickEntity(EntityService *es, EntityID e, float dt) override;
 
-	void renderEntity(EntityService *es, EntityID e, sf::RenderWindow &window) override;
+	void renderEntity(EntityService *es, EntityID e, WorldID currentWorld, sf::RenderWindow &window) override;
 };
 
 class InputSystem : public System

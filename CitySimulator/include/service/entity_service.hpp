@@ -38,7 +38,7 @@ public:
 	// systems
 	void tickSystems(float delta);
 
-	void renderSystems();
+	void renderSystems(WorldID currentWorld);
 
 	// component management
 	void removeComponent(EntityID e, ComponentType type);
