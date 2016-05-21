@@ -95,7 +95,7 @@ WorldService::EntityTransferListener::EntityTransferListener(WorldService *ws) :
 
 void WorldService::EntityTransferListener::onEvent(const Event &event)
 {
-	World *newWorld = ws->getWorld(event.switchWorld.newWorld);
+	World *newWorld = ws->getWorld(event.humanSwitchWorld.newWorld);
 	b2World *newBWorld = newWorld->getBox2DWorld();
 	// todo nullptr should never be returned, throw exception instead
 

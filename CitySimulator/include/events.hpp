@@ -16,6 +16,8 @@ enum EventType
 	EVENT_INPUT_STOP_MOVING,
 	EVENT_INPUT_YIELD_CONTROL,
 
+	EVENT_CAMERA_SWITCH_WORLD,
+
 	EVENT_HUMAN_SWITCH_WORLD,
 	EVENT_HUMAN_DEATH,
 	EVENT_HUMAN_INTERACT,
@@ -63,6 +65,13 @@ struct Event
 		/* DirectionType spawnDirection; */
 	};
 
+	struct CameraSwitchWorldEvent
+	{
+		WorldID newWorld;
+		int centreX;
+		int centreY;
+	};
+
 	EventType type;
 	EntityID entityID;
 
@@ -73,7 +82,8 @@ struct Event
 		InputStartMoveEvent startMove;
 		InputStopMoveEvent stopMove;
 		InputSprintEvent sprintToggle;
-		HumanSwitchWorldEvent switchWorld;
+		HumanSwitchWorldEvent humanSwitchWorld;
+		CameraSwitchWorldEvent cameraSwitchWorld;
 	};
 };
 

@@ -297,11 +297,11 @@ void CollisionMap::GlobalContactListener::BeginContact(b2Contact *contact)
 			Event event;
 			event.type = EVENT_HUMAN_SWITCH_WORLD;
 			event.entityID = entity->entityID.id;
-			event.switchWorld.newWorld = target.world;
+			event.humanSwitchWorld.newWorld = target.world;
 
-			/* event.switchWorld.spawnDirection = DIRECTION_NORTH; */ // todo store in Door
-			event.switchWorld.spawnX = target.x;
-			event.switchWorld.spawnY = target.y;
+			/* event.humanSwitchWorld.spawnDirection = DIRECTION_NORTH; */ // todo store in Door
+			event.humanSwitchWorld.spawnX = target.x;
+			event.humanSwitchWorld.spawnY = target.y;
 
 			Logger::logDebug(format("Door interaction with door %1%", _str(door->door)));
 
