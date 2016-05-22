@@ -252,7 +252,8 @@ TEST_F(BuildingConnectionMapTest, DoorBlockData)
 	b2World *bw = world->getBox2DWorld();
 	ASSERT_NE(bw, nullptr);
 
-	b2Fixture *doorFixture = getFixture(bw, 32, 12);
+	sf::Vector2i tile(33, 12);
+	b2Fixture *doorFixture = getFixture(bw, tile.x - 1, tile.y);
 	ASSERT_NE(doorFixture, nullptr);
 	ASSERT_NE(doorFixture->GetUserData(), nullptr);
 
@@ -264,7 +265,12 @@ TEST_F(BuildingConnectionMapTest, DoorBlockData)
 
 	DoorBlockData &doorData = blockData.door;
 
-	Building *building = world->getBuildingConnectionMap()->getBuildingByID(doorData.building);
+	boost::optional<std::pair<BuildingID, DoorID>> buildingAndDoor;
+	world->getBuildingConnectionMap()->getBuildingByOutsideDoorTile(tile, buildingAndDoor);
+
+	ASSERT_TRUE(buildingAndDoor.is_initialized());
+
+	Building *building = world->getBuildingConnectionMap()->getBuildingByID(buildingAndDoor->first);
 	ASSERT_NE(building, nullptr);
 	EXPECT_EQ(doorData.door, 2);
 

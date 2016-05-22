@@ -254,11 +254,10 @@ BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &
 			}
 
 			DoorBlockData *doorData = &data->blockData.door;
-			doorData->building = buildingAndDoor->first;
 			doorData->door = buildingAndDoor->second;
 
 			Logger::logDebuggiest(format("Added door block data to door %1% of building %2% in world %3%",
-			                             _str(doorData->door), _str(doorData->building), _str(container->getID())));
+			                             _str(doorData->door), _str(buildingAndDoor->first), _str(container->getID())));
 
 			return data;
 		}
