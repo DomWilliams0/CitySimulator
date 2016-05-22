@@ -1,5 +1,13 @@
 #include "world.hpp"
 
+void DomesticConnectionMap::addDoor(const sf::Vector2i &tile)
+{
+	Location loc(container->getID(), tile);
+	Door d;
+	d.location = loc;
+
+	doors.insert({loc, d});
+}
 
 Building &BuildingConnectionMap::addBuilding(const sf::IntRect &bounds, WorldID insideWorld)
 {

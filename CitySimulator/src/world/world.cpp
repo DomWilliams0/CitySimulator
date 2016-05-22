@@ -30,13 +30,24 @@ void WorldService::onEnable()
 		worlds[world->getID()] = world;
 	}
 
-	// transfer buildings
+	// transfer buildings and connections
 	BuildingConnectionMap *bm = getMainWorld()->getBuildingConnectionMap();
 	for (WorldLoader::LoadedBuilding &building : loader.buildings)
 	{
 		Building &b = bm->addBuilding(building.bounds, building.insideWorldID);
 		for (WorldLoader::LoadedDoor &door : building.doors)
 			b.addDoor(Location(b.getOutsideWorld()->getID(), door.tile), door.doorID);
+	}
+
+	for (auto &pair : loader.loadedWorlds)
+	{
+		if (pair.second.world->isOutside())
+			continue;
+
+		DomesticConnectionMap *cm = pair.second.world->getDomesticConnectionMap();
+		for (WorldLoader::LoadedDoor &door : pair.second.doors)
+			cm->addDoor(door.tile);
+
 	}
 
 	// load collisions

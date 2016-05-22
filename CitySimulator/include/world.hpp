@@ -302,6 +302,11 @@ public:
 	DomesticConnectionMap(World *container) : ConnectionMap(container)
 	{
 	}
+
+	void addDoor(const sf::Vector2i &tile);
+
+private:
+	std::unordered_map<Location, Door> doors;
 };
 
 /**
