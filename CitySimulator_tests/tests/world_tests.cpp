@@ -27,7 +27,7 @@ protected:\
 
 DECLARE_WORLD_TEST(SimpleWorldTest, "tiny")
 DECLARE_WORLD_TEST(ConnectionLookupTest, "hub")
-DECLARE_WORLD_TEST(BuildingMapTest, "buildings")
+DECLARE_WORLD_TEST(BuildingConnectionMapTest, "buildings")
 
 TEST_F(SimpleWorldTest, WorldService)
 {
@@ -173,34 +173,34 @@ TEST_F(ConnectionLookupTest, ConnectionLookup)
 				{"hub", "single-test", "none-test", "none-double-test", "none-double-test"}));
 }
 
-BuildingID findFirstBuilding(BuildingMap &bm, BuildingID max)
+BuildingID findFirstBuilding(BuildingConnectionMap *bm, BuildingID max)
 {
 	for (int id = 0; id <= max; ++id)
-		if (bm.getBuildingByID(id) != nullptr)
+		if (bm->getBuildingByID(id) != nullptr)
 			return id;
 
 	error("No buildings found with an ID less than %1%", _str(max));
 	return 0;
 }
 
-TEST_F(BuildingMapTest, BuildingDiscovery)
+TEST_F(BuildingConnectionMapTest, BuildingDiscovery)
 {
-	BuildingID firstID = findFirstBuilding(world->getBuildingMap(), MAX_BUILDING_ID);
+	BuildingID firstID = findFirstBuilding(world->getBuildingConnectionMap(), MAX_BUILDING_ID);
 
-	Building *first = world->getBuildingMap().getBuildingByID(firstID);
+	Building *first = world->getBuildingConnectionMap()->getBuildingByID(firstID);
 	ASSERT_NE(first, nullptr);
 	EXPECT_EQ(first->getID(), firstID);
 	EXPECT_EQ(first->getInsideWorldName(), "none-double-test");
 	EXPECT_EQ(first->getDoorCount(), 2);
 
-	Building *second = world->getBuildingMap().getBuildingByID(firstID + 1);
+	Building *second = world->getBuildingConnectionMap()->getBuildingByID(firstID + 1);
 	ASSERT_NE(second, nullptr);
 	EXPECT_EQ(second->getID(), firstID + 1);
 	EXPECT_EQ(second->getInsideWorldName(), "none-test");
 	EXPECT_EQ(second->getDoorCount(), 1);
 
 	// no more
-	EXPECT_EQ(world->getBuildingMap().getBuildingByID(firstID + 2), nullptr);
+	EXPECT_EQ(world->getBuildingConnectionMap()->getBuildingByID(firstID + 2), nullptr);
 }
 
 int countLitWindows(Building *building)
@@ -213,11 +213,11 @@ int countLitWindows(Building *building)
 	return count;
 }
 
-TEST_F(BuildingMapTest, WindowDiscovery)
+TEST_F(BuildingConnectionMapTest, WindowDiscovery)
 {
-	Building *first = world->getBuildingMap().getBuildingByID(
-			findFirstBuilding(world->getBuildingMap(), MAX_BUILDING_ID));
-	Building *second = world->getBuildingMap().getBuildingByID(first->getID() + 1);
+	Building *first = world->getBuildingConnectionMap()->getBuildingByID(
+			findFirstBuilding(world->getBuildingConnectionMap(), MAX_BUILDING_ID));
+	Building *second = world->getBuildingConnectionMap()->getBuildingByID(first->getID() + 1);
 
 	EXPECT_EQ(first->getWindowCount(), 18);
 	EXPECT_EQ(second->getWindowCount(), 8);
@@ -247,7 +247,7 @@ b2Fixture *getFixture(b2World *bw, int x, int y)
 
 }
 
-TEST_F(BuildingMapTest, DoorBlockData)
+TEST_F(BuildingConnectionMapTest, DoorBlockData)
 {
 	b2World *bw = world->getBox2DWorld();
 	ASSERT_NE(bw, nullptr);
@@ -264,7 +264,7 @@ TEST_F(BuildingMapTest, DoorBlockData)
 
 	DoorBlockData &doorData = blockData.door;
 
-	Building *building = world->getBuildingMap().getBuildingByID(doorData.building);
+	Building *building = world->getBuildingConnectionMap()->getBuildingByID(doorData.building);
 	ASSERT_NE(building, nullptr);
 	EXPECT_EQ(doorData.door, 2);
 
