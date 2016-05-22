@@ -253,11 +253,12 @@ BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &
 				return nullptr;
 			}
 
-			DoorBlockData *doorData = &data->blockData.door;
-			doorData->door = buildingAndDoor->second;
+			/* DoorBlockData *doorData = &data->blockData.door; */
 
 			Logger::logDebuggiest(format("Added door block data to door %1% of building %2% in world %3%",
-			                             _str(doorData->door), _str(buildingAndDoor->first), _str(container->getID())));
+			                             _str(buildingAndDoor->second),
+			                             _str(buildingAndDoor->first),
+			                             _str(container->getID())));
 
 			return data;
 		}
@@ -282,18 +283,20 @@ void CollisionMap::GlobalContactListener::BeginContact(b2Contact *contact)
 	{
 		BodyData *entity = aData->type == BODYDATA_ENTITY ? aData : bData;
 		BodyData *block = entity == aData ? bData : aData;
+		BlockData &blockData = block->blockData;
 
 		// door
 		if (block->blockData.blockDataType == BLOCKDATA_DOOR)
 		{
-			DoorBlockData *door = &block->blockData.door;
 			WorldService *ws = Locator::locate<WorldService>();
 
 			Location target;
 			if (!ws->getConnectionDestination(block->blockData.location, target))
 			{
-				Logger::logError(format("Door %1% in world %2% has no target location",
-										_str(door->door), _str(block->blockData.location.world)));
+				Logger::logError(format("Door at (%1%, %2%) in world %3% has no target location",
+										_str(blockData.location.x),
+										_str(blockData.location.y),
+										_str(blockData.location.world)));
 				return;
 			}
 
@@ -306,7 +309,10 @@ void CollisionMap::GlobalContactListener::BeginContact(b2Contact *contact)
 			event.humanSwitchWorld.spawnX = target.x;
 			event.humanSwitchWorld.spawnY = target.y;
 
-			Logger::logDebug(format("Door interaction with door %1%", _str(door->door)));
+			Logger::logDebug(format("Door interaction at (%1%, %2%) in world %3%",
+			                        _str(blockData.location.x),
+			                        _str(blockData.location.y),
+			                        _str(blockData.location.world)));
 
 			Locator::locate<EventService>()->callEvent(event);
 		}

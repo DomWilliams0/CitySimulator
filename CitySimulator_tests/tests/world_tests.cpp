@@ -263,8 +263,6 @@ TEST_F(BuildingConnectionMapTest, DoorBlockData)
 	BlockData &blockData = bodyData->blockData;
 	ASSERT_EQ(blockData.blockDataType, BLOCKDATA_DOOR);
 
-	DoorBlockData &doorData = blockData.door;
-
 	boost::optional<std::pair<BuildingID, DoorID>> buildingAndDoor;
 	world->getBuildingConnectionMap()->getBuildingByOutsideDoorTile(tile, buildingAndDoor);
 
@@ -272,6 +270,4 @@ TEST_F(BuildingConnectionMapTest, DoorBlockData)
 
 	Building *building = world->getBuildingConnectionMap()->getBuildingByID(buildingAndDoor->first);
 	ASSERT_NE(building, nullptr);
-	EXPECT_EQ(doorData.door, 2);
-
 }

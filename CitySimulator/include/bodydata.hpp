@@ -20,7 +20,7 @@ enum BlockDataType
 
 struct DoorBlockData
 {
-	DoorID door;
+	// nothing to see here...
 };
 
 struct BlockData
