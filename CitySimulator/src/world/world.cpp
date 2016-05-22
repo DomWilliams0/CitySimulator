@@ -118,6 +118,10 @@ void WorldService::EntityTransferListener::onEvent(const Event &event)
 	newPosition.x = event.humanSwitchWorld.spawnX;
 	newPosition.y = event.humanSwitchWorld.spawnY;
 
+	// todo temporary fix to prevent teleporting back and forth due to spawning in the door
+	if (!newWorld->isOutside())
+		newPosition.y -= 1;
+
 	// clone body and add to new world
 	b2Body *oldBody = phys->body;
 	b2Body *newBody = es->createBody(newBWorld, oldBody, newPosition);

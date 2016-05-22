@@ -264,6 +264,39 @@ BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &
 		}
 	}
 
+	// inside
+	else
+	{
+		// entrance
+		if (blockType == BLOCK_ENTRANCE_MAT)
+		{
+			BodyData *data = new BodyData; // todo cache
+			data->type = BODYDATA_BLOCK;
+			data->blockData.blockDataType = BLOCKDATA_DOOR;
+			data->blockData.location.set(container->getID(), tilePos);
+
+			Door *door = container->getDomesticConnectionMap()->getDoorByTile(tilePos);
+
+			if (door == nullptr)
+			{
+				Logger::logWarning(
+						format("Cannot add block data for door at (%1%, %2%), because there is no door there",
+						       _str(tilePos.x), _str(tilePos.y)));
+				return nullptr;
+			}
+
+			/* DoorBlockData *doorData = &data->blockData.door; */
+
+			Location &loc = data->blockData.location;
+			Logger::logDebuggiest(format("Added door block data at (%1%, %2%) in world %3%",
+			                             _str(loc.x),
+			                             _str(loc.y),
+			                             _str(loc.world)));
+
+			return data;
+		}
+	}
+
 	return nullptr;
 }
 

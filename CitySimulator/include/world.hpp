@@ -305,6 +305,7 @@ public:
 
 	void addDoor(const sf::Vector2i &tile);
 
+	Door *getDoorByTile(const sf::Vector2i &tile);
 private:
 	std::unordered_map<Location, Door> doors;
 };

@@ -8,6 +8,13 @@ void DomesticConnectionMap::addDoor(const sf::Vector2i &tile)
 
 	doors.insert({loc, d});
 }
+Door *DomesticConnectionMap::getDoorByTile(const sf::Vector2i &tile)
+{
+	Location loc(container->getID(), tile);
+	auto it = doors.find(loc);
+	return it == doors.end() ? nullptr : &it->second;
+}
+
 
 Building &BuildingConnectionMap::addBuilding(const sf::IntRect &bounds, WorldID insideWorld)
 {

@@ -12,7 +12,7 @@ bool isCollidable(BlockType blockType)
 bool isInteractable(BlockType blockType)
 {
 	static const std::set<BlockType> interactables(
-			{BLOCK_SLIDING_DOOR});
+			{BLOCK_SLIDING_DOOR, BLOCK_ENTRANCE_MAT});
 	return interactables.find(blockType) != interactables.end();
 }
 
