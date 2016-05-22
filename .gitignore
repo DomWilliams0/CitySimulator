@@ -5,7 +5,7 @@
 config.json
 .build
 *.swp
-
+todo*
 .ycm_*
 
 ## Ignore Visual Studio temporary files, build results, and
