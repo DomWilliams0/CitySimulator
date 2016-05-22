@@ -43,9 +43,19 @@ enum BlockType
 	BLOCK_UNKNOWN
 };
 
+enum BlockInteractivity
+{
+	INTERACTIVITY_COLLIDE = 1 << 0,
+	INTERACTIVITY_INTERACT = 1 << 1,
+
+	INTERACTIVTY_NONE = 0
+};
+
 bool isCollidable(BlockType blockType);
 
 bool isInteractable(BlockType blockType);
+
+BlockInteractivity getInteractivity(BlockType blockType);
 
 enum LayerType
 {

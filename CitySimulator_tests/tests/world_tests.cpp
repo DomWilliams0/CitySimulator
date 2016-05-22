@@ -271,3 +271,16 @@ TEST_F(BuildingConnectionMapTest, DoorBlockData)
 	Building *building = world->getBuildingConnectionMap()->getBuildingByID(buildingAndDoor->first);
 	ASSERT_NE(building, nullptr);
 }
+
+TEST(WorldUtils, BlockInteractivity)
+{
+	ASSERT_TRUE(isInteractable(BLOCK_SLIDING_DOOR));
+	ASSERT_FALSE(isInteractable(BLOCK_COBBLESTONE));
+
+	ASSERT_TRUE(isCollidable(BLOCK_BUILDING_WALL));
+	ASSERT_FALSE(isCollidable(BLOCK_SAND));
+
+	ASSERT_EQ(getInteractivity(BLOCK_BUILDING_WALL), INTERACTIVITY_COLLIDE);
+	ASSERT_EQ(getInteractivity(BLOCK_ENTRANCE_MAT), INTERACTIVITY_INTERACT);
+	ASSERT_EQ(getInteractivity(BLOCK_DIRT), INTERACTIVTY_NONE);
+}

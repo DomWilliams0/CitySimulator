@@ -16,6 +16,20 @@ bool isInteractable(BlockType blockType)
 	return interactables.find(blockType) != interactables.end();
 }
 
+
+BlockInteractivity getInteractivity(BlockType blockType)
+{
+	int bi = INTERACTIVTY_NONE;
+
+	if (isCollidable(blockType))
+		bi = bi | INTERACTIVITY_COLLIDE;
+
+	if (isInteractable(blockType))
+		bi |= INTERACTIVITY_INTERACT;
+
+	return static_cast<BlockInteractivity>(bi);
+}
+
 LayerType layerTypeFromString(const std::string &s)
 {
 	if (s == "underterrain")
