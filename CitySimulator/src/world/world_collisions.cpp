@@ -231,33 +231,37 @@ void CollisionMap::load()
 
 BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &tilePos)
 {
-	// outside building doors
-	if (blockType == BLOCK_SLIDING_DOOR)
+	// outside only
+	if (container->isOutside())
 	{
-		BodyData *data = new BodyData; // todo cache
-		data->type = BODYDATA_BLOCK;
-		data->blockData.blockDataType = BLOCKDATA_DOOR;
-		data->blockData.location.set(container->getID(), tilePos);
-
-		boost::optional<std::pair<BuildingID, DoorID>> buildingAndDoor;
-		container->getBuildingMap().getBuildingByOutsideDoorTile(tilePos, buildingAndDoor);
-
-		if (!buildingAndDoor)
+		// building doors
+		if (blockType == BLOCK_SLIDING_DOOR)
 		{
-			Logger::logWarning(
-					format("Cannot add block data for door at (%1%, %2%), because there is no building there",
-						   _str(tilePos.x), _str(tilePos.y)));
-			return nullptr;
+			BodyData *data = new BodyData; // todo cache
+			data->type = BODYDATA_BLOCK;
+			data->blockData.blockDataType = BLOCKDATA_DOOR;
+			data->blockData.location.set(container->getID(), tilePos);
+
+			boost::optional<std::pair<BuildingID, DoorID>> buildingAndDoor;
+			container->getBuildingConnectionMap()->getBuildingByOutsideDoorTile(tilePos, buildingAndDoor);
+
+			if (!buildingAndDoor)
+			{
+				Logger::logWarning(
+						format("Cannot add block data for door at (%1%, %2%), because there is no building there",
+						       _str(tilePos.x), _str(tilePos.y)));
+				return nullptr;
+			}
+
+			DoorBlockData *doorData = &data->blockData.door;
+			doorData->building = buildingAndDoor->first;
+			doorData->door = buildingAndDoor->second;
+
+			Logger::logDebuggiest(format("Added door block data to door %1% of building %2% in world %3%",
+			                             _str(doorData->door), _str(doorData->building), _str(container->getID())));
+
+			return data;
 		}
-
-		DoorBlockData *doorData = &data->blockData.door;
-		doorData->building = buildingAndDoor->first;
-		doorData->door = buildingAndDoor->second;
-
-		Logger::logDebuggiest(format("Added door block data to door %1% of building %2% in world %3%",
-					_str(doorData->door), _str(doorData->building), _str(container->getID())));
-
-		return data;
 	}
 
 	return nullptr;

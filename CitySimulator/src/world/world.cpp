@@ -31,10 +31,10 @@ void WorldService::onEnable()
 	}
 
 	// transfer buildings
-	BuildingMap &bm = getMainWorld()->getBuildingMap();
+	BuildingConnectionMap *bm = getMainWorld()->getBuildingConnectionMap();
 	for (WorldLoader::LoadedBuilding &building : loader.buildings)
 	{
-		Building &b = bm.addBuilding(building.bounds, building.insideWorldID);
+		Building &b = bm->addBuilding(building.bounds, building.insideWorldID);
 		for (WorldLoader::LoadedDoor &door : building.doors)
 			b.addDoor(Location(b.getOutsideWorld()->getID(), door.tile), door.doorID);
 	}
@@ -137,9 +137,10 @@ World::World(WorldID id, const std::string &name, bool outside)
 : id(id), name(name), outside(outside)
 {
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
-
 	if (outside)
-		buildingMap.reset(this);
+		connectionMap = dynamic_cast<ConnectionMap *>(new BuildingConnectionMap(this));
+	else
+		connectionMap = dynamic_cast<ConnectionMap *>(new DomesticConnectionMap(this));
 }
 
 void World::setTerrain(WorldTerrain &terrain)
@@ -157,10 +158,25 @@ CollisionMap *World::getCollisionMap() const
 	return terrain == nullptr ? nullptr : terrain->getCollisionMap();
 }
 
-BuildingMap &World::getBuildingMap()
+ConnectionMap *World::getConnectionMap()
 {
-	return *buildingMap;
+	return connectionMap;
 }
+
+BuildingConnectionMap *World::getBuildingConnectionMap()
+{
+	if (!outside)
+		error("Cannot get building connection map for non-outside world");
+	return dynamic_cast<BuildingConnectionMap *>(connectionMap);
+}
+
+DomesticConnectionMap *World::getDomesticConnectionMap()
+{
+	if (outside)
+		error("Cannot get domestic connection map for outside world");
+	return dynamic_cast<DomesticConnectionMap *>(connectionMap);
+}
+
 
 b2World *World::getBox2DWorld() const
 {

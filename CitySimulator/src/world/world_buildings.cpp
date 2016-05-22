@@ -1,7 +1,7 @@
 #include "world.hpp"
 
 
-Building &BuildingMap::addBuilding(const sf::IntRect &bounds, WorldID insideWorld)
+Building &BuildingConnectionMap::addBuilding(const sf::IntRect &bounds, WorldID insideWorld)
 {
 	static BuildingID lastID = 0;
 
@@ -19,14 +19,14 @@ Building &BuildingMap::addBuilding(const sf::IntRect &bounds, WorldID insideWorl
 
 
 
-Building *BuildingMap::getBuildingByID(BuildingID id)
+Building *BuildingConnectionMap::getBuildingByID(BuildingID id)
 {
 	auto it = buildings.find(id);
 	return it == buildings.end() ? nullptr : &it->second;
 }
 
 
-void BuildingMap::getBuildingByOutsideDoorTile(const sf::Vector2i &tile,
+void BuildingConnectionMap::getBuildingByOutsideDoorTile(const sf::Vector2i &tile,
 		boost::optional<std::pair<BuildingID, DoorID>> &out)
 {
 	for (auto &buildingPair : buildings)

@@ -280,12 +280,37 @@ protected:
 };
 
 /**
- * A world item that deals with buildings 
+ * A world item that holds inside doors or outside buildings
  */
-class BuildingMap : public BaseWorld
+class ConnectionMap : public BaseWorld
 {
 public:
-	BuildingMap(World *container) : BaseWorld(container)
+	ConnectionMap(World *container) : BaseWorld(container)
+	{
+	}
+
+	virtual ~ConnectionMap()
+	{
+	}
+};
+/**
+ * A world item that deals with inside doors
+ */
+class DomesticConnectionMap : public ConnectionMap
+{
+public:
+	DomesticConnectionMap(World *container) : ConnectionMap(container)
+	{
+	}
+};
+
+/**
+ * A world item that deals with buildings in outside worlds
+ */
+class BuildingConnectionMap : public ConnectionMap
+{
+public:
+	BuildingConnectionMap(World *container) : ConnectionMap(container)
 	{
 	}
 
@@ -311,7 +336,11 @@ public:
 
 	CollisionMap *getCollisionMap() const;
 
-	BuildingMap &getBuildingMap();
+	ConnectionMap *getConnectionMap();
+
+	BuildingConnectionMap *getBuildingConnectionMap();
+
+	DomesticConnectionMap *getDomesticConnectionMap();
 
 	b2World *getBox2DWorld() const;
 
@@ -340,7 +369,7 @@ private:
 	bool outside;
 
 	WorldTerrain *terrain;
-	boost::optional<BuildingMap> buildingMap;
+	ConnectionMap *connectionMap; // todo use variant/container struct to avoid heap
 
 	// todo move to a WorldRenderer
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
