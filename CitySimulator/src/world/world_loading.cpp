@@ -175,8 +175,11 @@ void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedW
 
 		// add connection to this world's lookup table
 		connectionLookup.emplace(std::piecewise_construct,
-				std::forward_as_tuple(world.world->getID(), door.tile),             // src
-				std::forward_as_tuple(childWorld->world->getID(), targetDoor->tile) // dst
+		                         std::forward_as_tuple(world.world->getID(), door.tile),         // src
+		                         std::forward_as_tuple(
+				                         Location{childWorld->world->getID(), targetDoor->tile}, // dst
+				                         door.orientation
+		                         )
 				);
 
 		Logger::logDebuggiest(format("Added world connection %1% to %2% from %3% through door %4%",
@@ -282,6 +285,14 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 			d.tile.y = (tile.tile.position.y / Constants::tilesetResolution);
 			d.doorID = boost::lexical_cast<int>(propObj.getProperty(TMX::PROPERTY_DOOR_ID));
 			d.doorTag = DOORTAG_UNKNOWN;
+
+			if (!propObj.hasProperty(TMX::PROPERTY_DOOR_ORIENTATION))
+				error("Door at (%1%, %2%) in world %3% is missing \"door-orientation\"",
+				      _str(d.tile.x), _str(d.tile.y), _str(worldID));
+
+			d.orientation = Direction::parseString(propObj.getProperty(TMX::PROPERTY_DOOR_ORIENTATION));
+			if (d.orientation == DIRECTION_UNKNOWN)
+				error("Invalid direction \"%1%\"", propObj.getProperty(TMX::PROPERTY_DOOR_ORIENTATION));
 
 			// preloaded
 			if (propObj.hasProperty(TMX::PROPERTY_DOOR_WORLD_ID))

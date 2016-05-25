@@ -7,7 +7,7 @@
 #include "bodydata.hpp"
 #include "events.hpp"
 
-typedef std::unordered_map<Location, Location> WorldConnectionTable;
+typedef std::unordered_map<Location, std::pair<Location, DirectionType>> WorldConnectionTable;
 
 class WorldService : public BaseService
 {
@@ -28,6 +28,8 @@ public:
 	  *         otherwise false if no connection was found
 	  */
 	bool getConnectionDestination(const Location &src, Location &out);
+
+	DirectionType getDoorOrientation(const Location &door);
 
 	void tickActiveWorlds(float delta);
 
@@ -87,6 +89,7 @@ private:
 			std::string worldName;
 			std::string worldShare;
 			WorldID worldID;
+			DirectionType orientation;
 		};
 
 		struct LoadedBuilding

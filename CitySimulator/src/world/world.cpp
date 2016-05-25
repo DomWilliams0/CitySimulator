@@ -80,13 +80,22 @@ World *WorldService::getWorld(WorldID id)
 	return world == worlds.end() ? nullptr : world->second;
 }
 
+DirectionType WorldService::getDoorOrientation(const Location &door)
+{
+	auto dst = connectionLookup.find(door);
+	if (dst == connectionLookup.end())
+		return DIRECTION_UNKNOWN;
+
+	return dst->second.second;
+}
+
 bool WorldService::getConnectionDestination(const Location &src, Location &out)
 {
 	auto dst = connectionLookup.find(src);
 	if (dst == connectionLookup.end())
 		return false;
 
-	out = dst->second;
+	out = dst->second.first;
 	return true;
 }
 
@@ -104,6 +113,22 @@ WorldService::EntityTransferListener::EntityTransferListener(WorldService *ws) :
 {
 }
 
+void adjustSpawnOffset(sf::Vector2f &spawnPos, sf::Vector2f &directionOut, World *world, WorldService *ws)
+{
+	DirectionType orientation = ws->getDoorOrientation({world->getID(), (int) spawnPos.x, (int) spawnPos.y});
+	if (orientation == DIRECTION_UNKNOWN)
+		return;
+
+	float dx, dy;
+	Direction::toVector(orientation, dx, dy);
+
+	spawnPos.x += dx;
+	spawnPos.y += dy;
+
+	directionOut.x = dx;
+	directionOut.y = dy;
+}
+
 void WorldService::EntityTransferListener::onEvent(const Event &event)
 {
 	World *newWorld = ws->getWorld(event.humanSwitchWorld.newWorld);
@@ -114,13 +139,10 @@ void WorldService::EntityTransferListener::onEvent(const Event &event)
 	PhysicsComponent *phys = es->getComponent<PhysicsComponent>(event.entityID, COMPONENT_PHYSICS); // todo never return null
 	b2World *oldBWorld = phys->bWorld;
 
-	sf::Vector2f newPosition;
+	sf::Vector2f newPosition, newDirection;
 	newPosition.x = event.humanSwitchWorld.spawnX;
 	newPosition.y = event.humanSwitchWorld.spawnY;
-
-	// todo temporary fix to prevent teleporting back and forth due to spawning in the door
-	if (!newWorld->isOutside())
-		newPosition.y -= 1;
+	adjustSpawnOffset(newPosition, newDirection, newWorld, ws);
 
 	// clone body and add to new world
 	b2Body *oldBody = phys->body;
@@ -133,6 +155,7 @@ void WorldService::EntityTransferListener::onEvent(const Event &event)
 	phys->body = newBody;
 	phys->bWorld = newBWorld;
 	phys->world = newWorld->getID();
+	phys->setVelocity(newDirection);
 
 	// camera target
 	CameraService *cs = Locator::locate<CameraService>();
@@ -141,8 +164,8 @@ void WorldService::EntityTransferListener::onEvent(const Event &event)
 		Event e;
 		e.type = EVENT_CAMERA_SWITCH_WORLD;
 		e.cameraSwitchWorld.newWorld = event.humanSwitchWorld.newWorld;
-		e.cameraSwitchWorld.centreX = event.humanSwitchWorld.spawnX;
-		e.cameraSwitchWorld.centreY = event.humanSwitchWorld.spawnY;
+		e.cameraSwitchWorld.centreX = (int) newPosition.x;
+		e.cameraSwitchWorld.centreY = (int) newPosition.y;
 
 		Locator::locate<EventService>()->callEvent(e);
 	}

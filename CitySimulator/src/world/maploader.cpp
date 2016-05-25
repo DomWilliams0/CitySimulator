@@ -21,6 +21,8 @@ TMX::PropertyType TMX::propertyTypeFromString(const std::string &s)
 		return PROPERTY_DOOR_WORLD;
 	if (s == "door-id")
 		return PROPERTY_DOOR_ID;
+	if (s == "door-orientation")
+		return PROPERTY_DOOR_ORIENTATION;
 
 	Logger::logWarning("Unknown property: " + s);
 	return PROPERTY_UNKNOWN;

@@ -55,6 +55,25 @@ DirectionType Direction::fromAngle(double degrees)
 	}
 }
 
+
+DirectionType Direction::parseString(const std::string &s)
+{
+	if (s == "N" || s == "n")
+		return DIRECTION_NORTH;
+
+	if (s == "E" || s == "e")
+		return DIRECTION_EAST;
+
+	if (s == "S" || s == "s")
+		return DIRECTION_SOUTH;
+
+	if (s == "W" || s == "w")
+		return DIRECTION_WEST;
+
+	return DIRECTION_UNKNOWN;
+}
+
+
 void Direction::toVector(DirectionType direction, sf::Vector2f &out)
 {
 	float x, y;
@@ -63,7 +82,7 @@ void Direction::toVector(DirectionType direction, sf::Vector2f &out)
 	out.y = y;
 }
 
-void ::Direction::toVector(DirectionType direction, float &xOut, float &yOut)
+void Direction::toVector(DirectionType direction, float &xOut, float &yOut)
 {
 switch (direction)
 	{

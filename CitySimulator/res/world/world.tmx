@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="41" tilewidth="16" tileheight="16" nextobjectid="47">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="41" tilewidth="16" tileheight="16" nextobjectid="49">
  <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="100" columns="10">
   <image source="tileset.png" width="160" height="160"/>
  </tileset>
@@ -173,16 +173,19 @@
   <object id="39" x="704" y="352" width="16" height="16">
    <properties>
     <property name="door-id" value="1"/>
+    <property name="door-orientation" value="S"/>
    </properties>
   </object>
   <object id="40" x="800" y="352" width="16" height="16">
    <properties>
     <property name="door-id" value="2"/>
+    <property name="door-orientation" value="S"/>
    </properties>
   </object>
   <object id="41" x="320" y="288" width="16" height="16">
    <properties>
     <property name="door-id" value="1"/>
+    <property name="door-orientation" value="S"/>
    </properties>
   </object>
   <object id="42" x="672" y="176" width="176" height="192">
