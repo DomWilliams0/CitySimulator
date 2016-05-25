@@ -21,15 +21,14 @@ void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 		for (auto x = 0; x < worldTileSize.x; ++x)
 		{
 			// the only collidable tile layer
-			BlockType bt = container->getTerrain()->getBlockType({x, y}, LAYER_TERRAIN); 
-			bool collide = isCollidable(bt);
-			bool interact = isInteractable(bt);
+			BlockType bt = container->getTerrain()->getBlockType({x, y}, LAYER_TERRAIN);
+			BlockInteractivity interactivity = getInteractivity(bt);
 
-			if (!collide && !interact)
-				continue;
-
-			sf::Vector2f pos(Utils::toPixel(sf::Vector2f(x, y)));
-			rects.emplace_back(sf::FloatRect(pos, size), 0.f, bt);
+			if (interactivity != INTERACTIVTY_NONE)
+			{
+				sf::Vector2f pos(Utils::toPixel(sf::Vector2f(x, y)));
+				rects.emplace_back(sf::FloatRect(pos, size), 0.f, bt);
+			}
 		}
 	}
 
