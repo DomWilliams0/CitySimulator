@@ -72,22 +72,32 @@ bool CollisionMap::compareRectsVertically(const CollisionRect &acr, const Collis
 	return false;
 }
 
+void CollisionMap::moveRects(std::vector<CollisionRect> &src, std::vector<CollisionRect> &dst,
+                             bool (*pred)(const CollisionRect &))
+{
+	// TODO: use STL collection wizardry
+	auto it = src.begin();
+	while (it != src.end())
+	{
+		if (pred(*it))
+		{
+			dst.push_back(*it);
+			it = src.erase(it);
+		}
+		else
+			++it;
+	}
+
+}
+
 void CollisionMap::mergeAdjacentTiles(std::vector<CollisionRect> &rects)
 {
 	std::vector<CollisionRect> rectangles;
 
 	// move all non-interactive rects to rectangles vector
-	auto it = rects.begin();
-	while (it != rects.end())
-	{
-		if (!isInteractable(it->blockType) && it->rotation == 0.f)
-		{
-			rectangles.push_back(*it);
-			it = rects.erase(it);
-		}
-		else
-			++it;
-	}
+	moveRects(rects, rectangles,
+	          [](const CollisionRect &r)
+	          { return !isInteractable(r.blockType) && r.rotation == 0.f; });
 
 	// join individual rects
 	sort(rectangles.begin(), rectangles.end(), compareRectsHorizontally);
@@ -102,6 +112,18 @@ void CollisionMap::mergeAdjacentTiles(std::vector<CollisionRect> &rects)
 		rects.push_back(mergedRect);
 
 	// TODO: join adjacent identical interactive rects in the least hacky way possible
+	rectangles.clear();
+	moveRects(rects, rectangles,
+	          [](const CollisionRect &r)
+	          { return isInteractable(r.blockType); });
+
+	sort(rectangles.begin(), rectangles.end(), compareRectsHorizontally);
+	mergeHelper(rectangles, interactivityChecker);
+	sort(rectangles.begin(), rectangles.end(), compareRectsVertically);
+	mergeHelper(rectangles, dimensionChecker);
+
+	for (auto &mergedRect : rectangles)
+		rects.push_back(mergedRect);
 }
 
 bool CollisionMap::distanceChecker(const CollisionRect *lastCRect, const CollisionRect *currentCRect)
@@ -127,9 +149,9 @@ bool CollisionMap::dimensionChecker(const CollisionRect *lastCRect, const Collis
 
 }
 
-bool CollisionMap::interactivityChecker(const CollisionRect * /* last */, const CollisionRect * /* current */)
+bool CollisionMap::interactivityChecker(const CollisionRect *last, const CollisionRect *current)
 {
-	return false; // TODO
+	return (last->blockType != current->blockType) || distanceChecker(last, current);
 }
 
 void CollisionMap::mergeHelper(std::vector<CollisionRect> &rects,

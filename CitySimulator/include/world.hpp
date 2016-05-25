@@ -198,6 +198,9 @@ private:
 
 	boost::optional<SFMLDebugDraw> b2Renderer;
 
+	void moveRects(std::vector<CollisionRect> &src, std::vector<CollisionRect> &dst,
+	                             bool (*pred)(const CollisionRect &));
+
 	void findCollidableTiles(std::vector<CollisionRect> &rects) const;
 
 	void mergeAdjacentTiles(std::vector<CollisionRect> &rects);
