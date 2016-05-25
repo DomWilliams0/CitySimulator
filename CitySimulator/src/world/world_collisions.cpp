@@ -168,12 +168,12 @@ void CollisionMap::mergeHelper(std::vector<CollisionRect> &rects, bool moveOnIfF
 		const sf::FloatRect &mergeRect = rect->rect;
 		sf::FloatRect &currentRect = current->rect;
 
-		currentRect.left = std::min(currentRect.left, mergeRect.left);
-		currentRect.top = std::min(currentRect.top, mergeRect.top);
-		currentRect.width = std::max(currentRect.left + currentRect.width,
-		                             mergeRect.left + mergeRect.width) - currentRect.left;
-		currentRect.height = std::max(currentRect.top + currentRect.height,
-		                              mergeRect.top + mergeRect.height) - currentRect.top;
+		currentRect.left     = std::min(currentRect.left, mergeRect.left);
+		currentRect.top      = std::min(currentRect.top, mergeRect.top);
+		currentRect.width    = std::max(currentRect.left + currentRect.width,
+		                                mergeRect.left + mergeRect.width) - currentRect.left;
+		currentRect.height   = std::max(currentRect.top + currentRect.height,
+		                                mergeRect.top + mergeRect.height) - currentRect.top;
 
 		lastRect = rect;
 	}
