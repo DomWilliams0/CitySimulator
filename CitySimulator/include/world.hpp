@@ -205,7 +205,12 @@ private:
 	static bool compareRectsHorizontally(const CollisionRect &acr, const CollisionRect &bcr);
 	static bool compareRectsVertically(const CollisionRect &acr, const CollisionRect &bcr);
 
-	void mergeHelper(std::vector<CollisionRect> &rects, bool moveOnIfFar);
+	static bool distanceChecker(const CollisionRect *last, const CollisionRect *current);
+	static bool dimensionChecker(const CollisionRect *last, const CollisionRect *current);
+	static bool interactivityChecker(const CollisionRect *last, const CollisionRect *current);
+
+	void mergeHelper(std::vector<CollisionRect> &rects,
+	                 bool (*nextRowFunc)(const CollisionRect *last, const CollisionRect *current));
 
 	BodyData *createBodyData(BlockType blockType, const sf::Vector2i &tilePos);
 };

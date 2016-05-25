@@ -91,11 +91,11 @@ void CollisionMap::mergeAdjacentTiles(std::vector<CollisionRect> &rects)
 
 	// join individual rects
 	sort(rectangles.begin(), rectangles.end(), compareRectsHorizontally);
-	mergeHelper(rectangles, true);
+	mergeHelper(rectangles, distanceChecker);
 
 	// join rows together
 	sort(rectangles.begin(), rectangles.end(), compareRectsVertically);
-	mergeHelper(rectangles, false);
+	mergeHelper(rectangles, dimensionChecker);
 
 	// add back to returning list
 	for (auto &mergedRect : rectangles)
@@ -104,36 +104,37 @@ void CollisionMap::mergeAdjacentTiles(std::vector<CollisionRect> &rects)
 	// TODO: join adjacent identical interactive rects in the least hacky way possible
 }
 
-void CollisionMap::mergeHelper(std::vector<CollisionRect> &rects, bool moveOnIfFar)
+bool CollisionMap::distanceChecker(const CollisionRect *lastCRect, const CollisionRect *currentCRect)
 {
-	bool (*nextRowFunc)(const CollisionRect *last, const CollisionRect *current);
-	if (moveOnIfFar)
-	{
-		nextRowFunc = [](const CollisionRect *lastCRect, const CollisionRect *cRect)
-		{
-			const sf::FloatRect &rect = cRect->rect;
-			const sf::FloatRect &lastRect = lastCRect->rect;
-			return powf(rect.left - lastRect.left, 2.f) + powf(rect.top - lastRect.top, 2.f) >
-				   Constants::tileSizef * Constants::tileSizef;
-		};
-	}
-	else
-	{
-		nextRowFunc = [](const CollisionRect *lastCRect, const CollisionRect *cRect)
-		{
-			const sf::FloatRect &rect = cRect->rect;
-			const sf::FloatRect &lastRect = lastCRect->rect;
-			
-			// adjacent and same dimensions
-			return !(lastRect.left <= rect.left + rect.width &&
-			         rect.left <= lastRect.left + lastRect.width &&
-			         lastRect.top <= rect.top + rect.height &&
-			         rect.top <= lastRect.top + lastRect.height &&
-			         lastRect.width == rect.width && lastRect.height == rect.height);
-		};
-	}
+	const sf::FloatRect &rect = currentCRect->rect;
+	const sf::FloatRect &lastRect = lastCRect->rect;
+	return powf(rect.left - lastRect.left, 2.f) + powf(rect.top - lastRect.top, 2.f) >
+	       Constants::tileSizef * Constants::tileSizef;
+}
+
+bool CollisionMap::dimensionChecker(const CollisionRect *lastCRect, const CollisionRect *currentCRect)
+{
+	const sf::FloatRect &rect = currentCRect->rect;
+	const sf::FloatRect &lastRect = lastCRect->rect;
+
+	// adjacent and same dimensions
+	return !(lastRect.left <= rect.left + rect.width &&
+	         rect.left <= lastRect.left + lastRect.width &&
+	         lastRect.top <= rect.top + rect.height &&
+	         rect.top <= lastRect.top + lastRect.height &&
+	         lastRect.width == rect.width && lastRect.height == rect.height);
 
 
+}
+
+bool CollisionMap::interactivityChecker(const CollisionRect * /* last */, const CollisionRect * /* current */)
+{
+	return false; // TODO
+}
+
+void CollisionMap::mergeHelper(std::vector<CollisionRect> &rects,
+                               bool (*nextRowFunc)(const CollisionRect *last, const CollisionRect *current))
+{
 	std::vector<CollisionRect> rectsCopy(rects.begin(), rects.end());
 	rects.clear();
 
