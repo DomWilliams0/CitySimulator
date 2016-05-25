@@ -77,7 +77,8 @@ TEST_F(SimpleWorldTest, CollisionBoxes)
 	// 4 borders
 	// 3 water
 	// 3 trees
-	EXPECT_EQ(count, 10);
+	// 1 door
+	EXPECT_EQ(count, 4 + 3 + 3 + 1);
 }
 
 TEST_F(SimpleWorldTest, BlockSetting)
