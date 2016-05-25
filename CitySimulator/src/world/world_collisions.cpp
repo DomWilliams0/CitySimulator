@@ -44,8 +44,11 @@ void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 	}
 }
 
-bool compareRectsHorizontally(const sf::FloatRect &a, const sf::FloatRect &b)
+bool CollisionMap::compareRectsHorizontally(const CollisionRect &acr, const CollisionRect &bcr)
 {
+	const sf::FloatRect &a = acr.rect;
+	const sf::FloatRect &b = bcr.rect;
+
 	if (a.top < b.top) return true;
 	if (b.top < a.top) return false;
 
@@ -55,8 +58,11 @@ bool compareRectsHorizontally(const sf::FloatRect &a, const sf::FloatRect &b)
 	return false;
 }
 
-bool compareRectsVertically(const sf::FloatRect &a, const sf::FloatRect &b)
+bool CollisionMap::compareRectsVertically(const CollisionRect &acr, const CollisionRect &bcr)
 {
+	const sf::FloatRect &a = acr.rect;
+	const sf::FloatRect &b = bcr.rect;
+
 	if (a.left < b.left) return true;
 	if (b.left < a.left) return false;
 
@@ -68,14 +74,15 @@ bool compareRectsVertically(const sf::FloatRect &a, const sf::FloatRect &b)
 
 void CollisionMap::mergeAdjacentTiles(std::vector<CollisionRect> &rects)
 {
-	std::vector<sf::FloatRect> rectangles;
+	std::vector<CollisionRect> rectangles;
 
+	// move all non-interactive rects to rectangles vector
 	auto it = rects.begin();
 	while (it != rects.end())
 	{
 		if (!isInteractable(it->blockType) && it->rotation == 0.f)
 		{
-			rectangles.push_back(it->rect);
+			rectangles.push_back(*it);
 			it = rects.erase(it);
 		}
 		else
@@ -92,45 +99,53 @@ void CollisionMap::mergeAdjacentTiles(std::vector<CollisionRect> &rects)
 
 	// add back to returning list
 	for (auto &mergedRect : rectangles)
-		rects.emplace_back(mergedRect, 0.f);
+		rects.push_back(mergedRect);
+
+	// TODO: join adjacent identical interactive rects in the least hacky way possible
 }
 
-void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar)
+void CollisionMap::mergeHelper(std::vector<CollisionRect> &rects, bool moveOnIfFar)
 {
-	bool (*nextRowFunc)(const sf::FloatRect *last, const sf::FloatRect *current);
+	bool (*nextRowFunc)(const CollisionRect *last, const CollisionRect *current);
 	if (moveOnIfFar)
 	{
-		nextRowFunc = [](const sf::FloatRect *lastRect, const sf::FloatRect *rect)
+		nextRowFunc = [](const CollisionRect *lastCRect, const CollisionRect *cRect)
 		{
-			return powf(rect->left - lastRect->left, 2.f) + powf(rect->top - lastRect->top, 2.f) >
+			const sf::FloatRect &rect = cRect->rect;
+			const sf::FloatRect &lastRect = lastCRect->rect;
+			return powf(rect.left - lastRect.left, 2.f) + powf(rect.top - lastRect.top, 2.f) >
 				   Constants::tileSizef * Constants::tileSizef;
 		};
 	}
 	else
 	{
-		nextRowFunc = [](const sf::FloatRect *lastRect, const sf::FloatRect *rect)
+		nextRowFunc = [](const CollisionRect *lastCRect, const CollisionRect *cRect)
 		{
+			const sf::FloatRect &rect = cRect->rect;
+			const sf::FloatRect &lastRect = lastCRect->rect;
+			
 			// adjacent and same dimensions
-			return !(lastRect->left <= rect->left + rect->width &&
-					 rect->left <= lastRect->left + lastRect->width &&
-					 lastRect->top <= rect->top + rect->height &&
-					 rect->top <= lastRect->top + lastRect->height &&
-					 lastRect->width == rect->width && lastRect->height == rect->height);
+			return !(lastRect.left <= rect.left + rect.width &&
+			         rect.left <= lastRect.left + lastRect.width &&
+			         lastRect.top <= rect.top + rect.height &&
+			         rect.top <= lastRect.top + lastRect.height &&
+			         lastRect.width == rect.width && lastRect.height == rect.height);
 		};
 	}
 
 
-	std::vector<sf::FloatRect> rectsCopy(rects.begin(), rects.end());
+	std::vector<CollisionRect> rectsCopy(rects.begin(), rects.end());
 	rects.clear();
 
-	sf::FloatRect *current = nullptr;
-	sf::FloatRect *lastRect = nullptr;
+	CollisionRect *current = nullptr;
+	CollisionRect *lastRect = nullptr;
 
-	rectsCopy.push_back(sf::FloatRect(-100.f, -100.f, 0.f, 0.f)); // to ensure the last rect is included
+	static CollisionRect placeholder(sf::FloatRect(-100.f, -100.f, 0.f, 0.f), 0.f);
+	rectsCopy.push_back(placeholder); // to ensure the last rect is included
 
 	for (size_t i = 0; i < rectsCopy.size(); ++i)
 	{
-		sf::FloatRect *rect = &rectsCopy[i];
+		CollisionRect *rect = &rectsCopy[i];
 
 		// no current rect expanding
 		if (current == nullptr)
@@ -139,18 +154,26 @@ void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfF
 			continue;
 		}
 
+		// done with current
 		if ((nextRowFunc)(lastRect, rect))
 		{
 			rects.push_back(*current);
+
+			// move on
 			current = lastRect = rect;
 			continue;
 		}
 
 		// stretch current
-		current->left = std::min(current->left, rect->left);
-		current->top = std::min(current->top, rect->top);
-		current->width = std::max(current->left + current->width, rect->left + rect->width) - current->left;
-		current->height = std::max(current->top + current->height, rect->top + rect->height) - current->top;
+		const sf::FloatRect &mergeRect = rect->rect;
+		sf::FloatRect &currentRect = current->rect;
+
+		currentRect.left = std::min(currentRect.left, mergeRect.left);
+		currentRect.top = std::min(currentRect.top, mergeRect.top);
+		currentRect.width = std::max(currentRect.left + currentRect.width,
+		                             mergeRect.left + mergeRect.width) - currentRect.left;
+		currentRect.height = std::max(currentRect.top + currentRect.height,
+		                              mergeRect.top + mergeRect.height) - currentRect.top;
 
 		lastRect = rect;
 	}

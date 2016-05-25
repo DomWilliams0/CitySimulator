@@ -202,7 +202,10 @@ private:
 
 	void mergeAdjacentTiles(std::vector<CollisionRect> &rects);
 
-	void mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar);
+	static bool compareRectsHorizontally(const CollisionRect &acr, const CollisionRect &bcr);
+	static bool compareRectsVertically(const CollisionRect &acr, const CollisionRect &bcr);
+
+	void mergeHelper(std::vector<CollisionRect> &rects, bool moveOnIfFar);
 
 	BodyData *createBodyData(BlockType blockType, const sf::Vector2i &tilePos);
 };
