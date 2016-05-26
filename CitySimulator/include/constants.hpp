@@ -49,6 +49,8 @@ namespace Direction
 
 	void toVector(DirectionType direction, sf::Vector2f &out);
 	void toVector(DirectionType direction, float &xOut, float &yOut);
+
+	bool isHorizontal(DirectionType direction);
 }
 
 enum EntityType

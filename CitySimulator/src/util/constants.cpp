@@ -107,3 +107,9 @@ switch (direction)
 
 	}
 }
+
+
+bool ::Direction::isHorizontal(DirectionType direction)
+{
+	return direction == DIRECTION_EAST || direction == DIRECTION_WEST;
+}
