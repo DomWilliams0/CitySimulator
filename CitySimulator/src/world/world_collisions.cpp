@@ -72,10 +72,11 @@ bool CollisionMap::compareRectsVertically(const CollisionRect &acr, const Collis
 	return false;
 }
 
-void CollisionMap::moveRects(std::vector<CollisionRect> &src, std::vector<CollisionRect> &dst,
-                             bool (*pred)(const CollisionRect &))
+void CollisionMap::mergeRectangles(std::vector<CollisionRect> &src, std::vector<CollisionRect> &dst,
+                                   bool (*pred)(const CollisionRect &))
 {
 	// TODO: use STL collection wizardry
+	dst.clear();
 	auto it = src.begin();
 	while (it != src.end())
 	{
@@ -88,70 +89,55 @@ void CollisionMap::moveRects(std::vector<CollisionRect> &src, std::vector<Collis
 			++it;
 	}
 
+	// join individual rects
+	sort(dst.begin(), dst.end(), compareRectsHorizontally);
+	mergeHelper(dst,
+	            [](const CollisionRect *last, const CollisionRect *current)
+	            {
+		            // same blocktype
+		            if (last->blockType != current->blockType)
+			            return true;
+
+		            float (*square)(float) = [](float f){ return f * f; };
+
+		            const sf::FloatRect &rect = current->rect;
+		            const sf::FloatRect &lastRect = last->rect;
+		            return square(rect.left - lastRect.left) + square(rect.top - lastRect.top) >
+		                   Constants::tileSizef * Constants::tileSizef;
+	            });
+
+	// join rows together
+	sort(dst.begin(), dst.end(), compareRectsVertically);
+	mergeHelper(dst,
+	            [](const CollisionRect *last, const CollisionRect *current)
+	            {
+		            const sf::FloatRect &rect = current->rect;
+		            const sf::FloatRect &lastRect = last->rect;
+
+		            // adjacent and same dimensions
+		            return !(lastRect.left <= rect.left + rect.width &&
+		                     rect.left <= lastRect.left + lastRect.width &&
+		                     lastRect.top <= rect.top + rect.height &&
+		                     rect.top <= lastRect.top + lastRect.height &&
+		                     lastRect.width == rect.width && lastRect.height == rect.height);
+	            });
+
+	// add back to returning list
+	for (auto &mergedRect : dst)
+		src.push_back(mergedRect);
 }
 
 void CollisionMap::mergeAdjacentTiles(std::vector<CollisionRect> &rects)
 {
 	std::vector<CollisionRect> rectangles;
 
-	// move all non-interactive rects to rectangles vector
-	moveRects(rects, rectangles,
-	          [](const CollisionRect &r)
-	          { return !isInteractable(r.blockType) && r.rotation == 0.f; });
+	mergeRectangles(rects, rectangles,
+	                [](const CollisionRect &r)
+	                { return !isInteractable(r.blockType) && r.rotation == 0.f; });
 
-	// join individual rects
-	sort(rectangles.begin(), rectangles.end(), compareRectsHorizontally);
-	mergeHelper(rectangles, distanceChecker);
-
-	// join rows together
-	sort(rectangles.begin(), rectangles.end(), compareRectsVertically);
-	mergeHelper(rectangles, dimensionChecker);
-
-	// add back to returning list
-	for (auto &mergedRect : rectangles)
-		rects.push_back(mergedRect);
-
-	// TODO: join adjacent identical interactive rects in the least hacky way possible
-	rectangles.clear();
-	moveRects(rects, rectangles,
-	          [](const CollisionRect &r)
-	          { return isInteractable(r.blockType); });
-
-	sort(rectangles.begin(), rectangles.end(), compareRectsHorizontally);
-	mergeHelper(rectangles, interactivityChecker);
-	sort(rectangles.begin(), rectangles.end(), compareRectsVertically);
-	mergeHelper(rectangles, dimensionChecker);
-
-	for (auto &mergedRect : rectangles)
-		rects.push_back(mergedRect);
-}
-
-bool CollisionMap::distanceChecker(const CollisionRect *lastCRect, const CollisionRect *currentCRect)
-{
-	const sf::FloatRect &rect = currentCRect->rect;
-	const sf::FloatRect &lastRect = lastCRect->rect;
-	return powf(rect.left - lastRect.left, 2.f) + powf(rect.top - lastRect.top, 2.f) >
-	       Constants::tileSizef * Constants::tileSizef;
-}
-
-bool CollisionMap::dimensionChecker(const CollisionRect *lastCRect, const CollisionRect *currentCRect)
-{
-	const sf::FloatRect &rect = currentCRect->rect;
-	const sf::FloatRect &lastRect = lastCRect->rect;
-
-	// adjacent and same dimensions
-	return !(lastRect.left <= rect.left + rect.width &&
-	         rect.left <= lastRect.left + lastRect.width &&
-	         lastRect.top <= rect.top + rect.height &&
-	         rect.top <= lastRect.top + lastRect.height &&
-	         lastRect.width == rect.width && lastRect.height == rect.height);
-
-
-}
-
-bool CollisionMap::interactivityChecker(const CollisionRect *last, const CollisionRect *current)
-{
-	return (last->blockType != current->blockType) || distanceChecker(last, current);
+	mergeRectangles(rects, rectangles,
+	                [](const CollisionRect &r)
+	                { return isInteractable(r.blockType); });
 }
 
 void CollisionMap::mergeHelper(std::vector<CollisionRect> &rects,
