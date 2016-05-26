@@ -37,12 +37,14 @@
   <object id="21" x="96" y="0" width="32" height="16">
    <properties>
     <property name="door-id" value="1"/>
+    <property name="door-orientation" value="S"/>
     <property name="door-world" value="none-test"/>
    </properties>
   </object>
   <object id="23" x="16" y="80" width="32" height="16">
    <properties>
     <property name="door-id" value="-1"/>
+    <property name="door-orientation" value="N"/>
    </properties>
   </object>
  </objectgroup>

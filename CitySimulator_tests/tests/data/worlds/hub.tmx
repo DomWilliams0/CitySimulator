@@ -42,6 +42,7 @@
   <object id="23" x="16" y="48" width="16" height="16">
    <properties>
     <property name="door-id" value="1"/>
+    <property name="door-orientation" value="S"/>
    </properties>
   </object>
   <object id="24" x="48" y="16" width="48" height="48">
@@ -52,6 +53,7 @@
   <object id="25" x="64" y="48" width="16" height="16">
    <properties>
     <property name="door-id" value="1"/>
+    <property name="door-orientation" value="S"/>
    </properties>
   </object>
   <object id="26" x="96" y="16" width="48" height="48">
@@ -62,6 +64,7 @@
   <object id="27" x="112" y="48" width="16" height="16">
    <properties>
     <property name="door-id" value="1"/>
+    <property name="door-orientation" value="S"/>
    </properties>
   </object>
  </objectgroup>

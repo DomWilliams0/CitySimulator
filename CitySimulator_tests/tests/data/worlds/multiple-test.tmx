@@ -37,29 +37,34 @@
   <object id="21" x="0" y="0" width="32" height="16">
    <properties>
     <property name="door-id" value="1"/>
+    <property name="door-orientation" value="S"/>
     <property name="door-world" value="single-test"/>
    </properties>
   </object>
   <object id="23" x="16" y="80" width="32" height="16">
    <properties>
     <property name="door-id" value="-1"/>
+    <property name="door-orientation" value="N"/>
    </properties>
   </object>
   <object id="24" x="32" y="0" width="32" height="16">
    <properties>
     <property name="door-id" value="1"/>
+    <property name="door-orientation" value="S"/>
     <property name="door-world" value="none-test"/>
    </properties>
   </object>
   <object id="25" x="112" y="0" width="32" height="16">
    <properties>
     <property name="door-id" value="2"/>
+    <property name="door-orientation" value="S"/>
     <property name="world-share" value="testy"/>
    </properties>
   </object>
   <object id="26" x="80" y="0" width="32" height="16">
    <properties>
     <property name="door-id" value="1"/>
+    <property name="door-orientation" value="S"/>
     <property name="door-world" value="none-double-test"/>
     <property name="world-share-source" value="testy"/>
    </properties>
