@@ -82,21 +82,37 @@ World *WorldService::getWorld(WorldID id)
 
 DirectionType WorldService::getDoorOrientation(const Location &door)
 {
-	auto dst = connectionLookup.find(door);
-	if (dst == connectionLookup.end())
+	WorldService::ConnectionDetails *d = getConnection(door);
+	if (d == nullptr)
 		return DIRECTION_UNKNOWN;
 
-	return dst->second.second;
+	return d->orientation;
+}
+
+bool WorldService::getDoorDimensions(const Location &door, sf::Vector2f &out)
+{
+	WorldService::ConnectionDetails *d = getConnection(door);
+	if (d == nullptr)
+		return false;
+
+	out = d->dimensions;
+	return true;
 }
 
 bool WorldService::getConnectionDestination(const Location &src, Location &out)
 {
-	auto dst = connectionLookup.find(src);
-	if (dst == connectionLookup.end())
+	WorldService::ConnectionDetails *d = getConnection(src);
+	if (d == nullptr)
 		return false;
 
-	out = dst->second.first;
+	out = d->location;
 	return true;
+}
+
+WorldService::ConnectionDetails *WorldService::getConnection(const Location &src)
+{
+	auto dst = connectionLookup.find(src);
+	return dst == connectionLookup.end() ? nullptr : &dst->second;
 }
 
 void WorldService::tickActiveWorlds(float delta)

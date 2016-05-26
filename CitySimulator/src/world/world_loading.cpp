@@ -178,7 +178,8 @@ void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedW
 		                         std::forward_as_tuple(world.world->getID(), door.tile),         // src
 		                         std::forward_as_tuple(
 				                         Location{childWorld->world->getID(), targetDoor->tile}, // dst
-				                         door.orientation
+				                         door.orientation,
+				                         door.dimensions
 		                         )
 				);
 
@@ -285,6 +286,7 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 			d.tile.y = (tile.tile.position.y / Constants::tilesetResolution);
 			d.doorID = boost::lexical_cast<int>(propObj.getProperty(TMX::PROPERTY_DOOR_ID));
 			d.doorTag = DOORTAG_UNKNOWN;
+			d.dimensions = propObj.dimensions;
 
 			if (!propObj.hasProperty(TMX::PROPERTY_DOOR_ORIENTATION))
 				error("Door at (%1%, %2%) in world %3% is missing \"door-orientation\"",

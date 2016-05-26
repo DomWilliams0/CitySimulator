@@ -7,8 +7,6 @@
 #include "bodydata.hpp"
 #include "events.hpp"
 
-typedef std::unordered_map<Location, std::pair<Location, DirectionType>> WorldConnectionTable;
-
 class WorldService : public BaseService
 {
 public:
@@ -31,10 +29,25 @@ public:
 
 	DirectionType getDoorOrientation(const Location &door);
 
+	bool getDoorDimensions(const Location &door, sf::Vector2f &out);
+
 	void tickActiveWorlds(float delta);
 
 private:
+
+	struct ConnectionDetails
+	{
+		Location location;
+		DirectionType orientation;
+		sf::Vector2f dimensions;
+
+		ConnectionDetails(const Location &location, DirectionType orientation, const sf::Vector2f &dimensions)
+				: location(location), orientation(orientation), dimensions(dimensions)
+		{ }
+	};
+
 	typedef TreeNode<World> WorldTreeNode;
+	typedef std::unordered_map<Location, WorldService::ConnectionDetails> WorldConnectionTable;
 
 	Tileset tileset;
 	std::string mainWorldName;
@@ -42,6 +55,8 @@ private:
 	std::map<WorldID, World *> worlds;
 	std::unordered_map<std::string, WorldTerrain> terrainCache;
 	WorldConnectionTable connectionLookup;
+
+	ConnectionDetails *getConnection(const Location &src);
 
 	struct EntityTransferListener : EventListener
 	{
@@ -89,7 +104,9 @@ private:
 			std::string worldName;
 			std::string worldShare;
 			WorldID worldID;
+
 			DirectionType orientation;
+			sf::Vector2f dimensions;
 		};
 
 		struct LoadedBuilding
