@@ -200,25 +200,25 @@ void TMX::Tile::processRotation(std::bitset<3> rotation)
 	{
 		if (h && v)
 		{
-			rotationAngle = 90;
+			rotationAngle = -90;
 			flipGID ^= VERTICAL;
 		}
 
 		else if (h)
 		{
-			rotationAngle = -90;
+			rotationAngle = 90;
 			flipGID ^= VERTICAL;
 		}
 
 		else if (v)
 		{
-			rotationAngle = 90;
+			rotationAngle = -90;
 			flipGID ^= HORIZONTAL;
 		}
 
 		else
 		{
-			rotationAngle = -90;
+			rotationAngle = 90;
 			flipGID ^= HORIZONTAL;
 		}
 	}
