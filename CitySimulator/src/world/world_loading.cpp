@@ -5,9 +5,10 @@
 
 WorldService::WorldLoader::WorldLoader(
 		WorldConnectionTable &connectionLookup,
+		std::unordered_map<Location, ConnectionDetails> &doorDetails,
 		std::unordered_map<std::string, WorldTerrain> &terrainCache
 		) :
-	lastWorldID(0), terrainCache(terrainCache), connectionLookup(connectionLookup)
+		lastWorldID(0), connectionLookup(connectionLookup), doorDetails(doorDetails), terrainCache(terrainCache)
 {
 }
 
@@ -174,14 +175,12 @@ void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedW
 		}
 
 		// add connection to this world's lookup table
+		Location loc(world.world->getID(), door.tile);
 		connectionLookup.emplace(std::piecewise_construct,
-		                         std::forward_as_tuple(world.world->getID(), door.tile),         // src
-		                         std::forward_as_tuple(
-				                         Location{childWorld->world->getID(), targetDoor->tile}, // dst
-				                         door.orientation,
-				                         door.dimensions
-		                         )
-				);
+		                         std::forward_as_tuple(loc),
+		                         std::forward_as_tuple(childWorld->world->getID(), targetDoor->tile));
+
+		doorDetails.insert({loc, ConnectionDetails(loc, door.orientation, door.dimensions)});
 
 		Logger::logDebuggiest(format("Added world connection %1% to %2% from %3% through door %4%",
 					door.doorID < 0 ? "up" : "down", _str(world.world->getID()), 

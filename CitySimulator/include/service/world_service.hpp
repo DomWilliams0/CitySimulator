@@ -47,7 +47,7 @@ private:
 	};
 
 	typedef TreeNode<World> WorldTreeNode;
-	typedef std::unordered_map<Location, WorldService::ConnectionDetails> WorldConnectionTable;
+	typedef std::unordered_map<Location, Location> WorldConnectionTable;
 
 	Tileset tileset;
 	std::string mainWorldName;
@@ -55,8 +55,7 @@ private:
 	std::map<WorldID, World *> worlds;
 	std::unordered_map<std::string, WorldTerrain> terrainCache;
 	WorldConnectionTable connectionLookup;
-
-	ConnectionDetails *getConnection(const Location &src);
+	std::unordered_map<Location, ConnectionDetails> doorDetails;
 
 	struct EntityTransferListener : EventListener
 	{
@@ -133,8 +132,9 @@ private:
 		WorldID lastWorldID; // todo be static inside generate()
 		std::unordered_set<int> flippedTileGIDs;
 
-		std::unordered_map<std::string, WorldTerrain> &terrainCache;
 		WorldConnectionTable &connectionLookup;
+		std::unordered_map<Location, ConnectionDetails> &doorDetails;
+		std::unordered_map<std::string, WorldTerrain> &terrainCache;
 
 		std::map<WorldID, LoadedWorld> loadedWorlds;
 		std::vector<LoadedBuilding> buildings;
@@ -145,6 +145,7 @@ private:
 		 */
 		WorldLoader(
 				WorldConnectionTable &connectionLookup,
+				std::unordered_map<Location, ConnectionDetails> &doorDetails,
 				std::unordered_map<std::string, WorldTerrain> &terrainCache
 				);
 

@@ -12,7 +12,7 @@ void WorldService::onEnable()
 	Logger::pushIndent();
 	
 	// load and connect all worlds
-	WorldLoader loader(connectionLookup, terrainCache);
+	WorldLoader loader(connectionLookup, doorDetails, terrainCache);
 	loader.loadWorlds(mainWorldName);
 
 	// generate tileset
@@ -82,37 +82,31 @@ World *WorldService::getWorld(WorldID id)
 
 DirectionType WorldService::getDoorOrientation(const Location &door)
 {
-	WorldService::ConnectionDetails *d = getConnection(door);
-	if (d == nullptr)
+	auto details = doorDetails.find(door);
+	if (details == doorDetails.end())
 		return DIRECTION_UNKNOWN;
 
-	return d->orientation;
+	return details->second.orientation;
 }
 
 bool WorldService::getDoorDimensions(const Location &door, sf::Vector2f &out)
 {
-	WorldService::ConnectionDetails *d = getConnection(door);
-	if (d == nullptr)
+	auto details = doorDetails.find(door);
+	if (details == doorDetails.end())
 		return false;
 
-	out = d->dimensions;
+	out = details->second.dimensions;
 	return true;
 }
 
 bool WorldService::getConnectionDestination(const Location &src, Location &out)
 {
-	WorldService::ConnectionDetails *d = getConnection(src);
-	if (d == nullptr)
+	auto it = connectionLookup.find(src);
+	if (it == connectionLookup.end())
 		return false;
 
-	out = d->location;
+	out = it->second;
 	return true;
-}
-
-WorldService::ConnectionDetails *WorldService::getConnection(const Location &src)
-{
-	auto dst = connectionLookup.find(src);
-	return dst == connectionLookup.end() ? nullptr : &dst->second;
 }
 
 void WorldService::tickActiveWorlds(float delta)
