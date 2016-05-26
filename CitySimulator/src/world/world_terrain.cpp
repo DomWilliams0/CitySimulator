@@ -5,7 +5,7 @@ bool isCollidable(BlockType blockType)
 {
 	static const std::set<BlockType> collidables(
 			{BLOCK_WATER, BLOCK_TREE, BLOCK_BUILDING_WALL, BLOCK_BUILDING_EDGE, BLOCK_BUILDING_ROOF,
-			 BLOCK_BUILDING_ROOF_CORNER});
+			 BLOCK_BUILDING_ROOF_CORNER, BLOCK_BLANK});
 	return collidables.find(blockType) != collidables.end();
 }
 
