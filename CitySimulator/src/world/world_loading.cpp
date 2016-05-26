@@ -285,7 +285,7 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 			d.tile.y = (tile.tile.position.y / Constants::tilesetResolution);
 			d.doorID = boost::lexical_cast<int>(propObj.getProperty(TMX::PROPERTY_DOOR_ID));
 			d.doorTag = DOORTAG_UNKNOWN;
-			d.dimensions = propObj.dimensions;
+			d.dimensions = Math::multiply(propObj.dimensions, 1.f / Constants::tilesetResolution);
 
 			if (!propObj.hasProperty(TMX::PROPERTY_DOOR_ORIENTATION))
 				error("Door at (%1%, %2%) in world %3% is missing \"door-orientation\"",

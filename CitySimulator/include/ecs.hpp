@@ -88,6 +88,8 @@ struct PhysicsComponent : BaseComponent
 
 	bool isSteering();
 
+	void getAABB(b2AABB &out);
+
 	float maxSpeed;
 	float damping;
 

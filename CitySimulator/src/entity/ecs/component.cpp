@@ -1,5 +1,5 @@
 #include "ecs.hpp"
-#include "Box2D/Dynamics/b2World.h"
+#include "Box2D/Box2D.h"
 
 
 void RenderComponent::reset()
@@ -49,6 +49,21 @@ bool PhysicsComponent::isSteering()
 {
 	return steering.x != 0.f || steering.y != 0.f;
 }
+
+
+void PhysicsComponent::getAABB(b2AABB &out)
+{
+	// merci http://gamedev.stackexchange.com/a/1373
+	out.lowerBound = b2Vec2(FLT_MAX, FLT_MAX);
+	out.upperBound = b2Vec2(-FLT_MAX, -FLT_MAX);
+	b2Fixture *fixture = body->GetFixtureList();
+	while (fixture != nullptr)
+	{
+		out.Combine(out, fixture->GetAABB(0));
+		fixture = fixture->GetNext();
+	}
+}
+
 
 void PhysicsComponent::reset()
 {

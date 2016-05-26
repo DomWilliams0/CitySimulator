@@ -123,7 +123,8 @@ WorldService::EntityTransferListener::EntityTransferListener(WorldService *ws) :
 {
 }
 
-void adjustSpawnOffset(sf::Vector2f &spawnPos, sf::Vector2f &directionOut, World *world, WorldService *ws)
+void adjustSpawnOffset(sf::Vector2f &spawnPos, sf::Vector2f &directionOut,
+                       PhysicsComponent *physicsComponent, World *world, WorldService *ws)
 {
 	Location doorLoc(world->getID(), (int) spawnPos.x, (int) spawnPos.y);
 
@@ -142,13 +143,20 @@ void adjustSpawnOffset(sf::Vector2f &spawnPos, sf::Vector2f &directionOut, World
 	if (!ws->getDoorDimensions(doorLoc, dimensions))
 		return;
 
-	bool horizontal = Direction::isHorizontal(orientation);
-	float offset =
-			(horizontal ? dimensions.x : dimensions.y)
-			/ Constants::tileSizef
-			* Utils::random(0.f, 1.f);
+	b2AABB aabb;
+	physicsComponent->getAABB(aabb);
 
-	if (horizontal)
+	bool doorHorizontal     = Direction::isHorizontal(orientation);
+	b2Vec2 entityDimensions = aabb.upperBound - aabb.lowerBound;
+	float entityDimension   = doorHorizontal ? entityDimensions.y : entityDimensions.x;
+	float dimension         = doorHorizontal ? dimensions.y : dimensions.x;
+
+	// random offset
+	float offset =
+			entityDimension / 2 +
+			(dimension - entityDimension) * Utils::random(0.f, 1.f);
+
+	if (doorHorizontal)
 		dy += offset;
 	else
 		dx += offset;
@@ -170,7 +178,7 @@ void WorldService::EntityTransferListener::onEvent(const Event &event)
 	sf::Vector2f newPosition, newDirection;
 	newPosition.x = event.humanSwitchWorld.spawnX;
 	newPosition.y = event.humanSwitchWorld.spawnY;
-	adjustSpawnOffset(newPosition, newDirection, newWorld, ws);
+	adjustSpawnOffset(newPosition, newDirection, phys, newWorld, ws);
 
 	// clone body and add to new world
 	b2Body *oldBody = phys->body;
