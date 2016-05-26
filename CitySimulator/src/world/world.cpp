@@ -131,18 +131,36 @@ WorldService::EntityTransferListener::EntityTransferListener(WorldService *ws) :
 
 void adjustSpawnOffset(sf::Vector2f &spawnPos, sf::Vector2f &directionOut, World *world, WorldService *ws)
 {
-	DirectionType orientation = ws->getDoorOrientation({world->getID(), (int) spawnPos.x, (int) spawnPos.y});
+	Location doorLoc(world->getID(), (int) spawnPos.x, (int) spawnPos.y);
+
+	DirectionType orientation = ws->getDoorOrientation(doorLoc);
 	if (orientation == DIRECTION_UNKNOWN)
 		return;
 
 	float dx, dy;
 	Direction::toVector(orientation, dx, dy);
 
-	spawnPos.x += dx;
-	spawnPos.y += dy;
-
 	directionOut.x = dx;
 	directionOut.y = dy;
+
+	// random offset
+	sf::Vector2f dimensions;
+	if (!ws->getDoorDimensions(doorLoc, dimensions))
+		return;
+
+	bool horizontal = Direction::isHorizontal(orientation);
+	float offset =
+			(horizontal ? dimensions.x : dimensions.y)
+			/ Constants::tileSizef
+			* Utils::random(0.f, 1.f);
+
+	if (horizontal)
+		dy += offset;
+	else
+		dx += offset;
+
+	spawnPos.x += dx;
+	spawnPos.y += dy;
 }
 
 void WorldService::EntityTransferListener::onEvent(const Event &event)
