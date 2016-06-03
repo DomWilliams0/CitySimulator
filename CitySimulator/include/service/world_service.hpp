@@ -176,7 +176,8 @@ private:
 		 * Discovers all worlds by recursing door connections, and loads
 		 * them
 		 */
-		void discoverAndLoadAllWorlds(LoadedWorld &world, std::set<WorldID> &visitedWorlds);
+		void discoverAndLoadAllWorlds(LoadedWorld &world, WorldID lastWorldID,
+		                              std::set<WorldID> &visitedWorlds);
 
 		/**
 		 * Populates the WorldTree with connections between doors
@@ -210,7 +211,9 @@ private:
 		 * @return The partner door in the given world with the given door ID,
 		 * null if not found
 		 */
-		LoadedDoor *findPartnerDoor(LoadedWorld &world, int doorID);
+		WorldService::WorldLoader::LoadedDoor *findPartnerDoor(LoadedWorld &world,
+		                                                       int doorID,
+		                                                       WorldID targetWorld);
 
 	};
 

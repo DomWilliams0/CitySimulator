@@ -56,7 +56,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName)
   	std::set<WorldID> visitedWorlds;
 
 	// load all worlds recursively without connecting doors
-	discoverAndLoadAllWorlds(mainWorld, visitedWorlds);
+	discoverAndLoadAllWorlds(mainWorld, mainWorld.world->getID(), visitedWorlds);
 	visitedWorlds.clear();
 
 	// connect up the doors
@@ -66,8 +66,8 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName)
 }
 
 
-void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world, 
-		std::set<WorldID> &visitedWorlds)
+void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world, WorldID lastWorldID,
+                                                         std::set<WorldID> &visitedWorlds)
 {
   	if (visitedWorlds.find(world.world->getID()) != visitedWorlds.end())
       	return;
@@ -82,9 +82,13 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world,
 	// iterate all doors found in last world
 	for (LoadedDoor &door : world.doors)
 	{
-		// only positive IDs load worlds
-		if (door.doorID <= 0)
+		// initialise negative/ascending doors
+		if (door.doorID < 0)
+		{
+			door.doorTag = DOORTAG_WORLD_ID;
+			door.worldID = lastWorldID;
 			continue;
+		}
 
     	LoadedWorld *newWorld = nullptr;
 
@@ -131,19 +135,19 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world,
       		return;
 		}
 
-    	if (newWorld == nullptr)
-      		newWorld = getLoadedWorld(door.worldID);
+		if (newWorld == nullptr)
+			newWorld = getLoadedWorld(door.worldID);
 
-    	discoverAndLoadAllWorlds(*newWorld, visitedWorlds);
+		discoverAndLoadAllWorlds(*newWorld, world.world->getID(), visitedWorlds);
 	}
 }
 
-WorldService::WorldLoader::LoadedDoor *WorldService::WorldLoader::findPartnerDoor(
-		LoadedWorld &world, int doorID)
+WorldService::WorldLoader::LoadedDoor *WorldService::WorldLoader::findPartnerDoor(LoadedWorld &world,
+                                                                                  int doorID,
+                                                                                  WorldID targetWorld)
 {
-	// todo what if multiple doors to multiple worlds? compare world ID too
 	for (LoadedDoor &door : world.doors)
-		if (door.doorID == -doorID)
+		if (door.doorID == -doorID && door.worldID == targetWorld)
 			return &door;
 
 	return nullptr;
@@ -166,7 +170,7 @@ void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedW
 			return;
 		}
 
-		LoadedDoor *targetDoor = findPartnerDoor(*childWorld, door.doorID);
+		LoadedDoor *targetDoor = findPartnerDoor(*childWorld, door.doorID, world.world->getID());
 		if (targetDoor == nullptr)
 		{
 			Logger::logError(format("Cannot find partner door in world %1% for door %2% in world %3%",
