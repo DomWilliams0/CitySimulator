@@ -22,7 +22,7 @@ enum InputKey
 class MovementController
 {
 public:
-	MovementController()
+	MovementController() : entity(INVALID_ENTITY)
 	{
 	}
 
