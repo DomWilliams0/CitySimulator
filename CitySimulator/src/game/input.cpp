@@ -125,7 +125,7 @@ boost::optional<EntityIdentifier *> InputService::getClickedEntity(const sf::Vec
 	ClickCallback callback;
 	aabb.lowerBound.Set(pos.x - radius, pos.y - radius);
 	aabb.upperBound.Set(pos.x + radius, pos.y + radius);
-	Locator::locate<WorldService>()->getMainWorld()->getBox2DWorld()->QueryAABB(&callback, aabb);
+	Locator::locate<CameraService>()->getCurrentWorld()->getBox2DWorld()->QueryAABB(&callback, aabb);
 
 	if (callback.clickedBody == nullptr)
 		return boost::optional<EntityIdentifier *>();
