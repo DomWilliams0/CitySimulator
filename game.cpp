@@ -3,11 +3,13 @@
 #include "game.hpp"
 #include "service/locator.hpp"
 
-const std::string RESOURCE_DIR("res"); // todo probably shouldn't be hardcoded
+const std::string RESOURCE_DIR("res");
 
 bool ensureCWD(int argc, char **argv)
 {
-	if (!boost::filesystem::exists(boost::filesystem::current_path() / RESOURCE_DIR))
+	using namespace boost::filesystem;
+
+	if (!exists(current_path() / RESOURCE_DIR))
 	{
 		// no args given
 		if (argc != 2)
@@ -17,19 +19,18 @@ bool ensureCWD(int argc, char **argv)
 		}
 
 		// try supplied relative path
-		std::string relativePath = argv[1];
-		boost::filesystem::path newPath = boost::filesystem::current_path() / relativePath;
+		path newPath = current_path() / argv[1];
 
 		// doesn't exist
-		if (!boost::filesystem::exists(newPath))
+		if (!exists(newPath))
 		{
 			std::cerr << "Invalid path: " << newPath.string() << std::endl;
 			return false;
 		}
 
 		// update path and try again
-		boost::filesystem::current_path(newPath);
-		return ensureCWD(-1, nullptr);
+		current_path(newPath);
+		return ensureCWD(1, argv);
 	}
 
 	return true;
@@ -71,12 +72,14 @@ int main(int argc, char **argv)
 {
 	try
 	{
+		// logging before all
+		Locator::provide(SERVICE_LOGGING, new LoggingService(std::cout, LOG_INFO));
+
 		// ensure that the program root is in the project root
 		if (!ensureCWD(argc, argv))
-			return -1;
+			return 1;
 
 		// create essential services
-		Locator::provide(SERVICE_LOGGING, new LoggingService(std::cout, LOG_DEBUG));
 		Locator::provide(SERVICE_EVENT, new EventService);
 
 		// load window size/style
