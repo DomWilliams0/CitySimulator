@@ -22,6 +22,8 @@ public:
 
 	World *getCurrentWorld();
 
+	void switchWorld(WorldID world, const sf::Vector2f &centredTile);
+
 	void setTrackedEntity(EntityID entity);
 
 	void clearPlayerEntity();

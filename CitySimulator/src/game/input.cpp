@@ -134,8 +134,29 @@ void InputService::handleClickedFixture(b2Fixture *fixture)
 		return;
 	}
 
-	// TODO interactive blocks
+	// interactive blocks
+	else if (data->type == BODYDATA_BLOCK)
+	{
+		// door
+		if (data->blockData.blockDataType == BLOCKDATA_DOOR)
+		{
+			Location target;
+			WorldService *ws = Locator::locate<WorldService>();
+			if (!ws->getConnectionDestination(data->blockData.location, target))
+				return;
 
+			// centre door
+			sf::Vector2f dimensions;
+			if (!ws->getDoorDimensions(target, dimensions))
+				return;
+
+			Locator::locate<CameraService>()->switchWorld(target.world,
+			                                              {
+					                                              target.x + dimensions.x / 2.f,
+					                                              target.y + dimensions.y / 2.f
+			                                              });
+		}
+	}
 }
 
 void InputService::handleMouseEvent(const Event &event)
