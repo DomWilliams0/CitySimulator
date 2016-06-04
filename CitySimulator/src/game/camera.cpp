@@ -3,7 +3,7 @@
 #include "world.hpp"
 #include "service/locator.hpp"
 
-CameraService::CameraService(World &world) : world(&world), trackedEntity(nullptr)
+CameraService::CameraService(World &world) : world(&world), trackedEntity(nullptr), worldChangeListener(this)
 {
 	float speed = Config::getFloat("debug.movement.camera-speed");
 	controller.reset(CAMERA_ENTITY, speed, speed, speed);
@@ -16,10 +16,16 @@ void CameraService::onEnable()
 	view.setSize(size);
 	view.reset(sf::FloatRect(-size.x / 4, -size.y / 4, size.x, size.y));
 	zoom = Config::getFloat("debug.zoom");
+
 	view.zoom(zoom);
 	Locator::locate<RenderService>()->setView(view);
 
 	clearPlayerEntity();
+
+	// register
+	Locator::locate<EventService>()->registerListener(
+			&worldChangeListener, EVENT_CAMERA_SWITCH_WORLD
+	);
 }
 
 void CameraService::onDisable()
@@ -40,10 +46,10 @@ void CameraService::tick(float delta)
 	}
 }
 
-void CameraService::switchWorld(World &world)
+
+World *CameraService::getCurrentWorld()
 {
-	Logger::logDebug("Switched camera world");
-	this->world = &world;
+	return world;
 }
 
 void CameraService::setTrackedEntity(EntityID entity)
@@ -67,6 +73,13 @@ void CameraService::clearPlayerEntity()
 	controller.registerListeners();
 }
 
+
+PhysicsComponent *CameraService::getTrackedEntity() const
+{
+	return trackedEntity;
+}
+
+
 void CameraService::updateViewSize(unsigned int width, unsigned int height)
 {
 	view.setSize(width, height);
@@ -86,3 +99,19 @@ void CameraService::zoomTo(float delta, const sf::Vector2i &pixel, sf::RenderWin
 	const sf::Vector2f offsetCoords{beforeCoord - afterCoord};
 	view.move(offsetCoords);
 }
+
+CameraService::WorldChangeListener::WorldChangeListener(CameraService *cs) : cs(cs)
+{ }
+
+void CameraService::WorldChangeListener::onEvent(const Event &event)
+{
+	WorldService *ws = Locator::locate<WorldService>();
+	World *newWorld = ws->getWorld(event.cameraSwitchWorld.newWorld); // todo never return null
+
+	cs->world = newWorld;
+	cs->view.setCenter((float) event.cameraSwitchWorld.centreX, (float) event.cameraSwitchWorld.centreY);
+
+	Logger::logDebug(format("Switched camera world to %1%", _str(newWorld->getID())));
+}
+
+

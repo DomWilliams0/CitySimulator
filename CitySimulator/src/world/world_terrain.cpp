@@ -5,15 +5,29 @@ bool isCollidable(BlockType blockType)
 {
 	static const std::set<BlockType> collidables(
 			{BLOCK_WATER, BLOCK_TREE, BLOCK_BUILDING_WALL, BLOCK_BUILDING_EDGE, BLOCK_BUILDING_ROOF,
-			 BLOCK_BUILDING_ROOF_CORNER});
+			 BLOCK_BUILDING_ROOF_CORNER, BLOCK_BLANK});
 	return collidables.find(blockType) != collidables.end();
 }
 
 bool isInteractable(BlockType blockType)
 {
 	static const std::set<BlockType> interactables(
-			{BLOCK_SLIDING_DOOR});
+			{BLOCK_SLIDING_DOOR, BLOCK_ENTRANCE_MAT});
 	return interactables.find(blockType) != interactables.end();
+}
+
+
+BlockInteractivity getInteractivity(BlockType blockType)
+{
+	int bi = INTERACTIVTY_NONE;
+
+	if (isCollidable(blockType))
+		bi = bi | INTERACTIVITY_COLLIDE;
+
+	if (isInteractable(blockType))
+		bi |= INTERACTIVITY_INTERACT;
+
+	return static_cast<BlockInteractivity>(bi);
 }
 
 LayerType layerTypeFromString(const std::string &s)

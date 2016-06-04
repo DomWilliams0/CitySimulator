@@ -142,6 +142,14 @@ bool EntityService::isAlive(EntityID e) const
 	return entities[e] != COMPONENT_UNKNOWN;
 }
 
+EntityID EntityService::getComponentMask(EntityID e) const
+{
+	if (e < 0 || e >= MAX_ENTITIES)
+		error("EntityID %1% out of range in getComponentMask", _str(e));
+
+	return entities[e];
+}
+
 boost::optional<EntityIdentifier *> EntityService::getEntityIDFromBody(const b2Body &body)
 {
 	auto data = static_cast<BodyData *>(body.GetFixtureList()[0].GetUserData());
@@ -158,9 +166,9 @@ void EntityService::tickSystems(float delta)
 		system->tick(this, delta);
 }
 
-void EntityService::renderSystems()
+void EntityService::renderSystems(WorldID currentWorld)
 {
-	renderSystem->render(this, *Locator::locate<RenderService>()->getWindow());
+	renderSystem->render(this, currentWorld, *Locator::locate<RenderService>()->getWindow());
 }
 
 BaseComponent *EntityService::addComponent(EntityID e, ComponentType type)
@@ -214,37 +222,11 @@ void EntityService::addPhysicsComponent(EntityIdentifier &entity, World *world,
 	phys->damping = damping;
 
 	b2World *bWorld = world->getBox2DWorld();
-
 	phys->bWorld = bWorld;
+	phys->world = world->getID();
 
-	b2BodyDef def;
-	def.type = b2_dynamicBody;
-	def.position.Set(static_cast<float>(startTilePos.x), static_cast<float>(startTilePos.y));
-	phys->body = bWorld->CreateBody(&def);
-	phys->body->SetFixedRotation(true);
-
-	// basic full body aabb
-	b2PolygonShape aabb;
-
-	const auto scale = Constants::entityScalef / 2;
-	aabb.SetAsBox(
-			scale * (28.f / 32.f), // width: 2px off each side
-			scale * 0.5f, // height: just bottom half
-			b2Vec2(0, scale * 0.75f), // centred over bottom half
-			0.f
-	);
-
-	b2FixtureDef fixDef;
-	fixDef.friction = 0.5f;
-	fixDef.density = 985.f;
-	fixDef.shape = &aabb;
-
-	BodyData *bodyData = new BodyData; // todo make sure to delete bodydata when deleting body (or cache)
-	bodyData->type = BODYDATA_ENTITY;
-	bodyData->entityID = entity;
-	fixDef.userData = bodyData;
-
-	phys->body->CreateFixture(&fixDef);
+	sf::Vector2f pos(static_cast<float>(startTilePos.x), static_cast<float>(startTilePos.y));
+	phys->body = createBody(bWorld, entity, pos);
 }
 
 
@@ -270,3 +252,61 @@ void EntityService::addAIInputComponent(EntityID e)
 	comp->brain.reset(new EntityBrain(e)); // todo allocate on stack
 }
 
+
+b2Body *EntityService::createBody(b2World *world, b2Body *clone, const sf::Vector2f &newPos)
+{
+	b2Body *body = createBody(world, clone);
+
+	body->SetTransform(
+			Utils::toB2Vec(newPos),
+			body->GetTransform().q.GetAngle()
+	);
+
+	return body;
+}
+
+b2Body *EntityService::createBody(b2World *world, b2Body *clone)
+{
+	sf::Vector2f pos = Utils::fromB2Vec<float>(clone->GetPosition());
+	BodyData *bodyData = static_cast<BodyData*>(clone->GetFixtureList()->GetUserData());
+	if (bodyData->type != BODYDATA_ENTITY)
+		error("Cannot clone non-entities");
+
+	EntityIdentifier &id = bodyData->entityID;
+	return createBody(world, id, pos);
+}
+
+b2Body *EntityService::createBody(b2World *world, EntityIdentifier &entity, const sf::Vector2f &pos)
+{
+	b2BodyDef def;
+	def.type = b2_dynamicBody;
+	def.position.Set(pos.x, pos.y);
+	b2Body *ret = world->CreateBody(&def);
+	ret->SetFixedRotation(true);
+
+	// basic full body aabb
+	b2PolygonShape aabb;
+
+	const auto scale = Constants::entityScalef / 2;
+	aabb.SetAsBox(
+			scale * (28.f / 32.f), // width: 2px off each side
+			scale * 0.5f, // height: just bottom half
+			b2Vec2(0, scale * 0.75f), // centred over bottom half
+			0.f
+			);
+
+	b2FixtureDef fixDef;
+	fixDef.friction = 0.5f;
+	fixDef.density = 985.f;
+	fixDef.shape = &aabb;
+
+	BodyData *bodyData = new BodyData; // todo make sure to delete bodydata when deleting body (or cache)
+	bodyData->type = BODYDATA_ENTITY;
+	bodyData->entityID = entity;
+	fixDef.userData = bodyData;
+
+	ret->CreateFixture(&fixDef);
+
+	return ret;
+
+}

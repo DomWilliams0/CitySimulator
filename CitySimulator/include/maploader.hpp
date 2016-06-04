@@ -49,6 +49,11 @@ namespace TMX
 		PROPERTY_DOOR_ID,
 
 		/**
+		 * The direction a door is facing
+		 */
+		PROPERTY_DOOR_ORIENTATION,
+
+		/**
 		 * An invalid property
 		 */
 

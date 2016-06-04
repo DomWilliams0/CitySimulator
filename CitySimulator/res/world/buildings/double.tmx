@@ -47,11 +47,13 @@
   <object id="2" x="16" y="240" width="32" height="16">
    <properties>
     <property name="door-id" value="-1"/>
+    <property name="door-orientation" value="N"/>
    </properties>
   </object>
   <object id="3" x="160" y="240" width="32" height="16">
    <properties>
     <property name="door-id" value="-2"/>
+    <property name="door-orientation" value="N"/>
    </properties>
   </object>
  </objectgroup>

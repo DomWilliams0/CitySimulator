@@ -5,9 +5,10 @@
 
 WorldService::WorldLoader::WorldLoader(
 		WorldConnectionTable &connectionLookup,
+		std::unordered_map<Location, ConnectionDetails> &doorDetails,
 		std::unordered_map<std::string, WorldTerrain> &terrainCache
 		) :
-	lastWorldID(0), terrainCache(terrainCache), connectionLookup(connectionLookup)
+		lastWorldID(0), connectionLookup(connectionLookup), doorDetails(doorDetails), terrainCache(terrainCache)
 {
 }
 
@@ -55,7 +56,7 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName)
   	std::set<WorldID> visitedWorlds;
 
 	// load all worlds recursively without connecting doors
-	discoverAndLoadAllWorlds(mainWorld, visitedWorlds);
+	discoverAndLoadAllWorlds(mainWorld, mainWorld.world->getID(), visitedWorlds);
 	visitedWorlds.clear();
 
 	// connect up the doors
@@ -65,8 +66,8 @@ World *WorldService::WorldLoader::loadWorlds(const std::string &mainWorldName)
 }
 
 
-void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world, 
-		std::set<WorldID> &visitedWorlds)
+void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world, WorldID lastWorldID,
+                                                         std::set<WorldID> &visitedWorlds)
 {
   	if (visitedWorlds.find(world.world->getID()) != visitedWorlds.end())
       	return;
@@ -81,9 +82,13 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world,
 	// iterate all doors found in last world
 	for (LoadedDoor &door : world.doors)
 	{
-		// only positive IDs load worlds
-		if (door.doorID <= 0)
+		// initialise negative/ascending doors
+		if (door.doorID < 0)
+		{
+			door.doorTag = DOORTAG_WORLD_ID;
+			door.worldID = lastWorldID;
 			continue;
+		}
 
     	LoadedWorld *newWorld = nullptr;
 
@@ -130,19 +135,19 @@ void WorldService::WorldLoader::discoverAndLoadAllWorlds(LoadedWorld &world,
       		return;
 		}
 
-    	if (newWorld == nullptr)
-      		newWorld = getLoadedWorld(door.worldID);
+		if (newWorld == nullptr)
+			newWorld = getLoadedWorld(door.worldID);
 
-    	discoverAndLoadAllWorlds(*newWorld, visitedWorlds);
+		discoverAndLoadAllWorlds(*newWorld, world.world->getID(), visitedWorlds);
 	}
 }
 
-WorldService::WorldLoader::LoadedDoor *WorldService::WorldLoader::findPartnerDoor(
-		LoadedWorld &world, int doorID)
+WorldService::WorldLoader::LoadedDoor *WorldService::WorldLoader::findPartnerDoor(LoadedWorld &world,
+                                                                                  int doorID,
+                                                                                  WorldID targetWorld)
 {
-	// todo what if multiple doors to multiple worlds? compare world ID too
 	for (LoadedDoor &door : world.doors)
-		if (door.doorID == -doorID)
+		if (door.doorID == -doorID && door.worldID == targetWorld)
 			return &door;
 
 	return nullptr;
@@ -165,7 +170,7 @@ void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedW
 			return;
 		}
 
-		LoadedDoor *targetDoor = findPartnerDoor(*childWorld, door.doorID);
+		LoadedDoor *targetDoor = findPartnerDoor(*childWorld, door.doorID, world.world->getID());
 		if (targetDoor == nullptr)
 		{
 			Logger::logError(format("Cannot find partner door in world %1% for door %2% in world %3%",
@@ -174,10 +179,12 @@ void WorldService::WorldLoader::connectDoors(WorldTreeNode &currentNode, LoadedW
 		}
 
 		// add connection to this world's lookup table
+		Location loc(world.world->getID(), door.tile);
 		connectionLookup.emplace(std::piecewise_construct,
-				std::forward_as_tuple(world.world->getID(), door.tile),             // src
-				std::forward_as_tuple(childWorld->world->getID(), targetDoor->tile) // dst
-				);
+		                         std::forward_as_tuple(loc),
+		                         std::forward_as_tuple(childWorld->world->getID(), targetDoor->tile));
+
+		doorDetails.insert({loc, ConnectionDetails(loc, door.orientation, door.dimensions)});
 
 		Logger::logDebuggiest(format("Added world connection %1% to %2% from %3% through door %4%",
 					door.doorID < 0 ? "up" : "down", _str(world.world->getID()), 
@@ -282,6 +289,15 @@ WorldService::WorldLoader::LoadedWorld &WorldService::WorldLoader::loadWorld(con
 			d.tile.y = (tile.tile.position.y / Constants::tilesetResolution);
 			d.doorID = boost::lexical_cast<int>(propObj.getProperty(TMX::PROPERTY_DOOR_ID));
 			d.doorTag = DOORTAG_UNKNOWN;
+			d.dimensions = Math::multiply(propObj.dimensions, 1.f / Constants::tilesetResolution);
+
+			if (!propObj.hasProperty(TMX::PROPERTY_DOOR_ORIENTATION))
+				error("Door at (%1%, %2%) in world %3% is missing \"door-orientation\"",
+				      _str(d.tile.x), _str(d.tile.y), _str(worldID));
+
+			d.orientation = Direction::parseString(propObj.getProperty(TMX::PROPERTY_DOOR_ORIENTATION));
+			if (d.orientation == DIRECTION_UNKNOWN)
+				error("Invalid direction \"%1%\"", propObj.getProperty(TMX::PROPERTY_DOOR_ORIENTATION));
 
 			// preloaded
 			if (propObj.hasProperty(TMX::PROPERTY_DOOR_WORLD_ID))

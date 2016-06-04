@@ -2,7 +2,7 @@
 #include "service/locator.hpp"
 
 WorldService::WorldService(const std::string &mainWorldPath, const std::string &tilesetPath)
-		: tileset(tilesetPath), mainWorldName(mainWorldPath)
+		: tileset(tilesetPath), mainWorldName(mainWorldPath), entityTransferListener(this)
 {
 }
 
@@ -12,7 +12,7 @@ void WorldService::onEnable()
 	Logger::pushIndent();
 	
 	// load and connect all worlds
-	WorldLoader loader(connectionLookup, terrainCache);
+	WorldLoader loader(connectionLookup, doorDetails, terrainCache);
 	loader.loadWorlds(mainWorldName);
 
 	// generate tileset
@@ -30,13 +30,24 @@ void WorldService::onEnable()
 		worlds[world->getID()] = world;
 	}
 
-	// transfer buildings
-	BuildingMap &bm = getMainWorld()->getBuildingMap();
+	// transfer buildings and connections
+	BuildingConnectionMap *bm = getMainWorld()->getBuildingConnectionMap();
 	for (WorldLoader::LoadedBuilding &building : loader.buildings)
 	{
-		Building &b = bm.addBuilding(building.bounds, building.insideWorldID);
+		Building &b = bm->addBuilding(building.bounds, building.insideWorldID);
 		for (WorldLoader::LoadedDoor &door : building.doors)
 			b.addDoor(Location(b.getOutsideWorld()->getID(), door.tile), door.doorID);
+	}
+
+	for (auto &pair : loader.loadedWorlds)
+	{
+		if (pair.second.world->isOutside())
+			continue;
+
+		DomesticConnectionMap *cm = pair.second.world->getDomesticConnectionMap();
+		for (WorldLoader::LoadedDoor &door : pair.second.doors)
+			cm->addDoor(door.tile);
+
 	}
 
 	// load collisions
@@ -44,6 +55,10 @@ void WorldService::onEnable()
 		pair.second.loadBlockData();
 
 	Logger::popIndent();
+
+	// register listener
+	Locator::locate<EventService>()->registerListener(
+			&entityTransferListener, EVENT_HUMAN_SWITCH_WORLD);
 }
 
 void WorldService::onDisable()
@@ -65,23 +80,141 @@ World *WorldService::getWorld(WorldID id)
 	return world == worlds.end() ? nullptr : world->second;
 }
 
-bool WorldService::getConnectionDestination(const Location &src, Location &out)
+DirectionType WorldService::getDoorOrientation(const Location &door)
 {
-	auto dst = connectionLookup.find(src);
-	if (dst == connectionLookup.end())
+	auto details = doorDetails.find(door);
+	if (details == doorDetails.end())
+		return DIRECTION_UNKNOWN;
+
+	return details->second.orientation;
+}
+
+bool WorldService::getDoorDimensions(const Location &door, sf::Vector2f &out)
+{
+	auto details = doorDetails.find(door);
+	if (details == doorDetails.end())
 		return false;
 
-	out = dst->second;
+	out = details->second.dimensions;
 	return true;
+}
+
+bool WorldService::getConnectionDestination(const Location &src, Location &out)
+{
+	auto it = connectionLookup.find(src);
+	if (it == connectionLookup.end())
+		return false;
+
+	out = it->second;
+	return true;
+}
+
+void WorldService::tickActiveWorlds(float delta)
+{
+	for (auto &pair : worlds)
+	{
+		World *world = pair.second;
+		if (!world->isEmpty())
+			world->tick(delta);
+	}
+}
+
+WorldService::EntityTransferListener::EntityTransferListener(WorldService *ws) : ws(ws)
+{
+}
+
+void adjustSpawnOffset(sf::Vector2f &spawnPos, sf::Vector2f &directionOut,
+                       PhysicsComponent *physicsComponent, World *world, WorldService *ws)
+{
+	Location doorLoc(world->getID(), (int) spawnPos.x, (int) spawnPos.y);
+
+	DirectionType orientation = ws->getDoorOrientation(doorLoc);
+	if (orientation == DIRECTION_UNKNOWN)
+		return;
+
+	float dx, dy;
+	Direction::toVector(orientation, dx, dy);
+
+	directionOut.x = dx;
+	directionOut.y = dy;
+
+	// random offset
+	sf::Vector2f dimensions;
+	if (!ws->getDoorDimensions(doorLoc, dimensions))
+		return;
+
+	b2AABB aabb;
+	physicsComponent->getAABB(aabb);
+
+	bool doorHorizontal     = Direction::isHorizontal(orientation);
+	b2Vec2 entityDimensions = aabb.upperBound - aabb.lowerBound;
+	float entityDimension   = doorHorizontal ? entityDimensions.y : entityDimensions.x;
+	float dimension         = doorHorizontal ? dimensions.y : dimensions.x;
+
+	// random offset
+	float offset =
+			entityDimension / 2 +
+			(dimension - entityDimension) * Utils::random(0.f, 1.f);
+
+	if (doorHorizontal)
+		dy += offset;
+	else
+		dx += offset;
+
+	spawnPos.x += dx;
+	spawnPos.y += dy;
+}
+
+void WorldService::EntityTransferListener::onEvent(const Event &event)
+{
+	World *newWorld = ws->getWorld(event.humanSwitchWorld.newWorld);
+	b2World *newBWorld = newWorld->getBox2DWorld();
+	// todo nullptr should never be returned, throw exception instead
+
+	EntityService *es = Locator::locate<EntityService>();
+	PhysicsComponent *phys = es->getComponent<PhysicsComponent>(event.entityID, COMPONENT_PHYSICS); // todo never return null
+	b2World *oldBWorld = phys->bWorld;
+
+	sf::Vector2f newPosition, newDirection;
+	newPosition.x = event.humanSwitchWorld.spawnX;
+	newPosition.y = event.humanSwitchWorld.spawnY;
+	adjustSpawnOffset(newPosition, newDirection, phys, newWorld, ws);
+
+	// clone body and add to new world
+	b2Body *oldBody = phys->body;
+	b2Body *newBody = es->createBody(newBWorld, oldBody, newPosition);
+
+	// remove from old world
+	oldBWorld->DestroyBody(oldBody);
+
+	// update component
+	phys->body = newBody;
+	phys->bWorld = newBWorld;
+	phys->world = newWorld->getID();
+	phys->setVelocity(newDirection);
+
+	// camera target
+	CameraService *cs = Locator::locate<CameraService>();
+	if (phys == cs->getTrackedEntity())
+	{
+		Event e;
+		e.type = EVENT_CAMERA_SWITCH_WORLD;
+		e.cameraSwitchWorld.newWorld = event.humanSwitchWorld.newWorld;
+		e.cameraSwitchWorld.centreX = (int) newPosition.x;
+		e.cameraSwitchWorld.centreY = (int) newPosition.y;
+
+		Locator::locate<EventService>()->callEvent(e);
+	}
 }
 
 World::World(WorldID id, const std::string &name, bool outside) 
 : id(id), name(name), outside(outside)
 {
 	transform.scale(Constants::tileSizef, Constants::tileSizef);
-
 	if (outside)
-		buildingMap.reset(this);
+		connectionMap = dynamic_cast<ConnectionMap *>(new BuildingConnectionMap(this));
+	else
+		connectionMap = dynamic_cast<ConnectionMap *>(new DomesticConnectionMap(this));
 }
 
 void World::setTerrain(WorldTerrain &terrain)
@@ -94,17 +227,32 @@ WorldTerrain *World::getTerrain()
 	return terrain;
 }
 
-CollisionMap *World::getCollisionMap()
+CollisionMap *World::getCollisionMap() const
 {
 	return terrain == nullptr ? nullptr : terrain->getCollisionMap();
 }
 
-BuildingMap &World::getBuildingMap()
+ConnectionMap *World::getConnectionMap()
 {
-	return *buildingMap;
+	return connectionMap;
 }
 
-b2World *World::getBox2DWorld()
+BuildingConnectionMap *World::getBuildingConnectionMap()
+{
+	if (!outside)
+		error("Cannot get building connection map for non-outside world");
+	return dynamic_cast<BuildingConnectionMap *>(connectionMap);
+}
+
+DomesticConnectionMap *World::getDomesticConnectionMap()
+{
+	if (outside)
+		error("Cannot get domestic connection map for outside world");
+	return dynamic_cast<DomesticConnectionMap *>(connectionMap);
+}
+
+
+b2World *World::getBox2DWorld() const
 {
 	return &getCollisionMap()->world;
 }
@@ -139,6 +287,11 @@ bool World::isOutside() const
 	return outside;
 }
 
+bool World::isEmpty()
+{
+	return getBox2DWorld()->GetBodyCount() == 1; // just block collision body
+}
+
 void World::tick(float delta)
 {
 	// todo fixed time step
@@ -154,9 +307,13 @@ void World::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	terrain->render(target, states, false);
 
 	// entities
-	Locator::locate<EntityService>()->renderSystems();
+	Locator::locate<EntityService>()->renderSystems(id);
 
 	// overterrain
 	terrain->render(target, states, true);
+
+	// box2d debug
+	if (Config::getBool("debug.render-physics"))
+		getBox2DWorld()->DrawDebugData();
 
 }

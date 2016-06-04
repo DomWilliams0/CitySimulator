@@ -17,10 +17,7 @@ public:
 
 	sf::Vector2f mapScreenToWorld(const sf::Vector2i &screenPos);
 
-	inline void setView(sf::View &view)
-	{
-		this->view = &view;
-	}
+	void setView(sf::View &view);
 
 private:
 	sf::RenderWindow *window;

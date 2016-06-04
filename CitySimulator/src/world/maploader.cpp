@@ -21,6 +21,8 @@ TMX::PropertyType TMX::propertyTypeFromString(const std::string &s)
 		return PROPERTY_DOOR_WORLD;
 	if (s == "door-id")
 		return PROPERTY_DOOR_ID;
+	if (s == "door-orientation")
+		return PROPERTY_DOOR_ORIENTATION;
 
 	Logger::logWarning("Unknown property: " + s);
 	return PROPERTY_UNKNOWN;
@@ -198,25 +200,25 @@ void TMX::Tile::processRotation(std::bitset<3> rotation)
 	{
 		if (h && v)
 		{
-			rotationAngle = 90;
+			rotationAngle = -90;
 			flipGID ^= VERTICAL;
 		}
 
 		else if (h)
 		{
-			rotationAngle = -90;
+			rotationAngle = 90;
 			flipGID ^= VERTICAL;
 		}
 
 		else if (v)
 		{
-			rotationAngle = 90;
+			rotationAngle = -90;
 			flipGID ^= HORIZONTAL;
 		}
 
 		else
 		{
-			rotationAngle = -90;
+			rotationAngle = 90;
 			flipGID ^= HORIZONTAL;
 		}
 	}

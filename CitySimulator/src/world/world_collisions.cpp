@@ -21,15 +21,14 @@ void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 		for (auto x = 0; x < worldTileSize.x; ++x)
 		{
 			// the only collidable tile layer
-			BlockType bt = container->getTerrain()->getBlockType({x, y}, LAYER_TERRAIN); 
-			bool collide = isCollidable(bt);
-			bool interact = isInteractable(bt);
+			BlockType bt = container->getTerrain()->getBlockType({x, y}, LAYER_TERRAIN);
+			BlockInteractivity interactivity = getInteractivity(bt);
 
-			if (!collide && !interact)
-				continue;
-
-			sf::Vector2f pos(Utils::toPixel(sf::Vector2f(x, y)));
-			rects.emplace_back(sf::FloatRect(pos, size), 0.f, bt);
+			if (interactivity != INTERACTIVTY_NONE)
+			{
+				sf::Vector2f pos(Utils::toPixel(sf::Vector2f(x, y)));
+				rects.emplace_back(sf::FloatRect(pos, size), 0.f, bt);
+			}
 		}
 	}
 
@@ -45,8 +44,11 @@ void CollisionMap::findCollidableTiles(std::vector<CollisionRect> &rects) const
 	}
 }
 
-bool compareRectsHorizontally(const sf::FloatRect &a, const sf::FloatRect &b)
+bool CollisionMap::compareRectsHorizontally(const CollisionRect &acr, const CollisionRect &bcr)
 {
+	const sf::FloatRect &a = acr.rect;
+	const sf::FloatRect &b = bcr.rect;
+
 	if (a.top < b.top) return true;
 	if (b.top < a.top) return false;
 
@@ -56,8 +58,11 @@ bool compareRectsHorizontally(const sf::FloatRect &a, const sf::FloatRect &b)
 	return false;
 }
 
-bool compareRectsVertically(const sf::FloatRect &a, const sf::FloatRect &b)
+bool CollisionMap::compareRectsVertically(const CollisionRect &acr, const CollisionRect &bcr)
 {
+	const sf::FloatRect &a = acr.rect;
+	const sf::FloatRect &b = bcr.rect;
+
 	if (a.left < b.left) return true;
 	if (b.left < a.left) return false;
 
@@ -67,71 +72,89 @@ bool compareRectsVertically(const sf::FloatRect &a, const sf::FloatRect &b)
 	return false;
 }
 
-void CollisionMap::mergeAdjacentTiles(std::vector<CollisionRect> &rects)
+void CollisionMap::mergeRectangles(std::vector<CollisionRect> &src, std::vector<CollisionRect> &dst,
+                                   bool (*pred)(const CollisionRect &))
 {
-	std::vector<sf::FloatRect> rectangles;
-
-	auto it = rects.begin();
-	while (it != rects.end())
+	// TODO: use STL collection wizardry
+	dst.clear();
+	auto it = src.begin();
+	while (it != src.end())
 	{
-		if (!isInteractable(it->blockType) && it->rotation == 0.f)
+		if (pred(*it))
 		{
-			rectangles.push_back(it->rect);
-			it = rects.erase(it);
+			dst.push_back(*it);
+			it = src.erase(it);
 		}
 		else
 			++it;
 	}
 
 	// join individual rects
-	sort(rectangles.begin(), rectangles.end(), compareRectsHorizontally);
-	mergeHelper(rectangles, true);
+	sort(dst.begin(), dst.end(), compareRectsHorizontally);
+	mergeHelper(dst,
+	            [](const CollisionRect *last, const CollisionRect *current)
+	            {
+		            // same blocktype
+		            if (last->blockType != current->blockType)
+			            return true;
+
+		            float (*square)(float) = [](float f){ return f * f; };
+
+		            const sf::FloatRect &rect = current->rect;
+		            const sf::FloatRect &lastRect = last->rect;
+		            return square(rect.left - lastRect.left) + square(rect.top - lastRect.top) >
+		                   Constants::tileSizef * Constants::tileSizef;
+	            });
 
 	// join rows together
-	sort(rectangles.begin(), rectangles.end(), compareRectsVertically);
-	mergeHelper(rectangles, false);
+	sort(dst.begin(), dst.end(), compareRectsVertically);
+	mergeHelper(dst,
+	            [](const CollisionRect *last, const CollisionRect *current)
+	            {
+		            const sf::FloatRect &rect = current->rect;
+		            const sf::FloatRect &lastRect = last->rect;
+
+		            // adjacent and same dimensions
+		            return !(lastRect.left <= rect.left + rect.width &&
+		                     rect.left <= lastRect.left + lastRect.width &&
+		                     lastRect.top <= rect.top + rect.height &&
+		                     rect.top <= lastRect.top + lastRect.height &&
+		                     lastRect.width == rect.width && lastRect.height == rect.height);
+	            });
 
 	// add back to returning list
-	for (auto &mergedRect : rectangles)
-		rects.emplace_back(mergedRect, 0.f);
+	for (auto &mergedRect : dst)
+		src.push_back(mergedRect);
 }
 
-void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar)
+void CollisionMap::mergeAdjacentTiles(std::vector<CollisionRect> &rects)
 {
-	bool (*nextRowFunc)(const sf::FloatRect *last, const sf::FloatRect *current);
-	if (moveOnIfFar)
-	{
-		nextRowFunc = [](const sf::FloatRect *lastRect, const sf::FloatRect *rect)
-		{
-			return powf(rect->left - lastRect->left, 2.f) + powf(rect->top - lastRect->top, 2.f) >
-				   Constants::tileSizef * Constants::tileSizef;
-		};
-	}
-	else
-	{
-		nextRowFunc = [](const sf::FloatRect *lastRect, const sf::FloatRect *rect)
-		{
-			// adjacent and same dimensions
-			return !(lastRect->left <= rect->left + rect->width &&
-					 rect->left <= lastRect->left + lastRect->width &&
-					 lastRect->top <= rect->top + rect->height &&
-					 rect->top <= lastRect->top + lastRect->height &&
-					 lastRect->width == rect->width && lastRect->height == rect->height);
-		};
-	}
+	std::vector<CollisionRect> rectangles;
 
+	mergeRectangles(rects, rectangles,
+	                [](const CollisionRect &r)
+	                { return !isInteractable(r.blockType) && r.rotation == 0.f; });
 
-	std::vector<sf::FloatRect> rectsCopy(rects.begin(), rects.end());
+	mergeRectangles(rects, rectangles,
+	                [](const CollisionRect &r)
+	                { return isInteractable(r.blockType); });
+}
+
+void CollisionMap::mergeHelper(std::vector<CollisionRect> &rects,
+                               bool (*nextRowFunc)(const CollisionRect *last, const CollisionRect *current))
+{
+	std::vector<CollisionRect> rectsCopy(rects.begin(), rects.end());
 	rects.clear();
 
-	sf::FloatRect *current = nullptr;
-	sf::FloatRect *lastRect = nullptr;
+	CollisionRect *current = nullptr;
+	CollisionRect *lastRect = nullptr;
 
-	rectsCopy.push_back(sf::FloatRect(-100.f, -100.f, 0.f, 0.f)); // to ensure the last rect is included
+	static CollisionRect placeholder(sf::FloatRect(-100.f, -100.f, 0.f, 0.f), 0.f);
+	rectsCopy.push_back(placeholder); // to ensure the last rect is included
 
 	for (size_t i = 0; i < rectsCopy.size(); ++i)
 	{
-		sf::FloatRect *rect = &rectsCopy[i];
+		CollisionRect *rect = &rectsCopy[i];
 
 		// no current rect expanding
 		if (current == nullptr)
@@ -140,18 +163,26 @@ void CollisionMap::mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfF
 			continue;
 		}
 
+		// done with current
 		if ((nextRowFunc)(lastRect, rect))
 		{
 			rects.push_back(*current);
+
+			// move on
 			current = lastRect = rect;
 			continue;
 		}
 
 		// stretch current
-		current->left = std::min(current->left, rect->left);
-		current->top = std::min(current->top, rect->top);
-		current->width = std::max(current->left + current->width, rect->left + rect->width) - current->left;
-		current->height = std::max(current->top + current->height, rect->top + rect->height) - current->top;
+		const sf::FloatRect &mergeRect = rect->rect;
+		sf::FloatRect &currentRect = current->rect;
+
+		currentRect.left     = std::min(currentRect.left, mergeRect.left);
+		currentRect.top      = std::min(currentRect.top, mergeRect.top);
+		currentRect.width    = std::max(currentRect.left + currentRect.width,
+		                                mergeRect.left + mergeRect.width) - currentRect.left;
+		currentRect.height   = std::max(currentRect.top + currentRect.height,
+		                                mergeRect.top + mergeRect.height) - currentRect.top;
 
 		lastRect = rect;
 	}
@@ -231,32 +262,70 @@ void CollisionMap::load()
 
 BodyData *CollisionMap::createBodyData(BlockType blockType, const sf::Vector2i &tilePos)
 {
-	// outside building doors
-	if (blockType == BLOCK_SLIDING_DOOR)
+	// outside only
+	if (container->isOutside())
 	{
-		BodyData *data = new BodyData; // todo cache
-		data->type = BODYDATA_BLOCK;
-		data->blockData.blockDataType = BLOCKDATA_DOOR;
-
-		boost::optional<std::pair<BuildingID, DoorID>> buildingAndDoor;
-		container->getBuildingMap().getBuildingByOutsideDoorTile(tilePos, buildingAndDoor);
-
-		if (!buildingAndDoor)
+		// building doors
+		if (blockType == BLOCK_SLIDING_DOOR)
 		{
-			Logger::logWarning(
-					format("Cannot add block data for door at (%1%, %2%), because there is no building there",
-						   _str(tilePos.x), _str(tilePos.y)));
-			return nullptr;
+			BodyData *data = new BodyData; // todo cache
+			data->type = BODYDATA_BLOCK;
+			data->blockData.blockDataType = BLOCKDATA_DOOR;
+			data->blockData.location.set(container->getID(), tilePos);
+
+			boost::optional<std::pair<BuildingID, DoorID>> buildingAndDoor;
+			container->getBuildingConnectionMap()->getBuildingByOutsideDoorTile(tilePos, buildingAndDoor);
+
+			if (!buildingAndDoor)
+			{
+				Logger::logWarning(
+						format("Cannot add block data for door at (%1%, %2%), because there is no building there",
+						       _str(tilePos.x), _str(tilePos.y)));
+				return nullptr;
+			}
+
+			/* DoorBlockData *doorData = &data->blockData.door; */
+
+			Logger::logDebuggiest(format("Added door block data to door %1% of building %2% in world %3%",
+			                             _str(buildingAndDoor->second),
+			                             _str(buildingAndDoor->first),
+			                             _str(container->getID())));
+
+			return data;
 		}
+	}
 
-		DoorBlockData *doorData = &data->blockData.door;
-		doorData->building = buildingAndDoor->first;
-		doorData->door = buildingAndDoor->second;
+	// inside
+	else
+	{
+		// entrance
+		if (blockType == BLOCK_ENTRANCE_MAT)
+		{
+			BodyData *data = new BodyData; // todo cache
+			data->type = BODYDATA_BLOCK;
+			data->blockData.blockDataType = BLOCKDATA_DOOR;
+			data->blockData.location.set(container->getID(), tilePos);
 
-		Logger::logDebuggiest(format("Added door block data to door %1% of building %2% in world %3%",
-					_str(doorData->door), _str(doorData->building), _str(container->getID())));
+			Door *door = container->getDomesticConnectionMap()->getDoorByTile(tilePos);
 
-		return data;
+			if (door == nullptr)
+			{
+				Logger::logWarning(
+						format("Cannot add block data for door at (%1%, %2%), because there is no door there",
+						       _str(tilePos.x), _str(tilePos.y)));
+				return nullptr;
+			}
+
+			/* DoorBlockData *doorData = &data->blockData.door; */
+
+			Location &loc = data->blockData.location;
+			Logger::logDebuggiest(format("Added door block data at (%1%, %2%) in world %3%",
+			                             _str(loc.x),
+			                             _str(loc.y),
+			                             _str(loc.world)));
+
+			return data;
+		}
 	}
 
 	return nullptr;
@@ -278,33 +347,38 @@ void CollisionMap::GlobalContactListener::BeginContact(b2Contact *contact)
 	{
 		BodyData *entity = aData->type == BODYDATA_ENTITY ? aData : bData;
 		BodyData *block = entity == aData ? bData : aData;
+		BlockData &blockData = block->blockData;
 
 		// door
 		if (block->blockData.blockDataType == BLOCKDATA_DOOR)
 		{
-			// todo
-			/* DoorBlockData *door = &block->blockData.door; */
-			/* Door *targetDoor = door->building->getConnectedDoor(door->door); */
-			/* if (targetDoor == nullptr) */
-			/* { */
-			/* 	Logger::logError(format("Could not find connected door for door %1% in building %2%", */
-			/* 							_str(door->door->id), _str(door->building->getID()))); */
-			/* 	return; */
-			/* } */
+			WorldService *ws = Locator::locate<WorldService>();
 
-			/* Event event; */
-			/* event.type = EVENT_HUMAN_JOIN_WORLD; */
-			/* event.entityID = entity->entityID.id; */
-			/* event.joinWorld.newWorldID = 1010101; // todo world's need IDs! */
+			Location target;
+			if (!ws->getConnectionDestination(block->blockData.location, target))
+			{
+				Logger::logError(format("Door at (%1%, %2%) in world %3% has no target location",
+										_str(blockData.location.x),
+										_str(blockData.location.y),
+										_str(blockData.location.world)));
+				return;
+			}
 
-			/* event.joinWorld.spawnDirection = DIRECTION_NORTH; // todo store in Door */
-			/* event.joinWorld.spawnX = targetDoor->localTilePos.x; */
-			/* event.joinWorld.spawnY = targetDoor->localTilePos.y; */
+			Event event;
+			event.type = EVENT_HUMAN_SWITCH_WORLD;
+			event.entityID = entity->entityID.id;
+			event.humanSwitchWorld.newWorld = target.world;
 
-			/* Logger::logDebug(format("Door interaction with building %1%", _str(door->building->getID()))); */
+			/* event.humanSwitchWorld.spawnDirection = DIRECTION_NORTH; */ // todo store in Door
+			event.humanSwitchWorld.spawnX = target.x;
+			event.humanSwitchWorld.spawnY = target.y;
 
-			/* // todo complete the two above todos before actually calling the event */
-			/* // Locator::locate<EventService>()->callEvent(event); */
+			Logger::logDebug(format("Door interaction at (%1%, %2%) in world %3%",
+			                        _str(blockData.location.x),
+			                        _str(blockData.location.y),
+			                        _str(blockData.location.world)));
+
+			Locator::locate<EventService>()->callEvent(event);
 		}
 
 

@@ -27,7 +27,7 @@ protected:\
 
 DECLARE_WORLD_TEST(SimpleWorldTest, "tiny")
 DECLARE_WORLD_TEST(ConnectionLookupTest, "hub")
-DECLARE_WORLD_TEST(BuildingMapTest, "buildings")
+DECLARE_WORLD_TEST(BuildingConnectionMapTest, "buildings")
 
 TEST_F(SimpleWorldTest, WorldService)
 {
@@ -77,7 +77,8 @@ TEST_F(SimpleWorldTest, CollisionBoxes)
 	// 4 borders
 	// 3 water
 	// 3 trees
-	EXPECT_EQ(count, 10);
+	// 1 door
+	EXPECT_EQ(count, 4 + 3 + 3 + 1);
 }
 
 TEST_F(SimpleWorldTest, BlockSetting)
@@ -173,34 +174,34 @@ TEST_F(ConnectionLookupTest, ConnectionLookup)
 				{"hub", "single-test", "none-test", "none-double-test", "none-double-test"}));
 }
 
-BuildingID findFirstBuilding(BuildingMap &bm, BuildingID max)
+BuildingID findFirstBuilding(BuildingConnectionMap *bm, BuildingID max)
 {
 	for (int id = 0; id <= max; ++id)
-		if (bm.getBuildingByID(id) != nullptr)
+		if (bm->getBuildingByID(id) != nullptr)
 			return id;
 
 	error("No buildings found with an ID less than %1%", _str(max));
 	return 0;
 }
 
-TEST_F(BuildingMapTest, BuildingDiscovery)
+TEST_F(BuildingConnectionMapTest, BuildingDiscovery)
 {
-	BuildingID firstID = findFirstBuilding(world->getBuildingMap(), MAX_BUILDING_ID);
+	BuildingID firstID = findFirstBuilding(world->getBuildingConnectionMap(), MAX_BUILDING_ID);
 
-	Building *first = world->getBuildingMap().getBuildingByID(firstID);
+	Building *first = world->getBuildingConnectionMap()->getBuildingByID(firstID);
 	ASSERT_NE(first, nullptr);
 	EXPECT_EQ(first->getID(), firstID);
 	EXPECT_EQ(first->getInsideWorldName(), "none-double-test");
 	EXPECT_EQ(first->getDoorCount(), 2);
 
-	Building *second = world->getBuildingMap().getBuildingByID(firstID + 1);
+	Building *second = world->getBuildingConnectionMap()->getBuildingByID(firstID + 1);
 	ASSERT_NE(second, nullptr);
 	EXPECT_EQ(second->getID(), firstID + 1);
 	EXPECT_EQ(second->getInsideWorldName(), "none-test");
 	EXPECT_EQ(second->getDoorCount(), 1);
 
 	// no more
-	EXPECT_EQ(world->getBuildingMap().getBuildingByID(firstID + 2), nullptr);
+	EXPECT_EQ(world->getBuildingConnectionMap()->getBuildingByID(firstID + 2), nullptr);
 }
 
 int countLitWindows(Building *building)
@@ -213,11 +214,11 @@ int countLitWindows(Building *building)
 	return count;
 }
 
-TEST_F(BuildingMapTest, WindowDiscovery)
+TEST_F(BuildingConnectionMapTest, WindowDiscovery)
 {
-	Building *first = world->getBuildingMap().getBuildingByID(
-			findFirstBuilding(world->getBuildingMap(), MAX_BUILDING_ID));
-	Building *second = world->getBuildingMap().getBuildingByID(first->getID() + 1);
+	Building *first = world->getBuildingConnectionMap()->getBuildingByID(
+			findFirstBuilding(world->getBuildingConnectionMap(), MAX_BUILDING_ID));
+	Building *second = world->getBuildingConnectionMap()->getBuildingByID(first->getID() + 1);
 
 	EXPECT_EQ(first->getWindowCount(), 18);
 	EXPECT_EQ(second->getWindowCount(), 8);
@@ -247,12 +248,13 @@ b2Fixture *getFixture(b2World *bw, int x, int y)
 
 }
 
-TEST_F(BuildingMapTest, DoorBlockData)
+TEST_F(BuildingConnectionMapTest, DoorBlockData)
 {
 	b2World *bw = world->getBox2DWorld();
 	ASSERT_NE(bw, nullptr);
 
-	b2Fixture *doorFixture = getFixture(bw, 32, 12);
+	sf::Vector2i tile(33, 12);
+	b2Fixture *doorFixture = getFixture(bw, tile.x - 1, tile.y);
 	ASSERT_NE(doorFixture, nullptr);
 	ASSERT_NE(doorFixture->GetUserData(), nullptr);
 
@@ -262,10 +264,24 @@ TEST_F(BuildingMapTest, DoorBlockData)
 	BlockData &blockData = bodyData->blockData;
 	ASSERT_EQ(blockData.blockDataType, BLOCKDATA_DOOR);
 
-	DoorBlockData &doorData = blockData.door;
+	boost::optional<std::pair<BuildingID, DoorID>> buildingAndDoor;
+	world->getBuildingConnectionMap()->getBuildingByOutsideDoorTile(tile, buildingAndDoor);
 
-	Building *building = world->getBuildingMap().getBuildingByID(doorData.building);
+	ASSERT_TRUE(buildingAndDoor.is_initialized());
+
+	Building *building = world->getBuildingConnectionMap()->getBuildingByID(buildingAndDoor->first);
 	ASSERT_NE(building, nullptr);
-	EXPECT_EQ(doorData.door, 2);
+}
 
+TEST(WorldUtils, BlockInteractivity)
+{
+	ASSERT_TRUE(isInteractable(BLOCK_SLIDING_DOOR));
+	ASSERT_FALSE(isInteractable(BLOCK_COBBLESTONE));
+
+	ASSERT_TRUE(isCollidable(BLOCK_BUILDING_WALL));
+	ASSERT_FALSE(isCollidable(BLOCK_SAND));
+
+	ASSERT_EQ(getInteractivity(BLOCK_BUILDING_WALL), INTERACTIVITY_COLLIDE);
+	ASSERT_EQ(getInteractivity(BLOCK_ENTRANCE_MAT), INTERACTIVITY_INTERACT);
+	ASSERT_EQ(getInteractivity(BLOCK_DIRT), INTERACTIVTY_NONE);
 }

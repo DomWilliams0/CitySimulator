@@ -27,17 +27,10 @@ public:
 
 	void clearPlayerEntity();
 
-	inline bool hasPlayerEntity()
-	{
-		return playerEntity.is_initialized();
-	}
+	bool hasPlayerEntity();
 
 	// throws an exception if hasPlayerEntity returns false
-	inline EntityID getPlayerEntity()
-	{
-		return playerEntity.get();
-	}
-
+	EntityID getPlayerEntity();
 
 private:
 	boost::bimap<InputKey, sf::Keyboard::Key> bindings;

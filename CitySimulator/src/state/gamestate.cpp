@@ -37,26 +37,27 @@ GameState::GameState() : State(STATE_GAME)
 												  Config::getResource("world.tileset"));
 	Locator::provide(SERVICE_WORLD, worldService);
 
-	world = worldService->getMainWorld();
+	mainWorld = worldService->getMainWorld();
 
 	// load camera
-	Locator::provide(SERVICE_CAMERA, new CameraService(*world));
+	Locator::provide(SERVICE_CAMERA, new CameraService(*mainWorld));
 
 	// create some humans
 	int count = Config::getInt("debug.humans.count");
 
 	for (int i = 0; i < count; ++i)
 	{
-		int x = Utils::random(0, world->getTileSize().x);
-		int y = Utils::random(0, world->getTileSize().y);
+		int x = Utils::random(0, mainWorld->getTileSize().x);
+		int y = Utils::random(0, mainWorld->getTileSize().y);
 
-		createTestHuman(*world, x, y, animationService->getRandomAnimationName(ENTITY_HUMAN), Direction::random());
+		createTestHuman(*mainWorld, x, y, 
+				animationService->getRandomAnimationName(ENTITY_HUMAN), Direction::random());
 	}
 }
 
 void GameState::tick(float delta)
 {
-	world->tick(delta);
+	Locator::locate<WorldService>()->tickActiveWorlds(delta);
 
 	Locator::locate<CameraService>()->tick(delta);
 	Locator::locate<EntityService>()->tickSystems(delta);
@@ -64,10 +65,11 @@ void GameState::tick(float delta)
 
 void GameState::render(sf::RenderWindow &/* window */)
 {
-	Locator::locate<RenderService>()->render(*world);
+	CameraService *cs = Locator::locate<CameraService>();
+	Locator::locate<RenderService>()->render(*cs->getCurrentWorld());
 }
 
 b2World *GameState::getBox2DWorld()
 {
-	return world->getBox2DWorld();
+	return mainWorld->getBox2DWorld();
 }

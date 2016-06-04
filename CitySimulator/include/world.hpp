@@ -43,9 +43,19 @@ enum BlockType
 	BLOCK_UNKNOWN
 };
 
+enum BlockInteractivity
+{
+	INTERACTIVITY_COLLIDE = 1 << 0,
+	INTERACTIVITY_INTERACT = 1 << 1,
+
+	INTERACTIVTY_NONE = 0
+};
+
 bool isCollidable(BlockType blockType);
 
 bool isInteractable(BlockType blockType);
+
+BlockInteractivity getInteractivity(BlockType blockType);
 
 enum LayerType
 {
@@ -188,11 +198,22 @@ private:
 
 	boost::optional<SFMLDebugDraw> b2Renderer;
 
+	void mergeRectangles(std::vector<CollisionRect> &src, std::vector<CollisionRect> &dst,
+	                     bool (*pred)(const CollisionRect &));
+
 	void findCollidableTiles(std::vector<CollisionRect> &rects) const;
 
 	void mergeAdjacentTiles(std::vector<CollisionRect> &rects);
 
-	void mergeHelper(std::vector<sf::FloatRect> &rects, bool moveOnIfFar);
+	static bool compareRectsHorizontally(const CollisionRect &acr, const CollisionRect &bcr);
+	static bool compareRectsVertically(const CollisionRect &acr, const CollisionRect &bcr);
+
+	static bool distanceChecker(const CollisionRect *last, const CollisionRect *current);
+	static bool dimensionChecker(const CollisionRect *last, const CollisionRect *current);
+	static bool interactivityChecker(const CollisionRect *last, const CollisionRect *current);
+
+	void mergeHelper(std::vector<CollisionRect> &rects,
+	                 bool (*nextRowFunc)(const CollisionRect *last, const CollisionRect *current));
 
 	BodyData *createBodyData(BlockType blockType, const sf::Vector2i &tilePos);
 };
@@ -280,12 +301,43 @@ protected:
 };
 
 /**
- * A world item that deals with buildings 
+ * A world item that holds inside doors or outside buildings
  */
-class BuildingMap : public BaseWorld
+class ConnectionMap : public BaseWorld
 {
 public:
-	BuildingMap(World *container) : BaseWorld(container)
+	ConnectionMap(World *container) : BaseWorld(container)
+	{
+	}
+
+	virtual ~ConnectionMap()
+	{
+	}
+};
+/**
+ * A world item that deals with inside doors
+ */
+class DomesticConnectionMap : public ConnectionMap
+{
+public:
+	DomesticConnectionMap(World *container) : ConnectionMap(container)
+	{
+	}
+
+	void addDoor(const sf::Vector2i &tile);
+
+	Door *getDoorByTile(const sf::Vector2i &tile);
+private:
+	std::unordered_map<Location, Door> doors;
+};
+
+/**
+ * A world item that deals with buildings in outside worlds
+ */
+class BuildingConnectionMap : public ConnectionMap
+{
+public:
+	BuildingConnectionMap(World *container) : ConnectionMap(container)
 	{
 	}
 
@@ -309,11 +361,15 @@ public:
 
 	WorldTerrain *getTerrain();
 
-	CollisionMap *getCollisionMap();
+	CollisionMap *getCollisionMap() const;
 
-	BuildingMap &getBuildingMap();
+	ConnectionMap *getConnectionMap();
 
-	b2World *getBox2DWorld();
+	BuildingConnectionMap *getBuildingConnectionMap();
+
+	DomesticConnectionMap *getDomesticConnectionMap();
+
+	b2World *getBox2DWorld() const;
 
 	sf::Vector2i getPixelSize() const;
 
@@ -329,13 +385,18 @@ public:
 
 	bool isOutside() const;
 
+	/**
+	 * @return True if there are no entities in this world, otherwise false
+	 */
+	bool isEmpty();
+
 private:
 	WorldID id;
 	std::string name;
 	bool outside;
 
 	WorldTerrain *terrain;
-	boost::optional<BuildingMap> buildingMap;
+	ConnectionMap *connectionMap; // todo use variant/container struct to avoid heap
 
 	// todo move to a WorldRenderer
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;

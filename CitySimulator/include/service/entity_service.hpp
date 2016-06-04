@@ -25,20 +25,14 @@ public:
 
 	bool isAlive(EntityID e) const;
 
-	inline EntityID getComponentMask(EntityID e) const
-	{
-		if (e < 0 || e >= MAX_ENTITIES)
-			error("EntityID %1% out of range in getComponentMask", _str(e));
-
-		return entities[e];
-	}
+	EntityID getComponentMask(EntityID e) const;
 
 	boost::optional<EntityIdentifier *> getEntityIDFromBody(const b2Body &body);
 
 	// systems
 	void tickSystems(float delta);
 
-	void renderSystems();
+	void renderSystems(WorldID currentWorld);
 
 	// component management
 	void removeComponent(EntityID e, ComponentType type);
@@ -62,6 +56,21 @@ public:
 	void addPlayerInputComponent(EntityID e);
 
 	void addAIInputComponent(EntityID e);
+
+	/**
+	 * @return A new body with new BodyData for the given entity
+	 */
+	b2Body *createBody(b2World *world, EntityIdentifier &entity, const sf::Vector2f &pos);
+
+	/**
+	 * @return A new body with the same BodyData and position as the given body
+	 */
+	b2Body *createBody(b2World *world, b2Body *clone);
+
+	/**
+	 * @return A new body with the same BodyData as the given body, at the given position
+	 */
+	b2Body *createBody(b2World *world, b2Body *clone, const sf::Vector2f &pos);
 
 private:
 	EntityID entities[MAX_ENTITIES];

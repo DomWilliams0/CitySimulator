@@ -84,7 +84,6 @@ public:
 	void switchState(StateType newScreenType);
 
 private:
-	b2World *box2DWorld;
 	State *current;
 	std::stack<State *> states;
 

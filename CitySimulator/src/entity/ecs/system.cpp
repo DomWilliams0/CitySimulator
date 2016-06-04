@@ -12,12 +12,12 @@ void System::tick(EntityService *es, float dt)
 	}
 }
 
-void System::render(EntityService *es, sf::RenderWindow &window)
+void System::render(EntityService *es, WorldID currentWorld, sf::RenderWindow &window)
 {
 	for (EntityID e = 0; e < MAX_ENTITIES; ++e)
 	{
 		if ((es->getComponentMask(e) & mask) == mask)
-			renderEntity(es, e, window);
+			renderEntity(es, e, currentWorld, window);
 	}
 }
 
@@ -87,10 +87,13 @@ void tempDrawVector(PhysicsComponent *physics, const sf::Vector2f vector, sf::Co
 	window.draw(r);
 }
 
-void RenderSystem::renderEntity(EntityService *es, EntityID e, sf::RenderWindow &window)
+void RenderSystem::renderEntity(EntityService *es, EntityID e, WorldID currentWorld, sf::RenderWindow &window)
 {
-	auto render = es->getComponent<RenderComponent>(e, COMPONENT_RENDER);
 	auto *physics = es->getComponent<PhysicsComponent>(e, COMPONENT_PHYSICS);
+	if (physics->world != currentWorld)
+		return;
+
+	auto render = es->getComponent<RenderComponent>(e, COMPONENT_RENDER);
 
 	sf::RenderStates states;
 	sf::Transform transform;

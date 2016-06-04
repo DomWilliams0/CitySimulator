@@ -5,8 +5,7 @@
 #include "world.hpp"
 #include "building.hpp"
 #include "bodydata.hpp"
-
-typedef std::unordered_map<Location, Location> WorldConnectionTable;
+#include "events.hpp"
 
 class WorldService : public BaseService
 {
@@ -28,15 +27,44 @@ public:
 	  */
 	bool getConnectionDestination(const Location &src, Location &out);
 
+	DirectionType getDoorOrientation(const Location &door);
+
+	bool getDoorDimensions(const Location &door, sf::Vector2f &out);
+
+	void tickActiveWorlds(float delta);
+
 private:
+
+	struct ConnectionDetails
+	{
+		Location location;
+		DirectionType orientation;
+		sf::Vector2f dimensions;
+
+		ConnectionDetails(const Location &location, DirectionType orientation, const sf::Vector2f &dimensions)
+				: location(location), orientation(orientation), dimensions(dimensions)
+		{ }
+	};
+
 	typedef TreeNode<World> WorldTreeNode;
+	typedef std::unordered_map<Location, Location> WorldConnectionTable;
 
 	Tileset tileset;
 	std::string mainWorldName;
 
-	std::unordered_map<WorldID, World *> worlds;
+	std::map<WorldID, World *> worlds;
 	std::unordered_map<std::string, WorldTerrain> terrainCache;
 	WorldConnectionTable connectionLookup;
+	std::unordered_map<Location, ConnectionDetails> doorDetails;
+
+	struct EntityTransferListener : EventListener
+	{
+		WorldService *ws;
+
+		EntityTransferListener(WorldService *ws);
+
+		void onEvent(const Event &event) override;
+	} entityTransferListener;
 
 	struct WorldLoader
 	{
@@ -75,6 +103,9 @@ private:
 			std::string worldName;
 			std::string worldShare;
 			WorldID worldID;
+
+			DirectionType orientation;
+			sf::Vector2f dimensions;
 		};
 
 		struct LoadedBuilding
@@ -101,8 +132,9 @@ private:
 		WorldID lastWorldID; // todo be static inside generate()
 		std::unordered_set<int> flippedTileGIDs;
 
-		std::unordered_map<std::string, WorldTerrain> &terrainCache;
 		WorldConnectionTable &connectionLookup;
+		std::unordered_map<Location, ConnectionDetails> &doorDetails;
+		std::unordered_map<std::string, WorldTerrain> &terrainCache;
 
 		std::map<WorldID, LoadedWorld> loadedWorlds;
 		std::vector<LoadedBuilding> buildings;
@@ -113,6 +145,7 @@ private:
 		 */
 		WorldLoader(
 				WorldConnectionTable &connectionLookup,
+				std::unordered_map<Location, ConnectionDetails> &doorDetails,
 				std::unordered_map<std::string, WorldTerrain> &terrainCache
 				);
 
@@ -143,7 +176,8 @@ private:
 		 * Discovers all worlds by recursing door connections, and loads
 		 * them
 		 */
-		void discoverAndLoadAllWorlds(LoadedWorld &world, std::set<WorldID> &visitedWorlds);
+		void discoverAndLoadAllWorlds(LoadedWorld &world, WorldID lastWorldID,
+		                              std::set<WorldID> &visitedWorlds);
 
 		/**
 		 * Populates the WorldTree with connections between doors
@@ -177,7 +211,9 @@ private:
 		 * @return The partner door in the given world with the given door ID,
 		 * null if not found
 		 */
-		LoadedDoor *findPartnerDoor(LoadedWorld &world, int doorID);
+		WorldService::WorldLoader::LoadedDoor *findPartnerDoor(LoadedWorld &world,
+		                                                       int doorID,
+		                                                       WorldID targetWorld);
 
 	};
 
