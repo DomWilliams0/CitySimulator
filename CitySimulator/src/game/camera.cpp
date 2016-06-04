@@ -23,6 +23,7 @@ void CameraService::onEnable()
 	clearPlayerEntity();
 
 	// register
+	worldChangeListener.identifier = "camera world change listener";
 	Locator::locate<EventService>()->registerListener(
 			&worldChangeListener, EVENT_CAMERA_SWITCH_WORLD
 	);

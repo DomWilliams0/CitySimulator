@@ -93,6 +93,8 @@ struct Event
 struct EventListener
 {
 	virtual void onEvent(const Event &event) = 0;
+
+	std::string identifier = "anonymous event listener";
 };
 
 #endif

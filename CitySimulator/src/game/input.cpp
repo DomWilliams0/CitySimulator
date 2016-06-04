@@ -26,6 +26,7 @@ void InputService::onEnable()
 	}
 
 	// listen to input events
+	identifier = "raw input event producer";
 	auto events = Locator::locate<EventService>();
 	events->registerListener(this, EVENT_RAW_INPUT_KEY);
 	events->registerListener(this, EVENT_RAW_INPUT_CLICK);
@@ -285,7 +286,7 @@ void DynamicMovementController::halt()
 
 void PlayerMovementController::init()
 {
-	registerListeners();
+	identifier = "player movement controller";
 	moving.resize(DIRECTION_UNKNOWN, false);
 
 }
@@ -356,6 +357,13 @@ PlayerMovementController::~PlayerMovementController()
 
 void PlayerMovementController::reset(EntityID entity, float movementForce, float maxWalkSpeed, float maxSprintSpeed)
 {
+	updateListenerIdentifier();
 	MovementController::reset(entity, movementForce, maxWalkSpeed, maxSprintSpeed);
 	halt();
+}
+
+
+void PlayerMovementController::updateListenerIdentifier()
+{
+	identifier = format("player movement controller%1%", entity != INVALID_ENTITY ? " for entity " + _str(entity): "");
 }

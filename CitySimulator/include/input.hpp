@@ -84,6 +84,8 @@ public:
 			: MovementController(entity, movementForce, maxWalkSpeed, maxSprintSpeed)
 	{
 		init();
+		updateListenerIdentifier();
+		registerListeners();
 	}
 
 
@@ -104,6 +106,8 @@ public:
 private:
 	void init();
 	std::vector<bool> moving;
+
+	void updateListenerIdentifier();
 };
 
 #endif

@@ -57,6 +57,7 @@ void WorldService::onEnable()
 	Logger::popIndent();
 
 	// register listener
+	entityTransferListener.identifier = "world entity transfer listener";
 	Locator::locate<EventService>()->registerListener(
 			&entityTransferListener, EVENT_HUMAN_SWITCH_WORLD);
 }
