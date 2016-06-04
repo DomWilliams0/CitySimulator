@@ -150,14 +150,16 @@ EntityID EntityService::getComponentMask(EntityID e) const
 	return entities[e];
 }
 
-boost::optional<EntityIdentifier *> EntityService::getEntityIDFromBody(const b2Body &body)
+bool EntityService::getEntityIDFromBody(const b2Body &body, EntityIdentifier &out)
 {
 	auto data = static_cast<BodyData *>(body.GetFixtureList()[0].GetUserData());
-	boost::optional<EntityIdentifier *> ret;
 	if (data != nullptr && data->type == BODYDATA_ENTITY)
-		ret = &data->entityID;
+	{
+		out = data->entityID;
+		return true;
+	}
 
-	return ret;
+	return false;
 }
 
 void EntityService::tickSystems(float delta)

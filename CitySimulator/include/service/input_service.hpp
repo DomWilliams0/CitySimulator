@@ -43,7 +43,7 @@ private:
 
 	void handleKeyEvent(const Event &event);
 
-	boost::optional<EntityIdentifier *> getClickedEntity(const sf::Vector2i &screenPos, float radius = 0.25f);
+	bool getClickedEntity(const sf::Vector2i &screenPos, float radius, EntityIdentifier &out);
 };
 
 #endif

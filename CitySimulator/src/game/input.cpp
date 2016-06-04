@@ -104,7 +104,7 @@ EntityID InputService::getPlayerEntity()
 	return playerEntity.get();
 }
 
-boost::optional<EntityIdentifier *> InputService::getClickedEntity(const sf::Vector2i &screenPos, float radius)
+bool InputService::getClickedEntity(const sf::Vector2i &screenPos, float radius, EntityIdentifier &out)
 {
 	// translate to world tile coordinates
 	sf::Vector2f pos(Utils::toTile(Locator::locate<RenderService>()->mapScreenToWorld(screenPos)));
@@ -117,9 +117,9 @@ boost::optional<EntityIdentifier *> InputService::getClickedEntity(const sf::Vec
 	Locator::locate<CameraService>()->getCurrentWorld()->getBox2DWorld()->QueryAABB(&callback, aabb);
 
 	if (callback.body == nullptr)
-		return boost::optional<EntityIdentifier *>();
+		return false;
 
-	return Locator::locate<EntityService>()->getEntityIDFromBody(*callback.body);
+	return Locator::locate<EntityService>()->getEntityIDFromBody(*callback.body, out);
 }
 
 void InputService::handleMouseEvent(const Event &event)
@@ -134,9 +134,9 @@ void InputService::handleMouseEvent(const Event &event)
 
 	sf::Vector2i windowPos(event.rawInputClick.x, event.rawInputClick.y);
 
-	auto clicked(getClickedEntity(windowPos, 0));
-	if (clicked.is_initialized())
-		setPlayerEntity(clicked.get()->id);
+	EntityIdentifier clicked;
+	if (getClickedEntity(windowPos, 0, clicked))
+		setPlayerEntity(clicked.id);
 
 }
 
