@@ -2,7 +2,7 @@
 #define CITYSIMULATOR_UTILS_HPP
 
 #include <SFML/Graphics.hpp>
-#include <Box2D/Common/b2Math.h>
+#include <Box2D/Box2D.h>
 #include <random>
 #include <boost/functional/hash_fwd.hpp>
 
@@ -50,7 +50,18 @@ struct Location
 	}
 };
 
+struct WorldQueryCallback : public b2QueryCallback
+{
+	b2Body *body = nullptr;
+	b2Fixture *fixture = nullptr;
 
+	virtual bool ReportFixture(b2Fixture *fixture) override
+	{
+		this->body = fixture->GetBody();
+		this->fixture = fixture;
+		return false; // stop after single hit
+	}
+};
 
 // formatting
 std::string format(const std::string &s, const std::string &arg1);

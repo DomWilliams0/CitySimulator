@@ -104,18 +104,6 @@ EntityID InputService::getPlayerEntity()
 	return playerEntity.get();
 }
 
-
-struct ClickCallback : public b2QueryCallback
-{
-	b2Body *clickedBody = nullptr;
-
-	virtual bool ReportFixture(b2Fixture *fixture) override
-	{
-		clickedBody = fixture->GetBody();
-		return false; // stop after single
-	}
-};
-
 boost::optional<EntityIdentifier *> InputService::getClickedEntity(const sf::Vector2i &screenPos, float radius)
 {
 	// translate to world tile coordinates
@@ -123,15 +111,15 @@ boost::optional<EntityIdentifier *> InputService::getClickedEntity(const sf::Vec
 
 	// find body
 	b2AABB aabb;
-	ClickCallback callback;
+	WorldQueryCallback callback;
 	aabb.lowerBound.Set(pos.x - radius, pos.y - radius);
 	aabb.upperBound.Set(pos.x + radius, pos.y + radius);
 	Locator::locate<CameraService>()->getCurrentWorld()->getBox2DWorld()->QueryAABB(&callback, aabb);
 
-	if (callback.clickedBody == nullptr)
+	if (callback.body == nullptr)
 		return boost::optional<EntityIdentifier *>();
 
-	return Locator::locate<EntityService>()->getEntityIDFromBody(*callback.clickedBody);
+	return Locator::locate<EntityService>()->getEntityIDFromBody(*callback.body);
 }
 
 void InputService::handleMouseEvent(const Event &event)
