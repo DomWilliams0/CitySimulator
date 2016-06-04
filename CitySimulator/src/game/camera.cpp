@@ -53,6 +53,16 @@ World *CameraService::getCurrentWorld()
 	return world;
 }
 
+void CameraService::switchWorld(WorldID newWorld, const sf::Vector2f &centredTile)
+{
+	Event e;
+	e.type = EVENT_CAMERA_SWITCH_WORLD;
+	e.cameraSwitchWorld.newWorld = newWorld;
+	e.cameraSwitchWorld.centreX = (int) (centredTile.x * Constants::tileSize);
+	e.cameraSwitchWorld.centreY = (int) (centredTile.y * Constants::tileSize);
+	Locator::locate<EventService>()->callEvent(e);
+}
+
 void CameraService::setTrackedEntity(EntityID entity)
 {
 	EntityService *es = Locator::locate<EntityService>();

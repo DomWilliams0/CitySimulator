@@ -31,6 +31,8 @@ public:
 
 	bool getDoorDimensions(const Location &door, sf::Vector2f &out);
 
+	void queryBox2DWorld(World *world, const sf::Vector2f &screenPosition, float radius, b2Fixture *out);
+
 	void tickActiveWorlds(float delta);
 
 private:

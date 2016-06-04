@@ -81,6 +81,16 @@ World *WorldService::getWorld(WorldID id)
 	return world == worlds.end() ? nullptr : world->second;
 }
 
+bool WorldService::getConnectionDestination(const Location &src, Location &out)
+{
+	auto it = connectionLookup.find(src);
+	if (it == connectionLookup.end())
+		return false;
+
+	out = it->second;
+	return true;
+}
+
 DirectionType WorldService::getDoorOrientation(const Location &door)
 {
 	auto details = doorDetails.find(door);
@@ -97,16 +107,6 @@ bool WorldService::getDoorDimensions(const Location &door, sf::Vector2f &out)
 		return false;
 
 	out = details->second.dimensions;
-	return true;
-}
-
-bool WorldService::getConnectionDestination(const Location &src, Location &out)
-{
-	auto it = connectionLookup.find(src);
-	if (it == connectionLookup.end())
-		return false;
-
-	out = it->second;
 	return true;
 }
 

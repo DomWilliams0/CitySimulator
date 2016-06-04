@@ -27,8 +27,6 @@ public:
 
 	EntityID getComponentMask(EntityID e) const;
 
-	boost::optional<EntityIdentifier *> getEntityIDFromBody(const b2Body &body);
-
 	// systems
 	void tickSystems(float delta);
 

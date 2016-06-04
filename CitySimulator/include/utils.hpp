@@ -2,7 +2,7 @@
 #define CITYSIMULATOR_UTILS_HPP
 
 #include <SFML/Graphics.hpp>
-#include <Box2D/Common/b2Math.h>
+#include <Box2D/Box2D.h>
 #include <random>
 #include <boost/functional/hash_fwd.hpp>
 
@@ -49,8 +49,6 @@ struct Location
 			a.y == b.y;
 	}
 };
-
-
 
 // formatting
 std::string format(const std::string &s, const std::string &arg1);

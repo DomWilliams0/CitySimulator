@@ -104,34 +104,59 @@ EntityID InputService::getPlayerEntity()
 	return playerEntity.get();
 }
 
-
-struct ClickCallback : public b2QueryCallback
-{
-	b2Body *clickedBody = nullptr;
-
-	virtual bool ReportFixture(b2Fixture *fixture) override
-	{
-		clickedBody = fixture->GetBody();
-		return false; // stop after single
-	}
-};
-
-boost::optional<EntityIdentifier *> InputService::getClickedEntity(const sf::Vector2i &screenPos, float radius)
+bool InputService::getClickedFixture(const sf::Vector2i &screenPos, float radius, b2Fixture **out)
 {
 	// translate to world tile coordinates
 	sf::Vector2f pos(Utils::toTile(Locator::locate<RenderService>()->mapScreenToWorld(screenPos)));
 
 	// find body
 	b2AABB aabb;
-	ClickCallback callback;
+	WorldQueryCallback callback;
 	aabb.lowerBound.Set(pos.x - radius, pos.y - radius);
 	aabb.upperBound.Set(pos.x + radius, pos.y + radius);
+
 	Locator::locate<CameraService>()->getCurrentWorld()->getBox2DWorld()->QueryAABB(&callback, aabb);
 
-	if (callback.clickedBody == nullptr)
-		return boost::optional<EntityIdentifier *>();
+	*out = callback.fixture;
+	return callback.fixture != nullptr;
+}
 
-	return Locator::locate<EntityService>()->getEntityIDFromBody(*callback.clickedBody);
+void InputService::handleClickedFixture(b2Fixture *fixture)
+{
+	BodyData *data = static_cast<BodyData *>(fixture->GetUserData());
+	if (data == nullptr)
+		return;
+
+	// entity
+	if (data->type == BODYDATA_ENTITY)
+	{
+		setPlayerEntity(data->entityID.id);
+		return;
+	}
+
+	// interactive blocks
+	else if (data->type == BODYDATA_BLOCK)
+	{
+		// door
+		if (data->blockData.blockDataType == BLOCKDATA_DOOR)
+		{
+			Location target;
+			WorldService *ws = Locator::locate<WorldService>();
+			if (!ws->getConnectionDestination(data->blockData.location, target))
+				return;
+
+			// centre door
+			sf::Vector2f dimensions;
+			if (!ws->getDoorDimensions(target, dimensions))
+				return;
+
+			Locator::locate<CameraService>()->switchWorld(target.world,
+			                                              {
+					                                              target.x + dimensions.x / 2.f,
+					                                              target.y + dimensions.y / 2.f
+			                                              });
+		}
+	}
 }
 
 void InputService::handleMouseEvent(const Event &event)
@@ -146,10 +171,9 @@ void InputService::handleMouseEvent(const Event &event)
 
 	sf::Vector2i windowPos(event.rawInputClick.x, event.rawInputClick.y);
 
-	auto clicked(getClickedEntity(windowPos, 0));
-	if (clicked.is_initialized())
-		setPlayerEntity(clicked.get()->id);
-
+	b2Fixture *clickedFixed;
+	if (getClickedFixture(windowPos, 0, &clickedFixed))
+		handleClickedFixture(clickedFixed);
 }
 
 void InputService::handleKeyEvent(const Event &event)

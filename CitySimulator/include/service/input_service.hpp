@@ -43,7 +43,20 @@ private:
 
 	void handleKeyEvent(const Event &event);
 
-	boost::optional<EntityIdentifier *> getClickedEntity(const sf::Vector2i &screenPos, float radius = 0.25f);
+	void handleClickedFixture(b2Fixture *fixture);
+
+	struct WorldQueryCallback : public b2QueryCallback
+	{
+		b2Fixture *fixture = nullptr;
+
+		virtual bool ReportFixture(b2Fixture *fixture) override
+		{
+			this->fixture = fixture;
+			return false; // stop after single hit
+		}
+	};
+
+	bool getClickedFixture(const sf::Vector2i &screenPos, float radius, b2Fixture **out);
 };
 
 #endif
