@@ -25,6 +25,8 @@ enum EventType
 	EVENT_UNKNOWN
 };
 
+std::string eventToString(EventType eventType);
+
 struct Event
 {
 	// event types

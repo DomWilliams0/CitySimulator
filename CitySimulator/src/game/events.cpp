@@ -3,6 +3,36 @@
 #include "service/event_service.hpp"
 #include "service/logging_service.hpp"
 
+std::string eventToString(EventType eventType)
+{
+	switch (eventType)
+	{
+		case EVENT_RAW_INPUT_KEY:
+			return "EVENT_RAW_INPUT_KEY";
+		case EVENT_RAW_INPUT_CLICK:
+			return "EVENT_RAW_INPUT_CLICK";
+		case EVENT_INPUT_SPRINT:
+			return "EVENT_INPUT_SPRINT";
+		case EVENT_INPUT_START_MOVING:
+			return "EVENT_INPUT_START_MOVING";
+		case EVENT_INPUT_STOP_MOVING:
+			return "EVENT_INPUT_STOP_MOVING";
+		case EVENT_INPUT_YIELD_CONTROL:
+			return "EVENT_INPUT_YIELD_CONTROL";
+		case EVENT_CAMERA_SWITCH_WORLD:
+			return "EVENT_CAMERA_SWITCH_WORLD";
+		case EVENT_HUMAN_SWITCH_WORLD:
+			return "EVENT_HUMAN_SWITCH_WORLD";
+		case EVENT_HUMAN_DEATH:
+			return "EVENT_HUMAN_DEATH";
+		case EVENT_HUMAN_INTERACT:
+			return "EVENT_HUMAN_INTERACT";
+		default:
+			return format("Unknown (%1%)", _str(eventType));
+	}
+}
+
+
 void EventService::onEnable()
 {
 }
@@ -13,14 +43,14 @@ void EventService::onDisable()
 
 void EventService::registerListener(EventListener *listener, EventType eventType)
 {
-	Logger::logDebuggiest(format("Registering listener for event %1%", _str(eventType)));
+	Logger::logDebuggiest(format("Registering listener for %1%", eventToString(eventType)));
 	listeners[eventType].push_front(listener);
 }
 
 void EventService::unregisterListener(EventListener *listener, EventType eventType)
 {
 	listeners[eventType].remove(listener);
-	Logger::logDebuggiest(format("Unregistering listener for event %1%", _str(eventType)));
+	Logger::logDebuggiest(format("Unregistering listener for %1%", eventToString(eventType)));
 }
 
 
