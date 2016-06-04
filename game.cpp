@@ -3,7 +3,12 @@
 #include "game.hpp"
 #include "service/locator.hpp"
 
-const std::string RESOURCE_DIR("res");
+const std::string RESOURCE_DIR            = "res";
+const std::string GAME_TITLE              = "Game";
+const int         GAME_EXIT_SUCCESS       = 0;
+const int         GAME_EXIT_FATAL_KNOWN   = 1;
+const int         GAME_EXIT_FATAL_UNKNOWN = 2;
+
 
 bool ensureCWD(int argc, char **argv)
 {
@@ -77,7 +82,7 @@ int main(int argc, char **argv)
 
 		// ensure that the program root is in the project root
 		if (!ensureCWD(argc, argv))
-			return 1;
+			return GAME_EXIT_FATAL_KNOWN;
 
 		// create essential services
 		Locator::provide(SERVICE_EVENT, new EventService);
@@ -86,7 +91,7 @@ int main(int argc, char **argv)
 		int style;
 		loadConfig(style);
 
-		sf::RenderWindow window(sf::VideoMode(Constants::windowSize.x, Constants::windowSize.y), "Game", style);
+		sf::RenderWindow window(sf::VideoMode(Constants::windowSize.x, Constants::windowSize.y), GAME_TITLE, style);
 
 		// create game
 		Game game(window);
@@ -94,16 +99,16 @@ int main(int argc, char **argv)
 		game.endGame();
 
 		Logger::logInfo("Shutdown cleanly");
-		return 0;
+		return GAME_EXIT_SUCCESS;
 	}
 	catch (std::exception &e)
 	{
 		Logger::logError(std::string("An error occurred: ") + e.what());
-		return 1;
+		return GAME_EXIT_FATAL_KNOWN;
 	}
 	catch (...)
 	{
 		Logger::logError("An unknown error occurred");
-		return 2;
+		return GAME_EXIT_FATAL_UNKNOWN;
 	}
 }
