@@ -27,8 +27,6 @@ public:
 
 	EntityID getComponentMask(EntityID e) const;
 
-	bool getEntityIDFromBody(const b2Body &body, EntityIdentifier &out);
-
 	// systems
 	void tickSystems(float delta);
 

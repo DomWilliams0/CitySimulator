@@ -104,7 +104,7 @@ EntityID InputService::getPlayerEntity()
 	return playerEntity.get();
 }
 
-bool InputService::getClickedEntity(const sf::Vector2i &screenPos, float radius, EntityIdentifier &out)
+bool InputService::getClickedFixture(const sf::Vector2i &screenPos, float radius, b2Fixture **out)
 {
 	// translate to world tile coordinates
 	sf::Vector2f pos(Utils::toTile(Locator::locate<RenderService>()->mapScreenToWorld(screenPos)));
@@ -114,12 +114,28 @@ bool InputService::getClickedEntity(const sf::Vector2i &screenPos, float radius,
 	WorldQueryCallback callback;
 	aabb.lowerBound.Set(pos.x - radius, pos.y - radius);
 	aabb.upperBound.Set(pos.x + radius, pos.y + radius);
+
 	Locator::locate<CameraService>()->getCurrentWorld()->getBox2DWorld()->QueryAABB(&callback, aabb);
 
-	if (callback.body == nullptr)
-		return false;
+	*out = callback.fixture;
+	return callback.fixture != nullptr;
+}
 
-	return Locator::locate<EntityService>()->getEntityIDFromBody(*callback.body, out);
+void InputService::handleClickedFixture(b2Fixture *fixture)
+{
+	BodyData *data = static_cast<BodyData *>(fixture->GetUserData());
+	if (data == nullptr)
+		return;
+
+	// entity
+	if (data->type == BODYDATA_ENTITY)
+	{
+		setPlayerEntity(data->entityID.id);
+		return;
+	}
+
+	// TODO interactive blocks
+
 }
 
 void InputService::handleMouseEvent(const Event &event)
@@ -134,10 +150,9 @@ void InputService::handleMouseEvent(const Event &event)
 
 	sf::Vector2i windowPos(event.rawInputClick.x, event.rawInputClick.y);
 
-	EntityIdentifier clicked;
-	if (getClickedEntity(windowPos, 0, clicked))
-		setPlayerEntity(clicked.id);
-
+	b2Fixture *clickedFixed;
+	if (getClickedFixture(windowPos, 0, &clickedFixed))
+		handleClickedFixture(clickedFixed);
 }
 
 void InputService::handleKeyEvent(const Event &event)
