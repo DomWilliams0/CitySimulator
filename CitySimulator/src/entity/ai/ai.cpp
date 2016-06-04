@@ -39,7 +39,6 @@ void EntityBrain::tickBrain(float /* delta */)
 InputBrain::InputBrain(EntityID e)
 {
 	setEntity(e);
-	controller->registerListeners();
 }
 
 InputBrain::~InputBrain()
