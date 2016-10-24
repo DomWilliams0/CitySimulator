@@ -80,6 +80,10 @@ do_clean() {
 	fi
 }
 
+do_debug() {
+	gdb -ex "set args CitySimulator" -tui $BUILD_DIR/CitySimulator_run
+}
+
 convert_target
 case "$action" in
   "all")
@@ -99,6 +103,9 @@ case "$action" in
     ;;
   "clean")
 	  do_clean
+	  ;;
+  "debug")
+	  do_debug
 	  ;;
   *)
 	  echo "Usage: $0 [all <target> | cmake | make | run <target>]"
